@@ -172,6 +172,44 @@ enum SailPixelFormat
     SAIL_PIXEL_FORMAT_BPP40_YUVA,
     SAIL_PIXEL_FORMAT_BPP48_YUVA,
     SAIL_PIXEL_FORMAT_BPP64_YUVA,
+
+    /*
+     * AYUV formats (packed YUV with alpha).
+     */
+    SAIL_PIXEL_FORMAT_BPP32_AYUV, /* 8-bit per channel  */
+    SAIL_PIXEL_FORMAT_BPP64_AYUV, /* 16-bit per channel */
+
+    /*
+     * CIE XYZ formats.
+     */
+    SAIL_PIXEL_FORMAT_BPP24_CIE_XYZ,  /* 8/8/8     */
+    SAIL_PIXEL_FORMAT_BPP48_CIE_XYZ,  /* 16/16/16  */
+    SAIL_PIXEL_FORMAT_BPP32_CIE_XYZA, /* 8/8/8/8   */
+
+    /*
+     * HSV/HSL formats.
+     */
+    SAIL_PIXEL_FORMAT_BPP24_HSV, /* 8-bit per channel  */
+    SAIL_PIXEL_FORMAT_BPP24_HSL, /* 8-bit per channel  */
+    SAIL_PIXEL_FORMAT_BPP48_HSV, /* 16-bit per channel */
+
+    /*
+     * Floating-point formats (HDR).
+     */
+    SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF, /* Half-precision grayscale */
+    SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT,/* Single-precision grayscale */
+    SAIL_PIXEL_FORMAT_BPP48_RGB_HALF,       /* Half-precision RGB (16-bit per channel) */
+    SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF,      /* Half-precision RGBA */
+    SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,      /* Single-precision RGB (32-bit per channel) */
+    SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,    /* Single-precision RGBA */
+
+    /*
+     * 10-bit HDR formats.
+     */
+    SAIL_PIXEL_FORMAT_BPP30_RGB,          /* RGB 10-bit per channel (R10G10B10) */
+    SAIL_PIXEL_FORMAT_BPP30_BGR,          /* BGR 10-bit per channel */
+    SAIL_PIXEL_FORMAT_BPP32_RGBA_1010102, /* RGBA with 10-bit RGB + 2-bit alpha */
+    SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102, /* BGRA with 10-bit BGR + 2-bit alpha */
 };
 
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */

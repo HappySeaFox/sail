@@ -357,6 +357,29 @@ unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format)
     case SAIL_PIXEL_FORMAT_BPP40_YUVA: return 40;
     case SAIL_PIXEL_FORMAT_BPP48_YUVA: return 48;
     case SAIL_PIXEL_FORMAT_BPP64_YUVA: return 64;
+
+    case SAIL_PIXEL_FORMAT_BPP32_AYUV: return 32;
+    case SAIL_PIXEL_FORMAT_BPP64_AYUV: return 64;
+
+    case SAIL_PIXEL_FORMAT_BPP24_CIE_XYZ: return 24;
+    case SAIL_PIXEL_FORMAT_BPP48_CIE_XYZ: return 48;
+    case SAIL_PIXEL_FORMAT_BPP32_CIE_XYZA: return 32;
+
+    case SAIL_PIXEL_FORMAT_BPP24_HSV: return 24;
+    case SAIL_PIXEL_FORMAT_BPP24_HSL: return 24;
+    case SAIL_PIXEL_FORMAT_BPP48_HSV: return 48;
+
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF: return 16;
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT: return 32;
+    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF: return 48;
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF: return 64;
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT: return 96;
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT: return 128;
+
+    case SAIL_PIXEL_FORMAT_BPP30_RGB: return 30;
+    case SAIL_PIXEL_FORMAT_BPP30_BGR: return 30;
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA_1010102: return 32;
+    case SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102: return 32;
     }
 
     return 0;
