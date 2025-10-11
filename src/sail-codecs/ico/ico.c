@@ -176,8 +176,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void* state, st
     /* Continue to loading BMP. */
     struct sail_image* image_local;
 
-    SAIL_TRY(
-        bmp_private_read_init(ico_state->io, ico_state->load_options, &ico_state->common_bmp_state, SAIL_NO_BMP_FLAGS));
+    SAIL_TRY(bmp_private_read_init(ico_state->io, ico_state->load_options, &ico_state->common_bmp_state,
+            SAIL_NO_BMP_FLAGS));
     SAIL_TRY(bmp_private_read_seek_next_frame(ico_state->common_bmp_state, ico_state->io, &image_local));
 
     /* Store CUR hotspot. */
@@ -185,22 +185,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void* state, st
     {
         if (ico_state->ico_header.type == SAIL_ICO_TYPE_CUR)
         {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
-                                /* cleanup */ sail_destroy_image(image_local));
-            SAIL_TRY_OR_CLEANUP(ico_private_store_cur_hotspot(&ico_state->ico_dir_entries[ico_state->current_frame - 1],
-                                                              image_local->special_properties),
-                                /* cleanup */ sail_destroy_image(image_local));
-        }
-    }
+            if (image_local->source_image == NULL)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                                    /* cleanup */ sail_destroy_image(image_local));
+            }
 
-    if (ico_state->load_options->options & SAIL_OPTION_META_DATA)
-    {
-        if (ico_state->ico_header.type == SAIL_ICO_TYPE_CUR)
-        {
-            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
+            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
                                 /* cleanup */ sail_destroy_image(image_local));
             SAIL_TRY_OR_CLEANUP(ico_private_store_cur_hotspot(&ico_state->ico_dir_entries[ico_state->current_frame - 1],
-                                                              image_local->special_properties),
+                                                              image_local->source_image->special_properties),
                                 /* cleanup */ sail_destroy_image(image_local));
         }
     }
@@ -279,9 +273,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_ico(void* state, co
     bool is_cur        = false;
     uint16_t hotspot_x = 0;
     uint16_t hotspot_y = 0;
-    if (image->special_properties != NULL)
+    if (image->source_image != NULL && image->source_image->special_properties != NULL)
     {
-        ico_private_fetch_cur_hotspot(image->special_properties, &hotspot_x, &hotspot_y);
+        ico_private_fetch_cur_hotspot(image->source_image->special_properties, &hotspot_x, &hotspot_y);
         if (hotspot_x != 0 || hotspot_y != 0)
         {
             is_cur = true;

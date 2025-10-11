@@ -40,6 +40,7 @@ sail_status_t sail_alloc_source_image(struct sail_source_image** source_image)
     (*source_image)->orientation        = SAIL_ORIENTATION_NORMAL;
     (*source_image)->compression        = SAIL_COMPRESSION_UNKNOWN;
     (*source_image)->interlaced         = false;
+    (*source_image)->special_properties = NULL;
 
     return SAIL_OK;
 }
@@ -50,6 +51,8 @@ void sail_destroy_source_image(struct sail_source_image* source_image)
     {
         return;
     }
+
+    sail_destroy_hash_map(source_image->special_properties);
 
     sail_free(source_image);
 }
@@ -67,6 +70,12 @@ sail_status_t sail_copy_source_image(const struct sail_source_image* source, str
     target_local->orientation        = source->orientation;
     target_local->compression        = source->compression;
     target_local->interlaced         = source->interlaced;
+
+    if (source->special_properties != NULL)
+    {
+        SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->special_properties, &target_local->special_properties),
+                            /* cleanup */ sail_destroy_source_image(target_local));
+    }
 
     *target = target_local;
 

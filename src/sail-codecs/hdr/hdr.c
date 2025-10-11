@@ -146,21 +146,27 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_hdr(void* state, st
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Add source image info if requested. */
-    if (hdr_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
+    if ((hdr_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
+        || (hdr_state->load_options->options & SAIL_OPTION_META_DATA))
     {
         SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
                             /* cleanup */ sail_destroy_image(image_local));
 
-        image_local->source_image->pixel_format = image_local->pixel_format;
-        image_local->source_image->compression  = SAIL_COMPRESSION_RLE;
+        if (hdr_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
+        {
+            image_local->source_image->pixel_format = image_local->pixel_format;
+            image_local->source_image->compression  = SAIL_COMPRESSION_RLE;
+        }
+
+        if (hdr_state->load_options->options & SAIL_OPTION_META_DATA)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
+                                /* cleanup */ sail_destroy_image(image_local));
+            SAIL_TRY_OR_CLEANUP(
+                hdr_private_store_properties(&hdr_state->header, image_local->source_image->special_properties),
+                /* cleanup */ sail_destroy_image(image_local));
+        }
     }
-
-    /* Store HDR-specific properties. */
-    SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
-                        /* cleanup */ sail_destroy_image(image_local));
-
-    SAIL_TRY_OR_CLEANUP(hdr_private_store_properties(&hdr_state->header, image_local->special_properties),
-                        /* cleanup */ sail_destroy_image(image_local));
 
     /* Store software in meta_data. */
     if (hdr_state->header.software != NULL)
@@ -298,9 +304,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_hdr(void* state, co
     hdr_codec_state->header.height = image->height;
 
     /* Fetch properties from special_properties. */
-    if (image->special_properties != NULL)
+    if (image->source_image != NULL && image->source_image->special_properties != NULL)
     {
-        SAIL_TRY(hdr_private_fetch_properties(image->special_properties, &hdr_codec_state->header));
+        SAIL_TRY(hdr_private_fetch_properties(image->source_image->special_properties, &hdr_codec_state->header));
     }
 
     /* Write header. */

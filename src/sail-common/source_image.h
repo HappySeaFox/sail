@@ -85,6 +85,20 @@ struct sail_source_image
      * SAVE: Ignored.
      */
     bool interlaced;
+
+    /*
+     * Image format-specific properties that cannot be expressed
+     * in a common way. For example, a cursor hot spot.
+     *
+     * Can be NULL.
+     *
+     * Special properties' names start with the codec name to avoid confusion.
+     * For example, "cur-hotspot-x".
+     *
+     * LOAD: Set by SAIL to valid special properties if SAIL_OPTION_META_DATA is enabled.
+     * SAVE: Ignored.
+     */
+    struct sail_hash_map* special_properties;
 };
 
 typedef struct sail_source_image sail_source_image_t;

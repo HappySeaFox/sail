@@ -220,8 +220,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
 
     struct sail_meta_data_node** last_meta_data_node = &image_local->meta_data_node;
 
-    for (JxlDecoderStatus status                         = jpegxl_state->frame_header_seen ? JXL_DEC_FRAME
-                                                                                           : JxlDecoderProcessInput(jpegxl_state->decoder);
+    for (JxlDecoderStatus status = jpegxl_state->frame_header_seen ? JXL_DEC_FRAME : JxlDecoderProcessInput(jpegxl_state->decoder);
          status != JXL_DEC_NEED_IMAGE_OUT_BUFFER; status = JxlDecoderProcessInput(jpegxl_state->decoder))
     {
         switch (status)
@@ -272,13 +271,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
             jpegxl_state->source_image->compression = SAIL_COMPRESSION_UNKNOWN;
 
             /* Special properties. */
-            if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA)
+            if ((jpegxl_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
+                || (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA))
             {
-                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
+                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&jpegxl_state->source_image->special_properties),
                                     /* cleanup */ sail_destroy_image(image_local));
-                SAIL_TRY_OR_CLEANUP(
-                    jpegxl_private_fetch_special_properties(jpegxl_state->basic_info, image_local->special_properties),
-                    /* cleanup*/ sail_destroy_image(image_local));
+                SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_special_properties(
+                                        jpegxl_state->basic_info, jpegxl_state->source_image->special_properties),
+                                    /* cleanup*/ sail_destroy_image(image_local));
             }
 
             SAIL_LOG_TRACE("JPEGXL: Animation(%s)", jpegxl_state->basic_info->have_animation ? "yes" : "no");

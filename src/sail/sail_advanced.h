@@ -36,6 +36,8 @@ extern "C"
 #endif
 
 struct sail_codec_info;
+struct sail_io;
+struct sail_image;
 
 /*
  * Loads an image from the specified I/O source and returns its properties without pixels.

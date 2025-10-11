@@ -123,6 +123,26 @@ public:
      */
     bool interlaced() const;
 
+    /*
+     * Returns image format-specific properties that cannot be expressed
+     * in a common way. For example, a cursor hot spot.
+     *
+     * Special properties' names start with the codec name to avoid confusion.
+     * For example, "cur-hotspot-x".
+     *
+     * LOAD: Set by SAIL to valid special properties if SAIL_OPTION_META_DATA is enabled.
+     * SAVE: Ignored.
+     */
+    const sail::special_properties& special_properties() const;
+
+    /*
+     * Returns the editable special properties.
+     *
+     * LOAD: Set by SAIL to valid special properties if SAIL_OPTION_META_DATA is enabled.
+     * SAVE: Ignored.
+     */
+    sail::special_properties& special_properties();
+
 private:
     /*
      * Makes a deep copy of the specified source image.

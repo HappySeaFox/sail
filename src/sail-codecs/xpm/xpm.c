@@ -166,14 +166,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xpm(void* state, st
     }
 
     /* Store hotspot in special properties if present. */
-    if (xpm_state->x_hotspot >= 0 && xpm_state->y_hotspot >= 0)
+    if ((xpm_state->load_options->options & SAIL_OPTION_META_DATA) && xpm_state->x_hotspot >= 0
+        && xpm_state->y_hotspot >= 0)
     {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
+        if (image_local->source_image == NULL)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                                /* cleanup */ sail_destroy_image(image_local));
+        }
+
+        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
 
-        SAIL_TRY_OR_CLEANUP(
-            xpm_private_store_hotspot(xpm_state->x_hotspot, xpm_state->y_hotspot, image_local->special_properties),
-            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(xpm_private_store_hotspot(xpm_state->x_hotspot, xpm_state->y_hotspot,
+                                                      image_local->source_image->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     *image = image_local;
@@ -297,7 +304,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xpm(void* state, co
 
     /* Extract hotspot from special properties if present. */
     int x_hotspot, y_hotspot;
-    SAIL_TRY(xpm_private_fetch_hotspot(image->special_properties, &x_hotspot, &y_hotspot));
+    SAIL_TRY(xpm_private_fetch_hotspot(image->source_image == NULL ? NULL : image->source_image->special_properties,
+                                       &x_hotspot, &y_hotspot));
 
     /* Write XPM header. */
     const char* name =

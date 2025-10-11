@@ -25,7 +25,6 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <stdexcept>
 #include <utility> // std::move
 
 #include <sail/sail.h>
@@ -75,7 +74,6 @@ public:
     std::vector<sail::meta_data> meta_data;
     sail::iccp iccp;
     sail::source_image source_image;
-    sail::special_properties special_properties;
     std::size_t pixels_size;
     bool shallow_pixels;
 };
@@ -153,7 +151,6 @@ image& image::operator=(const sail::image &image)
     set_meta_data(image.meta_data());
     set_iccp(image.iccp());
     set_source_image(image.source_image());
-    set_special_properties(image.special_properties());
     set_pixels(image.pixels(), image.pixels_size());
 
     return *this;
@@ -261,14 +258,9 @@ const sail::source_image& image::source_image() const
     return d->source_image;
 }
 
-const sail::special_properties& image::special_properties() const
+sail::source_image& image::source_image()
 {
-    return d->special_properties;
-}
-
-sail::special_properties& image::special_properties()
-{
-    return d->special_properties;
+    return d->source_image;
 }
 
 void* image::pixels()
@@ -346,15 +338,6 @@ void image::set_iccp(sail::iccp &&iccp) noexcept
     d->iccp = std::move(iccp);
 }
 
-void image::set_special_properties(const sail::special_properties &special_properties)
-{
-    d->special_properties = special_properties;
-}
-
-void image::set_special_properties(sail::special_properties &&special_properties) noexcept
-{
-    d->special_properties = std::move(special_properties);
-}
 
 sail_status_t image::load(const std::string &path)
 {
@@ -707,7 +690,6 @@ image::image(const sail_image *sail_image)
     set_meta_data(meta_data);
     set_iccp(sail::iccp(sail_image->iccp));
     set_source_image(sail::source_image(sail_image->source_image));
-    set_special_properties(utils_private::to_cpp_special_properties(sail_image->special_properties));
 
     if (sail_image->pixels != nullptr) {
         SAIL_TRY_OR_EXECUTE(transfer_pixels_pointer(sail_image),
@@ -789,11 +771,6 @@ sail_status_t image::to_sail_image(sail_image **image) const
 
     if (d->source_image.is_valid()) {
         SAIL_TRY(d->source_image.to_sail_source_image(&image_local->source_image));
-    }
-
-    if (!d->special_properties.empty()) {
-        SAIL_TRY(sail_alloc_hash_map(&image_local->special_properties));
-        SAIL_TRY(utils_private::to_sail_special_properties(d->special_properties, image_local->special_properties));
     }
 
     *image = image_local;

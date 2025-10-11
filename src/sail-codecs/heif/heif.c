@@ -292,13 +292,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_heif(void* state, s
     }
 
     /* Fetch specialized properties. */
-    if (image_local->special_properties != NULL)
+    if (heif_state->load_options->options & SAIL_OPTION_META_DATA)
     {
-        SAIL_TRY_OR_CLEANUP(heif_private_fetch_depth_info(handle, image_local->special_properties),
+        if (image_local->source_image == NULL)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                                /* cleanup */ sail_destroy_image(image_local));
+        }
+
+        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
-        SAIL_TRY_OR_CLEANUP(heif_private_fetch_thumbnail_info(handle, image_local->special_properties),
+        SAIL_TRY_OR_CLEANUP(heif_private_fetch_depth_info(handle, image_local->source_image->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
-        SAIL_TRY_OR_CLEANUP(heif_private_fetch_primary_flag(handle, image_local->special_properties),
+        SAIL_TRY_OR_CLEANUP(heif_private_fetch_thumbnail_info(handle, image_local->source_image->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(heif_private_fetch_primary_flag(handle, image_local->source_image->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 
@@ -365,10 +373,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_heif(void* state, struct sail
     }
 
     /* Fetch HDR metadata and alpha info from decoded image. */
-    if (image->special_properties != NULL)
+    if (image->source_image != NULL && image->source_image->special_properties != NULL)
     {
-        heif_private_fetch_hdr_metadata(heif_image, image->special_properties);
-        heif_private_fetch_premultiplied_alpha(heif_image, image->special_properties);
+        heif_private_fetch_hdr_metadata(heif_image, image->source_image->special_properties);
+        heif_private_fetch_premultiplied_alpha(heif_image, image->source_image->special_properties);
     }
 
     heif_image_release(heif_image);

@@ -36,19 +36,18 @@ sail_status_t sail_alloc_image(struct sail_image** image)
     SAIL_TRY(sail_malloc(sizeof(struct sail_image), &ptr));
     *image = ptr;
 
-    (*image)->pixels             = NULL;
-    (*image)->width              = 0;
-    (*image)->height             = 0;
-    (*image)->bytes_per_line     = 0;
-    (*image)->resolution         = NULL;
-    (*image)->pixel_format       = SAIL_PIXEL_FORMAT_UNKNOWN;
-    (*image)->gamma              = 1;
-    (*image)->delay              = -1;
-    (*image)->palette            = NULL;
-    (*image)->meta_data_node     = NULL;
-    (*image)->iccp               = NULL;
-    (*image)->source_image       = NULL;
-    (*image)->special_properties = NULL;
+    (*image)->pixels         = NULL;
+    (*image)->width          = 0;
+    (*image)->height         = 0;
+    (*image)->bytes_per_line = 0;
+    (*image)->resolution     = NULL;
+    (*image)->pixel_format   = SAIL_PIXEL_FORMAT_UNKNOWN;
+    (*image)->gamma          = 1;
+    (*image)->delay          = -1;
+    (*image)->palette        = NULL;
+    (*image)->meta_data_node = NULL;
+    (*image)->iccp           = NULL;
+    (*image)->source_image   = NULL;
 
     return SAIL_OK;
 }
@@ -67,7 +66,6 @@ void sail_destroy_image(struct sail_image* image)
     sail_destroy_meta_data_node_chain(image->meta_data_node);
     sail_destroy_iccp(image->iccp);
     sail_destroy_source_image(image->source_image);
-    sail_destroy_hash_map(image->special_properties);
 
     sail_free(image);
 }
@@ -137,12 +135,6 @@ sail_status_t sail_copy_image_skeleton(const struct sail_image* source, struct s
     if (source->source_image != NULL)
     {
         SAIL_TRY_OR_CLEANUP(sail_copy_source_image(source->source_image, &image_local->source_image),
-                            /* cleanup */ sail_destroy_image(image_local));
-    }
-
-    if (source->special_properties != NULL)
-    {
-        SAIL_TRY_OR_CLEANUP(sail_copy_hash_map(source->special_properties, &image_local->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 

@@ -112,9 +112,6 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format)
     case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: return "BPP24-CIE-LAB";
     case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB: return "BPP40-CIE-LAB";
 
-    case SAIL_PIXEL_FORMAT_BPP32_CIE_LABA: return "BPP32-CIE-LABA";
-    case SAIL_PIXEL_FORMAT_BPP64_CIE_LABA: return "BPP64-CIE-LABA";
-
     case SAIL_PIXEL_FORMAT_BPP24_CIE_LUV: return "BPP24-CIE-LUV";
     case SAIL_PIXEL_FORMAT_BPP40_CIE_LUV: return "BPP40-CIE-LUV";
 
@@ -127,6 +124,10 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format)
     case SAIL_PIXEL_FORMAT_BPP40_YUVA: return "BPP40-YUVA";
     case SAIL_PIXEL_FORMAT_BPP48_YUVA: return "BPP48-YUVA";
     case SAIL_PIXEL_FORMAT_BPP64_YUVA: return "BPP64-YUVA";
+
+    /* Since 1.0.0 */
+    case SAIL_PIXEL_FORMAT_BPP32_CIE_LABA: return "BPP32-CIE-LABA";
+    case SAIL_PIXEL_FORMAT_BPP64_CIE_LABA: return "BPP64-CIE-LABA";
 
     case SAIL_PIXEL_FORMAT_BPP32_AYUV: return "BPP32-AYUV";
     case SAIL_PIXEL_FORMAT_BPP64_AYUV: return "BPP64-AYUV";
@@ -369,17 +370,7 @@ const char* sail_compression_to_string(enum SailCompression compression)
     case SAIL_COMPRESSION_UNKNOWN: return "UNKNOWN";
     case SAIL_COMPRESSION_NONE: return "NONE";
     case SAIL_COMPRESSION_ADOBE_DEFLATE: return "ADOBE-DEFLATE";
-    case SAIL_COMPRESSION_ASTC: return "ASTC";
-    case SAIL_COMPRESSION_ATC: return "ATC";
     case SAIL_COMPRESSION_AV1: return "AV1";
-    case SAIL_COMPRESSION_B44: return "B44";
-    case SAIL_COMPRESSION_B44A: return "B44A";
-    case SAIL_COMPRESSION_BC4: return "BC4";
-    case SAIL_COMPRESSION_BC5: return "BC5";
-    case SAIL_COMPRESSION_BC6H: return "BC6H";
-    case SAIL_COMPRESSION_BC7: return "BC7";
-    case SAIL_COMPRESSION_BPG: return "BPG";
-    case SAIL_COMPRESSION_BROTLI: return "BROTLI";
     case SAIL_COMPRESSION_CCITT_FAX3: return "CCITT-FAX3";
     case SAIL_COMPRESSION_CCITT_FAX4: return "CCITT-FAX4";
     case SAIL_COMPRESSION_CCITT_RLE: return "CCITT-RLE";
@@ -388,6 +379,45 @@ const char* sail_compression_to_string(enum SailCompression compression)
     case SAIL_COMPRESSION_CCITT_T6: return "CCITT-T6";
     case SAIL_COMPRESSION_DCS: return "DCS";
     case SAIL_COMPRESSION_DEFLATE: return "DEFLATE";
+    case SAIL_COMPRESSION_IT8_BL: return "IT8-BL";
+    case SAIL_COMPRESSION_IT8_CTPAD: return "IT8-CTPAD";
+    case SAIL_COMPRESSION_IT8_LW: return "IT8-LW";
+    case SAIL_COMPRESSION_IT8_MP: return "IT8-MP";
+    case SAIL_COMPRESSION_JBIG: return "JBIG";
+    case SAIL_COMPRESSION_JPEG: return "JPEG";
+    case SAIL_COMPRESSION_JPEG_2000: return "JPEG-2000";
+    case SAIL_COMPRESSION_JPEG_XL: return "JPEG-XL";
+    case SAIL_COMPRESSION_JPEG_XR: return "JPEG-XR";
+    case SAIL_COMPRESSION_LERC: return "LERC";
+    case SAIL_COMPRESSION_LZMA: return "LZMA";
+    case SAIL_COMPRESSION_LZW: return "LZW";
+    case SAIL_COMPRESSION_NEXT: return "NEXT";
+    case SAIL_COMPRESSION_OJPEG: return "OJPEG";
+    case SAIL_COMPRESSION_PACKBITS: return "PACKBITS";
+    case SAIL_COMPRESSION_PIXAR_FILM: return "PIXAR-FILM";
+    case SAIL_COMPRESSION_PIXAR_LOG: return "PIXAR-LOG";
+    case SAIL_COMPRESSION_QOI: return "QOI";
+    case SAIL_COMPRESSION_RLE: return "RLE";
+    case SAIL_COMPRESSION_SGI_LOG: return "SGI-LOG";
+    case SAIL_COMPRESSION_SGI_LOG24: return "SGI-LOG24";
+    case SAIL_COMPRESSION_T43: return "T43";
+    case SAIL_COMPRESSION_T85: return "T85";
+    case SAIL_COMPRESSION_THUNDERSCAN: return "THUNDERSCAN";
+    case SAIL_COMPRESSION_WEBP: return "WEBP";
+    case SAIL_COMPRESSION_ZIP: return "ZIP";
+    case SAIL_COMPRESSION_ZSTD: return "ZSTD";
+
+    /* Since 1.0.0 */
+    case SAIL_COMPRESSION_ASTC: return "ASTC";
+    case SAIL_COMPRESSION_ATC: return "ATC";
+    case SAIL_COMPRESSION_B44: return "B44";
+    case SAIL_COMPRESSION_B44A: return "B44A";
+    case SAIL_COMPRESSION_BC4: return "BC4";
+    case SAIL_COMPRESSION_BC5: return "BC5";
+    case SAIL_COMPRESSION_BC6H: return "BC6H";
+    case SAIL_COMPRESSION_BC7: return "BC7";
+    case SAIL_COMPRESSION_BPG: return "BPG";
+    case SAIL_COMPRESSION_BROTLI: return "BROTLI";
     case SAIL_COMPRESSION_DWAA: return "DWAA";
     case SAIL_COMPRESSION_DWAB: return "DWAB";
     case SAIL_COMPRESSION_DXT1: return "DXT1";
@@ -397,41 +427,14 @@ const char* sail_compression_to_string(enum SailCompression compression)
     case SAIL_COMPRESSION_ETC1: return "ETC1";
     case SAIL_COMPRESSION_ETC2: return "ETC2";
     case SAIL_COMPRESSION_HEVC: return "HEVC";
-    case SAIL_COMPRESSION_IT8_BL: return "IT8-BL";
-    case SAIL_COMPRESSION_IT8_CTPAD: return "IT8-CTPAD";
-    case SAIL_COMPRESSION_IT8_LW: return "IT8-LW";
-    case SAIL_COMPRESSION_IT8_MP: return "IT8-MP";
-    case SAIL_COMPRESSION_JBIG: return "JBIG";
-    case SAIL_COMPRESSION_JPEG: return "JPEG";
-    case SAIL_COMPRESSION_JPEG_2000: return "JPEG-2000";
     case SAIL_COMPRESSION_JPEG_LS: return "JPEG-LS";
-    case SAIL_COMPRESSION_JPEG_XL: return "JPEG-XL";
-    case SAIL_COMPRESSION_JPEG_XR: return "JPEG-XR";
-    case SAIL_COMPRESSION_LERC: return "LERC";
     case SAIL_COMPRESSION_LZ4: return "LZ4";
-    case SAIL_COMPRESSION_LZMA: return "LZMA";
-    case SAIL_COMPRESSION_LZW: return "LZW";
-    case SAIL_COMPRESSION_NEXT: return "NEXT";
-    case SAIL_COMPRESSION_OJPEG: return "OJPEG";
-    case SAIL_COMPRESSION_PACKBITS: return "PACKBITS";
     case SAIL_COMPRESSION_PIZ: return "PIZ";
-    case SAIL_COMPRESSION_PIXAR_FILM: return "PIXAR-FILM";
-    case SAIL_COMPRESSION_PIXAR_LOG: return "PIXAR-LOG";
     case SAIL_COMPRESSION_PVRTC: return "PVRTC";
     case SAIL_COMPRESSION_PVRTC2: return "PVRTC2";
     case SAIL_COMPRESSION_PXR24: return "PXR24";
-    case SAIL_COMPRESSION_QOI: return "QOI";
-    case SAIL_COMPRESSION_RLE: return "RLE";
-    case SAIL_COMPRESSION_SGI_LOG: return "SGI-LOG";
-    case SAIL_COMPRESSION_SGI_LOG24: return "SGI-LOG24";
     case SAIL_COMPRESSION_SNAPPY: return "SNAPPY";
-    case SAIL_COMPRESSION_T43: return "T43";
-    case SAIL_COMPRESSION_T85: return "T85";
-    case SAIL_COMPRESSION_THUNDERSCAN: return "THUNDERSCAN";
     case SAIL_COMPRESSION_VVC: return "VVC";
-    case SAIL_COMPRESSION_WEBP: return "WEBP";
-    case SAIL_COMPRESSION_ZIP: return "ZIP";
-    case SAIL_COMPRESSION_ZSTD: return "ZSTD";
     }
 
     return NULL;

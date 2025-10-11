@@ -256,24 +256,12 @@ public:
     const sail::source_image& source_image() const;
 
     /*
-     * Returns image format-specific properties that cannot be expressed
-     * in a common way. For example, a cursor hot spot.
+     * Returns the editable source image properties.
      *
-     * Special properties' names start with the codec name to avoid confusion.
-     * For example, "cur-hotspot-x".
-     *
-     * LOAD: Set by SAIL to valid special properties.
-     * SAVE: Must be set by a caller to valid special properties if necessary.
+     * LOAD: Set by SAIL to valid source image properties of the original image.
+     * SAVE: Ignored.
      */
-    const sail::special_properties& special_properties() const;
-
-    /*
-     * Returns the editable special properties.
-     *
-     * LOAD: Set by SAIL to valid special properties.
-     * SAVE: Must be set by a caller to valid special properties if necessary.
-     */
-    sail::special_properties& special_properties();
+    sail::source_image& source_image();
 
     /*
      * Returns the editable pixel data if any. The channels are interleaved per pixel.
@@ -357,16 +345,6 @@ public:
      * Sets a new ICC profile.
      */
     void set_iccp(sail::iccp&& iccp) noexcept;
-
-    /*
-     * Sets new special properties.
-     */
-    void set_special_properties(const sail::special_properties& special_properties);
-
-    /*
-     * Sets new special properties.
-     */
-    void set_special_properties(sail::special_properties&& special_properties) noexcept;
 
     /*
      * Replaces the image with the image from the specified file path. Reads just a single frame

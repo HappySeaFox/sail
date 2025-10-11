@@ -273,9 +273,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
 
     if (pnm_state->load_options->options & SAIL_OPTION_META_DATA)
     {
-        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->special_properties),
+        if (image_local->source_image == NULL)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                                /* cleanup */ sail_destroy_image(image_local));
+        }
+
+        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
-        SAIL_TRY_OR_CLEANUP(pnm_private_store_ascii(pnm_state->version, image_local->special_properties),
+        SAIL_TRY_OR_CLEANUP(pnm_private_store_ascii(pnm_state->version, image_local->source_image->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
     }
 

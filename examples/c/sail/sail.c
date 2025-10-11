@@ -164,7 +164,6 @@ static sail_status_t convert_impl(const char** inputs,
         SAIL_TRY_OR_CLEANUP(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options),
                             sail_stop_saving(save_state);
                             sail_destroy_save_options(save_options));
-        load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
 
         SAIL_TRY_OR_CLEANUP(
             sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
@@ -463,7 +462,6 @@ static sail_status_t extract_frames_impl(const char* input,
     /* Use SOURCE_IMAGE option to preserve original pixel format when possible. */
     struct sail_load_options* load_options;
     SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
-    load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
 
     SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
                         sail_destroy_load_options(load_options));
@@ -997,10 +995,10 @@ static void print_aligned_image_info(const struct sail_image* image)
         }
     }
 
-    if (image->special_properties != NULL)
+    if (image->source_image != NULL)
     {
         printf("Special properties :\n");
-        sail_traverse_hash_map(image->special_properties, special_properties_printf_callback);
+        sail_traverse_hash_map(image->source_image->special_properties, special_properties_printf_callback);
     }
 }
 

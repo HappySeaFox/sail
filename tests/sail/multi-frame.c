@@ -168,6 +168,7 @@ static MunitResult test_multi_frame_special_properties(const MunitParameter para
     struct sail_load_options* load_options = NULL;
     munit_assert(sail_alloc_load_options(&load_options) == SAIL_OK);
     load_options->options |= SAIL_OPTION_META_DATA;
+    load_options->options |= SAIL_OPTION_SOURCE_IMAGE;
 
     const struct sail_codec_info* codec_info;
     munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
@@ -185,10 +186,10 @@ static MunitResult test_multi_frame_special_properties(const MunitParameter para
     struct sail_image* image = NULL;
     munit_assert(sail_load_next_frame(state, &image) == SAIL_OK);
 
-    if (image->special_properties != NULL)
+    if (image->source_image->special_properties != NULL)
     {
-        const struct sail_variant* frames_variant = sail_hash_map_value(image->special_properties, "apng-frames");
-        const struct sail_variant* plays_variant  = sail_hash_map_value(image->special_properties, "apng-plays");
+        const struct sail_variant* frames_variant = sail_hash_map_value(image->source_image->special_properties, "apng-frames");
+        const struct sail_variant* plays_variant  = sail_hash_map_value(image->source_image->special_properties, "apng-plays");
 
         if (frames_variant != NULL && frames_variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
         {
