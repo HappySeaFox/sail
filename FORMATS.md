@@ -168,6 +168,47 @@
 </tr>
 <tr>
     <td>6</td>
+    <td><a href="https://en.wikipedia.org/wiki/High_Efficiency_Image_File_Format">HEIF/HEIC</a></td>
+    <td>
+        <b>Grayscale:</b> 8-bit, 16-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <b>RGB:</b> 24-bit, 48-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <b>RGBA:</b> 32-bit, 64-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <b>YUV:</b> 24-bit, 30-bit<sup><a href="#star-underlying">[1]</a></sup>, 36-bit<sup><a href="#star-underlying">[1]</a></sup>, 48-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <br/><br/>
+        <b>Content:</b> Static, Animated, Meta data (EXIF, XMP), ICC profiles.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"heif-has-depth"</i>. Description: Has depth map. Possible values: bool.
+        Key: <i>"heif-depth-count"</i>. Description: Number of depth images. Possible values: int.
+        Key: <i>"heif-thumbnail-count"</i>. Description: Number of thumbnails. Possible values: int.
+        Key: <i>"heif-is-primary"</i>. Description: Is primary image. Possible values: bool.
+        Key: <i>"heif-content-light-level-max"</i>. Description: Max content light level (HDR). Possible values: unsigned int.
+        Key: <i>"heif-content-light-level-avg"</i>. Description: Average content light level (HDR). Possible values: unsigned int.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"heif-threads"</i>. Description: Number of decoder threads. Possible values: int (1-256, default: 1).
+    </td>
+    <td>-</td>
+    <td>
+        <b>Grayscale:</b> 8-bit, 16-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <b>RGB:</b> 24-bit, 48-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <b>RGBA:</b> 32-bit, 64-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <b>YUV:</b> 24-bit, 30-bit<sup><a href="#star-underlying">[1]</a></sup>, 36-bit<sup><a href="#star-underlying">[1]</a></sup>, 48-bit<sup><a href="#star-underlying">[1]</a></sup>.
+        <br/><br/>
+        <b>Compressions:</b> HEVC.
+        <br/><br/>
+        <b>Content:</b> Static, Animated, Meta data (EXIF, XMP), ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"heif-preset"</i>. Description: Encoding speed preset. Possible values: ultrafast, superfast, veryfast, faster, fast, medium (default), slow, slower, veryslow, placebo.
+        <br/>Key: <i>"heif-tune"</i>. Description: Encoding optimization. Possible values: psnr, ssim, grain, fastdecode.
+        <br/>Key: <i>"heif-tu-intra-depth"</i>. Description: Transform Unit intra depth. Possible values: int (1-4).
+        <br/>Key: <i>"heif-complexity"</i>. Description: Encoding complexity. Possible values: int/unsigned int/float/double (0-100).
+        <br/>Key: <i>"heif-chroma"</i>. Description: Chroma subsampling. Possible values: 420, 422, 444.
+        <br/>Key: <i>"heif-threads"</i>. Description: Number of encoder threads. Possible values: int (1-256, default: 1).
+    </td>
+    <td>-</td>
+    <td>libheif</td>
+</tr>
+<tr>
+    <td>7</td>
     <td><a href="https://en.wikipedia.org/wiki/ICO_(file_format)">ICO and CUR</a></td>
     <td>
         <b>Bit depth:</b> Same to BMP.
@@ -200,7 +241,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>7</td>
+    <td>8</td>
     <td><a href="https://en.wikipedia.org/wiki/JBIG">JBIG</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -226,7 +267,7 @@
     <td>libjbig</td>
 </tr>
 <tr>
-    <td>8</td>
+    <td>9</td>
     <td><a href="https://wikipedia.org/wiki/JPEG">JPEG</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -269,7 +310,7 @@
     <td>libjpeg or libjpeg-turbo</td>
 </tr>
 <tr>
-    <td>9</td>
+    <td>10</td>
     <td><a href="https://wikipedia.org/wiki/JPEG_2000">JPEG 2000</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -324,7 +365,7 @@
     <td>openjpeg</td>
 </tr>
 <tr>
-    <td>10</td>
+    <td>11</td>
     <td><a href="https://wikipedia.org/wiki/JPEG_XL">JPEG XL</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -383,7 +424,7 @@
     <td>libjxl</td>
 </tr>
 <tr>
-    <td>11</td>
+    <td>12</td>
     <td><a href="https://wikipedia.org/wiki/PCX">PCX</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
@@ -408,7 +449,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>12</td>
+    <td>13</td>
     <td><a href="https://wikipedia.org/wiki/Portable_Network_Graphics">PNG</a></td>
     <td>
         <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
@@ -436,7 +477,7 @@
     <td>libpng</td>
 </tr>
 <tr>
-    <td>13</td>
+    <td>14</td>
     <td><a href="https://wikipedia.org/wiki/Portable_anymap">PNM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -467,7 +508,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>14</td>
+    <td>15</td>
     <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -500,7 +541,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>15</td>
+    <td>16</td>
     <td><a href="http://qoiformat.org">QOI</a></td>
     <td>
         <b>RGB:</b> 24-bit.
@@ -519,7 +560,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>16</td>
+    <td>17</td>
     <td><a href="https://wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td>
     <td>
         <b>Bit depth:</b> 32-bit.
@@ -538,7 +579,7 @@
     <td>resvg or nanosvg</td>
 </tr>
 <tr>
-    <td>17</td>
+    <td>18</td>
     <td><a href="https://wikipedia.org/wiki/Truevision_TGA">TGA</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -569,7 +610,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>18</td>
+    <td>19</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 40-bit, 48-bit, 64-bit, 80-bit.
@@ -613,7 +654,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>19</td>
+    <td>20</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -632,7 +673,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>20</td>
+    <td>21</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>RGBA:</b> 32-bit.
@@ -707,7 +748,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>21</td>
+    <td>22</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -733,7 +774,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>22</td>
+    <td>23</td>
     <td><a href="https://en.wikipedia.org/wiki/X_PixMap">XPM</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
@@ -760,7 +801,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>23</td>
+    <td>24</td>
     <td><a href="https://en.wikipedia.org/wiki/Xwd">XWD</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.

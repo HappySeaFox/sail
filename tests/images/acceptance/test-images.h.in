@@ -39,6 +39,15 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/hdr/bright.hdr",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_HEIF
+/* ASAN fails with some heif builds https://bugs.launchpad.net/ubuntu/+source/x265/+bug/2127683 */
+#ifdef SAIL_ENABLE_HEIF_TEST_IMAGES
+    "@SAIL_TEST_IMAGES_PATH@/heif/bpp24-rgb.heic",
+    "@SAIL_TEST_IMAGES_PATH@/heif/bpp32-rgba.heic",
+    "@SAIL_TEST_IMAGES_PATH@/heif/bpp8-grayscale.heic",
+#endif
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_ICO
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp8-indexed.ico",
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp24-bgr.ico",

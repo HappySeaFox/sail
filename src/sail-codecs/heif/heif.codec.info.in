@@ -1,0 +1,27 @@
+# HEIF codec information
+#
+[codec]
+layout=8
+version=1.0.0
+priority=MEDIUM
+name=HEIF
+description=High Efficiency Image File Format
+# ????ftypheic;????ftypheix;????ftyphevc;????ftyphevx
+magic-numbers=?? ?? ?? ?? 66 74 79 70 68 65 69 63;?? ?? ?? ?? 66 74 79 70 68 65 69 78;?? ?? ?? ?? 66 74 79 70 68 65 76 63;?? ?? ?? ?? 66 74 79 70 68 65 76 78
+extensions=heif;heic;hif
+mime-types=image/heif;image/heic;image/heif-sequence;image/heic-sequence
+
+[load-features]
+features=STATIC;ANIMATED;META-DATA;ICCP;SOURCE-IMAGE
+tuning=heif-threads
+
+[save-features]
+features=STATIC;ANIMATED;META-DATA;ICCP
+pixel-formats=@HEIF_CODEC_INFO_SAVE_PIXEL_FORMATS@
+compressions=HEVC
+default-compression=HEVC
+compression-level-min=0
+compression-level-max=100
+compression-level-default=50
+compression-level-step=1
+tuning=heif-preset;heif-tune;heif-tu-intra-depth;heif-complexity;heif-chroma;heif-threads

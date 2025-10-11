@@ -8,6 +8,8 @@ addons:
     packages:
       - libavif-dev
       - libgif-dev
+      - libheif-dev
+      - libheif-plugin-x265
       - libjbig-dev
       - libjpeg-dev
       - libjxl-dev

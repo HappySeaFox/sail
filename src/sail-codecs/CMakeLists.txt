@@ -6,7 +6,7 @@ add_subdirectory(common/bmp)
 #
 set(HIGHEST_PRIORITY_CODECS gif jpeg png tiff)
 set(HIGH_PRIORITY_CODECS    bmp svg)
-set(MEDIUM_PRIORITY_CODECS  avif hdr jpeg2000 jpegxl webp)
+set(MEDIUM_PRIORITY_CODECS  avif hdr heif jpeg2000 jpegxl webp)
 set(LOW_PRIORITY_CODECS     ico jbig pcx pnm psd qoi tga)
 set(LOWEST_PRIORITY_CODECS  wal xbm xpm xwd)
 
