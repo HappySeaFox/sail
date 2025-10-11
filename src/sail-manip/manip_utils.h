@@ -36,6 +36,8 @@ struct sail_palette;
 
 SAIL_HIDDEN sail_status_t get_palette_rgba32(const struct sail_palette* palette, unsigned index, sail_rgba32_t* rgba32);
 
+SAIL_HIDDEN sail_status_t preconvert_palette_to_rgba32(const struct sail_palette* palette, sail_rgba32_t** rgba32_palette);
+
 SAIL_HIDDEN void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t* rgba32);
 
 SAIL_HIDDEN void spread_gray16_to_rgba32(uint16_t value, sail_rgba32_t* rgba32);

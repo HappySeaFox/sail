@@ -72,6 +72,57 @@ sail_status_t get_palette_rgba32(const struct sail_palette* palette, unsigned in
     return SAIL_OK;
 }
 
+sail_status_t preconvert_palette_to_rgba32(const struct sail_palette* palette, sail_rgba32_t** rgba32_palette)
+{
+
+    SAIL_CHECK_PTR(palette);
+    SAIL_CHECK_PTR(rgba32_palette);
+
+    /* Allocate array for pre-converted palette */
+    void* ptr;
+    SAIL_TRY(sail_malloc(palette->color_count * sizeof(sail_rgba32_t), &ptr));
+    *rgba32_palette = (sail_rgba32_t*)ptr;
+
+    /* Convert palette format once */
+    switch (palette->pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP24_RGB:
+    {
+        const uint8_t* src = (const uint8_t*)palette->data;
+        for (unsigned i = 0; i < palette->color_count; i++)
+        {
+            (*rgba32_palette)[i].component1 = *src++;
+            (*rgba32_palette)[i].component2 = *src++;
+            (*rgba32_palette)[i].component3 = *src++;
+            (*rgba32_palette)[i].component4 = 255;
+        }
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    {
+        const uint8_t* src = (const uint8_t*)palette->data;
+        for (unsigned i = 0; i < palette->color_count; i++)
+        {
+            (*rgba32_palette)[i].component1 = *src++;
+            (*rgba32_palette)[i].component2 = *src++;
+            (*rgba32_palette)[i].component3 = *src++;
+            (*rgba32_palette)[i].component4 = *src++;
+        }
+        break;
+    }
+    default:
+    {
+        sail_free(*rgba32_palette);
+        *rgba32_palette = NULL;
+        SAIL_LOG_ERROR("Palette pixel format %s is not currently supported",
+                       sail_pixel_format_to_string(palette->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+    }
+
+    return SAIL_OK;
+}
+
 void spread_gray8_to_rgba32(uint8_t value, sail_rgba32_t* rgba32)
 {
 

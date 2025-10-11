@@ -849,43 +849,41 @@ static sail_status_t convert_from_indexed(const struct sail_image* image,
                                           const struct output_context* output_context)
 {
 
-    sail_status_t status = SAIL_OK;
+    /* Pre-convert palette once to avoid repeated lookups and format conversions */
+    sail_rgba32_t* preconverted_palette = NULL;
+    SAIL_TRY(preconvert_palette_to_rgba32(image->palette, &preconverted_palette));
+
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE) shared(status)
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
     for (row = 0; row < image->height; row++)
     {
-#pragma omp flush(status)
-        if (status == SAIL_OK)
+        const uint8_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width;)
         {
-            const uint8_t* scan_input = sail_scan_line(image, row);
-            uint8_t* scan_output8     = sail_scan_line(output_context->image, row);
-            uint16_t* scan_output16   = sail_scan_line(output_context->image, row);
+            unsigned bit_shift = input_bit_shift;
+            unsigned bit_mask  = input_bit_mask;
+            const uint8_t byte = *scan_input++;
 
-            for (unsigned column = 0; column < image->width;)
+            while (bit_mask > 0 && column < image->width)
             {
-                unsigned bit_shift = input_bit_shift;
-                unsigned bit_mask  = input_bit_mask;
-                const uint8_t byte = *scan_input++;
+                const uint8_t index = (byte & bit_mask) >> bit_shift;
 
-                while (bit_mask > 0 && column < image->width)
-                {
-                    const uint8_t index = (byte & bit_mask) >> bit_shift;
+                /* Direct lookup in pre-converted palette (no bounds check needed - already validated) */
+                const sail_rgba32_t rgba32 = preconverted_palette[index];
+                pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
 
-                    sail_rgba32_t rgba32;
-                    SAIL_TRY_OR_EXECUTE(get_palette_rgba32(image->palette, index, &rgba32),
-                                        /* on error */ status = __sail_status);
-#pragma omp flush(status)
-                    pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
-
-                    bit_shift  -= bit_shift_decrease_by;
-                    bit_mask  >>= bit_mask_shift_by;
-                    column++;
-                }
+                bit_shift  -= bit_shift_decrease_by;
+                bit_mask  >>= bit_mask_shift_by;
+                column++;
             }
         }
     }
 
+    sail_free(preconverted_palette);
     return SAIL_OK;
 }
 
