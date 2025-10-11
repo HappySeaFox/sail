@@ -204,14 +204,21 @@ enum SailOrientation
 /* Pixels compression types. */
 enum SailCompression
 {
-    /* Unknown compression. */
-    SAIL_COMPRESSION_UNKNOWN,
-
-    /* No compression at all. */
-    SAIL_COMPRESSION_NONE,
+    SAIL_COMPRESSION_UNKNOWN,       /* Unknown compression. */
+    SAIL_COMPRESSION_NONE,          /* No compression at all. */
 
     SAIL_COMPRESSION_ADOBE_DEFLATE, /* Deflate compression, as recognized by Adobe. */
+    SAIL_COMPRESSION_ASTC,          /* Adaptive Scalable Texture Compression. */
+    SAIL_COMPRESSION_ATC,           /* AMD Texture Compression (Qualcomm Adreno). */
     SAIL_COMPRESSION_AV1,           /* AOMedia Video 1. */
+    SAIL_COMPRESSION_B44,           /* Lossy 4x4 pixel block compression (OpenEXR). */
+    SAIL_COMPRESSION_B44A,          /* B44 with flat fields (OpenEXR). */
+    SAIL_COMPRESSION_BC4,           /* Single channel compression. */
+    SAIL_COMPRESSION_BC5,           /* Two channel compression (normal maps). */
+    SAIL_COMPRESSION_BC6H,          /* HDR compression (RGB float). */
+    SAIL_COMPRESSION_BC7,           /* High quality RGB/RGBA compression. */
+    SAIL_COMPRESSION_BPG,           /* Better Portable Graphics (based on HEVC). */
+    SAIL_COMPRESSION_BROTLI,        /* Brotli compression. */
     SAIL_COMPRESSION_CCITT_FAX3,    /* CCITT Group 3 fax encoding. */
     SAIL_COMPRESSION_CCITT_FAX4,    /* CCITT Group 4 fax encoding. */
     SAIL_COMPRESSION_CCITT_RLE,     /* CCITT modified Huffman RLE. */
@@ -220,6 +227,15 @@ enum SailCompression
     SAIL_COMPRESSION_CCITT_T6,      /* CCITT T.6 (TIFF 6 name). */
     SAIL_COMPRESSION_DCS,           /* Kodak DCS encoding. */
     SAIL_COMPRESSION_DEFLATE,       /* Deflate compression. */
+    SAIL_COMPRESSION_DWAA,          /* Lossy DCT-based compression (OpenEXR). */
+    SAIL_COMPRESSION_DWAB,          /* DWAA with better compression (OpenEXR). */
+    SAIL_COMPRESSION_DXT1,          /* S3TC BC1 - RGB or RGB+1bit alpha. */
+    SAIL_COMPRESSION_DXT3,          /* S3TC BC2 - RGBA with explicit alpha. */
+    SAIL_COMPRESSION_DXT5,          /* S3TC BC3 - RGBA with interpolated alpha. */
+    SAIL_COMPRESSION_EAC,           /* ETC2 Alpha Compression. */
+    SAIL_COMPRESSION_ETC1,          /* Ericsson Texture Compression (Android, OpenGL ES). */
+    SAIL_COMPRESSION_ETC2,          /* Improved ETC for OpenGL ES 3.0+. */
+    SAIL_COMPRESSION_HEVC,          /* High Efficiency Video Coding (H.265). */
     SAIL_COMPRESSION_IT8_BL,        /* IT8 Binary line art. */
     SAIL_COMPRESSION_IT8_CTPAD,     /* IT8 CT w/padding. */
     SAIL_COMPRESSION_IT8_LW,        /* IT8 Linework RLE. */
@@ -227,23 +243,31 @@ enum SailCompression
     SAIL_COMPRESSION_JBIG,          /* ISO JBIG. */
     SAIL_COMPRESSION_JPEG,          /* JPEG DCT compression. */
     SAIL_COMPRESSION_JPEG_2000,     /* Leadtools JPEG 2000. */
+    SAIL_COMPRESSION_JPEG_LS,       /* Lossless/near-lossless JPEG (ISO-14495). */
     SAIL_COMPRESSION_JPEG_XL,       /* JPEG XL. */
     SAIL_COMPRESSION_JPEG_XR,       /* JPEG XR. */
     SAIL_COMPRESSION_LERC,          /* ESRI Lerc codec. */
+    SAIL_COMPRESSION_LZ4,           /* Extremely fast compression. */
     SAIL_COMPRESSION_LZMA,          /* LZMA2. */
-    SAIL_COMPRESSION_LZW,           /* Lempel-Ziv  & Welch. */
+    SAIL_COMPRESSION_LZW,           /* Lempel-Ziv & Welch. */
     SAIL_COMPRESSION_NEXT,          /* NeXT 2-bit RLE. */
     SAIL_COMPRESSION_OJPEG,         /* !6.0 JPEG. */
     SAIL_COMPRESSION_PACKBITS,      /* Macintosh RLE. */
+    SAIL_COMPRESSION_PIZ,           /* Wavelet compression (OpenEXR). */
     SAIL_COMPRESSION_PIXAR_FILM,    /* Pixar companded 10bit LZW. */
     SAIL_COMPRESSION_PIXAR_LOG,     /* Pixar companded 11bit ZIP. */
+    SAIL_COMPRESSION_PVRTC,         /* PowerVR Texture Compression (iOS). */
+    SAIL_COMPRESSION_PVRTC2,        /* PowerVR Texture Compression v2. */
+    SAIL_COMPRESSION_PXR24,         /* Lossy 24-bit float compression (Pixar/OpenEXR). */
     SAIL_COMPRESSION_QOI,           /* Quite OK Image. */
     SAIL_COMPRESSION_RLE,           /* RLE compression. */
     SAIL_COMPRESSION_SGI_LOG,       /* SGI Log Luminance RLE. */
     SAIL_COMPRESSION_SGI_LOG24,     /* SGI Log 24-bit packed. */
+    SAIL_COMPRESSION_SNAPPY,        /* Fast compression by Google. */
     SAIL_COMPRESSION_T43,           /* !TIFF/FX T.43 colour by layered JBIG compression. */
     SAIL_COMPRESSION_T85,           /* !TIFF/FX T.85 JBIG compression. */
     SAIL_COMPRESSION_THUNDERSCAN,   /* ThunderScan RLE. */
+    SAIL_COMPRESSION_VVC,           /* Versatile Video Coding (H.266). */
     SAIL_COMPRESSION_WEBP,          /* WEBP. */
     SAIL_COMPRESSION_ZIP,           /* ZIP. */
     SAIL_COMPRESSION_ZSTD,          /* ZSTD. */
