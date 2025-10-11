@@ -570,7 +570,15 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
         gif_state->is_first_frame = false;
 
         /* Build color map from first frame. */
-        SAIL_TRY(gif_private_build_color_map(image->palette, &gif_state->color_map));
+        int auto_transparency_index = -1;
+        SAIL_TRY(gif_private_build_color_map(image->palette, &gif_state->color_map, &auto_transparency_index));
+
+        /* Use auto-detected transparency index if user didn't specify one. */
+        if (gif_state->transparency_index_save == -1 && auto_transparency_index >= 0)
+        {
+            gif_state->transparency_index_save = auto_transparency_index;
+            SAIL_LOG_DEBUG("GIF: Using auto-detected transparency index: %d", auto_transparency_index);
+        }
 
         /* Initialize GIF for writing. */
         int error_code;

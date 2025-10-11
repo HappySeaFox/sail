@@ -52,7 +52,13 @@ SAIL_HIDDEN sail_status_t gif_private_fetch_application(const GifByteType* exten
 
 SAIL_HIDDEN sail_status_t gif_private_pixel_format_to_bpp(enum SailPixelFormat pixel_format, int* bpp);
 
-SAIL_HIDDEN sail_status_t gif_private_build_color_map(const struct sail_palette* palette, ColorMapObject** color_map);
+SAIL_HIDDEN sail_status_t gif_private_build_color_map(const struct sail_palette* palette,
+                                                      ColorMapObject** color_map,
+                                                      int* auto_transparency_index);
+
+SAIL_HIDDEN sail_status_t gif_private_convert_rgba_palette_to_rgb(const struct sail_palette* source_palette,
+                                                                  struct sail_palette** target_palette,
+                                                                  int* transparency_index);
 
 SAIL_HIDDEN bool gif_private_tuning_key_value_callback(const char* key,
                                                        const struct sail_variant* value,

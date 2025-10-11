@@ -114,31 +114,131 @@ sail_status_t gif_private_pixel_format_to_bpp(enum SailPixelFormat pixel_format,
     }
 }
 
-sail_status_t gif_private_build_color_map(const struct sail_palette* palette, ColorMapObject** color_map)
+sail_status_t gif_private_convert_rgba_palette_to_rgb(const struct sail_palette* source_palette,
+                                                      struct sail_palette** target_palette,
+                                                      int* transparency_index)
+{
+    SAIL_CHECK_PTR(source_palette);
+    SAIL_CHECK_PTR(target_palette);
+    SAIL_CHECK_PTR(transparency_index);
+
+    *transparency_index = -1;
+
+    /* Determine channel offsets based on pixel format. */
+    int r_offset, g_offset, b_offset, a_offset;
+    enum SailPixelFormat output_format;
+
+    switch (source_palette->pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    {
+        r_offset      = 0;
+        g_offset      = 1;
+        b_offset      = 2;
+        a_offset      = 3;
+        output_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+    {
+        b_offset      = 0;
+        g_offset      = 1;
+        r_offset      = 2;
+        a_offset      = 3;
+        output_format = SAIL_PIXEL_FORMAT_BPP24_BGR;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+    {
+        a_offset      = 0;
+        r_offset      = 1;
+        g_offset      = 2;
+        b_offset      = 3;
+        output_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+    {
+        a_offset      = 0;
+        b_offset      = 1;
+        g_offset      = 2;
+        r_offset      = 3;
+        output_format = SAIL_PIXEL_FORMAT_BPP24_BGR;
+        break;
+    }
+    default:
+    {
+        SAIL_LOG_ERROR("GIF: Cannot convert palette format %s to RGB",
+                       sail_pixel_format_to_string(source_palette->pixel_format));
+        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+    }
+    }
+
+    /* Find first color with alpha < 128 (transparent color). */
+    const unsigned char* src_data = (const unsigned char*)source_palette->data;
+    for (unsigned i = 0; i < source_palette->color_count; i++)
+    {
+        if (src_data[i * 4 + a_offset] < 128)
+        {
+            *transparency_index = (int)i;
+            SAIL_LOG_DEBUG("GIF: Found transparent color at index %d (alpha=%d)", i, src_data[i * 4 + a_offset]);
+            break;
+        }
+    }
+
+    /* Allocate RGB palette. */
+    SAIL_TRY(sail_alloc_palette_for_data(output_format, source_palette->color_count, target_palette));
+
+    /* Convert RGBA to RGB. */
+    unsigned char* dst_data = (unsigned char*)(*target_palette)->data;
+
+    for (unsigned i = 0; i < source_palette->color_count; i++)
+    {
+        dst_data[i * 3 + 0] = src_data[i * 4 + r_offset];
+        dst_data[i * 3 + 1] = src_data[i * 4 + g_offset];
+        dst_data[i * 3 + 2] = src_data[i * 4 + b_offset];
+    }
+
+    SAIL_LOG_DEBUG("GIF: Converted %s palette to %s. Partial transparency lost, only index %d is transparent",
+                   sail_pixel_format_to_string(source_palette->pixel_format),
+                   sail_pixel_format_to_string(output_format), *transparency_index);
+
+    return SAIL_OK;
+}
+
+sail_status_t gif_private_build_color_map(const struct sail_palette* palette,
+                                          ColorMapObject** color_map,
+                                          int* auto_transparency_index)
 {
     SAIL_CHECK_PTR(palette);
     SAIL_CHECK_PTR(color_map);
+    SAIL_CHECK_PTR(auto_transparency_index);
 
+    const struct sail_palette* palette_to_use = palette;
+    struct sail_palette* converted_palette    = NULL;
+
+    *auto_transparency_index = -1;
+
+    /* Convert RGBA palettes to RGB automatically. */
     if (palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_RGB && palette->pixel_format != SAIL_PIXEL_FORMAT_BPP24_BGR)
     {
-        SAIL_LOG_ERROR("GIF: Unsupported palette pixel format %s. Only BPP24-RGB and BPP24-BGR are supported",
-                       sail_pixel_format_to_string(palette->pixel_format));
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        SAIL_TRY(gif_private_convert_rgba_palette_to_rgb(palette, &converted_palette, auto_transparency_index));
+        palette_to_use = converted_palette;
     }
 
-    if (palette->color_count > 256)
+    if (palette_to_use->color_count > 256)
     {
-        SAIL_LOG_ERROR("GIF: Palette has %u colors, but GIF supports maximum 256 colors", palette->color_count);
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
+        sail_destroy_palette(converted_palette);
+        SAIL_LOG_ERROR("GIF: Palette has %u colors, but GIF supports maximum 256 colors", palette_to_use->color_count);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     /* GIF requires power-of-2 palette sizes. */
     int color_count_pow2 = 2;
-    while (color_count_pow2 < (int)palette->color_count)
+    while (color_count_pow2 < (int)palette_to_use->color_count)
     {
         color_count_pow2 *= 2;
     }
-
     if (color_count_pow2 > 256)
     {
         color_count_pow2 = 256;
@@ -148,37 +248,34 @@ sail_status_t gif_private_build_color_map(const struct sail_palette* palette, Co
 
     if (*color_map == NULL)
     {
+        sail_destroy_palette(converted_palette);
         SAIL_LOG_ERROR("GIF: Failed to allocate color map");
-        return SAIL_ERROR_MEMORY_ALLOCATION;
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     /* Copy colors to the GIF color map. */
-    const unsigned char* palette_data = palette->data;
-    const bool is_bgr                 = (palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR);
+    const unsigned char* palette_data = palette_to_use->data;
 
-    for (unsigned i = 0; i < palette->color_count; i++)
+    int r = (palette_to_use->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR) ? 2 : 0;
+    int g = 1;
+    int b = (palette_to_use->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR) ? 0 : 2;
+
+    for (unsigned i = 0; i < palette_to_use->color_count; i++)
     {
-        if (is_bgr)
-        {
-            (*color_map)->Colors[i].Blue  = palette_data[i * 3 + 0];
-            (*color_map)->Colors[i].Green = palette_data[i * 3 + 1];
-            (*color_map)->Colors[i].Red   = palette_data[i * 3 + 2];
-        }
-        else
-        {
-            (*color_map)->Colors[i].Red   = palette_data[i * 3 + 0];
-            (*color_map)->Colors[i].Green = palette_data[i * 3 + 1];
-            (*color_map)->Colors[i].Blue  = palette_data[i * 3 + 2];
-        }
+        (*color_map)->Colors[i].Red   = palette_data[i * 3 + r];
+        (*color_map)->Colors[i].Green = palette_data[i * 3 + g];
+        (*color_map)->Colors[i].Blue  = palette_data[i * 3 + b];
     }
 
     /* Fill remaining colors with black. */
-    for (unsigned i = palette->color_count; i < (unsigned)color_count_pow2; i++)
+    for (unsigned i = palette_to_use->color_count; i < (unsigned)color_count_pow2; i++)
     {
         (*color_map)->Colors[i].Red   = 0;
         (*color_map)->Colors[i].Green = 0;
         (*color_map)->Colors[i].Blue  = 0;
     }
+
+    sail_destroy_palette(converted_palette);
 
     return SAIL_OK;
 }
