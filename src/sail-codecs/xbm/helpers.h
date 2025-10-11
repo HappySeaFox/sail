@@ -51,10 +51,8 @@ struct xbm_state
 
 SAIL_HIDDEN unsigned char xbm_private_reverse_byte(unsigned char byte);
 
-SAIL_HIDDEN sail_status_t xbm_private_write_header(struct sail_io* io,
-                                                   unsigned width,
-                                                   unsigned height,
-                                                   const char* name);
+SAIL_HIDDEN sail_status_t xbm_private_write_header(
+    struct sail_io* io, unsigned width, unsigned height, const char* name, enum SailXbmVersion version);
 
 SAIL_HIDDEN sail_status_t xbm_private_write_pixels(
     struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height, enum SailXbmVersion version);

@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h> /* atoi() */
@@ -197,6 +198,35 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
 
     memcpy(image_local->palette->data, SAIL_XBM_MONO_PALETTE, 6);
 
+    /* Store XBM version in special properties for roundtrip. */
+    if (xbm_state->load_options->options & SAIL_OPTION_META_DATA)
+    {
+        if (image_local->source_image == NULL)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_source_image(&image_local->source_image),
+                                /* cleanup */ sail_destroy_image(image_local));
+        }
+
+        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        struct sail_variant* variant;
+        SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&variant),
+                            /* cleanup */ sail_destroy_image(image_local));
+
+        if (xbm_state->version == SAIL_XBM_VERSION_10)
+        {
+            sail_set_variant_string(variant, "X10");
+        }
+        else
+        {
+            sail_set_variant_string(variant, "X11");
+        }
+
+        sail_put_hash_map(image_local->source_image->special_properties, "xbm-version", variant);
+        sail_destroy_variant(variant);
+    }
+
     *image = image_local;
 
     return SAIL_OK;
@@ -219,39 +249,87 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_xbm(void* state, struct sail_
 
     SAIL_LOG_TRACE("XBM: Literals to read(%u)", literals_to_read);
 
-    char buf[512 + 1];
     unsigned char* pixels = image->pixels;
+    unsigned literals_read = 0;
 
-    for (unsigned literals_read = 0; literals_read < literals_to_read;)
+    /* Read hex values one by one, skipping whitespace and commas. */
+    while (literals_read < literals_to_read)
     {
-        SAIL_TRY(sail_read_string_from_io(xbm_codec_state->io, buf, sizeof(buf)));
-
-        unsigned buf_offset = 0;
         unsigned holder;
-        char comma;
-        int bytes_consumed;
+        char ch;
 
-#ifdef _MSC_VER
-        while (sscanf_s(buf + buf_offset, "%x %c %n", &holder, &comma, 1, &bytes_consumed) == 2)
+        do
         {
-#else
-        while (sscanf(buf + buf_offset, "%x %c %n", &holder, &comma, &bytes_consumed) == 2)
-        {
-#endif
+            SAIL_TRY(xbm_codec_state->io->strict_read(xbm_codec_state->io->stream, &ch, 1));
+        } while (isspace(ch) || ch == ',');
 
-            if (SAIL_LIKELY(xbm_codec_state->version == SAIL_XBM_VERSION_11))
+        if (ch != '0')
+        {
+            SAIL_LOG_ERROR("XBM: Expected '0' from '0x', got '%c'", ch);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
+        SAIL_TRY(xbm_codec_state->io->strict_read(xbm_codec_state->io->stream, &ch, 1));
+
+        if (ch != 'x' && ch != 'X')
+        {
+            SAIL_LOG_ERROR("XBM: Expected 'x' in hex literal, got '%c'", ch);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
+        /* Read hex digits. */
+        holder = 0;
+        int hex_digits = 0;
+
+        while (hex_digits < 4)
+        {
+            SAIL_TRY(xbm_codec_state->io->strict_read(xbm_codec_state->io->stream, &ch, 1));
+
+            if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))
             {
-                *pixels++ = xbm_private_reverse_byte((unsigned char)holder);
+                unsigned digit;
+                if (ch >= '0' && ch <= '9')
+                {
+                    digit = ch - '0';
+                }
+                else if (ch >= 'a' && ch <= 'f')
+                {
+                    digit = ch - 'a' + 10;
+                }
+                else
+                {
+                    digit = ch - 'A' + 10;
+                }
+
+                holder = (holder << 4) | digit;
+                hex_digits++;
             }
             else
             {
-                *pixels++ = xbm_private_reverse_byte((unsigned char)(holder & 0xff));
-                *pixels++ = xbm_private_reverse_byte((unsigned char)(holder >> 8));
+                /* End of hex number, put character back by seeking back. */
+                SAIL_TRY(xbm_codec_state->io->seek(xbm_codec_state->io->stream, -1, SEEK_CUR));
+                break;
             }
-
-            literals_read++;
-            buf_offset += bytes_consumed;
         }
+
+        if (hex_digits == 0)
+        {
+            SAIL_LOG_ERROR("XBM: No hex digits found");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
+        /* Store the parsed value. */
+        if (SAIL_LIKELY(xbm_codec_state->version == SAIL_XBM_VERSION_11))
+        {
+            *pixels++ = xbm_private_reverse_byte((unsigned char)holder);
+        }
+        else
+        {
+            *pixels++ = xbm_private_reverse_byte((unsigned char)(holder & 0xff));
+            *pixels++ = xbm_private_reverse_byte((unsigned char)(holder >> 8));
+        }
+
+        literals_read++;
     }
 
     return SAIL_OK;
@@ -323,7 +401,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xbm(void* state, co
     /* Write XBM header. */
     const char* name =
         (xbm_codec_state->tuning_state.var_name[0] != '\0') ? xbm_codec_state->tuning_state.var_name : NULL;
-    SAIL_TRY(xbm_private_write_header(xbm_codec_state->io, image->width, image->height, name));
+    SAIL_TRY(xbm_private_write_header(xbm_codec_state->io, image->width, image->height, name, xbm_codec_state->version));
 
     xbm_codec_state->frame_loaded = true;
 

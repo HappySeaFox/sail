@@ -39,16 +39,18 @@ unsigned char xbm_private_reverse_byte(unsigned char byte)
     return (reverse_lookup_4bits[byte & 0xF] << 4) | reverse_lookup_4bits[byte >> 4];
 }
 
-sail_status_t xbm_private_write_header(struct sail_io* io, unsigned width, unsigned height, const char* name)
+sail_status_t xbm_private_write_header(
+    struct sail_io* io, unsigned width, unsigned height, const char* name, enum SailXbmVersion version)
 {
-    const char* var_name = (name != NULL && name[0] != '\0') ? name : "image";
+    const char* var_name  = (name != NULL && name[0] != '\0') ? name : "image";
+    const char* type_name = (version == SAIL_XBM_VERSION_10) ? "unsigned short" : "unsigned char";
 
     char header[512];
     int written = snprintf(header, sizeof(header),
                            "#define %s_width %u\n"
                            "#define %s_height %u\n"
-                           "static unsigned char %s_bits[] = {\n",
-                           var_name, width, var_name, height, var_name);
+                           "static %s %s_bits[] = {\n",
+                           var_name, width, var_name, height, type_name, var_name);
 
     if (written < 0 || (size_t)written >= sizeof(header))
     {
