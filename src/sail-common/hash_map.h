@@ -83,7 +83,7 @@ SAIL_EXPORT void sail_traverse_hash_map(const struct sail_hash_map* hash_map,
 
 /*
  * Traverses the hash map in random order and calls the callback function on every key-value pair.
- * Additionally passes the specfied user data to the callback.
+ * Additionally passes the specified user data to the callback.
  * If the callback returns false, the loop stops at the current element.
  */
 SAIL_EXPORT void sail_traverse_hash_map_with_user_data(const struct sail_hash_map* hash_map,

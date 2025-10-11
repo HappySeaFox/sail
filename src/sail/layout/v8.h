@@ -72,9 +72,9 @@ Please define SAIL_CODEC_NAME before including this header.
      *   - Allocate an internal state object with internal data structures necessary to decode a file,
      *     and assign its value to the state.
      *
-     * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
-     * in it and destroy it in sail_codec_load_finish_v8(). States must be used per image. DO NOT use the same state
-     * to load multiple images in the same time.
+ * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
+ * in it and destroy it in sail_codec_load_finish_v8(). States must be used per image. DO NOT use the same state
+ * to load multiple images at the same time.
      *
      * Returns SAIL_OK on success.
      */
@@ -159,7 +159,7 @@ sail_status_t SAIL_CONSTRUCT_CODEC_FUNC(sail_codec_load_finish_v8)(void** state)
  *
  * STATE explanation: Pass the address of a local void* pointer. Codecs will store an internal state
  * in it and destroy it in sail_codec_save_finish_v8(). States must be used per image. DO NOT use the same state
- * to save multiple images to different targets in the same time.
+ * to save multiple images to different targets at the same time.
  *
  * Returns SAIL_OK on success.
  */

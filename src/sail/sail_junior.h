@@ -44,7 +44,7 @@ struct sail_codec_info;
  * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
  * data structure. If you don't need it, just pass NULL.
  *
- * This function is pretty fast because it doesn't decode whole image data for most image formats.
+ * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *

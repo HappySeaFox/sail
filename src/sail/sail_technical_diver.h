@@ -51,7 +51,7 @@ struct sail_save_options;
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
- * to load multiple images from different sources in the same time.
+ * to load multiple images from different sources at the same time.
  *
  * Returns SAIL_OK on success.
  */
@@ -60,7 +60,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_io(struct sail_io* io,
                                                      void** state);
 
 /*
- * Starts loading the specified I/O stream with the specified load options. If you don't need specific load options,
+ * Starts loading the specified I/O stream with the specified load options. If you do not need specific load options,
  * just pass NULL. Codec-specific defaults will be used in this case. The load options are deep copied.
  *
  * Typical usage: sail_alloc_io()                           ->
@@ -73,7 +73,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_io(struct sail_io* io,
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
- * to load multiple images from different sources in the same time.
+ * to load multiple images from different sources at the same time.
  *
  * Returns SAIL_OK on success.
  */
@@ -88,14 +88,14 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_io_with_options(struct sail_io
  * Typical usage: sail_alloc_io()                  ->
  *                set I/O callbacks                ->
  *                sail_codec_info_from_extension() ->
- *                sail_start_saving_into_file()    ->
+ *                sail_start_saving_into_io()      ->
  *                sail_write_next_frame()          ->
  *                sail_stop_saving()               ->
  *                sail_destroy_io().
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
- * to save multiple images to different targets in the same time.
+ * to save multiple images to different targets at the same time.
  *
  * Returns SAIL_OK on success.
  */
@@ -104,7 +104,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_io(struct sail_io* io,
                                                     void** state);
 
 /*
- * Starts saving the specified I/O stream with the specified save options. If you don't need specific save options,
+ * Starts saving the specified I/O stream with the specified save options. If you do not need specific save options,
  * just pass NULL. Codec-specific defaults will be used in this case. The save options are deep copied.
  *
  * Typical usage: sail_alloc_io()                          ->
@@ -117,7 +117,7 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_io(struct sail_io* io,
  *
  * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
- * to save multiple images to different targets in the same time.
+ * to save multiple images to different targets at the same time.
  *
  * Returns SAIL_OK on success.
  */

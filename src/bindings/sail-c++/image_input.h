@@ -120,7 +120,7 @@ public:
      * Loads the image and returns its properties without pixels and the corresponding
      * codec info.
      *
-     * This method is pretty fast because it doesn't decode whole image data for most image formats.
+     * This method is pretty fast because it doesn't decode the whole image data for most image formats.
      *
      * Returns an invalid image on error.
      */

@@ -163,7 +163,7 @@ It's pretty easy, isn't it? :smile: See also [FAQ](FAQ.md).
 
 - Easily extensible with new image format plugins
 - Easy-to-use API providing expected business entities - images, palettes, pixels etc.
-- Access to source pixel data (supported by the most codecs)
+- Access to source pixel data (supported by most codecs)
 - Access to the image properties w/o decoding pixel data (probing)
 
 ## Have questions or issues?

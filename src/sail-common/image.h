@@ -167,7 +167,7 @@ struct sail_image
      *
      * Can be NULL.
      *
-     * Special properties' names start with the codec name to avoid confusing.
+     * Special properties' names start with the codec name to avoid confusion.
      * For example, "cur-hotspot-x".
      *
      * LOAD: Set by SAIL to valid special properties if SAIL_OPTION_META_DATA is enabled.
@@ -250,7 +250,7 @@ SAIL_EXPORT sail_status_t sail_mirror(struct sail_image* image, enum SailOrienta
 
 /*
  * Returns the scan line at the given row.
- * Return NULL if the image or its pixels is NULL.
+ * Return NULL if the image or its pixels are NULL.
  */
 SAIL_EXPORT void* sail_scan_line(const struct sail_image* image, unsigned row);
 

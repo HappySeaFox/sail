@@ -42,7 +42,7 @@ struct sail_codec_info;
  * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
  * data structure. If you don't need it, just pass NULL.
  *
- * This function is pretty fast because it doesn't decode whole image data for most image formats.
+ * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
@@ -57,7 +57,7 @@ SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io* io,
  * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
  * data structure. If you don't need it, just pass NULL.
  *
- * This function is pretty fast because it doesn't decode whole image data for most image formats.
+ * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *
@@ -99,7 +99,7 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_file(const char* path,
  *                sail_load_next_frame()           ->
  *                sail_stop_loading().
  *
- * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
+ * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
  * in it and destroy it in sail_stop_loading(). States must be used per image. DO NOT use the same state
  * to start loading multiple images at the same time.
  *

@@ -168,7 +168,7 @@ Codecs are combined into a dynamically linked library, so no need to search them
 `<FOUND PATH>/lib` is added to `LD_LIBRARY_PATH`.
 
 Additionally, `SAIL_THIRD_PARTY_CODECS_PATH` environment variable with a list of ';'-separated paths
-is searched if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake, (the default) so you can load your own codecs
+is searched if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default) so you can load your own codecs
 from there.
 
 ## How can I point SAIL to my custom codecs?
@@ -297,17 +297,17 @@ name=ABC
 #
 description=Some ABC Format
 
-# ';'-separated list of hex-encoded magic numbers indentifying this image format.
+# ';'-separated list of hex-encoded magic numbers identifying this image format.
 # Can be empty only if the list of file extensions below is not empty.
 #
 magic-numbers=34 AB
 
-# ';'-separated list of file extensions indentifying this image format.
+# ';'-separated list of file extensions identifying this image format.
 # Can be empty only if the list of magic numbers above is not empty.
 #
 extensions=abc;bca
 
-# ';'-separated list of MIME types indentifying this image format. Can be empty.
+# ';'-separated list of MIME types identifying this image format. Can be empty.
 #
 mime-types=image/abc
 
@@ -330,9 +330,9 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 
 # ';'-separated list of codec-specific tuning options. For example, it's possible
 # to disable ABC codec filtering with setting abc-filtering to 0 in load options.
-# Tuning options' names must start with the codec name to avoid confusing.
+# Tuning options' names must start with the codec name to avoid confusion.
 #
-# The list of possible values for every tuning option is not current available
+# The list of possible values for every tuning option is not currently available
 # programmatically. Every codec must document them in the codec info file.
 #
 # For example:
@@ -359,9 +359,9 @@ features=STATIC;META-DATA;INTERLACED;ICCP
 
 # ';'-separated list of codec-specific tuning options. For example, it's possible
 # to disable ABC codec filtering with setting abc-filtering to 0 in save options.
-# Tuning options' names must start with the codec name to avoid confusing.
+# Tuning options' names must start with the codec name to avoid confusion.
 #
-# The list of possible values for every tuning option is not current available
+# The list of possible values for every tuning option is not currently available
 # programmatically. Every codec must document them in the codec info file.
 #
 # For example:

@@ -259,7 +259,7 @@ public:
      * Returns image format-specific properties that cannot be expressed
      * in a common way. For example, a cursor hot spot.
      *
-     * Special properties' names start with the codec name to avoid confusing.
+     * Special properties' names start with the codec name to avoid confusion.
      * For example, "cur-hotspot-x".
      *
      * LOAD: Set by SAIL to valid special properties.

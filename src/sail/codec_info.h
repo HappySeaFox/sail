@@ -106,7 +106,7 @@ typedef struct sail_codec_info sail_codec_info_t;
  *
  * Or:            sail_codec_info_from_path()   ->
  *                sail_start_saving_into_file() ->
- *                sail_load_next_frame()        ->
+ *                sail_write_next_frame()       ->
  *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
@@ -179,7 +179,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  *
  * Or:            sail_codec_info_from_extension() ->
  *                sail_start_saving_into_file()    ->
- *                sail_load_next_frame()           ->
+ *                sail_write_next_frame()          ->
  *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
@@ -200,7 +200,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char* extension,
  *
  * Or:            sail_codec_info_from_mime_type() ->
  *                sail_start_saving_into_file()    ->
- *                sail_load_next_frame()           ->
+ *                sail_write_next_frame()          ->
  *                sail_stop_saving().
  *
  * Returns SAIL_OK on success.
