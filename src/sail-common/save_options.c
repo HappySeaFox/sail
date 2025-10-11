@@ -51,6 +51,7 @@ void sail_destroy_save_options(struct sail_save_options* save_options)
         return;
     }
 
+    sail_destroy_hash_map(save_options->tuning);
     sail_free(save_options);
 }
 
