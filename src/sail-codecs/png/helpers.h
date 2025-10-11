@@ -26,7 +26,6 @@
 #pragma once
 
 #include <stdbool.h>
-#include <stdio.h>
 
 #include <png.h>
 
@@ -99,3 +98,5 @@ SAIL_HIDDEN sail_status_t png_private_write_resolution(png_structp png_ptr,
 SAIL_HIDDEN bool png_private_tuning_key_value_callback(const char* key,
                                                        const struct sail_variant* value,
                                                        void* user_data);
+
+SAIL_HIDDEN unsigned png_private_read_variant_uint(const struct sail_variant* value);

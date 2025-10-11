@@ -26,6 +26,7 @@
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <png.h>
 
@@ -83,6 +84,16 @@ struct png_state
     void* temp_scanline;
     /* Scan line for skipping a first hidden frame. */
     void* scanline_for_skipping;
+
+    /* For writing APNG. */
+    bool is_apng_write;
+    unsigned total_frames;
+    unsigned frames_written;
+    unsigned num_plays;
+    bool acTL_written;
+    png_uint_32 canvas_width;
+    png_uint_32 canvas_height;
+    unsigned next_seq_num;
 #endif
 };
 
@@ -128,6 +139,15 @@ static sail_status_t alloc_png_state(const struct sail_load_options* load_option
         .prev                  = NULL,
         .temp_scanline         = NULL,
         .scanline_for_skipping = NULL,
+
+        .is_apng_write  = false,
+        .total_frames   = 0,
+        .frames_written = 0,
+        .num_plays      = 0,
+        .acTL_written   = false,
+        .canvas_width   = 0,
+        .canvas_height  = 0,
+        .next_seq_num   = 0,
 #endif
     };
 
@@ -247,14 +267,17 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io* io,
         SAIL_TRY(png_private_alloc_rows(&png_state->prev, png_state->first_image->bytes_per_line,
                                         png_state->first_image->height));
 
-        if (png_state->load_options->options & SAIL_OPTION_META_DATA)
+        if (png_state->load_options->options & (SAIL_OPTION_META_DATA | SAIL_OPTION_SOURCE_IMAGE))
         {
             if (png_state->first_image->source_image == NULL)
             {
                 SAIL_TRY(sail_alloc_source_image(&png_state->first_image->source_image));
             }
+            if (png_state->first_image->source_image->special_properties == NULL)
+            {
+                SAIL_TRY(sail_alloc_hash_map(&png_state->first_image->source_image->special_properties));
+            }
 
-            SAIL_TRY(sail_alloc_hash_map(&png_state->first_image->source_image->special_properties));
             SAIL_TRY(png_private_store_num_frames_and_plays(png_state->png_ptr, png_state->info_ptr,
                                                             png_state->first_image->source_image->special_properties));
         }
@@ -564,6 +587,31 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_png(struct sail_io* io,
 
     png_set_write_fn(png_state->png_ptr, io, png_private_my_write_fn, png_private_my_flush_fn);
 
+#ifdef PNG_APNG_SUPPORTED
+    /* Read APNG parameters from tuning options. */
+    if (png_state->save_options->tuning != NULL)
+    {
+        const struct sail_variant* frames_variant = sail_hash_map_value(png_state->save_options->tuning, "apng-frames");
+        const struct sail_variant* plays_variant  = sail_hash_map_value(png_state->save_options->tuning, "apng-plays");
+
+        if (frames_variant != NULL)
+        {
+            png_state->total_frames  = png_private_read_variant_uint(frames_variant);
+            png_state->is_apng_write = (png_state->total_frames > 1);
+        }
+        if (plays_variant != NULL)
+        {
+            png_state->num_plays = png_private_read_variant_uint(plays_variant);
+        }
+
+        if (png_state->is_apng_write)
+        {
+            SAIL_LOG_TRACE("PNG: APNG write enabled: %u frames, %u plays", png_state->total_frames,
+                           png_state->num_plays);
+        }
+    }
+#endif
+
     return SAIL_OK;
 }
 
@@ -571,12 +619,20 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
 {
     struct png_state* png_state = state;
 
+#ifdef PNG_APNG_SUPPORTED
+    /* Check if we've written all frames. */
+    if (png_state->total_frames > 0 && png_state->frames_written >= png_state->total_frames)
+    {
+        return SAIL_ERROR_NO_MORE_FRAMES;
+    }
+#else
     if (png_state->frame_saved)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     png_state->frame_saved = true;
+#endif
 
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr)))
@@ -591,114 +647,189 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
                         /* cleanup */ SAIL_LOG_ERROR("PNG: %s pixel format is not currently supported for saving",
                                                      sail_pixel_format_to_string(image->pixel_format)));
 
-    /* Save meta data. */
-    if (png_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL)
+#ifdef PNG_APNG_SUPPORTED
+    /* On first frame, save canvas dimensions and write IHDR. */
+    if (png_state->frames_written == 0)
     {
-        SAIL_TRY(png_private_write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
-        SAIL_LOG_TRACE("PNG: Meta data has been written");
-    }
-
-    png_set_IHDR(png_state->png_ptr, png_state->info_ptr, image->width, image->height, bit_depth, color_type,
-                 (png_state->save_options->options & SAIL_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7 : PNG_INTERLACE_NONE,
-                 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-
-    /* Save resolution. */
-    SAIL_TRY(png_private_write_resolution(png_state->png_ptr, png_state->info_ptr, image->resolution));
-
-    /* Save ICC profile. */
-    if (png_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL)
-    {
-        if (setjmp(png_jmpbuf(png_state->png_ptr)))
+#endif
+        /* Save meta data. */
+        if (png_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL)
         {
-            SAIL_LOG_WARNING("PNG: ICC profile was rejected (incompatible color space?)");
-        }
-        else
-        {
-            png_set_iCCP(png_state->png_ptr, png_state->info_ptr, "ICC profile", PNG_COMPRESSION_TYPE_BASE,
-                         (const png_bytep)image->iccp->data, (unsigned)image->iccp->size);
-
-            SAIL_LOG_TRACE("PNG: ICC profile has been written");
-        }
-    }
-
-    /* Save palette. */
-    if (sail_is_indexed(image->pixel_format))
-    {
-        if (image->palette == NULL)
-        {
-            SAIL_LOG_ERROR("PNG: The indexed image has no palette");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+            SAIL_TRY(png_private_write_meta_data(png_state->png_ptr, png_state->info_ptr, image->meta_data_node));
+            SAIL_LOG_TRACE("PNG: Meta data has been written");
         }
 
-        /* Set palette. BPP24-RGB can be used directly, BPP32-RGBA needs conversion. */
-        if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
-        {
-            png_set_PLTE(png_state->png_ptr, png_state->info_ptr, (png_color*)image->palette->data,
-                         image->palette->color_count);
-        }
-        else if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA)
-        {
-            void* png_palette_ptr = NULL;
-            SAIL_TRY(sail_malloc(image->palette->color_count * sizeof(png_color), &png_palette_ptr));
-            png_color* png_palette = (png_color*)png_palette_ptr;
+        png_set_IHDR(png_state->png_ptr, png_state->info_ptr, image->width, image->height, bit_depth, color_type,
+                     (png_state->save_options->options & SAIL_OPTION_INTERLACED) ? PNG_INTERLACE_ADAM7
+                                                                                  : PNG_INTERLACE_NONE,
+                     PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
-            const unsigned char* pal_data = (const unsigned char*)image->palette->data;
-            for (unsigned i = 0; i < image->palette->color_count; i++)
-            {
-                png_palette[i].red   = pal_data[i * 4 + 0];
-                png_palette[i].green = pal_data[i * 4 + 1];
-                png_palette[i].blue  = pal_data[i * 4 + 2];
-                /* Alpha channel ignored. */
-            }
-
-            png_set_PLTE(png_state->png_ptr, png_state->info_ptr, png_palette, image->palette->color_count);
-            sail_free(png_palette);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("PNG: Unsupported palette format %s",
-                           sail_pixel_format_to_string(image->palette->pixel_format));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-    }
-
-    /* Save gamma. */
-    png_set_gAMA(png_state->png_ptr, png_state->info_ptr, image->gamma);
-
-    /* Set compression. */
-    const double compression = (png_state->save_options->compression_level < COMPRESSION_MIN
-                                || png_state->save_options->compression_level > COMPRESSION_MAX)
-                                   ? COMPRESSION_DEFAULT
-                                   : png_state->save_options->compression_level;
-
-    png_set_compression_level(png_state->png_ptr, (int)compression);
-
-    png_write_info(png_state->png_ptr, png_state->info_ptr);
-
-    /* Convert to big-endian for PNG format. */
-    png_set_swap(png_state->png_ptr);
-
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR || image->pixel_format == SAIL_PIXEL_FORMAT_BPP48_BGR
-        || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR
-        || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_BGRA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR)
-    {
-        png_set_bgr(png_state->png_ptr);
-    }
-
-    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ARGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR
-        || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ARGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR)
-    {
-        png_set_swap_alpha(png_state->png_ptr);
-    }
-
-    if (png_state->save_options->options & SAIL_OPTION_INTERLACED)
-    {
-        png_state->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
+#ifdef PNG_APNG_SUPPORTED
+        png_state->canvas_width  = image->width;
+        png_state->canvas_height = image->height;
     }
     else
     {
-        png_state->interlaced_passes = 1;
+        /* Subsequent frames: validate dimensions against canvas. */
+        if (image->width > png_state->canvas_width || image->height > png_state->canvas_height)
+        {
+            SAIL_LOG_ERROR("PNG: Frame %u dimensions %ux%u exceed canvas %ux%u", png_state->frames_written,
+                           image->width, image->height, png_state->canvas_width, png_state->canvas_height);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+        }
     }
+
+    /* Save resolution (only on first frame). */
+    if (png_state->frames_written == 0)
+    {
+#endif
+        SAIL_TRY(png_private_write_resolution(png_state->png_ptr, png_state->info_ptr, image->resolution));
+
+        /* Save ICC profile. */
+        if (png_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL)
+        {
+            if (setjmp(png_jmpbuf(png_state->png_ptr)))
+            {
+                SAIL_LOG_WARNING("PNG: ICC profile was rejected (incompatible color space?)");
+            }
+            else
+            {
+                png_set_iCCP(png_state->png_ptr, png_state->info_ptr, "ICC profile", PNG_COMPRESSION_TYPE_BASE,
+                             (const png_bytep)image->iccp->data, (unsigned)image->iccp->size);
+
+                SAIL_LOG_TRACE("PNG: ICC profile has been written");
+            }
+        }
+
+        /* Save palette. */
+        if (sail_is_indexed(image->pixel_format))
+        {
+            if (image->palette == NULL)
+            {
+                SAIL_LOG_ERROR("PNG: The indexed image has no palette");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+            }
+
+            /* Set palette. BPP24-RGB can be used directly, BPP32-RGBA needs conversion. */
+            if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
+            {
+                png_set_PLTE(png_state->png_ptr, png_state->info_ptr, (png_color*)image->palette->data,
+                             image->palette->color_count);
+            }
+            else if (image->palette->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA)
+            {
+                void* png_palette_ptr = NULL;
+                SAIL_TRY(sail_malloc(image->palette->color_count * sizeof(png_color), &png_palette_ptr));
+                png_color* png_palette = (png_color*)png_palette_ptr;
+
+                void* transparency_ptr = NULL;
+                SAIL_TRY_OR_CLEANUP(sail_malloc(image->palette->color_count, &transparency_ptr),
+                                    /* cleanup */ sail_free(png_palette));
+                png_bytep transparency = (png_bytep)transparency_ptr;
+
+                const unsigned char* pal_data = (const unsigned char*)image->palette->data;
+                for (unsigned i = 0; i < image->palette->color_count; i++)
+                {
+                    png_palette[i].red   = pal_data[i * 4 + 0];
+                    png_palette[i].green = pal_data[i * 4 + 1];
+                    png_palette[i].blue  = pal_data[i * 4 + 2];
+                    transparency[i]      = pal_data[i * 4 + 3];
+                }
+
+                png_set_PLTE(png_state->png_ptr, png_state->info_ptr, png_palette, image->palette->color_count);
+                png_set_tRNS(png_state->png_ptr, png_state->info_ptr, transparency, image->palette->color_count, NULL);
+
+                sail_free(transparency);
+                sail_free(png_palette);
+            }
+            else
+            {
+                SAIL_LOG_ERROR("PNG: Unsupported palette format %s",
+                               sail_pixel_format_to_string(image->palette->pixel_format));
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+            }
+        }
+
+        /* Save gamma. */
+        png_set_gAMA(png_state->png_ptr, png_state->info_ptr, image->gamma);
+
+        /* Set compression. */
+        const double compression = (png_state->save_options->compression_level < COMPRESSION_MIN
+                                    || png_state->save_options->compression_level > COMPRESSION_MAX)
+                                       ? COMPRESSION_DEFAULT
+                                       : png_state->save_options->compression_level;
+
+        png_set_compression_level(png_state->png_ptr, (int)compression);
+
+        png_write_info(png_state->png_ptr, png_state->info_ptr);
+
+#ifdef PNG_APNG_SUPPORTED
+        /* Write acTL chunk for APNG after png_write_info. */
+        if (png_state->is_apng_write && !png_state->acTL_written)
+        {
+            png_set_acTL(png_state->png_ptr, png_state->info_ptr, png_state->total_frames, png_state->num_plays);
+            png_state->acTL_written = true;
+            SAIL_LOG_TRACE("PNG: acTL written: %u frames, %u plays", png_state->total_frames, png_state->num_plays);
+        }
+#endif
+
+#ifdef PNG_APNG_SUPPORTED
+    }
+
+    /* Write fcTL for each frame in APNG. */
+    if (png_state->is_apng_write)
+    {
+        png_uint_16 delay_num = 0;
+        png_uint_16 delay_den = 1000; /* Default denominator: milliseconds. */
+
+        if (image->delay > 0)
+        {
+            delay_num = (png_uint_16)image->delay;
+        }
+
+        /* Always use default dimensions (full canvas) and position (0, 0). */
+        /* Always use DISPOSE_OP_NONE and BLEND_OP_SOURCE for simplicity. */
+        png_set_next_frame_fcTL(png_state->png_ptr, png_state->info_ptr, image->width, image->height,
+                                0, /* x_offset */
+                                0, /* y_offset */
+                                delay_num, delay_den, PNG_DISPOSE_OP_NONE, PNG_BLEND_OP_SOURCE);
+    }
+#endif
+
+#ifdef PNG_APNG_SUPPORTED
+    /* Set pixel format transformations only on first frame. */
+    if (png_state->frames_written == 0)
+    {
+#endif
+        /* Convert to big-endian for PNG format. */
+        png_set_swap(png_state->png_ptr);
+
+        if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR || image->pixel_format == SAIL_PIXEL_FORMAT_BPP48_BGR
+            || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR
+            || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_BGRA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR)
+        {
+            png_set_bgr(png_state->png_ptr);
+        }
+
+        if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ARGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_ABGR
+            || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ARGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP64_ABGR)
+        {
+            png_set_swap_alpha(png_state->png_ptr);
+        }
+
+        if (png_state->save_options->options & SAIL_OPTION_INTERLACED)
+        {
+            png_state->interlaced_passes = png_set_interlace_handling(png_state->png_ptr);
+        }
+        else
+        {
+            png_state->interlaced_passes = 1;
+        }
+#ifdef PNG_APNG_SUPPORTED
+    }
+
+    png_state->frames_written++;
+#endif
 
     return SAIL_OK;
 }

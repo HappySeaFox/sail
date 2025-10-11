@@ -822,6 +822,11 @@ sail_status_t png_private_store_num_frames_and_plays(png_structp png_ptr,
     sail_set_variant_unsigned_int(variant, num_plays);
     sail_put_hash_map(special_properties, "apng-plays", variant);
 
+    const bool first_frame_hidden = png_get_first_frame_is_hidden(png_ptr, info_ptr);
+    SAIL_LOG_TRACE("PNG: First frame is hidden: %s", first_frame_hidden ? "yes" : "no");
+    sail_set_variant_bool(variant, first_frame_hidden);
+    sail_put_hash_map(special_properties, "apng-first-frame-hidden", variant);
+
     sail_destroy_variant(variant);
 
     return SAIL_OK;
@@ -890,6 +895,26 @@ sail_status_t png_private_write_resolution(png_structp png_ptr,
     png_set_pHYs(png_ptr, info_ptr, (unsigned)resolution->x, (unsigned)resolution->y, unit);
 
     return SAIL_OK;
+}
+
+unsigned png_private_read_variant_uint(const struct sail_variant* value)
+{
+    switch (value->type)
+    {
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+    {
+        return sail_variant_to_unsigned_int(value);
+    }
+    case SAIL_VARIANT_TYPE_INT:
+    {
+        int int_val = sail_variant_to_int(value);
+        return (int_val < 0) ? 0 : (unsigned)int_val;
+    }
+    default:
+    {
+        return 0;
+    }
+    }
 }
 
 bool png_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)

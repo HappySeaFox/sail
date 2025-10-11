@@ -24,9 +24,32 @@
         Possible values: unsigned int.
         Key: <i>"apng-plays"</i>. Description: Number of plays of the animation.
         Possible values: unsigned int.
+        Key: <i>"apng-first-frame-hidden"</i>. Description: Whether the first frame is hidden.
+        Possible values: bool.
     </td>
     <td>Blend operations with pixel formats other than BPP16-GRAYSCALE-ALPHA, BPP32-GRAYSCALE-ALPHA, BPP32-RGBA, BPP64-RGBA.</td>
-    <td>Unsupported</td>
+    <td>
+        <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
+        <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
+        <b>RGB:</b> 24-bit, 48-bit.
+        <b>BGR:</b> 24-bit, 48-bit.
+        <b>RGBA:</b> 32-bit, 64-bit.
+        <b>BGRA:</b> 32-bit, 64-bit.
+        <b>ARGB:</b> 32-bit, 64-bit.
+        <b>ABGR:</b> 32-bit, 64-bit.
+        <br/><br/>
+        <b>Compressions:</b> DEFLATE.
+        <br/><br/>
+        <b>Content:</b> Static, Animated, Meta data, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"png-filter"</i>. Description: PNG filter methods (comma-separated).
+        Possible values: none, sub, up, avg, paeth.
+        <br/>Key: <i>"apng-frames"</i>. Description: Number of frames to write in animation.
+        Possible values: unsigned int (>1 enables APNG mode).
+        <br/>Key: <i>"apng-plays"</i>. Description: Number of animation loops (0 = infinite).
+        Possible values: unsigned int (default: 0).
+    </td>
     <td>-</td>
     <td>libpng+APNG patch</td>
 </tr>

@@ -37,6 +37,7 @@ cmake_pop_check_state()
 if (HAVE_APNG)
     set(PNG_CODEC_INFO_EXTENSION_APNG   ";apng")
     set(PNG_CODEC_INFO_FEATURE_ANIMATED ";ANIMATED")
+    set(PNG_CODEC_INFO_TUNING_APNG      ";apng-frames;apng-plays")
 endif()
 
 # Common codec configuration
