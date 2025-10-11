@@ -512,8 +512,13 @@ sail_status_t xpm_private_write_colors(struct sail_io* io,
     return SAIL_OK;
 }
 
-sail_status_t xpm_private_write_pixels(
-    struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height, unsigned cpp, unsigned num_colors)
+sail_status_t xpm_private_write_pixels(struct sail_io* io,
+                                       const unsigned char* pixels,
+                                       unsigned width,
+                                       unsigned height,
+                                       unsigned cpp,
+                                       unsigned num_colors,
+                                       enum SailPixelFormat pixel_format)
 {
     char* line               = NULL;
     const unsigned line_size = width * cpp + 16;
@@ -529,7 +534,38 @@ sail_status_t xpm_private_write_pixels(
 
         for (unsigned x = 0; x < width; x++)
         {
-            unsigned char pixel_index = pixels[y * width + x];
+            unsigned char pixel_index;
+
+            /* Extract pixel index based on pixel format. */
+            if (pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
+            {
+                pixel_index = pixels[y * width + x];
+            }
+            else if (pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
+            {
+                unsigned byte_index = (y * width + x) / 2;
+                unsigned shift      = ((y * width + x) % 2) ? 0 : 4;
+                pixel_index         = (pixels[byte_index] >> shift) & 0x0F;
+            }
+            else if (pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED)
+            {
+                unsigned byte_index = (y * width + x) / 4;
+                unsigned shift      = 6 - ((y * width + x) % 4) * 2;
+                pixel_index         = (pixels[byte_index] >> shift) & 0x03;
+            }
+            else if (pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED)
+            {
+                unsigned byte_index = (y * width + x) / 8;
+                unsigned shift      = 7 - ((y * width + x) % 8);
+                pixel_index         = (pixels[byte_index] >> shift) & 0x01;
+            }
+            else
+            {
+                SAIL_LOG_ERROR("XPM: Unsupported pixel format for writing: %s",
+                               sail_pixel_format_to_string(pixel_format));
+                sail_free(line);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+            }
 
             if (pixel_index >= num_colors)
             {

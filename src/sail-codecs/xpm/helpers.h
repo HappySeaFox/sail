@@ -97,7 +97,8 @@ SAIL_HIDDEN sail_status_t xpm_private_write_pixels(struct sail_io* io,
                                                    unsigned width,
                                                    unsigned height,
                                                    unsigned cpp,
-                                                   unsigned num_colors);
+                                                   unsigned num_colors,
+                                                   enum SailPixelFormat pixel_format);
 
 SAIL_HIDDEN bool xpm_private_tuning_key_value_callback(const char* key,
                                                        const struct sail_variant* value,
