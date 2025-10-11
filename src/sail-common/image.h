@@ -48,7 +48,6 @@ struct sail_source_image;
  */
 struct sail_image
 {
-
     /*
      * Image pixels. The channels are interleaved per pixel. The pixels are
      * organized row by row, left to right, top to bottom.

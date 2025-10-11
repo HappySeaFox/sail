@@ -30,7 +30,6 @@
 
 sail_status_t sail_alloc_save_options(struct sail_save_options** save_options)
 {
-
     SAIL_CHECK_PTR(save_options);
 
     void* ptr;
@@ -47,7 +46,6 @@ sail_status_t sail_alloc_save_options(struct sail_save_options** save_options)
 
 void sail_destroy_save_options(struct sail_save_options* save_options)
 {
-
     if (save_options == NULL)
     {
         return;
@@ -59,7 +57,6 @@ void sail_destroy_save_options(struct sail_save_options* save_options)
 sail_status_t sail_alloc_save_options_from_features(const struct sail_save_features* save_features,
                                                     struct sail_save_options** save_options)
 {
-
     struct sail_save_options* save_options_local;
     SAIL_TRY(sail_alloc_save_options(&save_options_local));
 
@@ -91,7 +88,6 @@ sail_status_t sail_alloc_save_options_from_features(const struct sail_save_featu
 
 sail_status_t sail_copy_save_options(const struct sail_save_options* source, struct sail_save_options** target)
 {
-
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 

@@ -30,7 +30,6 @@
 
 sail_status_t sail_alloc_load_features(struct sail_load_features** load_features)
 {
-
     SAIL_CHECK_PTR(load_features);
 
     void* ptr;
@@ -45,7 +44,6 @@ sail_status_t sail_alloc_load_features(struct sail_load_features** load_features
 
 void sail_destroy_load_features(struct sail_load_features* load_features)
 {
-
     if (load_features == NULL)
     {
         return;

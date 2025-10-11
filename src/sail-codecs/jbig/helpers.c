@@ -37,7 +37,6 @@
 
 bool jbig_private_is_jbig(const void* data, size_t size)
 {
-
     if (data == NULL || size < JBIG_MAGIC_SIZE)
     {
         return false;
@@ -75,7 +74,6 @@ bool jbig_private_is_jbig(const void* data, size_t size)
 
 sail_status_t jbig_private_read_header(struct sail_io* io, unsigned long* width, unsigned long* height, int* planes)
 {
-
     unsigned char header[JBIG_MAGIC_SIZE];
     size_t bytes_read;
 

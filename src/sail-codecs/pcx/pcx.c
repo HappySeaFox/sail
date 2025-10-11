@@ -59,7 +59,6 @@ static sail_status_t alloc_pcx_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct pcx_state** pcx_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct pcx_state), &ptr));
     *pcx_state = ptr;
@@ -79,7 +78,6 @@ static sail_status_t alloc_pcx_state(struct sail_io* io,
 
 static void destroy_pcx_state(struct pcx_state* pcx_state)
 {
-
     if (pcx_state == NULL)
     {
         return;
@@ -98,7 +96,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pcx(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -130,7 +127,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pcx(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void* state, struct sail_image** image)
 {
-
     struct pcx_state* pcx_state = state;
 
     if (pcx_state->frame_loaded)
@@ -187,7 +183,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_image* image)
 {
-
     const struct pcx_state* pcx_state = state;
 
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING)
@@ -253,7 +248,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_pcx(void** state)
 {
-
     struct pcx_state* pcx_state = *state;
 
     *state = NULL;
@@ -271,7 +265,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_pcx(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -284,7 +277,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_pcx(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pcx(void* state, const struct sail_image* image)
 {
-
     struct pcx_state* pcx_state = state;
 
     if (pcx_state->frame_saved)
@@ -425,7 +417,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pcx(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pcx(void* state, const struct sail_image* image)
 {
-
     struct pcx_state* pcx_state = state;
 
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING)
@@ -530,7 +521,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pcx(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_pcx(void** state)
 {
-
     struct pcx_state* pcx_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */

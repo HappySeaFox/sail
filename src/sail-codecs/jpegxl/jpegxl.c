@@ -78,7 +78,6 @@ static sail_status_t alloc_jpegxl_state(struct sail_io* io,
                                         const struct sail_save_options* save_options,
                                         struct jpegxl_state** jpegxl_state)
 {
-
     void* ptr;
 
     /* JxlMemoryManager */
@@ -129,7 +128,6 @@ static sail_status_t alloc_jpegxl_state(struct sail_io* io,
 
 static void destroy_jpegxl_state(struct jpegxl_state* jpegxl_state)
 {
-
     if (jpegxl_state == NULL)
     {
         return;
@@ -166,7 +164,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io* io,
                                                          const struct sail_load_options* load_options,
                                                          void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -211,7 +208,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state, struct sail_image** image)
 {
-
     struct jpegxl_state* jpegxl_state = state;
 
     if (jpegxl_state->libjxl_success)
@@ -384,7 +380,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void* state, struct sail_image* image)
 {
-
     struct jpegxl_state* jpegxl_state = state;
 
     JxlPixelFormat format = {.num_channels = jpegxl_private_pixel_format_to_num_channels(image->pixel_format),
@@ -462,7 +457,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void* state, struct sa
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jpegxl(void** state)
 {
-
     struct jpegxl_state* jpegxl_state = *state;
 
     *state = NULL;
@@ -480,7 +474,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpegxl(struct sail_io* io,
                                                          const struct sail_save_options* save_options,
                                                          void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -524,7 +517,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpegxl(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpegxl(void* state, const struct sail_image* image)
 {
-
     struct jpegxl_state* jpegxl_state = state;
 
     /* Set basic info and color encoding on first frame. */
@@ -632,7 +624,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpegxl(void* state,
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpegxl(void* state, const struct sail_image* image)
 {
-
     struct jpegxl_state* jpegxl_state = state;
 
     /* Get pixel format. */
@@ -658,7 +649,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpegxl(void* state, const str
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpegxl(void** state)
 {
-
     struct jpegxl_state* jpegxl_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */

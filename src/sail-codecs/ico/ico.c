@@ -68,7 +68,6 @@ static sail_status_t alloc_ico_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct ico_state** ico_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct ico_state), &ptr));
     *ico_state = ptr;
@@ -93,7 +92,6 @@ static sail_status_t alloc_ico_state(struct sail_io* io,
 
 static void destroy_ico_state(struct ico_state* ico_state)
 {
-
     if (ico_state == NULL)
     {
         return;
@@ -114,7 +112,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_ico(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -156,7 +153,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_ico(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void* state, struct sail_image** image)
 {
-
     struct ico_state* ico_state = state;
 
     /* Skip non-BMP images. */
@@ -222,7 +218,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_ico(void* state, struct sail_image* image)
 {
-
     struct ico_state* ico_state = state;
 
     SAIL_TRY(bmp_private_read_frame(ico_state->common_bmp_state, ico_state->io, image));
@@ -233,7 +228,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_ico(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_ico(void** state)
 {
-
     struct ico_state* ico_state = *state;
 
     *state = NULL;
@@ -257,7 +251,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_ico(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -274,7 +267,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_ico(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_ico(void* state, const struct sail_image* image)
 {
-
     struct ico_state* ico_state = state;
 
     /* Validate image size. ICO dimensions are stored as uint8_t (0 means 256). */
@@ -383,7 +375,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_ico(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_ico(void* state, const struct sail_image* image)
 {
-
     struct ico_state* ico_state = state;
 
     SAIL_TRY(bmp_private_write_frame(ico_state->common_bmp_state, ico_state->io, image));
@@ -418,7 +409,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_ico(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_ico(void** state)
 {
-
     struct ico_state* ico_state = *state;
 
     *state = NULL;

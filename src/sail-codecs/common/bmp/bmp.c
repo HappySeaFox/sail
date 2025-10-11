@@ -100,7 +100,6 @@ struct bmp_state
 
 static sail_status_t alloc_bmp_state(struct bmp_state** bmp_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct bmp_state), &ptr));
     *bmp_state = ptr;
@@ -125,7 +124,6 @@ static sail_status_t alloc_bmp_state(struct bmp_state** bmp_state)
 
 static void destroy_bmp_state(struct bmp_state* bmp_state)
 {
-
     if (bmp_state == NULL)
     {
         return;
@@ -140,7 +138,6 @@ static void destroy_bmp_state(struct bmp_state* bmp_state)
 
 static sail_status_t read_bmp_headers(struct sail_io* io, struct bmp_state* bmp_state)
 {
-
     size_t offset_of_bitmap_header;
     SAIL_TRY(io->tell(io->stream, &offset_of_bitmap_header));
 
@@ -211,7 +208,6 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
                                     void** state,
                                     int bmp_load_options)
 {
-
     /* Allocate a new state. */
     struct bmp_state* bmp_state;
     SAIL_TRY(alloc_bmp_state(&bmp_state));
@@ -397,7 +393,6 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
 
 sail_status_t bmp_private_read_seek_next_frame(void* state, struct sail_io* io, struct sail_image** image)
 {
-
     struct bmp_state* bmp_state = state;
 
     struct sail_image* image_local;
@@ -474,7 +469,6 @@ sail_status_t bmp_private_read_seek_next_frame(void* state, struct sail_io* io, 
 
 sail_status_t bmp_private_read_frame(void* state, struct sail_io* io, struct sail_image* image)
 {
-
     struct bmp_state* bmp_state = state;
 
     /* RLE-encoded images don't need to skip pad bytes. */
@@ -669,7 +663,6 @@ sail_status_t bmp_private_read_frame(void* state, struct sail_io* io, struct sai
 
 sail_status_t bmp_private_read_finish(void** state, struct sail_io* io)
 {
-
     (void)io;
 
     struct bmp_state* bmp_state = *state;
@@ -690,7 +683,6 @@ sail_status_t bmp_private_write_init(struct sail_io* io,
                                      void** state,
                                      int bmp_write_options)
 {
-
     (void)io;
 
     struct bmp_state* bmp_state;
@@ -705,7 +697,6 @@ sail_status_t bmp_private_write_init(struct sail_io* io,
 
 sail_status_t bmp_private_write_seek_next_frame(void* state, struct sail_io* io, const struct sail_image* image)
 {
-
     struct bmp_state* bmp_state = state;
 
     /* Validate pixel format. */
@@ -976,7 +967,6 @@ sail_status_t bmp_private_write_seek_next_frame(void* state, struct sail_io* io,
 
 sail_status_t bmp_private_write_frame(void* state, struct sail_io* io, const struct sail_image* image)
 {
-
     struct bmp_state* bmp_state = state;
 
     /* BMP images are stored bottom-to-top. */
@@ -1028,7 +1018,6 @@ sail_status_t bmp_private_write_frame(void* state, struct sail_io* io, const str
 
 sail_status_t bmp_private_write_finish(void** state, struct sail_io* io)
 {
-
     (void)io;
 
     struct bmp_state* bmp_state = *state;

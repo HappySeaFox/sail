@@ -58,7 +58,6 @@ static sail_status_t alloc_tiff_state(const struct sail_load_options* load_optio
                                       const struct sail_save_options* save_options,
                                       struct tiff_state** tiff_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct tiff_state), &ptr));
     *tiff_state = ptr;
@@ -83,7 +82,6 @@ static sail_status_t alloc_tiff_state(const struct sail_load_options* load_optio
 
 static void destroy_tiff_state(struct tiff_state* tiff_state)
 {
-
     if (tiff_state == NULL)
     {
         return;
@@ -100,7 +98,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io* io,
                                                        const struct sail_load_options* load_options,
                                                        void** state)
 {
-
     *state = NULL;
 
     TIFFSetWarningHandler(tiff_private_my_warning_fn);
@@ -134,7 +131,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void* state, struct sail_image** image)
 {
-
     struct tiff_state* tiff_state = state;
 
     if (tiff_state->libtiff_error)
@@ -258,7 +254,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void* state, s
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tiff(void* state, struct sail_image* image)
 {
-
     struct tiff_state* tiff_state = state;
 
     if (tiff_state->libtiff_error)
@@ -294,7 +289,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tiff(void* state, struct sail
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_tiff(void** state)
 {
-
     struct tiff_state* tiff_state = *state;
 
     *state = NULL;
@@ -317,7 +311,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io* io,
                                                        const struct sail_save_options* save_options,
                                                        void** state)
 {
-
     *state = NULL;
 
     struct tiff_state* tiff_state;
@@ -356,7 +349,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, const struct sail_image* image)
 {
-
     struct tiff_state* tiff_state = state;
 
     if (tiff_state->libtiff_error)
@@ -645,7 +637,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, c
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tiff(void* state, const struct sail_image* image)
 {
-
     struct tiff_state* tiff_state = state;
 
     if (tiff_state->libtiff_error)
@@ -671,7 +662,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tiff(void* state, const struc
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_tiff(void** state)
 {
-
     struct tiff_state* tiff_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */

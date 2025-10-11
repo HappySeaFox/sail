@@ -38,7 +38,6 @@ struct sail_save_features;
 
 struct hidden_state
 {
-
     struct sail_io* io;
     bool own_io;
 

@@ -47,7 +47,6 @@ void convert_cmyk32_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, sail_r
 
 void convert_cmyk64_to_rgba64(uint16_t c, uint16_t m, uint16_t y, uint16_t k, sail_rgba64_t* rgba64)
 {
-
     rgba64->component1 = (uint16_t)((double)c * k / 65535.0 + 0.5);
     rgba64->component2 = (uint16_t)((double)m * k / 65535.0 + 0.5);
     rgba64->component3 = (uint16_t)((double)y * k / 65535.0 + 0.5);
@@ -56,7 +55,6 @@ void convert_cmyk64_to_rgba64(uint16_t c, uint16_t m, uint16_t y, uint16_t k, sa
 
 void convert_cmyka40_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8_t a, sail_rgba32_t* rgba32)
 {
-
     rgba32->component1 = (uint8_t)((double)c * k / 255.0 + 0.5);
     rgba32->component2 = (uint8_t)((double)m * k / 255.0 + 0.5);
     rgba32->component3 = (uint8_t)((double)y * k / 255.0 + 0.5);
@@ -65,7 +63,6 @@ void convert_cmyka40_to_rgba32(uint8_t c, uint8_t m, uint8_t y, uint8_t k, uint8
 
 void convert_cmyka80_to_rgba64(uint16_t c, uint16_t m, uint16_t y, uint16_t k, uint16_t a, sail_rgba64_t* rgba64)
 {
-
     rgba64->component1 = (uint16_t)((double)c * k / 65535.0 + 0.5);
     rgba64->component2 = (uint16_t)((double)m * k / 65535.0 + 0.5);
     rgba64->component3 = (uint16_t)((double)y * k / 65535.0 + 0.5);

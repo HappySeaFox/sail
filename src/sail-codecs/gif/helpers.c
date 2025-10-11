@@ -37,7 +37,6 @@ static sail_status_t save_str_in_meta_data(const char* str,
                                            enum SailMetaData key,
                                            struct sail_meta_data_node** meta_data_node)
 {
-
     SAIL_CHECK_PTR(str);
     SAIL_CHECK_PTR(meta_data_node);
 
@@ -57,7 +56,6 @@ static sail_status_t save_str_in_meta_data(const char* str,
 
 sail_status_t gif_private_fetch_comment(const GifByteType* extension, struct sail_meta_data_node** meta_data_node)
 {
-
     SAIL_CHECK_PTR(extension);
 
     const unsigned length = *(unsigned char*)(extension);
@@ -74,7 +72,6 @@ sail_status_t gif_private_fetch_comment(const GifByteType* extension, struct sai
 
 sail_status_t gif_private_fetch_application(const GifByteType* extension, struct sail_meta_data_node** meta_data_node)
 {
-
     SAIL_CHECK_PTR(extension);
 
     /* 8 bytes as per the spec. */
@@ -85,7 +82,6 @@ sail_status_t gif_private_fetch_application(const GifByteType* extension, struct
 
 sail_status_t gif_private_pixel_format_to_bpp(enum SailPixelFormat pixel_format, int* bpp)
 {
-
     SAIL_CHECK_PTR(bpp);
 
     switch (pixel_format)
@@ -120,7 +116,6 @@ sail_status_t gif_private_pixel_format_to_bpp(enum SailPixelFormat pixel_format,
 
 sail_status_t gif_private_build_color_map(const struct sail_palette* palette, ColorMapObject** color_map)
 {
-
     SAIL_CHECK_PTR(palette);
     SAIL_CHECK_PTR(color_map);
 
@@ -190,7 +185,6 @@ sail_status_t gif_private_build_color_map(const struct sail_palette* palette, Co
 
 bool gif_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct gif_tuning_state* tuning_state = (struct gif_tuning_state*)user_data;
 
     if (strcmp(key, "gif-transparency-index") == 0)

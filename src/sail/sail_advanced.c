@@ -31,7 +31,6 @@
 
 sail_status_t sail_probe_io(struct sail_io* io, struct sail_image** image, const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(io);
 
     const struct sail_codec_info* codec_info_noop;
@@ -68,7 +67,6 @@ sail_status_t sail_probe_memory(const void* buffer,
                                 struct sail_image** image,
                                 const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(buffer);
 
     struct sail_io* io;
@@ -84,7 +82,6 @@ sail_status_t sail_probe_memory(const void* buffer,
 
 sail_status_t sail_start_loading_from_file(const char* path, const struct sail_codec_info* codec_info, void** state)
 {
-
     SAIL_TRY(sail_start_loading_from_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
@@ -95,7 +92,6 @@ sail_status_t sail_start_loading_from_memory(const void* buffer,
                                              const struct sail_codec_info* codec_info,
                                              void** state)
 {
-
     SAIL_TRY(sail_start_loading_from_memory_with_options(buffer, buffer_size, codec_info, NULL, state));
 
     return SAIL_OK;
@@ -103,7 +99,6 @@ sail_status_t sail_start_loading_from_memory(const void* buffer,
 
 sail_status_t sail_load_next_frame(void* state, struct sail_image** image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -150,7 +145,6 @@ sail_status_t sail_load_next_frame(void* state, struct sail_image** image)
 
 sail_status_t sail_stop_loading(void* state)
 {
-
     /* Not an error. */
     if (state == NULL)
     {
@@ -176,7 +170,6 @@ sail_status_t sail_stop_loading(void* state)
 
 sail_status_t sail_start_saving_into_file(const char* path, const struct sail_codec_info* codec_info, void** state)
 {
-
     SAIL_TRY(sail_start_saving_into_file_with_options(path, codec_info, NULL, state));
 
     return SAIL_OK;
@@ -187,7 +180,6 @@ sail_status_t sail_start_saving_into_memory(void* buffer,
                                             const struct sail_codec_info* codec_info,
                                             void** state)
 {
-
     SAIL_TRY(sail_start_saving_into_memory_with_options(buffer, buffer_size, codec_info, NULL, state));
 
     return SAIL_OK;
@@ -195,7 +187,6 @@ sail_status_t sail_start_saving_into_memory(void* buffer,
 
 sail_status_t sail_write_next_frame(void* state, const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -217,7 +208,6 @@ sail_status_t sail_write_next_frame(void* state, const struct sail_image* image)
 
 sail_status_t sail_stop_saving(void* state)
 {
-
     SAIL_TRY(stop_saving(state, NULL));
 
     return SAIL_OK;

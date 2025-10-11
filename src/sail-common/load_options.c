@@ -30,7 +30,6 @@
 
 sail_status_t sail_alloc_load_options(struct sail_load_options** load_options)
 {
-
     SAIL_CHECK_PTR(load_options);
 
     void* ptr;
@@ -45,7 +44,6 @@ sail_status_t sail_alloc_load_options(struct sail_load_options** load_options)
 
 void sail_destroy_load_options(struct sail_load_options* load_options)
 {
-
     if (load_options == NULL)
     {
         return;
@@ -58,7 +56,6 @@ void sail_destroy_load_options(struct sail_load_options* load_options)
 sail_status_t sail_alloc_load_options_from_features(const struct sail_load_features* load_features,
                                                     struct sail_load_options** load_options)
 {
-
     SAIL_CHECK_PTR(load_options);
 
     struct sail_load_options* load_options_local;
@@ -88,7 +85,6 @@ sail_status_t sail_alloc_load_options_from_features(const struct sail_load_featu
 
 sail_status_t sail_copy_load_options(const struct sail_load_options* source, struct sail_load_options** target)
 {
-
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 

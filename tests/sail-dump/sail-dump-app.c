@@ -46,7 +46,6 @@ int main(int argc, char* argv[])
 
     while ((res = sail_load_next_frame(state, &image)) == SAIL_OK)
     {
-
         SAIL_TRY_OR_EXECUTE(sail_dump(image),
                             /* on error */ return 3);
 

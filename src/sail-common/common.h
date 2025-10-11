@@ -35,7 +35,6 @@
 /* Pixel format */
 enum SailPixelFormat
 {
-
     /*
      * Unknown or unsupported pixel format that cannot be parsed by SAIL.
      */
@@ -178,7 +177,6 @@ enum SailPixelFormat
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */
 enum SailChromaSubsampling
 {
-
     SAIL_CHROMA_SUBSAMPLING_UNKNOWN,
     SAIL_CHROMA_SUBSAMPLING_311,
     SAIL_CHROMA_SUBSAMPLING_400,
@@ -193,7 +191,6 @@ enum SailChromaSubsampling
 /* Orientation. */
 enum SailOrientation
 {
-
     SAIL_ORIENTATION_NORMAL,
     SAIL_ORIENTATION_ROTATED_90,
     SAIL_ORIENTATION_ROTATED_180,
@@ -207,7 +204,6 @@ enum SailOrientation
 /* Pixels compression types. */
 enum SailCompression
 {
-
     /* Unknown compression. */
     SAIL_COMPRESSION_UNKNOWN,
 
@@ -256,7 +252,6 @@ enum SailCompression
 /* Meta data. */
 enum SailMetaData
 {
-
     /* Unknown meta data type. */
     SAIL_META_DATA_UNKNOWN,
 
@@ -292,7 +287,6 @@ enum SailMetaData
 /* Resolution units. */
 enum SailResolutionUnit
 {
-
     SAIL_RESOLUTION_UNIT_UNKNOWN,
     SAIL_RESOLUTION_UNIT_MICROMETER,
     SAIL_RESOLUTION_UNIT_CENTIMETER,
@@ -303,7 +297,6 @@ enum SailResolutionUnit
 /* Codec features. */
 enum SailCodecFeature
 {
-
     /* Unknown codec feature used to indicate an error in parsing functions. */
     SAIL_CODEC_FEATURE_UNKNOWN = 1 << 0,
 
@@ -332,7 +325,6 @@ enum SailCodecFeature
 /* Load or save options. */
 enum SailOption
 {
-
     /*
      * Instruction to load or save image meta data like JPEG comments or EXIF.
      * Loading special properties in source images is also affected by this option.

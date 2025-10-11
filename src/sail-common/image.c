@@ -30,7 +30,6 @@
 
 sail_status_t sail_alloc_image(struct sail_image** image)
 {
-
     SAIL_CHECK_PTR(image);
 
     void* ptr;
@@ -56,7 +55,6 @@ sail_status_t sail_alloc_image(struct sail_image** image)
 
 void sail_destroy_image(struct sail_image* image)
 {
-
     if (image == NULL)
     {
         return;
@@ -76,7 +74,6 @@ void sail_destroy_image(struct sail_image* image)
 
 sail_status_t sail_copy_image(const struct sail_image* source, struct sail_image** target)
 {
-
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
@@ -108,7 +105,6 @@ sail_status_t sail_copy_image(const struct sail_image* source, struct sail_image
 
 sail_status_t sail_copy_image_skeleton(const struct sail_image* source, struct sail_image** target)
 {
-
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
@@ -193,7 +189,6 @@ sail_status_t sail_check_image_valid(const struct sail_image* image)
 
 sail_status_t sail_mirror_vertically(struct sail_image* image)
 {
-
     SAIL_TRY(sail_mirror(image, SAIL_ORIENTATION_MIRRORED_VERTICALLY));
 
     return SAIL_OK;
@@ -201,7 +196,6 @@ sail_status_t sail_mirror_vertically(struct sail_image* image)
 
 sail_status_t sail_mirror_horizontally(struct sail_image* image)
 {
-
     SAIL_TRY(sail_mirror(image, SAIL_ORIENTATION_MIRRORED_HORIZONTALLY));
 
     return SAIL_OK;
@@ -272,7 +266,6 @@ sail_status_t sail_mirror(struct sail_image* image, enum SailOrientation orienta
 
 void* sail_scan_line(const struct sail_image* image, unsigned row)
 {
-
     if (SAIL_UNLIKELY(image == NULL || image->pixels == NULL))
     {
         return NULL;

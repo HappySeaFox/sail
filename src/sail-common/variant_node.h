@@ -40,7 +40,6 @@ struct sail_variant;
  */
 struct sail_variant_node
 {
-
     /*
      * Variant value.
      */

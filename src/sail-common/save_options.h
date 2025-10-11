@@ -42,7 +42,6 @@ struct sail_save_features;
  */
 struct sail_save_options
 {
-
     /* Or-ed manipulation options. See SailOption. */
     int options;
 

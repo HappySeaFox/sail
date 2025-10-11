@@ -38,7 +38,6 @@ struct sail_codec_layout_v8;
  */
 struct sail_codec
 {
-
     /* Layout version. */
     int layout;
 

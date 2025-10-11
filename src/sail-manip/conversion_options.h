@@ -41,7 +41,6 @@ extern "C"
  */
 struct sail_conversion_options
 {
-
     /*
      * Or-ed SailConversionOption-s. If zero, SAIL_CONVERSION_OPTION_DROP_ALPHA is assumed.
      */

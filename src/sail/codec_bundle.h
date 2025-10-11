@@ -40,7 +40,6 @@ struct sail_codec;
  */
 struct sail_codec_bundle
 {
-
     /* Codec information. */
     struct sail_codec_info* codec_info;
 

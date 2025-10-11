@@ -74,7 +74,6 @@ static MunitResult test_conversions_rgba_to_rgb(const MunitParameter params[], v
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA)
     {
-
         struct sail_image* converted = NULL;
         sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted);
 
@@ -102,7 +101,6 @@ static MunitResult test_conversions_rgb_to_rgba(const MunitParameter params[], v
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR)
     {
-
         struct sail_image* converted = NULL;
         sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP32_RGBA, &converted);
 
@@ -130,7 +128,6 @@ static MunitResult test_conversions_rgb_to_grayscale(const MunitParameter params
 
     if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR)
     {
-
         struct sail_image* converted = NULL;
         sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE, &converted);
 
@@ -186,7 +183,6 @@ static MunitResult test_conversions_rgb_to_indexed(const MunitParameter params[]
     if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB || image->pixel_format == SAIL_PIXEL_FORMAT_BPP24_BGR
         || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA || image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_BGRA)
     {
-
         struct sail_image* converted = NULL;
         sail_status_t status         = sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP8_INDEXED, &converted);
 

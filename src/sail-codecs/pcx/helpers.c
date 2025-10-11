@@ -38,7 +38,6 @@ static const unsigned char SAIL_PCX_MONO_PALETTE[] = {0, 0, 0, 255, 255, 255};
 
 sail_status_t pcx_private_read_header(struct sail_io* io, struct SailPcxHeader* header)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &header->id, sizeof(header->id)));
     SAIL_TRY(io->strict_read(io->stream, &header->version, sizeof(header->version)));
     SAIL_TRY(io->strict_read(io->stream, &header->encoding, sizeof(header->encoding)));
@@ -63,7 +62,6 @@ sail_status_t pcx_private_read_header(struct sail_io* io, struct SailPcxHeader* 
 
 sail_status_t pcx_private_sail_pixel_format(unsigned bits_per_plane, unsigned planes, enum SailPixelFormat* result)
 {
-
     switch (planes)
     {
     case 1:
@@ -104,7 +102,6 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format,
                                         uint8_t palette16[48],
                                         struct sail_palette** palette)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
@@ -169,7 +166,6 @@ sail_status_t pcx_private_read_uncompressed(struct sail_io* io,
                                             unsigned char* buffer,
                                             struct sail_image* image)
 {
-
     for (unsigned row = 0; row < image->height; row++)
     {
         unsigned char* target_scan = sail_scan_line(image, row);
@@ -191,7 +187,6 @@ sail_status_t pcx_private_read_uncompressed(struct sail_io* io,
 
 sail_status_t pcx_private_write_header(struct sail_io* io, const struct SailPcxHeader* header)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &header->id, sizeof(header->id)));
     SAIL_TRY(io->strict_write(io->stream, &header->version, sizeof(header->version)));
     SAIL_TRY(io->strict_write(io->stream, &header->encoding, sizeof(header->encoding)));
@@ -218,7 +213,6 @@ sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_
                                                      uint8_t* bits_per_plane,
                                                      uint8_t* planes)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
@@ -261,7 +255,6 @@ sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_
 
 void pcx_private_palette_to_rgb(const struct sail_palette* palette, unsigned char* rgb_output, unsigned color_count)
 {
-
     if (palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
     {
         memcpy(rgb_output, palette->data, color_count * 3);
@@ -281,7 +274,6 @@ void pcx_private_palette_to_rgb(const struct sail_palette* palette, unsigned cha
 
 sail_status_t pcx_private_write_palette(struct sail_io* io, const struct sail_palette* palette)
 {
-
     /* Write 256-color palette signature. */
     uint8_t signature = SAIL_PCX_PALETTE_SIGNATURE;
     SAIL_TRY(io->strict_write(io->stream, &signature, sizeof(signature)));

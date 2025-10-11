@@ -36,7 +36,6 @@ extern "C"
 
 enum SailLogLevel
 {
-
     /* Special log level for setting as a barrier to silent all messages. */
     SAIL_LOG_LEVEL_SILENCE,
 

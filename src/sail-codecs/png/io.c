@@ -34,7 +34,6 @@
 
 void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size)
 {
-
     if (png_ptr == NULL)
     {
         return;
@@ -52,7 +51,6 @@ void png_private_my_read_fn(png_structp png_ptr, png_bytep bytes, png_size_t byt
 
 void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t bytes_size)
 {
-
     if (png_ptr == NULL)
     {
         return;
@@ -70,7 +68,6 @@ void png_private_my_write_fn(png_structp png_ptr, png_bytep bytes, png_size_t by
 
 void png_private_my_flush_fn(png_structp png_ptr)
 {
-
     if (png_ptr == NULL)
     {
         return;

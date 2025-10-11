@@ -51,7 +51,6 @@
 
 static sail_status_t hex_string_into_data(const char* str, size_t str_length, void* data, size_t* data_saved)
 {
-
     unsigned char* data_local = data;
     *data_saved               = 0;
     unsigned byte;
@@ -78,7 +77,6 @@ static sail_status_t hex_string_into_data(const char* str, size_t str_length, vo
 
 sail_status_t sail_memdup(const void* input, size_t input_size, void** output)
 {
-
     if (input == NULL)
     {
         *output = NULL;
@@ -100,7 +98,6 @@ sail_status_t sail_memdup(const void* input, size_t input_size, void** output)
 
 sail_status_t sail_strdup(const char* input, char** output)
 {
-
     if (input == NULL)
     {
         *output = NULL;
@@ -116,7 +113,6 @@ sail_status_t sail_strdup(const char* input, char** output)
 
 sail_status_t sail_strdup_length(const char* input, size_t length, char** output)
 {
-
     if (input == NULL)
     {
         *output = NULL;
@@ -141,7 +137,6 @@ sail_status_t sail_strdup_length(const char* input, size_t length, char** output
 
 sail_status_t sail_concat(char** output, int num, ...)
 {
-
     if (num < 1)
     {
         SAIL_LOG_ERROR("The second argument of %s() must be >= 1", __func__);
@@ -193,7 +188,6 @@ sail_status_t sail_concat(char** output, int num, ...)
 
 void sail_to_lower(char* str)
 {
-
     if (str == NULL)
     {
         return;
@@ -209,7 +203,6 @@ void sail_to_lower(char* str)
 
 sail_status_t sail_to_wchar(const char* input, wchar_t** output)
 {
-
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output);
 
@@ -244,7 +237,6 @@ sail_status_t sail_to_wchar(const char* input, wchar_t** output)
 
 uint64_t sail_string_hash(const char* str)
 {
-
     if (str == NULL || *str == '\0')
     {
         return 0;
@@ -265,7 +257,6 @@ uint64_t sail_string_hash(const char* str)
 
 unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_UNKNOWN: return 0;
@@ -384,7 +375,6 @@ static sail_status_t sail_compare_bits_per_pixel(enum SailPixelFormat pixel_form
                                                  enum SailPixelFormat pixel_format2,
                                                  enum SailPixelFormatComparisonPrivate op)
 {
-
     if (pixel_format1 == SAIL_PIXEL_FORMAT_UNKNOWN || pixel_format2 == SAIL_PIXEL_FORMAT_UNKNOWN)
     {
         return false;
@@ -411,38 +401,32 @@ static sail_status_t sail_compare_bits_per_pixel(enum SailPixelFormat pixel_form
 
 bool sail_less_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2)
 {
-
     return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS);
 }
 
 bool sail_less_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2)
 {
-
     return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_LESS_EQUAL);
 }
 
 bool sail_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2)
 {
-
     return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_EQUAL);
 }
 
 bool sail_greater_equal_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2)
 {
-
     return sail_compare_bits_per_pixel(pixel_format1, pixel_format2,
                                        SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER_EQUAL);
 }
 
 bool sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1, enum SailPixelFormat pixel_format2)
 {
-
     return sail_compare_bits_per_pixel(pixel_format1, pixel_format2, SAIL_PIXEL_FORMAT_COMPARISON_PRIVATE_GREATER);
 }
 
 unsigned sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format)
 {
-
     const unsigned bits_per_pixel = sail_bits_per_pixel(pixel_format);
     const double bytes_per_line   = ((double)width * bits_per_pixel + 7) / 8;
     return (bytes_per_line < UINT_MAX) ? (unsigned)bytes_per_line : 0;
@@ -450,7 +434,6 @@ unsigned sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format)
 
 bool sail_is_indexed(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
@@ -470,7 +453,6 @@ bool sail_is_indexed(enum SailPixelFormat pixel_format)
 
 bool sail_is_grayscale(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
@@ -494,7 +476,6 @@ bool sail_is_grayscale(enum SailPixelFormat pixel_format)
 
 bool sail_is_rgb_family(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP16_RGB555:
@@ -537,7 +518,6 @@ bool sail_is_rgb_family(enum SailPixelFormat pixel_format)
 
 bool sail_is_cmyk(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP32_CMYK:
@@ -556,19 +536,16 @@ bool sail_is_cmyk(enum SailPixelFormat pixel_format)
 
 bool sail_is_ycbcr(enum SailPixelFormat pixel_format)
 {
-
     return pixel_format == SAIL_PIXEL_FORMAT_BPP24_YCBCR;
 }
 
 bool sail_is_ycck(enum SailPixelFormat pixel_format)
 {
-
     return pixel_format == SAIL_PIXEL_FORMAT_BPP32_YCCK;
 }
 
 void sail_print_errno(const char* format)
 {
-
     if (strstr(format, "%s") == NULL)
     {
         SAIL_LOG_ERROR("Format argument must contain %%s");
@@ -628,7 +605,6 @@ uint64_t sail_now(void)
 
 bool sail_path_exists(const char* path)
 {
-
     if (path == NULL)
     {
         SAIL_LOG_ERROR("Path is NULL");
@@ -656,7 +632,6 @@ bool sail_path_exists(const char* path)
 
 bool sail_is_dir(const char* path)
 {
-
     if (path == NULL)
     {
         SAIL_LOG_ERROR("Path is NULL");
@@ -704,7 +679,6 @@ bool sail_is_dir(const char* path)
 
 bool sail_is_file(const char* path)
 {
-
     if (path == NULL)
     {
         SAIL_LOG_ERROR("Path is NULL");
@@ -752,7 +726,6 @@ bool sail_is_file(const char* path)
 
 sail_status_t sail_file_size(const char* path, size_t* size)
 {
-
     SAIL_CHECK_PTR(path);
 
     bool is_file;
@@ -810,7 +783,6 @@ sail_status_t sail_file_size(const char* path, size_t* size)
 
 sail_status_t sail_file_contents_into_data(const char* path, void* data)
 {
-
     SAIL_CHECK_PTR(path);
     SAIL_CHECK_PTR(data);
 
@@ -851,7 +823,6 @@ sail_status_t sail_file_contents_into_data(const char* path, void* data)
 
 sail_status_t sail_alloc_data_from_file_contents(const char* path, void** data, size_t* data_size)
 {
-
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(data_size);
 
@@ -872,7 +843,6 @@ sail_status_t sail_alloc_data_from_file_contents(const char* path, void** data, 
 
 sail_status_t sail_hex_string_into_data(const char* str, void* data)
 {
-
     SAIL_CHECK_PTR(str);
     SAIL_CHECK_PTR(data);
 
@@ -884,7 +854,6 @@ sail_status_t sail_hex_string_into_data(const char* str, void* data)
 
 sail_status_t sail_hex_string_to_data(const char* str, void** data, size_t* data_size)
 {
-
     SAIL_CHECK_PTR(str);
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(data_size);
@@ -907,7 +876,6 @@ sail_status_t sail_hex_string_to_data(const char* str, void** data, size_t* data
 
 sail_status_t sail_data_into_hex_string(const void* data, size_t data_size, char* str)
 {
-
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(str);
 
@@ -931,7 +899,6 @@ sail_status_t sail_data_into_hex_string(const void* data, size_t data_size, char
 
 sail_status_t sail_data_to_hex_string(const void* data, size_t data_size, char** str)
 {
-
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(str);
 
@@ -990,7 +957,6 @@ uint64_t sail_reverse_uint64(uint64_t v)
 #ifdef SAIL_WINDOWS_UTF8_PATHS
 sail_status_t sail_multibyte_to_wchar(const char* str, wchar_t** wstr)
 {
-
     SAIL_CHECK_PTR(str);
     SAIL_CHECK_PTR(wstr);
 

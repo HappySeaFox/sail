@@ -40,7 +40,6 @@ extern "C"
  */
 struct sail_iccp
 {
-
     /* ICC profile binary data. */
     void* data;
 

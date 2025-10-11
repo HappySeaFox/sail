@@ -40,7 +40,6 @@ struct sail_meta_data;
  */
 struct sail_meta_data_node
 {
-
     /*
      * Meta data value.
      */

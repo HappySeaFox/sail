@@ -59,7 +59,6 @@ static sail_status_t alloc_qoi_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct qoi_state** qoi_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct qoi_state), &ptr));
     *qoi_state = ptr;
@@ -82,7 +81,6 @@ static sail_status_t alloc_qoi_state(struct sail_io* io,
 
 static void destroy_qoi_state(struct qoi_state* qoi_state)
 {
-
     if (qoi_state == NULL)
     {
         return;
@@ -102,7 +100,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -118,7 +115,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_qoi(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void* state, struct sail_image** image)
 {
-
     struct qoi_state* qoi_state = state;
 
     if (qoi_state->frame_loaded)
@@ -182,7 +178,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void* state, struct sail_image* image)
 {
-
     const struct qoi_state* qoi_state = state;
 
     const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
@@ -194,7 +189,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_qoi(void** state)
 {
-
     struct qoi_state* qoi_state = *state;
 
     *state = NULL;
@@ -212,7 +206,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     struct qoi_state* qoi_state;
@@ -231,7 +224,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_qoi(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void* state, const struct sail_image* image)
 {
-
     struct qoi_state* qoi_state = state;
 
     unsigned char channels;
@@ -265,7 +257,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void* state, const struct sail_image* image)
 {
-
     struct qoi_state* qoi_state = state;
 
     const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
@@ -277,7 +268,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_qoi(void** state)
 {
-
     struct qoi_state* qoi_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */

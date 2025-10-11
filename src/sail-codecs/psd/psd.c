@@ -59,7 +59,6 @@ static sail_status_t alloc_psd_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct psd_state** psd_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct psd_state), &ptr));
     *psd_state = ptr;
@@ -84,7 +83,6 @@ static sail_status_t alloc_psd_state(struct sail_io* io,
 
 static void destroy_psd_state(struct psd_state* psd_state)
 {
-
     if (psd_state == NULL)
     {
         return;
@@ -105,7 +103,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_psd(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -137,7 +134,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_psd(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, struct sail_image** image)
 {
-
     struct psd_state* psd_state = state;
 
     if (psd_state->frame_loaded)
@@ -269,7 +265,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_image* image)
 {
-
     const struct psd_state* psd_state = state;
 
     const unsigned bpp = (psd_state->channels * psd_state->depth + 7) / 8;
@@ -386,7 +381,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_psd(void** state)
 {
-
     struct psd_state* psd_state = *state;
 
     *state = NULL;
@@ -404,7 +398,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_psd(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     (void)io;
     (void)save_options;
     (void)state;
@@ -414,7 +407,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_psd(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_psd(void* state, const struct sail_image* image)
 {
-
     (void)state;
     (void)image;
 
@@ -423,7 +415,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_psd(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_psd(void* state, const struct sail_image* image)
 {
-
     (void)state;
     (void)image;
 
@@ -432,7 +423,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_psd(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_psd(void** state)
 {
-
     (void)state;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);

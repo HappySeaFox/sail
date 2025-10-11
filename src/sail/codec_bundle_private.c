@@ -27,7 +27,6 @@
 
 sail_status_t alloc_codec_bundle(struct sail_codec_bundle** codec_bundle)
 {
-
     SAIL_CHECK_PTR(codec_bundle);
 
     void* ptr;
@@ -42,7 +41,6 @@ sail_status_t alloc_codec_bundle(struct sail_codec_bundle** codec_bundle)
 
 void destroy_codec_bundle(struct sail_codec_bundle* codec_bundle)
 {
-
     if (codec_bundle == NULL)
     {
         return;

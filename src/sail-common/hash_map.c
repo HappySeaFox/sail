@@ -32,7 +32,6 @@
  */
 static inline uint64_t calculate_hash(const char* key)
 {
-
     return sail_string_hash(key) % SAIL_HASH_MAP_SIZE;
 }
 
@@ -41,7 +40,6 @@ static inline uint64_t calculate_hash(const char* key)
  */
 sail_status_t sail_alloc_hash_map(struct sail_hash_map** hash_map)
 {
-
     SAIL_CHECK_PTR(hash_map);
 
     void* ptr;
@@ -58,7 +56,6 @@ sail_status_t sail_alloc_hash_map(struct sail_hash_map** hash_map)
 
 void sail_destroy_hash_map(struct sail_hash_map* hash_map)
 {
-
     if (hash_map == NULL)
     {
         return;
@@ -71,7 +68,6 @@ void sail_destroy_hash_map(struct sail_hash_map* hash_map)
 
 sail_status_t sail_put_hash_map(struct sail_hash_map* hash_map, const char* key, const struct sail_variant* value)
 {
-
     SAIL_CHECK_PTR(hash_map);
     SAIL_CHECK_PTR(key);
     SAIL_CHECK_PTR(value);
@@ -114,7 +110,6 @@ sail_status_t sail_put_hash_map(struct sail_hash_map* hash_map, const char* key,
 
 bool sail_hash_map_has_key(const struct sail_hash_map* hash_map, const char* key)
 {
-
     if (key == NULL)
     {
         return false;
@@ -134,7 +129,6 @@ bool sail_hash_map_has_key(const struct sail_hash_map* hash_map, const char* key
 
 struct sail_variant* sail_hash_map_value(const struct sail_hash_map* hash_map, const char* key)
 {
-
     if (key == NULL)
     {
         return NULL;
@@ -154,7 +148,6 @@ struct sail_variant* sail_hash_map_value(const struct sail_hash_map* hash_map, c
 
 unsigned sail_hash_map_size(const struct sail_hash_map* hash_map)
 {
-
     unsigned size = 0;
 
     for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++)
@@ -172,7 +165,6 @@ unsigned sail_hash_map_size(const struct sail_hash_map* hash_map)
 void sail_traverse_hash_map(const struct sail_hash_map* hash_map,
                             bool (*callback)(const char* key, const struct sail_variant* value))
 {
-
     for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++)
     {
         for (const struct sail_variant_node* key_variant_node = hash_map->buckets[i];
@@ -190,7 +182,6 @@ void sail_traverse_hash_map_with_user_data(const struct sail_hash_map* hash_map,
                                                             void* user_data),
                                            void* user_data)
 {
-
     for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++)
     {
         for (const struct sail_variant_node* key_variant_node = hash_map->buckets[i];
@@ -204,7 +195,6 @@ void sail_traverse_hash_map_with_user_data(const struct sail_hash_map* hash_map,
 
 void sail_erase_hash_map_key(struct sail_hash_map* hash_map, const char* key)
 {
-
     if (key == NULL)
     {
         return;
@@ -217,7 +207,6 @@ void sail_erase_hash_map_key(struct sail_hash_map* hash_map, const char* key)
     {
         if (strcmp(sail_variant_to_string(key_variant_node->variant), key) == 0)
         {
-
             struct sail_variant_node* next_key_variant_node = key_variant_node->next->next;
 
             sail_destroy_variant_node(key_variant_node->next);
@@ -241,7 +230,6 @@ void sail_erase_hash_map_key(struct sail_hash_map* hash_map, const char* key)
 
 void sail_clear_hash_map(struct sail_hash_map* hash_map)
 {
-
     for (size_t i = 0; i < SAIL_HASH_MAP_SIZE; i++)
     {
         sail_destroy_variant_node_chain(hash_map->buckets[i]);
@@ -251,7 +239,6 @@ void sail_clear_hash_map(struct sail_hash_map* hash_map)
 
 sail_status_t sail_copy_hash_map(const struct sail_hash_map* source_hash_map, struct sail_hash_map** target_hash_map)
 {
-
     SAIL_CHECK_PTR(source_hash_map);
     SAIL_CHECK_PTR(target_hash_map);
 

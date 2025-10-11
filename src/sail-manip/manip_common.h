@@ -30,7 +30,6 @@
  */
 enum SailConversionOption
 {
-
     /*
      * Drops the input alpha channel if the output alpha channel doesn't exist.
      * For example, when we convert RGBA pixels to RGB.

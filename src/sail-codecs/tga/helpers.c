@@ -36,7 +36,6 @@ static const uint16_t TGA2_EXTENSION_AREA_LENGTH = 495;
 
 sail_status_t tga_private_read_file_header(struct sail_io* io, struct TgaFileHeader* file_header)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &file_header->id_length, sizeof(file_header->id_length)));
     SAIL_TRY(io->strict_read(io->stream, &file_header->color_map_type, sizeof(file_header->color_map_type)));
     SAIL_TRY(io->strict_read(io->stream, &file_header->image_type, sizeof(file_header->image_type)));
@@ -57,7 +56,6 @@ sail_status_t tga_private_read_file_header(struct sail_io* io, struct TgaFileHea
 
 sail_status_t tga_private_read_file_footer(struct sail_io* io, struct TgaFooter* footer)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &footer->extension_area_offset, sizeof(footer->extension_area_offset)));
     SAIL_TRY(io->strict_read(io->stream, &footer->developer_area_offset, sizeof(footer->developer_area_offset)));
     SAIL_TRY(io->strict_read(io->stream, &footer->signature, sizeof(footer->signature)));
@@ -67,7 +65,6 @@ sail_status_t tga_private_read_file_footer(struct sail_io* io, struct TgaFooter*
 
 enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp)
 {
-
     switch (image_type)
     {
     case TGA_INDEXED:
@@ -107,7 +104,6 @@ enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp)
 
 enum SailPixelFormat tga_private_palette_bpp_to_sail_pixel_format(int bpp)
 {
-
     switch (bpp)
     {
     case 15:
@@ -126,7 +122,6 @@ sail_status_t tga_private_fetch_id(struct sail_io* io,
                                    const struct TgaFileHeader* file_header,
                                    struct sail_meta_data_node** meta_data_node)
 {
-
     struct sail_meta_data_node* meta_data_node_local;
     SAIL_TRY(sail_alloc_meta_data_node_and_value(&meta_data_node_local));
 
@@ -155,7 +150,6 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
                                           double* gamma,
                                           struct sail_meta_data_node** meta_data_node)
 {
-
     /* Find the last node. */
     struct sail_meta_data_node** last_meta_data_node = meta_data_node;
 
@@ -350,7 +344,6 @@ sail_status_t tga_private_fetch_palette(struct sail_io* io,
                                         const struct TgaFileHeader* file_header,
                                         struct sail_palette** palette)
 {
-
     size_t element_size_in_bytes = ((size_t)file_header->color_map_entry_size + 7) / 8;
     size_t bytes_to_skip         = file_header->first_color_map_entry_index * element_size_in_bytes;
 
@@ -427,7 +420,6 @@ sail_status_t tga_private_fetch_palette(struct sail_io* io,
 
 sail_status_t tga_private_write_file_header(struct sail_io* io, const struct TgaFileHeader* file_header)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &file_header->id_length, sizeof(file_header->id_length)));
     SAIL_TRY(io->strict_write(io->stream, &file_header->color_map_type, sizeof(file_header->color_map_type)));
     SAIL_TRY(io->strict_write(io->stream, &file_header->image_type, sizeof(file_header->image_type)));
@@ -448,7 +440,6 @@ sail_status_t tga_private_write_file_header(struct sail_io* io, const struct Tga
 
 sail_status_t tga_private_write_file_footer(struct sail_io* io, const struct TgaFooter* footer)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &footer->extension_area_offset, sizeof(footer->extension_area_offset)));
     SAIL_TRY(io->strict_write(io->stream, &footer->developer_area_offset, sizeof(footer->developer_area_offset)));
     SAIL_TRY(io->strict_write(io->stream, footer->signature, sizeof(footer->signature)));
@@ -460,7 +451,6 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
                                                double gamma,
                                                const struct sail_meta_data_node* meta_data_node)
 {
-
     /* Extension area size (495 bytes for TGA 2.0). */
     uint16_t extension_size = TGA2_EXTENSION_AREA_LENGTH;
     SAIL_TRY(io->strict_write(io->stream, &extension_size, sizeof(extension_size)));
@@ -668,7 +658,6 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
 
 void tga_private_pixel_format_to_tga_format(enum SailPixelFormat pixel_format, uint8_t* image_type, uint8_t* bpp)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
@@ -713,7 +702,6 @@ sail_status_t tga_private_write_palette(struct sail_io* io,
                                         const struct sail_palette* palette,
                                         struct TgaFileHeader* file_header)
 {
-
     /* Write palette data converting RGB(A) to BGR(A). */
     const unsigned bytes_per_entry    = (file_header->color_map_entry_size + 7) / 8;
     const unsigned char* palette_data = palette->data;

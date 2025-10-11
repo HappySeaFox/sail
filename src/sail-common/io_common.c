@@ -30,7 +30,6 @@
 
 sail_status_t sail_alloc_io(struct sail_io** io)
 {
-
     SAIL_CHECK_PTR(io);
 
     void* ptr;
@@ -54,7 +53,6 @@ sail_status_t sail_alloc_io(struct sail_io** io)
 
 void sail_destroy_io(struct sail_io* io)
 {
-
     if (io == NULL)
     {
         return;
@@ -84,7 +82,6 @@ sail_status_t sail_check_io_valid(const struct sail_io* io)
 
 sail_status_t sail_io_size(struct sail_io* io, size_t* size)
 {
-
     SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_PTR(size);
 
@@ -104,7 +101,6 @@ sail_status_t sail_io_size(struct sail_io* io, size_t* size)
 
 sail_status_t sail_io_contents_into_data(struct sail_io* io, void* data)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(data);
 
@@ -136,7 +132,6 @@ sail_status_t sail_io_contents_into_data(struct sail_io* io, void* data)
 
 sail_status_t sail_alloc_data_from_io_contents(struct sail_io* io, void** data, size_t* data_size)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(data);
     SAIL_CHECK_PTR(data_size);
@@ -159,7 +154,6 @@ sail_status_t sail_alloc_data_from_io_contents(struct sail_io* io, void** data, 
 
 sail_status_t sail_read_string_from_io(struct sail_io* io, char* str, size_t str_size)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(str);
 

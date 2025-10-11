@@ -41,7 +41,6 @@ struct sail_string_node;
  */
 struct sail_save_features
 {
-
     /*
      * A list of supported pixel formats that can be written by this codec.
      */

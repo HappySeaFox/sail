@@ -31,7 +31,6 @@
 
 sail_status_t bmp_private_read_ddb_file_header(struct sail_io* io, struct SailBmpDdbFileHeader* ddb_file_header)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &ddb_file_header->type, sizeof(ddb_file_header->type)));
 
     return SAIL_OK;
@@ -39,7 +38,6 @@ sail_status_t bmp_private_read_ddb_file_header(struct sail_io* io, struct SailBm
 
 sail_status_t bmp_private_read_v1(struct sail_io* io, struct SailBmpDdbBitmap* v1)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &v1->type, sizeof(v1->type)));
     SAIL_TRY(io->strict_read(io->stream, &v1->width, sizeof(v1->width)));
     SAIL_TRY(io->strict_read(io->stream, &v1->height, sizeof(v1->height)));
@@ -53,7 +51,6 @@ sail_status_t bmp_private_read_v1(struct sail_io* io, struct SailBmpDdbBitmap* v
 
 sail_status_t bmp_private_read_dib_file_header(struct sail_io* io, struct SailBmpDibFileHeader* fh)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &fh->type, sizeof(fh->type)));
     SAIL_TRY(io->strict_read(io->stream, &fh->size, sizeof(fh->size)));
     SAIL_TRY(io->strict_read(io->stream, &fh->reserved1, sizeof(fh->reserved1)));
@@ -65,7 +62,6 @@ sail_status_t bmp_private_read_dib_file_header(struct sail_io* io, struct SailBm
 
 sail_status_t bmp_private_read_v2(struct sail_io* io, struct SailBmpDibHeaderV2* v2)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &v2->size, sizeof(v2->size)));
     SAIL_TRY(io->strict_read(io->stream, &v2->width, sizeof(v2->width)));
     SAIL_TRY(io->strict_read(io->stream, &v2->height, sizeof(v2->height)));
@@ -77,7 +73,6 @@ sail_status_t bmp_private_read_v2(struct sail_io* io, struct SailBmpDibHeaderV2*
 
 sail_status_t bmp_private_read_v3(struct sail_io* io, struct SailBmpDibHeaderV3* v3)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &v3->compression, sizeof(v3->compression)));
     SAIL_TRY(io->strict_read(io->stream, &v3->bitmap_size, sizeof(v3->bitmap_size)));
     SAIL_TRY(io->strict_read(io->stream, &v3->x_pixels_per_meter, sizeof(v3->x_pixels_per_meter)));
@@ -90,7 +85,6 @@ sail_status_t bmp_private_read_v3(struct sail_io* io, struct SailBmpDibHeaderV3*
 
 sail_status_t bmp_private_read_v4(struct sail_io* io, struct SailBmpDibHeaderV4* v4)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &v4->red_mask, sizeof(v4->red_mask)));
     SAIL_TRY(io->strict_read(io->stream, &v4->green_mask, sizeof(v4->green_mask)));
     SAIL_TRY(io->strict_read(io->stream, &v4->blue_mask, sizeof(v4->blue_mask)));
@@ -114,7 +108,6 @@ sail_status_t bmp_private_read_v4(struct sail_io* io, struct SailBmpDibHeaderV4*
 
 sail_status_t bmp_private_read_v5(struct sail_io* io, struct SailBmpDibHeaderV5* v5)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &v5->intent, sizeof(v5->intent)));
     SAIL_TRY(io->strict_read(io->stream, &v5->profile_data, sizeof(v5->profile_data)));
     SAIL_TRY(io->strict_read(io->stream, &v5->profile_size, sizeof(v5->profile_size)));
@@ -125,7 +118,6 @@ sail_status_t bmp_private_read_v5(struct sail_io* io, struct SailBmpDibHeaderV5*
 
 sail_status_t bmp_private_bit_count_to_pixel_format(uint16_t bit_count, enum SailPixelFormat* pixel_format)
 {
-
     switch (bit_count)
     {
     case 1: *pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
@@ -144,7 +136,6 @@ sail_status_t bmp_private_fetch_iccp(struct sail_io* io,
                                      uint32_t profile_size,
                                      struct sail_iccp** iccp)
 {
-
     SAIL_TRY(io->seek(io->stream, offset_of_data, SEEK_SET));
 
     void* profile_data;
@@ -161,7 +152,6 @@ sail_status_t bmp_private_fetch_iccp(struct sail_io* io,
 
 sail_status_t bmp_private_skip_end_of_scan_line(struct sail_io* io)
 {
-
     uint8_t marker;
     SAIL_TRY(io->strict_read(io->stream, &marker, sizeof(marker)));
 
@@ -184,7 +174,6 @@ sail_status_t bmp_private_skip_end_of_scan_line(struct sail_io* io)
 
 sail_status_t bmp_private_bytes_in_row(unsigned width, unsigned bit_count, unsigned* bytes_in_row)
 {
-
     switch (bit_count)
     {
     case 1: *bytes_in_row = (width + 7) / 8; return SAIL_OK;
@@ -200,14 +189,12 @@ sail_status_t bmp_private_bytes_in_row(unsigned width, unsigned bit_count, unsig
 
 unsigned bmp_private_pad_bytes(unsigned bytes_in_row)
 {
-
     const unsigned remainder = bytes_in_row % 4;
     return (remainder == 0) ? 0 : (4 - remainder);
 }
 
 sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb24_t** palette, unsigned* palette_count)
 {
-
     switch (bit_count)
     {
     case 1:
@@ -257,7 +244,6 @@ sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb24_t**
 
 sail_status_t bmp_private_write_dib_file_header(struct sail_io* io, const struct SailBmpDibFileHeader* fh)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &fh->type, sizeof(fh->type)));
     SAIL_TRY(io->strict_write(io->stream, &fh->size, sizeof(fh->size)));
     SAIL_TRY(io->strict_write(io->stream, &fh->reserved1, sizeof(fh->reserved1)));
@@ -269,7 +255,6 @@ sail_status_t bmp_private_write_dib_file_header(struct sail_io* io, const struct
 
 sail_status_t bmp_private_write_v2(struct sail_io* io, const struct SailBmpDibHeaderV2* v2)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &v2->size, sizeof(v2->size)));
     SAIL_TRY(io->strict_write(io->stream, &v2->width, sizeof(v2->width)));
     SAIL_TRY(io->strict_write(io->stream, &v2->height, sizeof(v2->height)));
@@ -281,7 +266,6 @@ sail_status_t bmp_private_write_v2(struct sail_io* io, const struct SailBmpDibHe
 
 sail_status_t bmp_private_write_v3(struct sail_io* io, const struct SailBmpDibHeaderV3* v3)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &v3->compression, sizeof(v3->compression)));
     SAIL_TRY(io->strict_write(io->stream, &v3->bitmap_size, sizeof(v3->bitmap_size)));
     SAIL_TRY(io->strict_write(io->stream, &v3->x_pixels_per_meter, sizeof(v3->x_pixels_per_meter)));
@@ -294,7 +278,6 @@ sail_status_t bmp_private_write_v3(struct sail_io* io, const struct SailBmpDibHe
 
 sail_status_t bmp_private_supported_write_pixel_format(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
@@ -316,7 +299,6 @@ sail_status_t bmp_private_supported_write_pixel_format(enum SailPixelFormat pixe
 
 sail_status_t bmp_private_write_rle8_scan_line(struct sail_io* io, const unsigned char* scan, unsigned width)
 {
-
     unsigned i = 0;
 
     while (i < width)
@@ -387,7 +369,6 @@ sail_status_t bmp_private_write_rle8_scan_line(struct sail_io* io, const unsigne
 
 sail_status_t bmp_private_write_rle4_scan_line(struct sail_io* io, const unsigned char* scan, unsigned width)
 {
-
     unsigned i = 0;
 
     while (i < width)

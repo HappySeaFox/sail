@@ -61,7 +61,6 @@ static sail_status_t alloc_tga_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct tga_state** tga_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct tga_state), &ptr));
     *tga_state = ptr;
@@ -85,7 +84,6 @@ static sail_status_t alloc_tga_state(struct sail_io* io,
 
 static void destroy_tga_state(struct tga_state* tga_state)
 {
-
     if (tga_state == NULL)
     {
         return;
@@ -102,7 +100,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tga(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -122,7 +119,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tga(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, struct sail_image** image)
 {
-
     struct tga_state* tga_state = state;
 
     if (tga_state->frame_loaded)
@@ -223,7 +219,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_image* image)
 {
-
     struct tga_state* tga_state = state;
 
     switch (tga_state->file_header.image_type)
@@ -296,7 +291,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_tga(void** state)
 {
-
     struct tga_state* tga_state = *state;
 
     *state = NULL;
@@ -314,7 +308,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tga(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -327,7 +320,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tga(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tga(void* state, const struct sail_image* image)
 {
-
     struct tga_state* tga_state = state;
 
     if (tga_state->frame_saved)
@@ -431,7 +423,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tga(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tga(void* state, const struct sail_image* image)
 {
-
     struct tga_state* tga_state = state;
 
     const unsigned pixel_size = (tga_state->file_header.bpp + 7) / 8;
@@ -530,7 +521,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tga(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_tga(void** state)
 {
-
     struct tga_state* tga_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */

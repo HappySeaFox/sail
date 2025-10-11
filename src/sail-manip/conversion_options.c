@@ -27,7 +27,6 @@
 
 sail_status_t sail_alloc_conversion_options(struct sail_conversion_options** options)
 {
-
     SAIL_CHECK_PTR(options);
 
     void* ptr;
@@ -43,7 +42,6 @@ sail_status_t sail_alloc_conversion_options(struct sail_conversion_options** opt
 
 void sail_destroy_conversion_options(struct sail_conversion_options* options)
 {
-
     if (options == NULL)
     {
         return;

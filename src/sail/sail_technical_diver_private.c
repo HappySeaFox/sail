@@ -33,7 +33,6 @@
 
 static sail_status_t check_io_arguments(struct sail_io* io, const struct sail_codec_info* codec_info, void** state)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(codec_info);
     SAIL_CHECK_PTR(state);
@@ -44,7 +43,6 @@ static sail_status_t check_io_arguments(struct sail_io* io, const struct sail_co
 static sail_status_t allowed_write_compression(const struct sail_save_features* save_features,
                                                enum SailCompression compression)
 {
-
     SAIL_CHECK_PTR(save_features);
 
     for (unsigned i = 0; i < save_features->compressions_length; i++)
@@ -68,7 +66,6 @@ sail_status_t start_loading_io_with_options(struct sail_io* io,
                                             const struct sail_load_options* load_options,
                                             void** state)
 {
-
     SAIL_TRY_OR_CLEANUP(check_io_arguments(io, codec_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
 
@@ -118,7 +115,6 @@ sail_status_t start_saving_io_with_options(struct sail_io* io,
                                            const struct sail_save_options* save_options,
                                            void** state)
 {
-
     SAIL_TRY_OR_CLEANUP(check_io_arguments(io, codec_info, state),
                         /* cleanup */ if (own_io) sail_destroy_io(io));
 

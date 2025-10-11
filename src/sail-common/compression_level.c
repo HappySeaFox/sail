@@ -27,7 +27,6 @@
 
 sail_status_t sail_alloc_compression_level(struct sail_compression_level** compression_level)
 {
-
     SAIL_CHECK_PTR(compression_level);
 
     void* ptr;
@@ -44,7 +43,6 @@ sail_status_t sail_alloc_compression_level(struct sail_compression_level** compr
 
 void sail_destroy_compression_level(struct sail_compression_level* compression_level)
 {
-
     if (compression_level == NULL)
     {
         return;

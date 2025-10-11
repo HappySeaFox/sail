@@ -43,7 +43,6 @@ extern "C"
  */
 struct linked_list_node
 {
-
     /*
      * Node value.
      */

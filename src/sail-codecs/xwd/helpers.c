@@ -33,7 +33,6 @@
 
 bool xwd_private_is_native_byte_order(uint32_t byte_order)
 {
-
     uint32_t test         = 1;
     bool is_little_endian = (*((uint8_t*)&test) == 1);
 
@@ -42,7 +41,6 @@ bool xwd_private_is_native_byte_order(uint32_t byte_order)
 
 sail_status_t xwd_private_read_header(struct sail_io* io, struct XWDFileHeader* header)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(header);
 
@@ -113,7 +111,6 @@ sail_status_t xwd_private_read_header(struct sail_io* io, struct XWDFileHeader* 
 
 sail_status_t xwd_private_write_header(struct sail_io* io, const struct XWDFileHeader* header)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(header);
 
@@ -155,7 +152,6 @@ sail_status_t xwd_private_read_colormap(struct sail_io* io,
                                         bool byte_swap,
                                         struct XWDColor** colormap)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(colormap);
 
@@ -207,7 +203,6 @@ sail_status_t xwd_private_read_colormap(struct sail_io* io,
 
 sail_status_t xwd_private_write_colormap(struct sail_io* io, const struct XWDColor* colormap, uint32_t ncolors)
 {
-
     SAIL_CHECK_PTR(io);
 
     if (ncolors == 0)
@@ -232,7 +227,6 @@ sail_status_t xwd_private_write_colormap(struct sail_io* io, const struct XWDCol
 
 enum SailPixelFormat xwd_private_pixel_format_from_header(const struct XWDFileHeader* header)
 {
-
     /* ZPixmap format is most common for color images. */
     if (header->pixmap_format == ZPixmap)
     {
@@ -338,7 +332,6 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
                                       const struct XWDColor* colormap,
                                       struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(header);
     SAIL_CHECK_PTR(image);
@@ -413,7 +406,6 @@ sail_status_t xwd_private_write_pixels(struct sail_io* io,
                                        const struct XWDFileHeader* header,
                                        const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(header);
     SAIL_CHECK_PTR(image);
@@ -431,7 +423,6 @@ sail_status_t xwd_private_write_pixels(struct sail_io* io,
 
 sail_status_t xwd_private_header_from_image(const struct sail_image* image, struct XWDFileHeader* header)
 {
-
     SAIL_CHECK_PTR(image);
     SAIL_CHECK_PTR(header);
 
@@ -723,7 +714,6 @@ sail_status_t xwd_private_palette_to_colormap(const struct sail_palette* palette
                                               struct XWDColor** colormap,
                                               uint32_t* ncolors)
 {
-
     SAIL_CHECK_PTR(palette);
     SAIL_CHECK_PTR(colormap);
     SAIL_CHECK_PTR(ncolors);

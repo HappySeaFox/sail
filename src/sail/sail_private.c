@@ -31,7 +31,6 @@
 
 static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_format)
 {
-
     SAIL_LOG_ERROR(
         "This codec cannot save %s pixels. Use its save features to get the list of supported pixel formats for saving",
         sail_pixel_format_to_string(pixel_format));
@@ -40,7 +39,6 @@ static void print_unsupported_write_pixel_format(enum SailPixelFormat pixel_form
 static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_info* codec_info,
                                                      const struct sail_codec** codec)
 {
-
     SAIL_CHECK_PTR(codec_info);
     SAIL_CHECK_PTR(codec);
 
@@ -90,7 +88,6 @@ static sail_status_t load_codec_by_codec_info_unsafe(const struct sail_codec_inf
 
 sail_status_t load_codec_by_codec_info(const struct sail_codec_info* codec_info, const struct sail_codec** codec)
 {
-
     SAIL_CHECK_PTR(codec_info);
     SAIL_CHECK_PTR(codec);
 
@@ -106,7 +103,6 @@ sail_status_t load_codec_by_codec_info(const struct sail_codec_info* codec_info,
 
 void destroy_hidden_state(struct hidden_state* state)
 {
-
     if (state == NULL)
     {
         return;
@@ -128,7 +124,6 @@ void destroy_hidden_state(struct hidden_state* state)
 
 sail_status_t stop_saving(void* state, size_t* written)
 {
-
     if (written != NULL)
     {
         *written = 0;
@@ -168,7 +163,6 @@ sail_status_t stop_saving(void* state, size_t* written)
 sail_status_t allowed_write_output_pixel_format(const struct sail_save_features* save_features,
                                                 enum SailPixelFormat pixel_format)
 {
-
     SAIL_CHECK_PTR(save_features);
 
     for (unsigned i = 0; i < save_features->pixel_formats_length; i++)

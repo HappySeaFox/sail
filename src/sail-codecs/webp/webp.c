@@ -79,7 +79,6 @@ static sail_status_t alloc_webp_state(struct sail_io* io,
                                       const struct sail_save_options* save_options,
                                       struct webp_state** webp_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct webp_state), &ptr));
     *webp_state = ptr;
@@ -118,7 +117,6 @@ static sail_status_t alloc_webp_state(struct sail_io* io,
 
 static void destroy_webp_state(struct webp_state* webp_state)
 {
-
     if (webp_state == NULL)
     {
         return;
@@ -154,7 +152,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io* io,
                                                        const struct sail_load_options* load_options,
                                                        void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -284,7 +281,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void* state, struct sail_image** image)
 {
-
     struct webp_state* webp_state = state;
 
     /* Start demuxing. */
@@ -367,7 +363,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void* state, s
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void* state, struct sail_image* image)
 {
-
     struct webp_state* webp_state = state;
 
     switch (webp_state->frame_blend_method)
@@ -425,7 +420,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void* state, struct sail
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_webp(void** state)
 {
-
     struct webp_state* webp_state = *state;
 
     *state = NULL;
@@ -443,7 +437,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_webp(struct sail_io* io,
                                                        const struct sail_save_options* save_options,
                                                        void** state)
 {
-
     *state = NULL;
 
     struct webp_state* webp_state;
@@ -462,7 +455,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_webp(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_webp(void* state, const struct sail_image* image)
 {
-
     struct webp_state* webp_state = state;
 
     /* Validate pixel format. */
@@ -488,7 +480,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_webp(void* state, c
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_webp(void* state, const struct sail_image* image)
 {
-
     struct webp_state* webp_state = state;
 
     /* Determine if this is an animation (has delay) or static image. */
@@ -611,7 +602,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_webp(void* state, const struc
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_webp(void** state)
 {
-
     struct webp_state* webp_state = *state;
 
     *state = NULL;

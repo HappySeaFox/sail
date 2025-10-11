@@ -32,7 +32,6 @@ sail_status_t sail_start_loading_from_file_with_options(const char* path,
                                                         const struct sail_load_options* load_options,
                                                         void** state)
 {
-
     SAIL_CHECK_PTR(path);
 
     const struct sail_codec_info* codec_info_local;
@@ -60,7 +59,6 @@ sail_status_t sail_start_loading_from_memory_with_options(const void* buffer,
                                                           const struct sail_load_options* load_options,
                                                           void** state)
 {
-
     SAIL_CHECK_PTR(buffer);
 
     const struct sail_codec_info* codec_info_local;
@@ -87,7 +85,6 @@ sail_status_t sail_start_saving_into_file_with_options(const char* path,
                                                        const struct sail_save_options* save_options,
                                                        void** state)
 {
-
     SAIL_CHECK_PTR(path);
 
     const struct sail_codec_info* codec_info_local;
@@ -130,7 +127,6 @@ sail_status_t sail_start_saving_into_memory_with_options(void* buffer,
 
 sail_status_t sail_stop_saving_with_written(void* state, size_t* written)
 {
-
     SAIL_TRY(stop_saving(state, written));
 
     return SAIL_OK;

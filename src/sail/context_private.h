@@ -38,7 +38,6 @@ struct sail_codec_bundle_node;
  */
 struct sail_context
 {
-
     /* Context is already initialized. */
     bool initialized;
 

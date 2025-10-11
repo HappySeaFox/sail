@@ -38,7 +38,6 @@ static const char XPM_CHARS[] =
 
 static sail_status_t parse_color_value(const char* str, unsigned char* r, unsigned char* g, unsigned char* b)
 {
-
     /* Parse #RRGGBB format. */
     if (str[0] == '#')
     {
@@ -142,7 +141,6 @@ sail_status_t xpm_private_parse_xpm_header(struct sail_io* io,
                                            int* x_hotspot,
                                            int* y_hotspot)
 {
-
     char buf[512];
 
     /* Read lines until we find XPM comment. */
@@ -215,7 +213,6 @@ sail_status_t xpm_private_parse_xpm_header(struct sail_io* io,
 sail_status_t xpm_private_parse_colors(
     struct sail_io* io, unsigned num_colors, unsigned cpp, struct xpm_color** colors, bool* has_transparency)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(num_colors * sizeof(struct xpm_color), &ptr));
     *colors = ptr;
@@ -353,7 +350,6 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
                                       unsigned char* pixels,
                                       enum SailPixelFormat pixel_format)
 {
-
     char buf[8192];
     char pixel_chars[8];
 
@@ -437,7 +433,6 @@ sail_status_t xpm_private_write_header(struct sail_io* io,
                                        int x_hotspot,
                                        int y_hotspot)
 {
-
     const char* var_name = (name != NULL && name[0] != '\0') ? name : "image";
 
     char header[512];
@@ -479,7 +474,6 @@ sail_status_t xpm_private_write_colors(struct sail_io* io,
                                        bool has_transparency,
                                        int transparency_index)
 {
-
     char line[256];
 
     for (unsigned i = 0; i < num_colors; i++)
@@ -521,7 +515,6 @@ sail_status_t xpm_private_write_colors(struct sail_io* io,
 sail_status_t xpm_private_write_pixels(
     struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height, unsigned cpp, unsigned num_colors)
 {
-
     char* line               = NULL;
     const unsigned line_size = width * cpp + 16;
 
@@ -576,7 +569,6 @@ sail_status_t xpm_private_write_pixels(
 
 bool xpm_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct xpm_state* xpm_state = user_data;
 
     if (strcmp(key, "xpm-name") == 0)
@@ -603,7 +595,6 @@ bool xpm_private_tuning_key_value_callback(const char* key, const struct sail_va
 
 sail_status_t xpm_private_skip_extensions(struct sail_io* io)
 {
-
     /* XPM extensions start with "XPMEXT" and end with "XPMENDEXT".
      * We simply skip them for now. */
     char buf[512];
@@ -631,7 +622,6 @@ sail_status_t xpm_private_skip_extensions(struct sail_io* io)
 
 enum SailPixelFormat xpm_private_determine_pixel_format(unsigned num_colors, bool has_transparency)
 {
-
     if (has_transparency)
     {
         return SAIL_PIXEL_FORMAT_BPP32_RGBA;
@@ -663,7 +653,6 @@ sail_status_t xpm_private_build_palette(struct sail_palette** palette,
                                         const struct xpm_color* colors,
                                         unsigned num_colors)
 {
-
     SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, num_colors, palette));
 
     unsigned char* palette_data = (*palette)->data;
@@ -679,7 +668,6 @@ sail_status_t xpm_private_build_palette(struct sail_palette** palette,
 
 sail_status_t xpm_private_store_hotspot(int x_hotspot, int y_hotspot, struct sail_hash_map* special_properties)
 {
-
     if (x_hotspot < 0 || y_hotspot < 0)
     {
         return SAIL_OK;
@@ -708,7 +696,6 @@ sail_status_t xpm_private_store_hotspot(int x_hotspot, int y_hotspot, struct sai
 
 sail_status_t xpm_private_fetch_hotspot(const struct sail_hash_map* special_properties, int* x_hotspot, int* y_hotspot)
 {
-
     *x_hotspot = -1;
     *y_hotspot = -1;
 
@@ -741,7 +728,6 @@ sail_status_t xpm_private_check_transparency(const struct sail_palette* palette,
                                              bool* has_transparency,
                                              int* transparency_index)
 {
-
     *has_transparency   = false;
     *transparency_index = -1;
 
@@ -796,7 +782,6 @@ sail_status_t xpm_private_convert_palette_to_rgb(const unsigned char* src_palett
                                                  unsigned num_colors,
                                                  unsigned char** rgb_palette)
 {
-
     if (src_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
     {
         *rgb_palette = NULL;

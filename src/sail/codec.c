@@ -42,7 +42,6 @@
 
 static sail_status_t alloc_codec(struct sail_codec** codec)
 {
-
     SAIL_CHECK_PTR(codec);
 
     void* ptr;
@@ -161,7 +160,6 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info* codec_in
 
 sail_status_t alloc_and_load_codec(const struct sail_codec_info* codec_info, struct sail_codec** codec)
 {
-
     SAIL_CHECK_PTR(codec_info);
     SAIL_CHECK_PTR(codec);
 
@@ -230,7 +228,6 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info* codec_info, str
 
 void destroy_codec(struct sail_codec* codec)
 {
-
     if (codec == NULL)
     {
         return;

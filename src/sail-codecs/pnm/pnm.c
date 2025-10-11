@@ -59,7 +59,6 @@ static sail_status_t alloc_pnm_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct pnm_state** pnm_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct pnm_state), &ptr));
     *pnm_state = ptr;
@@ -84,7 +83,6 @@ static sail_status_t alloc_pnm_state(struct sail_io* io,
 
 static void destroy_pnm_state(struct pnm_state* pnm_state)
 {
-
     if (pnm_state == NULL)
     {
         return;
@@ -101,7 +99,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pnm(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -139,7 +136,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pnm(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, struct sail_image** image)
 {
-
     struct pnm_state* pnm_state = state;
 
     if (pnm_state->frame_loaded)
@@ -216,7 +212,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
         if (pnm_state->version == SAIL_PNM_VERSION_P2 || pnm_state->version == SAIL_PNM_VERSION_P3
             || pnm_state->version == SAIL_PNM_VERSION_P5 || pnm_state->version == SAIL_PNM_VERSION_P6)
         {
-
             SAIL_TRY(pnm_private_read_word(pnm_state->io, buffer, sizeof(buffer)));
 
             unsigned max_color;
@@ -305,7 +300,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void* state, struct sail_image* image)
 {
-
     const struct pnm_state* pnm_state = state;
 
     switch (pnm_state->version)
@@ -410,7 +404,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_pnm(void** state)
 {
-
     struct pnm_state* pnm_state = *state;
 
     *state = NULL;
@@ -428,7 +421,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_pnm(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(state);
 
@@ -444,7 +436,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_pnm(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pnm(void* state, const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -482,7 +473,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pnm(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pnm(void* state, const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -528,7 +518,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pnm(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_pnm(void** state)
 {
-
     SAIL_CHECK_PTR(state);
 
     struct pnm_state* pnm_state = *state;

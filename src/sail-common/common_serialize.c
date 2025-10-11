@@ -27,7 +27,6 @@
 
 const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_UNKNOWN: return "UNKNOWN";
@@ -135,7 +134,6 @@ const char* sail_pixel_format_to_string(enum SailPixelFormat pixel_format)
 
 enum SailPixelFormat sail_pixel_format_from_string(const char* str)
 {
-
     /*
      * The switch doesn't look very nice, I know :) However, it's fast and doesn't require
      * extra data structures and initializations. It's not C++11, so we choose between two evils:
@@ -250,7 +248,6 @@ enum SailPixelFormat sail_pixel_format_from_string(const char* str)
 
 const char* sail_chroma_subsampling_to_string(enum SailChromaSubsampling chroma_subsampling)
 {
-
     switch (chroma_subsampling)
     {
     case SAIL_CHROMA_SUBSAMPLING_UNKNOWN: return "UNKNOWN";
@@ -269,7 +266,6 @@ const char* sail_chroma_subsampling_to_string(enum SailChromaSubsampling chroma_
 
 enum SailChromaSubsampling sail_chroma_subsampling_from_string(const char* str)
 {
-
     switch (sail_string_hash(str))
     {
     case UINT64_C(229442760833397): return SAIL_CHROMA_SUBSAMPLING_UNKNOWN;
@@ -288,7 +284,6 @@ enum SailChromaSubsampling sail_chroma_subsampling_from_string(const char* str)
 
 const char* sail_orientation_to_string(enum SailOrientation orientation)
 {
-
     switch (orientation)
     {
     case SAIL_ORIENTATION_NORMAL: return "NORMAL";
@@ -306,7 +301,6 @@ const char* sail_orientation_to_string(enum SailOrientation orientation)
 
 enum SailOrientation sail_orientation_from_string(const char* str)
 {
-
     switch (sail_string_hash(str))
     {
     case UINT64_C(6952538422510): return SAIL_ORIENTATION_NORMAL;
@@ -324,7 +318,6 @@ enum SailOrientation sail_orientation_from_string(const char* str)
 
 const char* sail_compression_to_string(enum SailCompression compression)
 {
-
     switch (compression)
     {
     case SAIL_COMPRESSION_UNKNOWN: return "UNKNOWN";
@@ -373,7 +366,6 @@ const char* sail_compression_to_string(enum SailCompression compression)
 
 enum SailCompression sail_compression_from_string(const char* str)
 {
-
     switch (sail_string_hash(str))
     {
     case UINT64_C(229442760833397): return SAIL_COMPRESSION_UNKNOWN;
@@ -422,7 +414,6 @@ enum SailCompression sail_compression_from_string(const char* str)
 
 const char* sail_meta_data_to_string(enum SailMetaData meta_data)
 {
-
     switch (meta_data)
     {
     case SAIL_META_DATA_UNKNOWN: return "Unknown";
@@ -461,7 +452,6 @@ const char* sail_meta_data_to_string(enum SailMetaData meta_data)
 
 enum SailMetaData sail_meta_data_from_string(const char* str)
 {
-
     switch (sail_string_hash(str))
     {
     case UINT64_C(229444052301365): return SAIL_META_DATA_UNKNOWN;
@@ -500,7 +490,6 @@ enum SailMetaData sail_meta_data_from_string(const char* str)
 
 const char* sail_resolution_unit_to_string(enum SailResolutionUnit resolution_unit)
 {
-
     switch (resolution_unit)
     {
     case SAIL_RESOLUTION_UNIT_UNKNOWN: return "Unknown";
@@ -515,7 +504,6 @@ const char* sail_resolution_unit_to_string(enum SailResolutionUnit resolution_un
 
 enum SailResolutionUnit sail_resolution_unit_from_string(const char* str)
 {
-
     switch (sail_string_hash(str))
     {
     case UINT64_C(229444052301365): return SAIL_RESOLUTION_UNIT_UNKNOWN;
@@ -530,7 +518,6 @@ enum SailResolutionUnit sail_resolution_unit_from_string(const char* str)
 
 const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature)
 {
-
     switch (codec_feature)
     {
     case SAIL_CODEC_FEATURE_UNKNOWN: return "UNKNOWN";
@@ -548,7 +535,6 @@ const char* sail_codec_feature_to_string(enum SailCodecFeature codec_feature)
 
 enum SailCodecFeature sail_codec_feature_from_string(const char* str)
 {
-
     switch (sail_string_hash(str))
     {
     case UINT64_C(229442760833397): return SAIL_CODEC_FEATURE_UNKNOWN;

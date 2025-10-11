@@ -37,14 +37,12 @@ struct sail_palette;
 
 enum TgaColorMapType
 {
-
     TGA_HAS_NO_COLOR_MAP = 0,
     TGA_HAS_COLOR_MAP    = 1,
 };
 
 enum TgaImageType
 {
-
     TGA_NO_IMAGE       = 0,
     TGA_INDEXED        = 1,
     TGA_TRUE_COLOR     = 2,

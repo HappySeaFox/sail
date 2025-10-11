@@ -38,7 +38,6 @@ extern "C"
  */
 struct sail_compression_level
 {
-
     /*
      * Minimum compression value. For lossy codecs, more compression means less quality
      * and vice versa. For lossless codecs, more compression means nothing but a smaller

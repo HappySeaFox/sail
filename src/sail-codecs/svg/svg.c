@@ -61,7 +61,6 @@ static sail_status_t alloc_svg_state(const struct sail_load_options* load_option
                                      const struct sail_save_options* save_options,
                                      struct svg_state** svg_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct svg_state), &ptr));
     *svg_state = ptr;
@@ -86,7 +85,6 @@ static sail_status_t alloc_svg_state(const struct sail_load_options* load_option
 
 static void destroy_svg_state(struct svg_state* svg_state)
 {
-
     if (svg_state == NULL)
     {
         return;
@@ -117,7 +115,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -175,7 +172,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_svg(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void* state, struct sail_image** image)
 {
-
     struct svg_state* svg_state = state;
 
     if (svg_state->frame_loaded)
@@ -216,7 +212,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_svg(void* state, struct sail_image* image)
 {
-
     const struct svg_state* svg_state = state;
 
     memset(image->pixels, 0, (size_t)image->bytes_per_line * image->height);
@@ -238,7 +233,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_svg(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_svg(void** state)
 {
-
     struct svg_state* svg_state = *state;
 
     *state = NULL;
@@ -256,7 +250,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_svg(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     (void)io;
     (void)save_options;
     (void)state;
@@ -266,7 +259,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_svg(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_svg(void* state, const struct sail_image* image)
 {
-
     (void)state;
     (void)image;
 
@@ -275,7 +267,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_svg(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_svg(void* state, const struct sail_image* image)
 {
-
     (void)state;
     (void)image;
 
@@ -284,7 +275,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_svg(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_svg(void** state)
 {
-
     (void)state;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);

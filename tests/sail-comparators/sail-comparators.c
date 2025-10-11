@@ -32,7 +32,6 @@
 sail_status_t sail_test_compare_resolutions(const struct sail_resolution* resolution1,
                                             const struct sail_resolution* resolution2)
 {
-
     munit_assert_not_null(resolution1);
     munit_assert_not_null(resolution2);
 
@@ -47,7 +46,6 @@ sail_status_t sail_test_compare_resolutions(const struct sail_resolution* resolu
 
 sail_status_t sail_test_compare_palettes(const struct sail_palette* palette1, const struct sail_palette* palette2)
 {
-
     munit_assert_not_null(palette1);
     munit_assert_not_null(palette2);
 
@@ -69,7 +67,6 @@ sail_status_t sail_test_compare_palettes(const struct sail_palette* palette1, co
 
 sail_status_t sail_test_compare_variants(const struct sail_variant* variant1, const struct sail_variant* variant2)
 {
-
     munit_assert_not_null(variant1);
     munit_assert_not_null(variant2);
 
@@ -84,7 +81,6 @@ sail_status_t sail_test_compare_variants(const struct sail_variant* variant1, co
 
 static bool compare_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     const struct sail_hash_map* hash_map2 = (struct sail_hash_map*)user_data;
     const struct sail_variant* value2     = sail_hash_map_value(hash_map2, key);
 
@@ -95,7 +91,6 @@ static bool compare_key_value_callback(const char* key, const struct sail_varian
 
 sail_status_t sail_test_compare_hash_maps(const struct sail_hash_map* hash_map1, const struct sail_hash_map* hash_map2)
 {
-
     munit_assert_not_null(hash_map1);
     munit_assert_not_null(hash_map2);
 
@@ -109,7 +104,6 @@ sail_status_t sail_test_compare_hash_maps(const struct sail_hash_map* hash_map1,
 sail_status_t sail_test_compare_meta_datas(const struct sail_meta_data* meta_data1,
                                            const struct sail_meta_data* meta_data2)
 {
-
     munit_assert_not_null(meta_data1);
     munit_assert_not_null(meta_data2);
 
@@ -132,7 +126,6 @@ sail_status_t sail_test_compare_meta_datas(const struct sail_meta_data* meta_dat
 sail_status_t sail_test_compare_meta_data_nodes(const struct sail_meta_data_node* meta_data_node1,
                                                 const struct sail_meta_data_node* meta_data_node2)
 {
-
     munit_assert_not_null(meta_data_node1);
     munit_assert_not_null(meta_data_node2);
 
@@ -146,7 +139,6 @@ sail_status_t sail_test_compare_meta_data_nodes(const struct sail_meta_data_node
 sail_status_t sail_test_compare_meta_data_node_chains(const struct sail_meta_data_node* meta_data_node1,
                                                       const struct sail_meta_data_node* meta_data_node2)
 {
-
     munit_assert_not_null(meta_data_node1);
     munit_assert_not_null(meta_data_node2);
 
@@ -169,7 +161,6 @@ sail_status_t sail_test_compare_meta_data_node_chains(const struct sail_meta_dat
 
 sail_status_t sail_test_compare_iccps(const struct sail_iccp* iccp1, const struct sail_iccp* iccp2)
 {
-
     munit_assert_not_null(iccp1);
     munit_assert_not_null(iccp2);
 
@@ -185,7 +176,6 @@ sail_status_t sail_test_compare_iccps(const struct sail_iccp* iccp1, const struc
 sail_status_t sail_test_compare_source_images(const struct sail_source_image* source_image1,
                                               const struct sail_source_image* source_image2)
 {
-
     munit_assert_not_null(source_image1);
     munit_assert_not_null(source_image2);
 
@@ -202,7 +192,6 @@ sail_status_t sail_test_compare_source_images(const struct sail_source_image* so
 
 sail_status_t sail_test_compare_images(const struct sail_image* image1, const struct sail_image* image2)
 {
-
     munit_assert_not_null(image1);
     munit_assert_not_null(image2);
 

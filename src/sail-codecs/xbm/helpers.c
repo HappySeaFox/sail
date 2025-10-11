@@ -36,13 +36,11 @@ static const unsigned char reverse_lookup_4bits[] = {
 
 unsigned char xbm_private_reverse_byte(unsigned char byte)
 {
-
     return (reverse_lookup_4bits[byte & 0xF] << 4) | reverse_lookup_4bits[byte >> 4];
 }
 
 sail_status_t xbm_private_write_header(struct sail_io* io, unsigned width, unsigned height, const char* name)
 {
-
     const char* var_name = (name != NULL && name[0] != '\0') ? name : "image";
 
     char header[512];
@@ -66,7 +64,6 @@ sail_status_t xbm_private_write_header(struct sail_io* io, unsigned width, unsig
 sail_status_t xbm_private_write_pixels(
     struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height, enum SailXbmVersion version)
 {
-
     const unsigned bytes_per_line = (width + 7) / 8;
     unsigned total_units;
 
@@ -146,7 +143,6 @@ sail_status_t xbm_private_write_pixels(
 
 bool xbm_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct xbm_state* xbm_state = user_data;
 
     if (strcmp(key, "xbm-version") == 0)

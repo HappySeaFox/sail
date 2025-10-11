@@ -29,7 +29,6 @@
 
 sail_status_t sail_alloc_source_image(struct sail_source_image** source_image)
 {
-
     SAIL_CHECK_PTR(source_image);
 
     void* ptr;
@@ -47,7 +46,6 @@ sail_status_t sail_alloc_source_image(struct sail_source_image** source_image)
 
 void sail_destroy_source_image(struct sail_source_image* source_image)
 {
-
     if (source_image == NULL)
     {
         return;
@@ -58,7 +56,6 @@ void sail_destroy_source_image(struct sail_source_image* source_image)
 
 sail_status_t sail_copy_source_image(const struct sail_source_image* source, struct sail_source_image** target)
 {
-
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 

@@ -172,7 +172,6 @@ static void term_source(j_decompress_ptr cinfo)
  */
 void jpeg_private_sail_io_src(j_decompress_ptr cinfo, struct sail_io* io)
 {
-
     struct sail_jpeg_source_mgr* src;
 
     /* The source object and input buffer are made permanent so that a series

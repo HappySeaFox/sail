@@ -31,7 +31,6 @@
 
 avifResult avif_private_read_proc(struct avifIO* io, uint32_t read_flags, uint64_t offset, size_t size, avifROData* out)
 {
-
     if (read_flags != 0)
     {
         SAIL_LOG_ERROR("AVIF: Read flags must be #0, but got #%u", read_flags);
@@ -63,7 +62,6 @@ avifResult avif_private_read_proc(struct avifIO* io, uint32_t read_flags, uint64
 avifResult avif_private_write_proc(
     struct avifIO* io, uint32_t write_flags, uint64_t offset, const uint8_t* data, size_t size)
 {
-
     (void)write_flags;
 
     struct sail_avif_context* avif_context = io->data;

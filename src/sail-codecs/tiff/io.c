@@ -29,7 +29,6 @@
 
 tmsize_t tiff_private_my_read_proc(thandle_t client_data, void* buffer, tmsize_t buffer_size)
 {
-
     struct sail_io* io = (struct sail_io*)client_data;
     size_t nbytes;
 
@@ -46,7 +45,6 @@ tmsize_t tiff_private_my_read_proc(thandle_t client_data, void* buffer, tmsize_t
 
 tmsize_t tiff_private_my_write_proc(thandle_t client_data, void* buffer, tmsize_t buffer_size)
 {
-
     struct sail_io* io = (struct sail_io*)client_data;
     size_t nbytes;
 
@@ -63,7 +61,6 @@ tmsize_t tiff_private_my_write_proc(thandle_t client_data, void* buffer, tmsize_
 
 toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whence)
 {
-
     struct sail_io* io = (struct sail_io*)client_data;
 
     sail_status_t err = io->seek(io->stream, (long)offset, whence);
@@ -88,7 +85,6 @@ toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whenc
 
 int tiff_private_my_dummy_close_proc(thandle_t client_data)
 {
-
     (void)client_data;
 
     return 0;
@@ -96,7 +92,6 @@ int tiff_private_my_dummy_close_proc(thandle_t client_data)
 
 toff_t tiff_private_my_dummy_size_proc(thandle_t client_data)
 {
-
     (void)client_data;
 
     return (toff_t)-1;

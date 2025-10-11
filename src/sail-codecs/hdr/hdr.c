@@ -51,7 +51,6 @@ static sail_status_t alloc_hdr_codec_state(struct sail_io* io,
                                            const struct sail_save_options* save_options,
                                            struct hdr_codec_state** hdr_codec_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct hdr_codec_state), &ptr));
     *hdr_codec_state = ptr;
@@ -89,7 +88,6 @@ static sail_status_t alloc_hdr_codec_state(struct sail_io* io,
 
 static void destroy_hdr_codec_state(struct hdr_codec_state* hdr_codec_state)
 {
-
     if (hdr_codec_state == NULL)
     {
         return;
@@ -108,7 +106,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_hdr(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -121,7 +118,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_hdr(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_hdr(void* state, struct sail_image** image)
 {
-
     struct hdr_codec_state* hdr_state = state;
 
     if (hdr_state->frame_loaded)
@@ -188,7 +184,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_hdr(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_hdr(void* state, struct sail_image* image)
 {
-
     const struct hdr_codec_state* hdr_codec_state = state;
 
     float* scanline = NULL;
@@ -241,7 +236,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_hdr(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_hdr(void** state)
 {
-
     struct hdr_codec_state* hdr_codec_state = *state;
 
     *state = NULL;
@@ -259,7 +253,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_hdr(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(state);
 
@@ -282,7 +275,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_hdr(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_hdr(void* state, const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -319,7 +311,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_hdr(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_hdr(void* state, const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -346,7 +337,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_hdr(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_hdr(void** state)
 {
-
     SAIL_CHECK_PTR(state);
 
     struct hdr_codec_state* hdr_codec_state = *state;

@@ -35,7 +35,6 @@
 
 sail_status_t pnm_private_skip_to_letters_numbers_force_read(struct sail_io* io, char* first_char)
 {
-
     char c;
 
     do
@@ -58,7 +57,6 @@ sail_status_t pnm_private_skip_to_letters_numbers_force_read(struct sail_io* io,
 
 sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io* io, char starting_char, char* first_char)
 {
-
     if (isalnum(starting_char))
     {
         *first_char = starting_char;
@@ -72,7 +70,6 @@ sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io* io, char start
 
 sail_status_t pnm_private_read_word(struct sail_io* io, char* str, size_t str_size)
 {
-
     if (str_size < 2)
     {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
@@ -117,7 +114,6 @@ sail_status_t pnm_private_read_word(struct sail_io* io, char* str, size_t str_si
 sail_status_t pnm_private_read_pixels(
     struct sail_io* io, struct sail_image* image, unsigned channels, unsigned bpc, double multiplier_to_full_range)
 {
-
     for (unsigned row = 0; row < image->height; row++)
     {
         uint8_t* scan8   = sail_scan_line(image, row);
@@ -159,7 +155,6 @@ sail_status_t pnm_private_read_pixels(
 
 enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_version, unsigned bpc)
 {
-
     switch (pnm_version)
     {
     case SAIL_PNM_VERSION_P1:
@@ -198,7 +193,6 @@ enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_v
 
 sail_status_t pnm_private_store_ascii(enum SailPnmVersion pnm_version, struct sail_hash_map* special_properties)
 {
-
     struct sail_variant* variant;
     SAIL_TRY(sail_alloc_variant(&variant));
 
@@ -232,7 +226,6 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
                                           unsigned* maxval,
                                           enum SailPamTuplType* tupltype)
 {
-
     *width    = 0;
     *height   = 0;
     *depth    = 0;
@@ -346,7 +339,6 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
 
 enum SailPixelFormat pnm_private_pam_sail_pixel_format(enum SailPamTuplType tupltype, unsigned depth, unsigned bpc)
 {
-
     switch (tupltype)
     {
     case SAIL_PAM_TUPLTYPE_BLACKANDWHITE:
@@ -418,7 +410,6 @@ sail_status_t pnm_private_pixel_format_to_pnm_params(enum SailPixelFormat pixel_
                                                      unsigned* depth,
                                                      enum SailPamTuplType* tupltype)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
@@ -504,7 +495,6 @@ sail_status_t pnm_private_pixel_format_to_pnm_params(enum SailPixelFormat pixel_
 sail_status_t pnm_private_write_pnm_header(
     struct sail_io* io, enum SailPnmVersion version, unsigned width, unsigned height, unsigned maxval)
 {
-
     char header[256];
     int written = 0;
 
@@ -546,7 +536,6 @@ sail_status_t pnm_private_write_pnm_header(
 sail_status_t pnm_private_write_pam_header(
     struct sail_io* io, unsigned width, unsigned height, unsigned depth, unsigned maxval, enum SailPamTuplType tupltype)
 {
-
     char header[512];
     const char* tupltype_str = NULL;
 

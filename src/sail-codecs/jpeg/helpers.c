@@ -105,7 +105,6 @@ J_COLOR_SPACE jpeg_private_pixel_format_to_color_space(enum SailPixelFormat pixe
 sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct* decompress_context,
                                            struct sail_meta_data_node** last_meta_data_node)
 {
-
     SAIL_CHECK_PTR(last_meta_data_node);
 
     jpeg_saved_marker_ptr it = decompress_context->marker_list;
@@ -137,7 +136,6 @@ sail_status_t jpeg_private_fetch_meta_data(struct jpeg_decompress_struct* decomp
 sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct* compress_context,
                                            const struct sail_meta_data_node* meta_data_node)
 {
-
     while (meta_data_node != NULL)
     {
         if (meta_data_node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING)
@@ -161,7 +159,6 @@ sail_status_t jpeg_private_write_meta_data(struct jpeg_compress_struct* compress
 #ifdef SAIL_HAVE_JPEG_ICCP
 sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct* decompress_context, struct sail_iccp** iccp)
 {
-
     SAIL_CHECK_PTR(iccp);
 
     JOCTET* data       = NULL;
@@ -183,7 +180,6 @@ sail_status_t jpeg_private_fetch_iccp(struct jpeg_decompress_struct* decompress_
 sail_status_t jpeg_private_fetch_resolution(struct jpeg_decompress_struct* decompress_context,
                                             struct sail_resolution** resolution)
 {
-
     SAIL_CHECK_PTR(resolution);
 
     /* Resolution information is not valid. */
@@ -217,7 +213,6 @@ sail_status_t jpeg_private_fetch_resolution(struct jpeg_decompress_struct* decom
 sail_status_t jpeg_private_write_resolution(struct jpeg_compress_struct* compress_context,
                                             const struct sail_resolution* resolution)
 {
-
     /* Not an error. */
     if (resolution == NULL)
     {
@@ -251,7 +246,6 @@ sail_status_t jpeg_private_write_resolution(struct jpeg_compress_struct* compres
 
 bool jpeg_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct jpeg_compress_struct* compress_context = user_data;
 
     if (strcmp(key, "jpeg-dct-method") == 0)

@@ -31,7 +31,6 @@
 
 sail_status_t ico_private_read_header(struct sail_io* io, struct SailIcoHeader* header)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &header->reserved, sizeof(header->reserved)));
     SAIL_TRY(io->strict_read(io->stream, &header->type, sizeof(header->type)));
     SAIL_TRY(io->strict_read(io->stream, &header->images_count, sizeof(header->images_count)));
@@ -41,7 +40,6 @@ sail_status_t ico_private_read_header(struct sail_io* io, struct SailIcoHeader* 
 
 sail_status_t ico_private_read_dir_entry(struct sail_io* io, struct SailIcoDirEntry* dir_entry)
 {
-
     SAIL_TRY(io->strict_read(io->stream, &dir_entry->width, sizeof(dir_entry->width)));
     SAIL_TRY(io->strict_read(io->stream, &dir_entry->height, sizeof(dir_entry->height)));
     SAIL_TRY(io->strict_read(io->stream, &dir_entry->color_count, sizeof(dir_entry->color_count)));
@@ -56,7 +54,6 @@ sail_status_t ico_private_read_dir_entry(struct sail_io* io, struct SailIcoDirEn
 
 sail_status_t ico_private_probe_image_type(struct sail_io* io, enum SailIcoImageType* ico_image_type)
 {
-
     size_t saved_offset;
     SAIL_TRY(io->tell(io->stream, &saved_offset));
 
@@ -75,7 +72,6 @@ sail_status_t ico_private_probe_image_type(struct sail_io* io, enum SailIcoImage
 sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry* ico_dir_entry,
                                             struct sail_hash_map* special_properties)
 {
-
     struct sail_variant* variant;
     SAIL_TRY(sail_alloc_variant(&variant));
 
@@ -94,7 +90,6 @@ sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry* ico_di
 
 sail_status_t ico_private_write_header(struct sail_io* io, const struct SailIcoHeader* header)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &header->reserved, sizeof(header->reserved)));
     SAIL_TRY(io->strict_write(io->stream, &header->type, sizeof(header->type)));
     SAIL_TRY(io->strict_write(io->stream, &header->images_count, sizeof(header->images_count)));
@@ -104,7 +99,6 @@ sail_status_t ico_private_write_header(struct sail_io* io, const struct SailIcoH
 
 sail_status_t ico_private_write_dir_entry(struct sail_io* io, const struct SailIcoDirEntry* dir_entry)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &dir_entry->width, sizeof(dir_entry->width)));
     SAIL_TRY(io->strict_write(io->stream, &dir_entry->height, sizeof(dir_entry->height)));
     SAIL_TRY(io->strict_write(io->stream, &dir_entry->color_count, sizeof(dir_entry->color_count)));
@@ -121,7 +115,6 @@ sail_status_t ico_private_fetch_cur_hotspot(const struct sail_hash_map* special_
                                             uint16_t* hotspot_x,
                                             uint16_t* hotspot_y)
 {
-
     *hotspot_x = 0;
     *hotspot_y = 0;
 

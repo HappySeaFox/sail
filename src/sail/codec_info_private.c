@@ -36,13 +36,11 @@
 
 static int pixel_format_from_string(const char* str)
 {
-
     return sail_pixel_format_from_string(str);
 }
 
 static int compression_from_string(const char* str)
 {
-
     return sail_compression_from_string(str);
 }
 
@@ -51,7 +49,6 @@ static sail_status_t parse_serialized_ints(const char* value,
                                            unsigned* length,
                                            int (*converter)(const char* str))
 {
-
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(target);
     SAIL_CHECK_PTR(length);
@@ -88,13 +85,11 @@ static sail_status_t parse_serialized_ints(const char* value,
 
 static int codec_feature_from_string(const char* str)
 {
-
     return sail_codec_feature_from_string(str);
 }
 
 static sail_status_t parse_flags(const char* value, int* features, int (*converter)(const char* str))
 {
-
     SAIL_CHECK_PTR(value);
     SAIL_CHECK_PTR(features);
 
@@ -120,7 +115,6 @@ struct init_data
 
 static sail_status_t codec_priority_from_string(const char* str, enum SailCodecPriority* result)
 {
-
     switch (sail_string_hash(str))
     {
     case UINT64_C(229425771102513): *result = SAIL_CODEC_PRIORITY_HIGHEST; return SAIL_OK;
@@ -135,7 +129,6 @@ static sail_status_t codec_priority_from_string(const char* str, enum SailCodecP
 
 static sail_status_t inih_handler_sail_error(void* data, const char* section, const char* name, const char* value)
 {
-
     /* Silently ignore empty values. */
     if (strlen(value) == 0)
     {
@@ -312,7 +305,6 @@ static sail_status_t inih_handler_sail_error(void* data, const char* section, co
 /* Returns 1 on success. */
 static int inih_handler(void* data, const char* section, const char* name, const char* value)
 {
-
     SAIL_TRY_OR_EXECUTE(inih_handler_sail_error(data, section, name, value),
                         /* on error */ return 0);
 
@@ -321,7 +313,6 @@ static int inih_handler(void* data, const char* section, const char* name, const
 
 static sail_status_t check_codec_info(const struct sail_codec_info* codec_info)
 {
-
     if (codec_info->name == NULL || strlen(codec_info->name) == 0)
     {
         SAIL_LOG_ERROR("Codec validation error: the codec currently being parsed has empty name");
@@ -423,7 +414,6 @@ static sail_status_t check_codec_info(const struct sail_codec_info* codec_info)
 
 static sail_status_t alloc_codec_info(struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(codec_info);
 
     void* ptr;
@@ -448,7 +438,6 @@ static sail_status_t codec_read_info_from_input(const char* input,
                                                 int (*ini_parser)(const char*, ini_handler, void*),
                                                 struct sail_codec_info** codec_info)
 {
-
     struct sail_codec_info* codec_info_local;
     SAIL_TRY(alloc_codec_info(&codec_info_local));
     SAIL_TRY_OR_CLEANUP(sail_alloc_load_features(&codec_info_local->load_features),
@@ -507,7 +496,6 @@ static sail_status_t codec_read_info_from_input(const char* input,
 
 void destroy_codec_info(struct sail_codec_info* codec_info)
 {
-
     if (codec_info == NULL)
     {
         return;
@@ -530,7 +518,6 @@ void destroy_codec_info(struct sail_codec_info* codec_info)
 
 sail_status_t codec_read_info_from_file(const char* path, struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(path);
     SAIL_CHECK_PTR(codec_info);
 
@@ -543,7 +530,6 @@ sail_status_t codec_read_info_from_file(const char* path, struct sail_codec_info
 
 sail_status_t codec_read_info_from_string(const char* str, struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(str);
     SAIL_CHECK_PTR(codec_info);
 

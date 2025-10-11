@@ -50,7 +50,6 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
                                             uint16_t depth,
                                             enum SailPixelFormat* result)
 {
-
     switch (mode)
     {
     case SAIL_PSD_MODE_BITMAP:

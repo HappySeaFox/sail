@@ -46,7 +46,6 @@ struct sail_hash_map;
  */
 struct sail_source_image
 {
-
     /*
      * Source image pixel format. See SailPixelFormat.
      *

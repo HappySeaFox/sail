@@ -55,7 +55,6 @@ static void skip_whitespaces(FILE* fptr)
 
 static sail_status_t read_hex(FILE* fptr, size_t data_size, uint8_t** value)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(data_size, &ptr));
     uint8_t* value_local = ptr;
@@ -87,7 +86,6 @@ static sail_status_t read_hex(FILE* fptr, size_t data_size, uint8_t** value)
 
 static sail_status_t print_hex(uint8_t* data, size_t data_size)
 {
-
     if (data_size == 0)
     {
         return SAIL_OK;
@@ -111,7 +109,6 @@ static sail_status_t print_hex(uint8_t* data, size_t data_size)
 
 static sail_status_t read_image(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * 124 124 62(bpl) BPP4-INDEXED NORMAL(orientation)
      */
@@ -146,7 +143,6 @@ static sail_status_t read_image(FILE* fptr, struct sail_image* image)
 
 static sail_status_t read_source_image(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * BPP4-INDEXED UNKNOWN(chroma subsampling) NORMAL(orientation) NONE(compression) 1(interlaced)
      */
@@ -191,7 +187,6 @@ static sail_status_t read_source_image(FILE* fptr, struct sail_image* image)
 
 static sail_status_t read_resolution(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * 1 1 CENTIMETER
      */
@@ -219,7 +214,6 @@ static sail_status_t read_resolution(FILE* fptr, struct sail_image* image)
 
 static sail_status_t read_animation(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * 0(delay)
      */
@@ -241,7 +235,6 @@ static sail_status_t read_animation(FILE* fptr, struct sail_image* image)
 
 static sail_status_t read_meta_data(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * 2(number of entries)
      * Artist
@@ -365,7 +358,6 @@ static sail_status_t read_meta_data(FILE* fptr, struct sail_image* image)
 
 static sail_status_t read_iccp(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * 126(data length)
      * 00 11 22...
@@ -398,7 +390,6 @@ static sail_status_t read_iccp(FILE* fptr, struct sail_image* image)
 
 static sail_status_t read_palette(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * BPP24-RGB 3(color count) 144(data length)
      * 00 11 22...
@@ -443,7 +434,6 @@ static sail_status_t read_palette(FILE* fptr, struct sail_image* image)
 
 static sail_status_t read_pixels(FILE* fptr, struct sail_image* image)
 {
-
     /*
      * 00 11 22...
      */
@@ -465,7 +455,6 @@ static sail_status_t read_pixels(FILE* fptr, struct sail_image* image)
 
 sail_status_t sail_read_dump(const char* path, struct sail_image* images[])
 {
-
     SAIL_CHECK_PTR(path);
 
     /*  To scanf dots in floats. */
@@ -563,7 +552,6 @@ sail_status_t sail_read_dump(const char* path, struct sail_image* images[])
 
 sail_status_t sail_dump(const struct sail_image* image)
 {
-
     SAIL_TRY(sail_check_image_valid(image));
 
     /*  To print dots in floats. */

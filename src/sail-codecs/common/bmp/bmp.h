@@ -35,7 +35,6 @@ struct sail_save_options;
 
 enum SailBmpReadOptions
 {
-
     /*
      * No specific BMP flags. This will:
      *   1. Skip the BMP file header
@@ -51,7 +50,6 @@ enum SailBmpReadOptions
 
 enum SailBmpWriteOptions
 {
-
     /*
      * No specific BMP write flags.
      */

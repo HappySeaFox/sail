@@ -446,7 +446,6 @@ static sail_status_t extract_frames_impl(const char* input,
                                          bool flip_horizontal,
                                          bool flip_vertical)
 {
-
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output_template);
 
@@ -948,7 +947,6 @@ static sail_status_t convert(int argc, char* argv[])
 
 static bool special_properties_printf_callback(const char* key, const struct sail_variant* value)
 {
-
     printf("  %s : ", key);
     sail_printf_variant(value);
     printf("\n");

@@ -39,7 +39,6 @@ extern "C"
  */
 struct sail_palette
 {
-
     /*
      * Pixel format.
      *

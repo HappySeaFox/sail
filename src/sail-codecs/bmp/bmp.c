@@ -48,7 +48,6 @@ static sail_status_t alloc_bmp_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct bmp_state** bmp_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct bmp_state), &ptr));
     *bmp_state = ptr;
@@ -68,7 +67,6 @@ static sail_status_t alloc_bmp_state(struct sail_io* io,
 
 static void destroy_bmp_state(struct bmp_state* bmp_state)
 {
-
     if (bmp_state == NULL)
     {
         return;
@@ -85,7 +83,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_bmp(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -101,7 +98,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_bmp(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_bmp(void* state, struct sail_image** image)
 {
-
     struct bmp_state* bmp_state = state;
 
     if (bmp_state->frame_loaded)
@@ -118,7 +114,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_bmp(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_bmp(void* state, struct sail_image* image)
 {
-
     struct bmp_state* bmp_state = state;
 
     SAIL_TRY(bmp_private_read_frame(bmp_state->common_bmp_state, bmp_state->io, image));
@@ -128,7 +123,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_bmp(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_bmp(void** state)
 {
-
     struct bmp_state* bmp_state = *state;
 
     *state = NULL;
@@ -152,7 +146,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_bmp(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -168,7 +161,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_bmp(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_bmp(void* state, const struct sail_image* image)
 {
-
     struct bmp_state* bmp_state = state;
 
     if (bmp_state->frame_saved)
@@ -185,7 +177,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_bmp(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_bmp(void* state, const struct sail_image* image)
 {
-
     struct bmp_state* bmp_state = state;
 
     SAIL_TRY(bmp_private_write_frame(bmp_state->common_bmp_state, bmp_state->io, image));
@@ -195,7 +186,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_bmp(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_bmp(void** state)
 {
-
     struct bmp_state* bmp_state = *state;
 
     *state = NULL;

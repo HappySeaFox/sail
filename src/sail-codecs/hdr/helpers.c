@@ -36,7 +36,6 @@
 
 bool hdr_private_is_hdr(const void* data, size_t size)
 {
-
     if (data == NULL || size < 11)
     {
         return false;
@@ -55,7 +54,6 @@ bool hdr_private_is_hdr(const void* data, size_t size)
 
 static sail_status_t read_line(struct sail_io* io, char* buffer, size_t buffer_size)
 {
-
     size_t pos = 0;
     char ch;
 
@@ -87,7 +85,6 @@ static sail_status_t read_line(struct sail_io* io, char* buffer, size_t buffer_s
 
 sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* header)
 {
-
     char line[1024];
 
     /* Initialize header. */
@@ -158,7 +155,6 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
 
     if (sscanf(line, "%c%c %d %c%c %d", &y_sign, &y_axis, &height, &x_sign, &x_axis, &width) == 6)
     {
-
         if (y_axis == 'Y' && x_axis == 'X')
         {
             header->height       = height;
@@ -184,7 +180,6 @@ sail_status_t hdr_private_write_header(struct sail_io* io,
                                        const struct hdr_header* header,
                                        const struct sail_meta_data_node* meta_data_node)
 {
-
     /* Write signature. */
     const char* signature = "#?RADIANCE\n";
     SAIL_TRY(io->strict_write(io->stream, signature, strlen(signature)));
@@ -274,7 +269,6 @@ sail_status_t hdr_private_write_header(struct sail_io* io,
 
 void hdr_private_rgbe_to_float(const uint8_t* rgbe, float* rgb)
 {
-
     if (rgbe[3] == 0)
     {
         rgb[0] = rgb[1] = rgb[2] = 0.0f;
@@ -289,7 +283,6 @@ void hdr_private_rgbe_to_float(const uint8_t* rgbe, float* rgb)
 
 void hdr_private_float_to_rgbe(const float* rgb, uint8_t* rgbe)
 {
-
     float max_val = rgb[0];
     if (rgb[1] > max_val)
         max_val = rgb[1];
@@ -313,7 +306,6 @@ void hdr_private_float_to_rgbe(const float* rgb, uint8_t* rgbe)
 
 static sail_status_t read_old_rle_scanline(struct sail_io* io, int width, uint8_t* scanline)
 {
-
     uint8_t rgbe[4];
     int rshift = 0;
     int pos    = 0;
@@ -358,7 +350,6 @@ static sail_status_t read_old_rle_scanline(struct sail_io* io, int width, uint8_
 
 static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_t* scanline)
 {
-
     if (width < 8 || width > 32767)
     {
         return read_old_rle_scanline(io, width, scanline);
@@ -459,7 +450,6 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
 
 sail_status_t hdr_private_read_scanline(struct sail_io* io, int width, float* scanline)
 {
-
     uint8_t* rgbe_scanline = NULL;
     void* ptr;
 
@@ -487,7 +477,6 @@ sail_status_t hdr_private_read_scanline(struct sail_io* io, int width, float* sc
 
 static sail_status_t write_new_rle_scanline(struct sail_io* io, int width, const uint8_t* scanline)
 {
-
     /* Write RLE header. */
     uint8_t header[4] = {2, 2, (uint8_t)(width >> 8), (uint8_t)(width & 0xFF)};
 
@@ -570,7 +559,6 @@ static sail_status_t write_new_rle_scanline(struct sail_io* io, int width, const
 
 sail_status_t hdr_private_write_scanline(struct sail_io* io, int width, const float* scanline, bool use_rle)
 {
-
     uint8_t* rgbe_scanline = NULL;
     void* ptr;
 
@@ -602,7 +590,6 @@ sail_status_t hdr_private_write_scanline(struct sail_io* io, int width, const fl
 
 void hdr_private_destroy_header(struct hdr_header* header)
 {
-
     if (header == NULL)
     {
         return;
@@ -619,7 +606,6 @@ void hdr_private_destroy_header(struct hdr_header* header)
 
 sail_status_t hdr_private_store_properties(const struct hdr_header* header, struct sail_hash_map* special_properties)
 {
-
     struct sail_variant* variant;
     SAIL_TRY(sail_alloc_variant(&variant));
 
@@ -671,7 +657,6 @@ sail_status_t hdr_private_store_properties(const struct hdr_header* header, stru
 
 sail_status_t hdr_private_fetch_properties(const struct sail_hash_map* special_properties, struct hdr_header* header)
 {
-
     if (special_properties == NULL)
     {
         return SAIL_OK;
@@ -741,7 +726,6 @@ sail_status_t hdr_private_fetch_properties(const struct sail_hash_map* special_p
 
 bool hdr_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct hdr_write_context* write_ctx = user_data;
 
     if (strcmp(key, "hdr-rle-compression") == 0)

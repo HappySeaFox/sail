@@ -39,7 +39,6 @@ struct sail_codec_bundle;
  */
 struct sail_codec_bundle_node
 {
-
     /* Codec bundle. */
     struct sail_codec_bundle* codec_bundle;
 

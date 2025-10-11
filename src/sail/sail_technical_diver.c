@@ -29,7 +29,6 @@
 
 sail_status_t sail_start_loading_from_io(struct sail_io* io, const struct sail_codec_info* codec_info, void** state)
 {
-
     SAIL_TRY(sail_start_loading_from_io_with_options(io, codec_info, NULL, state));
 
     return SAIL_OK;
@@ -40,7 +39,6 @@ sail_status_t sail_start_loading_from_io_with_options(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     SAIL_TRY(start_loading_io_with_options(io, false, codec_info, load_options, state));
 
     return SAIL_OK;
@@ -48,7 +46,6 @@ sail_status_t sail_start_loading_from_io_with_options(struct sail_io* io,
 
 sail_status_t sail_start_saving_into_io(struct sail_io* io, const struct sail_codec_info* codec_info, void** state)
 {
-
     SAIL_TRY(sail_start_saving_into_io_with_options(io, codec_info, NULL, state));
 
     return SAIL_OK;
@@ -59,7 +56,6 @@ sail_status_t sail_start_saving_into_io_with_options(struct sail_io* io,
                                                      const struct sail_save_options* save_options,
                                                      void** state)
 {
-
     SAIL_TRY(start_saving_io_with_options(io, false, codec_info, save_options, state));
 
     return SAIL_OK;

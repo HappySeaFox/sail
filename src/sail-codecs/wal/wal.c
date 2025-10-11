@@ -59,7 +59,6 @@ static sail_status_t alloc_wal_state(struct sail_io* io,
                                      const struct sail_save_options* save_options,
                                      struct wal_state** wal_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct wal_state), &ptr));
     *wal_state = ptr;
@@ -83,7 +82,6 @@ static sail_status_t alloc_wal_state(struct sail_io* io,
 
 static void destroy_wal_state(struct wal_state* wal_state)
 {
-
     if (wal_state == NULL)
     {
         return;
@@ -105,7 +103,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_wal(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -124,7 +121,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_wal(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void* state, struct sail_image** image)
 {
-
     struct wal_state* wal_state = state;
 
     if (wal_state->frame_number >= 4)
@@ -190,7 +186,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void* state, struct sail_image* image)
 {
-
     struct wal_state* wal_state = state;
 
     const size_t bytes_to_read = (size_t)image->bytes_per_line * image->height;
@@ -208,7 +203,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_wal(void** state)
 {
-
     struct wal_state* wal_state = *state;
 
     *state = NULL;
@@ -226,7 +220,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_wal(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -239,7 +232,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_wal(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void* state, const struct sail_image* image)
 {
-
     struct wal_state* wal_state = state;
 
     /* WAL format supports up to 4 mipmap levels. */
@@ -318,7 +310,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_wal(void* state, const struct sail_image* image)
 {
-
     struct wal_state* wal_state = state;
 
     /* Store the mipmap data. */
@@ -337,7 +328,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_wal(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_wal(void** state)
 {
-
     struct wal_state* wal_state = *state;
 
     if (wal_state->frame_number == 0)

@@ -31,7 +31,6 @@
 
 enum SailPixelFormat jpeg2000_private_sail_pixel_format(OPJ_COLOR_SPACE color_space, int num_comps, int prec)
 {
-
     /* Scale precision to byte boundary. */
     const int scaled_prec = ((prec + 7) / 8) * 8;
 
@@ -182,7 +181,6 @@ sail_status_t jpeg2000_private_pixel_format_to_openjpeg(enum SailPixelFormat pix
                                                         int* num_comps,
                                                         int* prec)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
@@ -285,7 +283,6 @@ sail_status_t jpeg2000_private_pixel_format_to_openjpeg(enum SailPixelFormat pix
 
 bool jpeg2000_private_tuning_key_value_callback_load(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     opj_dparameters_t* parameters = user_data;
 
     if (strcmp(key, "jpeg2000-reduce") == 0)
@@ -350,7 +347,6 @@ bool jpeg2000_private_tuning_key_value_callback_load(const char* key, const stru
 
 bool jpeg2000_private_tuning_key_value_callback_save(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     opj_cparameters_t* parameters = user_data;
 
     if (strcmp(key, "jpeg2000-irreversible") == 0)

@@ -36,7 +36,6 @@
 
 void tiff_private_my_error_fn(const char* module, const char* format, va_list ap)
 {
-
     char buffer[160];
 
     vsnprintf(buffer, sizeof(buffer), format, ap);
@@ -53,7 +52,6 @@ void tiff_private_my_error_fn(const char* module, const char* format, va_list ap
 
 void tiff_private_my_warning_fn(const char* module, const char* format, va_list ap)
 {
-
     char buffer[160];
 
     vsnprintf(buffer, sizeof(buffer), format, ap);
@@ -70,7 +68,6 @@ void tiff_private_my_warning_fn(const char* module, const char* format, va_list 
 
 enum SailCompression tiff_private_compression_to_sail_compression(int compression)
 {
-
     switch (compression)
     {
 #ifdef SAIL_HAVE_TIFF_ADOBE_DEFLATE
@@ -176,7 +173,6 @@ enum SailCompression tiff_private_compression_to_sail_compression(int compressio
 
 sail_status_t tiff_private_sail_compression_to_compression(enum SailCompression compression, int* tiff_compression)
 {
-
     SAIL_CHECK_PTR(tiff_compression);
 
     switch (compression)
@@ -284,7 +280,6 @@ sail_status_t tiff_private_sail_compression_to_compression(enum SailCompression 
 
 enum SailPixelFormat tiff_private_bpp_to_pixel_format(int bpp)
 {
-
     switch (bpp)
     {
     case 1: return SAIL_PIXEL_FORMAT_BPP1;
@@ -309,7 +304,6 @@ enum SailPixelFormat tiff_private_bpp_to_pixel_format(int bpp)
 
 sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF* tiff, enum SailPixelFormat* result)
 {
-
     SAIL_CHECK_PTR(tiff);
     SAIL_CHECK_PTR(result);
 
@@ -498,7 +492,6 @@ sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF* tiff, enum SailPixe
 
 void tiff_private_zero_tiff_image(TIFFRGBAImage* img)
 {
-
     if (img == NULL)
     {
         return;
@@ -518,7 +511,6 @@ void tiff_private_zero_tiff_image(TIFFRGBAImage* img)
 
 sail_status_t tiff_private_fetch_iccp(TIFF* tiff, struct sail_iccp** iccp)
 {
-
     unsigned char* data;
     unsigned data_size;
 
@@ -535,7 +527,6 @@ static sail_status_t fetch_single_meta_data(TIFF* tiff,
                                             enum SailMetaData key,
                                             struct sail_meta_data_node*** last_meta_data_node)
 {
-
     char* data;
 
     if (TIFFGetField(tiff, tag, &data))
@@ -557,7 +548,6 @@ static sail_status_t fetch_single_meta_data(TIFF* tiff,
 
 sail_status_t tiff_private_fetch_meta_data(TIFF* tiff, struct sail_meta_data_node*** last_meta_data_node)
 {
-
     SAIL_CHECK_PTR(last_meta_data_node);
 
     /* Basic TIFF tags. */
@@ -578,7 +568,6 @@ sail_status_t tiff_private_fetch_meta_data(TIFF* tiff, struct sail_meta_data_nod
 
 sail_status_t tiff_private_write_meta_data(TIFF* tiff, const struct sail_meta_data_node* meta_data_node)
 {
-
     SAIL_CHECK_PTR(tiff);
 
     for (; meta_data_node != NULL; meta_data_node = meta_data_node->next)
@@ -636,7 +625,6 @@ sail_status_t tiff_private_write_meta_data(TIFF* tiff, const struct sail_meta_da
 
 sail_status_t tiff_private_fetch_xmp(TIFF* tiff, struct sail_meta_data_node*** last_meta_data_node)
 {
-
     SAIL_CHECK_PTR(tiff);
     SAIL_CHECK_PTR(last_meta_data_node);
 
@@ -678,7 +666,6 @@ sail_status_t tiff_private_fetch_xmp(TIFF* tiff, struct sail_meta_data_node*** l
 
 sail_status_t tiff_private_write_xmp(TIFF* tiff, const struct sail_meta_data_node* meta_data_node)
 {
-
     SAIL_CHECK_PTR(tiff);
 
     /* Look for XMP metadata in the list. */
@@ -705,7 +692,6 @@ sail_status_t tiff_private_write_xmp(TIFF* tiff, const struct sail_meta_data_nod
 
 sail_status_t tiff_private_fetch_resolution(TIFF* tiff, struct sail_resolution** resolution)
 {
-
     SAIL_CHECK_PTR(resolution);
 
     int unit = RESUNIT_NONE;
@@ -745,7 +731,6 @@ sail_status_t tiff_private_fetch_resolution(TIFF* tiff, struct sail_resolution**
 
 sail_status_t tiff_private_write_resolution(TIFF* tiff, const struct sail_resolution* resolution)
 {
-
     /* Not an error. */
     if (resolution == NULL)
     {
@@ -782,7 +767,6 @@ sail_status_t tiff_private_write_resolution(TIFF* tiff, const struct sail_resolu
 
 bool tiff_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     TIFF* tiff = user_data;
 
     if (strcmp(key, "tiff-predictor") == 0)

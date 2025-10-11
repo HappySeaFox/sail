@@ -70,7 +70,6 @@ static sail_logger sail_external_logger = NULL;
 
 static bool check_ansi_colors_supported(void)
 {
-
     static SAIL_THREAD_LOCAL bool ansi_colors_supported_called = false;
     static SAIL_THREAD_LOCAL bool ansi_colors_supported        = false;
 
@@ -123,7 +122,6 @@ static bool check_ansi_colors_supported(void)
 
 void sail_log(enum SailLogLevel level, const char* file, int line, const char* format, ...)
 {
-
     /* Filter out. */
     if (level > sail_max_log_level)
     {
@@ -204,12 +202,10 @@ void sail_log(enum SailLogLevel level, const char* file, int line, const char* f
 
 void sail_set_log_barrier(enum SailLogLevel max_level)
 {
-
     sail_max_log_level = max_level;
 }
 
 void sail_set_logger(sail_logger logger)
 {
-
     sail_external_logger = logger;
 }

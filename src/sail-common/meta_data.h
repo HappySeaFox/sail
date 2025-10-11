@@ -75,7 +75,6 @@ struct sail_variant;
  */
 struct sail_meta_data
 {
-
     /*
      * If the key is SAIL_META_DATA_UNKNOWN, key_unknown contains an actual string key.
      * If the key is other than SAIL_META_DATA_UNKNOWN, key_unknown is NULL.

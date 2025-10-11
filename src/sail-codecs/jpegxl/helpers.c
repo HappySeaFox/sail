@@ -35,7 +35,6 @@
 
 SAIL_HIDDEN bool jpegxl_private_is_cmyk(JxlDecoder* decoder, uint32_t num_extra_channels)
 {
-
     for (uint32_t i = 0; i < num_extra_channels; i++)
     {
         JxlExtraChannelInfo extra_channel_info;
@@ -56,7 +55,6 @@ SAIL_HIDDEN bool jpegxl_private_is_cmyk(JxlDecoder* decoder, uint32_t num_extra_
 
 enum SailPixelFormat jpegxl_private_source_pixel_format_cmyk(uint32_t bits_per_sample, uint32_t alpha_bits)
 {
-
     SAIL_LOG_TRACE("JPEGXL: CMYK bits per sample(%u), alpha bits(%u)", bits_per_sample, alpha_bits);
 
     switch (bits_per_sample)
@@ -75,7 +73,6 @@ enum SailPixelFormat jpegxl_private_source_pixel_format(uint32_t bits_per_sample
                                                         uint32_t num_color_channels,
                                                         uint32_t alpha_bits)
 {
-
     SAIL_LOG_TRACE("JPEGXL: Bits per sample(%u), number of channels(%u), alpha bits(%u)", bits_per_sample,
                    num_color_channels, alpha_bits);
 
@@ -119,7 +116,6 @@ enum SailPixelFormat jpegxl_private_source_pixel_format(uint32_t bits_per_sample
 
 enum SailPixelFormat jpegxl_private_source_pixel_format_to_output(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP32_CMYK: return SAIL_PIXEL_FORMAT_BPP24_RGB;
@@ -137,7 +133,6 @@ enum SailPixelFormat jpegxl_private_source_pixel_format_to_output(enum SailPixel
 
 unsigned jpegxl_private_pixel_format_to_num_channels(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
@@ -158,7 +153,6 @@ unsigned jpegxl_private_pixel_format_to_num_channels(enum SailPixelFormat pixel_
 
 JxlDataType jpegxl_private_pixel_format_to_jxl_data_type(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
@@ -180,7 +174,6 @@ JxlDataType jpegxl_private_pixel_format_to_jxl_data_type(enum SailPixelFormat pi
 
 sail_status_t jpegxl_private_fetch_iccp(JxlDecoder* decoder, struct sail_iccp** iccp)
 {
-
     size_t icc_size;
     if (JxlDecoderGetICCProfileSize(decoder,
 #if JPEGXL_NUMERIC_VERSION < JPEGXL_COMPUTE_NUMERIC_VERSION(0, 9, 0)
@@ -218,7 +211,6 @@ sail_status_t jpegxl_private_read_more_data(struct sail_io* io,
                                             unsigned char* buffer,
                                             size_t buffer_size)
 {
-
     size_t remaining = JxlDecoderReleaseInput(decoder);
 
     if (remaining > 0)
@@ -247,7 +239,6 @@ sail_status_t jpegxl_private_read_more_data(struct sail_io* io,
 sail_status_t jpegxl_private_fetch_special_properties(const JxlBasicInfo* basic_info,
                                                       struct sail_hash_map* special_properties)
 {
-
     struct sail_variant* variant;
     SAIL_TRY(sail_alloc_variant(&variant));
 
@@ -304,7 +295,6 @@ sail_status_t jpegxl_private_fetch_name(JxlDecoder* decoder,
                                         uint32_t name_length,
                                         struct sail_meta_data_node** meta_data_node)
 {
-
     struct sail_meta_data_node* meta_data_node_local = NULL;
 
     void* ptr;
@@ -334,7 +324,6 @@ sail_status_t jpegxl_private_fetch_name(JxlDecoder* decoder,
 
 sail_status_t jpegxl_private_fetch_metadata(JxlDecoder* decoder, struct sail_meta_data_node** meta_data_node)
 {
-
     JxlBoxType type;
     if (JxlDecoderGetBoxType(decoder, type, JXL_FALSE) != JXL_DEC_SUCCESS)
     {
@@ -395,7 +384,6 @@ sail_status_t jpegxl_private_write_output(JxlEncoder* encoder,
                                           unsigned char* buffer,
                                           size_t buffer_size)
 {
-
     uint8_t* next_out = buffer;
     size_t avail_out  = buffer_size;
 
@@ -442,7 +430,6 @@ sail_status_t jpegxl_private_pixel_format_to_jxl_basic_info(enum SailPixelFormat
                                                             JxlBasicInfo* basic_info,
                                                             JxlPixelFormat* jxl_pixel_format)
 {
-
     JxlEncoderInitBasicInfo(basic_info);
 
     jxl_pixel_format->endianness = JXL_NATIVE_ENDIAN;
@@ -539,7 +526,6 @@ bool jpegxl_private_encoder_tuning_key_value_callback(const char* key,
                                                       const struct sail_variant* value,
                                                       void* user_data)
 {
-
     JxlEncoderFrameSettings* frame_settings = user_data;
 
     if (strcmp(key, "jpegxl-effort") == 0)
@@ -752,7 +738,6 @@ bool jpegxl_private_decoder_tuning_key_value_callback(const char* key,
                                                       const struct sail_variant* value,
                                                       void* user_data)
 {
-
     JxlDecoder* decoder = user_data;
 
     if (strcmp(key, "jpegxl-desired-intensity-target") == 0)

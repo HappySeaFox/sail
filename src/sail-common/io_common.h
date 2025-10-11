@@ -118,7 +118,6 @@ typedef sail_status_t (*sail_io_eof_t)(void* stream, bool* result);
 /* I/O features. */
 enum SailIoFeature
 {
-
     /*
      * The I/O object is seekable. When this flag is off, the seek callback
      * must return SAIL_ERROR_NOT_IMPLEMENTED.
@@ -132,7 +131,6 @@ enum SailIoFeature
  */
 struct sail_io
 {
-
     /*
      * Or-ed I/O features. See SailIoFeature.
      */

@@ -28,7 +28,6 @@
 /* Codec priority. */
 enum SailCodecPriority
 {
-
     /* One of the most popular image formats like JPEG. */
     SAIL_CODEC_PRIORITY_HIGHEST,
     /* Pretty popular and common image format like SVG. */

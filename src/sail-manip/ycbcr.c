@@ -227,7 +227,6 @@ static const uint8_t B_CR[256] = {
 
 void convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t* rgba32)
 {
-
     rgba32->component1 = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y + CR_R[cr])));
     rgba32->component2 = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y - CB_G[cb] - CR_G[cr])));
     rgba32->component3 = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y + CB_B[cb])));
@@ -236,7 +235,6 @@ void convert_ycbcr24_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, sail_rgba32_t*
 
 void convert_rgba32_to_ycbcr24(const sail_rgba32_t* rgba32, uint8_t* y, uint8_t* cb, uint8_t* cr)
 {
-
     *y  = (uint8_t)(0 + R_Y[rgba32->component1] + G_Y[rgba32->component2] + B_Y[rgba32->component3]);
     *cb = (uint8_t)(128 - R_CB[rgba32->component1] - G_CB[rgba32->component2] + B_CB[rgba32->component3]);
     *cr = (uint8_t)(128 + R_CR[rgba32->component1] - G_CR[rgba32->component2] - B_CR[rgba32->component3]);

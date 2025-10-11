@@ -97,7 +97,6 @@ static const uint16_t CB_B[256] = {
 
 void convert_ycck32_to_rgba32(uint8_t y, uint8_t cb, uint8_t cr, uint8_t k, sail_rgba32_t* rgba32)
 {
-
     rgba32->component1 = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y + CR_R[cr] - 179.45600)));
     rgba32->component2 = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y - CB_G[cb] - CR_G[cr] + 135.45984)));
     rgba32->component3 = (uint8_t)(SAIL_MAX(0, SAIL_MIN(255, y + CB_B[cb] - 226.81600)));

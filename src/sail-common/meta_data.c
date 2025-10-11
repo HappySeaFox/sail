@@ -31,7 +31,6 @@
 
 sail_status_t sail_alloc_meta_data(struct sail_meta_data** meta_data)
 {
-
     SAIL_CHECK_PTR(meta_data);
 
     void* ptr;
@@ -47,7 +46,6 @@ sail_status_t sail_alloc_meta_data(struct sail_meta_data** meta_data)
 
 sail_status_t sail_alloc_meta_data_from_known_key(enum SailMetaData key, struct sail_meta_data** meta_data)
 {
-
     SAIL_TRY(sail_alloc_meta_data(meta_data));
 
     (*meta_data)->key = key;
@@ -57,7 +55,6 @@ sail_status_t sail_alloc_meta_data_from_known_key(enum SailMetaData key, struct 
 
 sail_status_t sail_alloc_meta_data_from_unknown_key(const char* key_unknown, struct sail_meta_data** meta_data)
 {
-
     struct sail_meta_data* meta_data_local;
     SAIL_TRY(sail_alloc_meta_data(&meta_data_local));
 
@@ -73,7 +70,6 @@ sail_status_t sail_alloc_meta_data_from_unknown_key(const char* key_unknown, str
 
 sail_status_t sail_alloc_meta_data_and_value_from_known_key(enum SailMetaData key, struct sail_meta_data** meta_data)
 {
-
     struct sail_meta_data* meta_data_local;
     SAIL_TRY(sail_alloc_meta_data_from_known_key(key, &meta_data_local));
 
@@ -88,7 +84,6 @@ sail_status_t sail_alloc_meta_data_and_value_from_known_key(enum SailMetaData ke
 sail_status_t sail_alloc_meta_data_and_value_from_unknown_key(const char* key_unknown,
                                                               struct sail_meta_data** meta_data)
 {
-
     struct sail_meta_data* meta_data_local;
     SAIL_TRY(sail_alloc_meta_data_from_unknown_key(key_unknown, &meta_data_local));
 
@@ -102,7 +97,6 @@ sail_status_t sail_alloc_meta_data_and_value_from_unknown_key(const char* key_un
 
 void sail_destroy_meta_data(struct sail_meta_data* meta_data)
 {
-
     if (meta_data == NULL)
     {
         return;
@@ -115,7 +109,6 @@ void sail_destroy_meta_data(struct sail_meta_data* meta_data)
 
 sail_status_t sail_copy_meta_data(const struct sail_meta_data* source, struct sail_meta_data** target)
 {
-
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 

@@ -27,7 +27,6 @@
 
 sail_status_t sail_private_alloc_linked_list_node(struct linked_list_node** node)
 {
-
     SAIL_CHECK_PTR(node);
 
     void* ptr;
@@ -60,7 +59,6 @@ sail_status_t sail_private_alloc_linked_list_node_and_value(linked_list_value_al
 void sail_private_destroy_linked_list_node(struct linked_list_node* node,
                                            linked_list_value_deallocator_t value_deallocator)
 {
-
     if (node == NULL)
     {
         return;
@@ -75,7 +73,6 @@ sail_status_t sail_private_copy_linked_list_node(const struct linked_list_node* 
                                                  linked_list_value_copier_t value_copier,
                                                  linked_list_value_deallocator_t value_deallocator)
 {
-
     SAIL_CHECK_PTR(source);
     SAIL_CHECK_PTR(target);
 
@@ -95,7 +92,6 @@ sail_status_t sail_private_copy_linked_list_node(const struct linked_list_node* 
 void sail_private_destroy_linked_list_node_chain(struct linked_list_node* node,
                                                  linked_list_value_deallocator_t value_deallocator)
 {
-
     while (node != NULL)
     {
         struct linked_list_node* node_next = node->next;
@@ -111,7 +107,6 @@ sail_status_t sail_private_copy_linked_list_node_chain(const struct linked_list_
                                                        linked_list_value_copier_t value_copier,
                                                        linked_list_value_deallocator_t value_deallocator)
 {
-
     SAIL_CHECK_PTR(target);
 
     if (source == NULL)

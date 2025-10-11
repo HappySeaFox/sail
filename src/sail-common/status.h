@@ -32,7 +32,6 @@
  */
 enum SailStatus
 {
-
     /*
      * Success.
      */

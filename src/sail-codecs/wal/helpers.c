@@ -68,7 +68,6 @@ static const unsigned char WAL_PALETTE[256 * 3] = {
 
 sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHeader* wal_header)
 {
-
     /* WAL file header structure (100 bytes total):
      * - name (32 bytes): texture name (null-terminated string)
      * - width (4 bytes): texture width in pixels
@@ -160,7 +159,6 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
 
 sail_status_t wal_private_assign_palette(struct sail_image* image)
 {
-
     SAIL_TRY(
         sail_alloc_palette_from_data(SAIL_PIXEL_FORMAT_BPP24_RGB, WAL_PALETTE, WAL_PALETTE_ELEMENTS, &image->palette));
 
@@ -170,7 +168,6 @@ sail_status_t wal_private_assign_palette(struct sail_image* image)
 sail_status_t wal_private_assign_meta_data(const struct WalFileHeader* wal_header,
                                            struct sail_meta_data_node** meta_data_node)
 {
-
     struct sail_meta_data_node* meta_data_node_local;
     SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
 
@@ -187,7 +184,6 @@ sail_status_t wal_private_assign_meta_data(const struct WalFileHeader* wal_heade
 
 sail_status_t wal_private_write_file_header(struct sail_io* io, const struct WalFileHeader* wal_header)
 {
-
     SAIL_TRY(io->strict_write(io->stream, &wal_header->name, sizeof(wal_header->name)));
     SAIL_TRY(io->strict_write(io->stream, &wal_header->width, sizeof(wal_header->width)));
     SAIL_TRY(io->strict_write(io->stream, &wal_header->height, sizeof(wal_header->height)));
@@ -202,7 +198,6 @@ sail_status_t wal_private_write_file_header(struct sail_io* io, const struct Wal
 
 sail_status_t wal_private_supported_write_pixel_format(enum SailPixelFormat pixel_format)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
@@ -219,7 +214,6 @@ sail_status_t wal_private_supported_write_pixel_format(enum SailPixelFormat pixe
 sail_status_t wal_private_downsample_indexed(
     const void* src, unsigned src_width, unsigned src_height, void** dst, unsigned* dst_width, unsigned* dst_height)
 {
-
     *dst_width  = src_width / 2;
     *dst_height = src_height / 2;
 

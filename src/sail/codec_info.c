@@ -31,7 +31,6 @@
 
 sail_status_t sail_codec_info_from_path(const char* path, const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(path);
     SAIL_CHECK_PTR(codec_info);
 
@@ -79,7 +78,6 @@ sail_status_t sail_codec_info_from_path(const char* path, const struct sail_code
 
 sail_status_t sail_codec_info_by_magic_number_from_path(const char* path, const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(path);
     SAIL_CHECK_PTR(codec_info);
 
@@ -98,7 +96,6 @@ sail_status_t sail_codec_info_by_magic_number_from_memory(const void* buffer,
                                                           size_t buffer_size,
                                                           const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(buffer);
     SAIL_CHECK_PTR(codec_info);
 
@@ -115,7 +112,6 @@ sail_status_t sail_codec_info_by_magic_number_from_memory(const void* buffer,
 
 sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io* io, const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(codec_info);
 
@@ -226,7 +222,6 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io* io, const 
 
 sail_status_t sail_codec_info_from_extension(const char* extension, const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(extension);
     SAIL_CHECK_PTR(codec_info);
 
@@ -274,7 +269,6 @@ sail_status_t sail_codec_info_from_extension(const char* extension, const struct
 
 sail_status_t sail_codec_info_from_mime_type(const char* mime_type, const struct sail_codec_info** codec_info)
 {
-
     SAIL_CHECK_PTR(mime_type);
     SAIL_CHECK_PTR(codec_info);
 

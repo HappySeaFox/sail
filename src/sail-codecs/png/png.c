@@ -90,7 +90,6 @@ static sail_status_t alloc_png_state(const struct sail_load_options* load_option
                                      const struct sail_save_options* save_options,
                                      struct png_state** png_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct png_state), &ptr));
     *png_state = ptr;
@@ -137,7 +136,6 @@ static sail_status_t alloc_png_state(const struct sail_load_options* load_option
 
 static void destroy_png_state(struct png_state* png_state)
 {
-
     if (png_state == NULL)
     {
         return;
@@ -166,7 +164,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io* io,
                                                       const struct sail_load_options* load_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -304,7 +301,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, struct sail_image** image)
 {
-
     struct png_state* png_state = state;
 
     if (png_state->current_frame == png_state->frames)
@@ -405,7 +401,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, st
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void* state, struct sail_image* image)
 {
-
     struct png_state* png_state = state;
 
     if (png_state->libpng_error)
@@ -489,7 +484,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void* state, struct sail_
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_png(void** state)
 {
-
     struct png_state* png_state = *state;
 
     *state = NULL;
@@ -521,7 +515,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_png(struct sail_io* io,
                                                       const struct sail_save_options* save_options,
                                                       void** state)
 {
-
     *state = NULL;
 
     struct png_state* png_state;
@@ -571,7 +564,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_png(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, const struct sail_image* image)
 {
-
     struct png_state* png_state = state;
 
     if (png_state->frame_saved)
@@ -708,7 +700,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_png(void* state, const struct sail_image* image)
 {
-
     struct png_state* png_state = state;
 
     if (png_state->libpng_error)
@@ -736,7 +727,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_png(void* state, const struct
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_png(void** state)
 {
-
     struct png_state* png_state = *state;
 
     /* Subsequent calls to finish() will expectedly fail in the above line. */

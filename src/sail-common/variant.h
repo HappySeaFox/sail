@@ -43,7 +43,6 @@ extern "C"
  */
 enum SailVariantType
 {
-
     SAIL_VARIANT_TYPE_BOOL,
     SAIL_VARIANT_TYPE_CHAR,
     SAIL_VARIANT_TYPE_UNSIGNED_CHAR,
@@ -65,7 +64,6 @@ enum SailVariantType
  */
 struct sail_variant
 {
-
     /*
      * Value type.
      */

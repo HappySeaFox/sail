@@ -38,7 +38,6 @@ extern "C"
  */
 struct sail_string_node
 {
-
     /*
      * String value.
      */

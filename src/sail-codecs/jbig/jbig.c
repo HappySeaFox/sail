@@ -54,7 +54,6 @@ static sail_status_t alloc_jbig_codec_state(struct sail_io* io,
                                             const struct sail_save_options* save_options,
                                             struct jbig_codec_state** jbig_codec_state)
 {
-
     void* ptr;
     SAIL_TRY(sail_malloc(sizeof(struct jbig_codec_state), &ptr));
     *jbig_codec_state = ptr;
@@ -76,7 +75,6 @@ static sail_status_t alloc_jbig_codec_state(struct sail_io* io,
 
 static void destroy_jbig_codec_state(struct jbig_codec_state* jbig_codec_state)
 {
-
     if (jbig_codec_state == NULL)
     {
         return;
@@ -93,7 +91,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jbig(struct sail_io* io,
                                                        const struct sail_load_options* load_options,
                                                        void** state)
 {
-
     *state = NULL;
 
     /* Allocate a new state. */
@@ -106,7 +103,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jbig(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jbig(void* state, struct sail_image** image)
 {
-
     struct jbig_codec_state* jbig_state = state;
 
     if (jbig_state->frame_loaded)
@@ -159,7 +155,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jbig(void* state, s
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail_image* image)
 {
-
     const struct jbig_codec_state* jbig_codec_state = state;
 
     struct jbg_dec_state decoder;
@@ -244,7 +239,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail
 
 SAIL_EXPORT sail_status_t sail_codec_load_finish_v8_jbig(void** state)
 {
-
     struct jbig_codec_state* jbig_codec_state = *state;
 
     *state = NULL;
@@ -269,7 +263,6 @@ struct jbig_write_context
 
 static void jbig_write_callback(unsigned char* data, size_t len, void* context)
 {
-
     struct jbig_write_context* ctx = context;
 
     if (ctx->status != SAIL_OK)
@@ -282,7 +275,6 @@ static void jbig_write_callback(unsigned char* data, size_t len, void* context)
 
 static bool jbig_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct jbig_write_context* write_ctx = user_data;
 
     if (strcmp(key, "jbig-stripe-height") == 0)
@@ -325,7 +317,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jbig(struct sail_io* io,
                                                        const struct sail_save_options* save_options,
                                                        void** state)
 {
-
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(state);
 
@@ -341,7 +332,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jbig(struct sail_io* io,
 
 SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jbig(void* state, const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -370,7 +360,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jbig(void* state, c
 
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jbig(void* state, const struct sail_image* image)
 {
-
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
@@ -425,7 +414,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jbig(void* state, const struc
 
 SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jbig(void** state)
 {
-
     SAIL_CHECK_PTR(state);
 
     struct jbig_codec_state* jbig_codec_state = *state;

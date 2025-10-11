@@ -29,7 +29,6 @@
 
 sail_status_t sail_malloc(size_t size, void** ptr)
 {
-
     SAIL_CHECK_PTR(ptr);
 
     void* ptr_local = malloc(size);
@@ -46,7 +45,6 @@ sail_status_t sail_malloc(size_t size, void** ptr)
 
 void* sail_malloc_std_signature(size_t size)
 {
-
     void* ptr;
 
     SAIL_TRY_OR_EXECUTE(sail_malloc(size, &ptr),
@@ -57,7 +55,6 @@ void* sail_malloc_std_signature(size_t size)
 
 sail_status_t sail_realloc(size_t size, void** ptr)
 {
-
     SAIL_CHECK_PTR(ptr);
 
     void* ptr_local = realloc(*ptr, size);
@@ -74,7 +71,6 @@ sail_status_t sail_realloc(size_t size, void** ptr)
 
 sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr)
 {
-
     SAIL_CHECK_PTR(ptr);
 
     void* ptr_local = calloc(nmemb, size);
@@ -91,6 +87,5 @@ sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr)
 
 void sail_free(void* ptr)
 {
-
     free(ptr);
 }

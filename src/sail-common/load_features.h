@@ -40,7 +40,6 @@ struct sail_string_node;
  */
 struct sail_load_features
 {
-
     /* Supported or-ed features of loading operations. See SailCodecFeature. */
     int features;
 

@@ -29,7 +29,6 @@
 
 int my_read_proc(GifFileType* gif, GifByteType* buffer, int buffer_size)
 {
-
     struct sail_io* io = gif->UserData;
     size_t nbytes;
 
@@ -46,7 +45,6 @@ int my_read_proc(GifFileType* gif, GifByteType* buffer, int buffer_size)
 
 int my_write_proc(GifFileType* gif, const GifByteType* buffer, int buffer_size)
 {
-
     struct sail_io* io = gif->UserData;
     size_t nbytes;
 

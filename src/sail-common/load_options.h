@@ -41,7 +41,6 @@ struct sail_load_features;
  */
 struct sail_load_options
 {
-
     /* Or-ed manipulation options for loading operations. See SailOption. */
     int options;
 

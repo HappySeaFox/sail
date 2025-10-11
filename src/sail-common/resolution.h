@@ -39,7 +39,6 @@ extern "C"
  */
 struct sail_resolution
 {
-
     enum SailResolutionUnit unit;
 
     double x;

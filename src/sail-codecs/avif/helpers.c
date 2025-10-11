@@ -33,7 +33,6 @@ enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pi
                                                     uint32_t depth,
                                                     bool has_alpha)
 {
-
     switch (avif_pixel_format)
     {
     case AVIF_PIXEL_FORMAT_NONE:
@@ -68,7 +67,6 @@ enum SailPixelFormat avif_private_sail_pixel_format(enum avifPixelFormat avif_pi
 
 enum SailChromaSubsampling avif_private_sail_chroma_subsampling(enum avifPixelFormat avif_pixel_format)
 {
-
     switch (avif_pixel_format)
     {
     case AVIF_PIXEL_FORMAT_YUV444: return SAIL_CHROMA_SUBSAMPLING_444;
@@ -85,7 +83,6 @@ enum SailChromaSubsampling avif_private_sail_chroma_subsampling(enum avifPixelFo
 
 enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_pixel_format, uint32_t depth)
 {
-
     switch (depth)
     {
     case 8:
@@ -125,7 +122,6 @@ enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGBFormat rgb_p
 
 uint32_t avif_private_round_depth(uint32_t depth)
 {
-
     if (depth > 8)
     {
         return 16;
@@ -138,7 +134,6 @@ uint32_t avif_private_round_depth(uint32_t depth)
 
 sail_status_t avif_private_fetch_iccp(const struct avifRWData* avif_iccp, struct sail_iccp** iccp)
 {
-
     SAIL_CHECK_PTR(avif_iccp);
     SAIL_CHECK_PTR(iccp);
 
@@ -159,7 +154,6 @@ sail_status_t avif_private_fetch_meta_data(enum SailMetaData key,
                                            const struct avifRWData* avif_rw_data,
                                            struct sail_meta_data_node** meta_data_node)
 {
-
     if (avif_rw_data->data != NULL)
     {
         struct sail_meta_data_node* meta_data_node_local;
@@ -182,7 +176,6 @@ bool avif_private_sail_pixel_format_to_avif_rgb_format(enum SailPixelFormat pixe
                                                        enum avifRGBFormat* rgb_format,
                                                        uint32_t* depth)
 {
-
     switch (pixel_format)
     {
     case SAIL_PIXEL_FORMAT_BPP24_RGB:
@@ -266,7 +259,6 @@ bool avif_private_sail_pixel_format_to_avif_rgb_format(enum SailPixelFormat pixe
 
 sail_status_t avif_private_write_iccp(struct avifImage* avif_image, const struct sail_iccp* iccp)
 {
-
     SAIL_CHECK_PTR(avif_image);
 
     if (iccp != NULL && iccp->data != NULL)
@@ -289,7 +281,6 @@ sail_status_t avif_private_write_meta_data(struct avifEncoder* encoder,
                                            struct avifImage* avif_image,
                                            const struct sail_meta_data_node* meta_data_node)
 {
-
     SAIL_CHECK_PTR(encoder);
     SAIL_CHECK_PTR(avif_image);
 
@@ -330,7 +321,6 @@ sail_status_t avif_private_write_meta_data(struct avifEncoder* encoder,
 
 bool avif_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct avifEncoder* encoder = user_data;
 
     if (strcmp(key, "avif-speed") == 0)
@@ -385,7 +375,6 @@ bool avif_private_tuning_key_value_callback(const char* key, const struct sail_v
 
 bool avif_private_load_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
-
     struct avifDecoder* decoder = user_data;
 
     if (strcmp(key, "avif-threads") == 0)

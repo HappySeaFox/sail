@@ -27,7 +27,6 @@
 
 sail_status_t sail_io_noop_tolerant_read(void* stream, void* buf, size_t size_to_read, size_t* read_size)
 {
-
     (void)stream;
     (void)buf;
     (void)size_to_read;
@@ -38,7 +37,6 @@ sail_status_t sail_io_noop_tolerant_read(void* stream, void* buf, size_t size_to
 
 sail_status_t sail_io_noop_strict_read(void* stream, void* buf, size_t size_to_read)
 {
-
     (void)stream;
     (void)buf;
     (void)size_to_read;
@@ -48,7 +46,6 @@ sail_status_t sail_io_noop_strict_read(void* stream, void* buf, size_t size_to_r
 
 sail_status_t sail_io_noop_seek(void* stream, long offset, int whence)
 {
-
     (void)stream;
     (void)offset;
     (void)whence;
@@ -58,7 +55,6 @@ sail_status_t sail_io_noop_seek(void* stream, long offset, int whence)
 
 sail_status_t sail_io_noop_tell(void* stream, size_t* offset)
 {
-
     (void)stream;
     (void)offset;
 
@@ -67,7 +63,6 @@ sail_status_t sail_io_noop_tell(void* stream, size_t* offset)
 
 sail_status_t sail_io_noop_tolerant_write(void* stream, const void* buf, size_t size_to_write, size_t* written_size)
 {
-
     (void)stream;
     (void)buf;
     (void)size_to_write;
@@ -78,7 +73,6 @@ sail_status_t sail_io_noop_tolerant_write(void* stream, const void* buf, size_t 
 
 sail_status_t sail_io_noop_strict_write(void* stream, const void* buf, size_t size_to_write)
 {
-
     (void)stream;
     (void)buf;
     (void)size_to_write;
@@ -88,7 +82,6 @@ sail_status_t sail_io_noop_strict_write(void* stream, const void* buf, size_t si
 
 sail_status_t sail_io_noop_flush(void* stream)
 {
-
     (void)stream;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
@@ -96,7 +89,6 @@ sail_status_t sail_io_noop_flush(void* stream)
 
 sail_status_t sail_io_noop_close(void* stream)
 {
-
     (void)stream;
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
@@ -104,7 +96,6 @@ sail_status_t sail_io_noop_close(void* stream)
 
 sail_status_t sail_io_noop_eof(void* stream, bool* result)
 {
-
     (void)stream;
     (void)result;
 

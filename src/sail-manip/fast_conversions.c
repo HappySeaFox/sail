@@ -37,7 +37,6 @@
 /* RGB24 ↔ BGR24: Simple byte swap */
 static bool fast_convert_rgb24_bgr24(const struct sail_image* image_input, struct sail_image* image_output)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -63,7 +62,6 @@ static bool fast_convert_rgb24_bgr24(const struct sail_image* image_input, struc
 /* RGB48 ↔ BGR48: Simple word swap */
 static bool fast_convert_rgb48_bgr48(const struct sail_image* image_input, struct sail_image* image_output)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -98,7 +96,6 @@ static bool fast_convert_rgba32_variants(const struct sail_image* image_input,
                                          int b_out,
                                          int a_out)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -134,7 +131,6 @@ static bool fast_convert_rgba64_variants(const struct sail_image* image_input,
                                          int b_out,
                                          int a_out)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -168,7 +164,6 @@ static bool fast_convert_rgba32_to_rgb24(const struct sail_image* image_input,
                                          int g_out,
                                          int b_out)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -201,7 +196,6 @@ static bool fast_convert_rgba64_to_rgb48(const struct sail_image* image_input,
                                          int g_out,
                                          int b_out)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -235,7 +229,6 @@ static bool fast_convert_rgb24_to_rgba32(const struct sail_image* image_input,
                                          int b_out,
                                          int a_out)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -270,7 +263,6 @@ static bool fast_convert_rgb48_to_rgba64(const struct sail_image* image_input,
                                          int b_out,
                                          int a_out)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -297,7 +289,6 @@ static bool fast_convert_rgb48_to_rgba64(const struct sail_image* image_input,
 /* RGB555 ↔ BGR555: Swap color bits */
 static bool fast_convert_rgb555_bgr555(const struct sail_image* image_input, struct sail_image* image_output)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -322,7 +313,6 @@ static bool fast_convert_rgb555_bgr555(const struct sail_image* image_input, str
 /* RGB565 ↔ BGR565: Swap color bits */
 static bool fast_convert_rgb565_bgr565(const struct sail_image* image_input, struct sail_image* image_output)
 {
-
     unsigned row;
 
 #pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
@@ -347,7 +337,6 @@ static bool fast_convert_rgb565_bgr565(const struct sail_image* image_input, str
 /* Identical format: direct memcpy */
 static bool fast_convert_identical(const struct sail_image* image_input, struct sail_image* image_output)
 {
-
     const size_t total_size = (size_t)image_input->height * image_input->bytes_per_line;
     memcpy(image_output->pixels, image_input->pixels, total_size);
 
@@ -359,7 +348,6 @@ bool sail_try_fast_conversion(const struct sail_image* image_input,
                               struct sail_image* image_output,
                               enum SailPixelFormat output_pixel_format)
 {
-
     const enum SailPixelFormat input_format = image_input->pixel_format;
 
     /* Fast-path 1: Identical formats - just memcpy */

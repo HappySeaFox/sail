@@ -27,7 +27,6 @@
 
 sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node** node)
 {
-
     SAIL_TRY(sail_private_alloc_linked_list_node((struct linked_list_node**)node));
 
     return SAIL_OK;
@@ -35,7 +34,6 @@ sail_status_t sail_alloc_meta_data_node(struct sail_meta_data_node** node)
 
 sail_status_t sail_alloc_meta_data_node_and_value(struct sail_meta_data_node** node)
 {
-
     SAIL_TRY(sail_private_alloc_linked_list_node_and_value((linked_list_value_allocator_t)&sail_alloc_meta_data,
                                                            (linked_list_value_deallocator_t)&sail_destroy_meta_data,
                                                            (struct linked_list_node**)node));
@@ -45,14 +43,12 @@ sail_status_t sail_alloc_meta_data_node_and_value(struct sail_meta_data_node** n
 
 void sail_destroy_meta_data_node(struct sail_meta_data_node* node)
 {
-
     sail_private_destroy_linked_list_node((struct linked_list_node*)node,
                                           (linked_list_value_deallocator_t)&sail_destroy_meta_data);
 }
 
 sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node* source, struct sail_meta_data_node** target)
 {
-
     SAIL_TRY(sail_private_copy_linked_list_node(
         (const struct linked_list_node*)source, (struct linked_list_node**)target,
         (linked_list_value_copier_t)&sail_copy_meta_data, (linked_list_value_deallocator_t)&sail_destroy_meta_data));
@@ -62,7 +58,6 @@ sail_status_t sail_copy_meta_data_node(const struct sail_meta_data_node* source,
 
 void sail_destroy_meta_data_node_chain(struct sail_meta_data_node* node)
 {
-
     sail_private_destroy_linked_list_node_chain((struct linked_list_node*)node,
                                                 (linked_list_value_deallocator_t)&sail_destroy_meta_data);
 }
@@ -70,7 +65,6 @@ void sail_destroy_meta_data_node_chain(struct sail_meta_data_node* node)
 sail_status_t sail_copy_meta_data_node_chain(const struct sail_meta_data_node* source,
                                              struct sail_meta_data_node** target)
 {
-
     SAIL_TRY(sail_private_copy_linked_list_node_chain(
         (const struct linked_list_node*)source, (struct linked_list_node**)target,
         (linked_list_value_copier_t)&sail_copy_meta_data, (linked_list_value_deallocator_t)&sail_destroy_meta_data));
