@@ -98,11 +98,52 @@ static MunitResult test_realloc(const MunitParameter params[], void* user_data)
     return MUNIT_OK;
 }
 
+static MunitResult test_aligned_alloc(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    const size_t size = 10 * 1024;
+    const size_t alignment = 64;
+
+    void* ptr = NULL;
+    munit_assert(sail_aligned_alloc(alignment, size, &ptr) == SAIL_OK);
+    munit_assert_not_null(ptr);
+
+    munit_assert(((size_t)ptr % alignment) == 0);
+
+    memset(ptr, 0, size);
+    sail_free(ptr);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_aligned_alloc_std_signature(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    const size_t size = 10 * 1024;
+    const size_t alignment = 64;
+
+    void* ptr = sail_aligned_alloc_std_signature(alignment, size);
+    munit_assert_not_null(ptr);
+
+    munit_assert(((size_t)ptr % alignment) == 0);
+
+    memset(ptr, 0, size);
+    sail_free(ptr);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/malloc",  test_malloc,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/calloc",  test_calloc,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/realloc", test_realloc, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/malloc",                      test_malloc,                      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/calloc",                      test_calloc,                      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/realloc",                     test_realloc,                     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/aligned_alloc",               test_aligned_alloc,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/aligned_alloc_std_signature", test_aligned_alloc_std_signature, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
