@@ -274,6 +274,10 @@ static MunitResult test_multi_frame_dimensions(const MunitParameter params[], vo
         return MUNIT_SKIP;
     }
 
+    /* For animated formats (GIF, APNG, WEBP), frames should fit within the canvas dimensions.
+     * For multi-paged formats (ICO, TIFF, WAL), each page can have different dimensions. */
+    bool is_animated = (codec_info->load_features->features & SAIL_CODEC_FEATURE_ANIMATED) != 0;
+
     void* state = NULL;
     munit_assert(sail_start_loading_from_file(path, codec_info, &state) == SAIL_OK);
 
@@ -296,8 +300,13 @@ static MunitResult test_multi_frame_dimensions(const MunitParameter params[], vo
         }
 
         munit_assert(status == SAIL_OK);
-        munit_assert(image->width <= canvas_width);
-        munit_assert(image->height <= canvas_height);
+
+        /* Only check canvas dimensions for animated formats. */
+        if (is_animated)
+        {
+            munit_assert(image->width <= canvas_width);
+            munit_assert(image->height <= canvas_height);
+        }
 
         sail_destroy_image(image);
     }
