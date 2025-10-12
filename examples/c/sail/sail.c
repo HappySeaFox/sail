@@ -966,6 +966,7 @@ static void print_aligned_image_info(const struct sail_image* image)
     }
 
     printf("Pixel format  : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
+    printf("Compression   : %s\n", sail_compression_to_string(image->source_image->compression));
     printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
     printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
     printf("Delay         : %d ms.\n", image->delay);
@@ -995,7 +996,7 @@ static void print_aligned_image_info(const struct sail_image* image)
         }
     }
 
-    if (image->source_image != NULL && image->source_image->special_properties != NULL)
+    if (image->source_image->special_properties != NULL)
     {
         printf("Special properties :\n");
         sail_traverse_hash_map(image->source_image->special_properties, special_properties_printf_callback);
