@@ -42,11 +42,11 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams (see `tests/sail/custom-io.c`)
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Save pixels as close as possible to the source
-- [x] Codec-specific tuning options like <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>. See [FORMATS](FORMATS.md)
+- [x] Format-specific tuning options like <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>. See [FORMATS](FORMATS.md)
 - [x] Meta data support: text comments, EXIF, ICC profiles
 - [x] Access to the image properties w/o decoding pixels (probing)
-- [x] Access to the source image properties
+- [x] Access to the source image properties (source encoding etc.)
+- [x] Save pixels as close as possible to the source
 - [x] Adding or updating image codecs with ease demonstrated by Intel \[[*](#intel)\]
 - [x] The best MIME icons in the computer industry :smile:
 
@@ -58,38 +58,26 @@ and
 [JPEG 2000](https://web.archive.org/web/20091009224048/http://software.intel.com/en-us/articles/performance-tools-for-software-developers-application-notes-intel-ipp-jpeg2000-and-jasper-in-ksquirrel)
 images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecessor of SAIL.
 
-## Features NOT provided
+## 20+ image formats
 
-- [ ] Image editing capabilities (filtering, distortion, scaling, etc.)
-- [ ] Color space conversion functions
-- [ ] Color management functions (applying ICC profiles etc.)
-- [ ] EXIF rotation
-
-## Supported image formats
-
-| N  | Image format                                                        | Operations    | Dependencies      |
-| -- | --------------------------------------------------------------------| ------------- | ----------------- |
-| 1  | [APNG](https://wikipedia.org/wiki/APNG)                             | RW            | libpng+APNG patch |
-| 2  | [AVIF](https://wikipedia.org/wiki/AV1#AV1_Image_File_Format_(AVIF)) | RW            | libavif           |
-| 3  | [BMP](https://wikipedia.org/wiki/BMP_file_format)                   | RW            |                   |
-| 4  | [GIF](https://wikipedia.org/wiki/GIF)                               | RW            | giflib            |
-| .. | ...                                                                 |               |                   |
-| 6  | [HEIF](https://wikipedia.org/wiki/High_Efficiency_Image_File_Format)| RW            | libheif, libheif-plugin-x265 |
-| .. | ...                                                                 |               |                   |
-| 9  | [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
-| 10 | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                   | RW            | openjpeg          |
-| 11 | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | RW            | libjxl            |
-| 12 | [PCX](https://wikipedia.org/wiki/PCX)                               | RW            |                   |
-| 13 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| 14 | [PNM](https://wikipedia.org/wiki/Portable_anymap)                   | RW            |                   |
-| 15 | [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
-| 16 | [QOI](http://qoiformat.org)                                         | RW            |                   |
-| 17 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg/nanosvg     |
-| 18 | [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
-| 19 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
-| .. | ...                                                                 |               |                   |
-| 21 | [WEBP](https://wikipedia.org/wiki/WebP)                             | RW            | libwebp           |
-| .. | ...                                                                 |               |                   |
+| Image format                                                        | Operations    | Dependencies      |
+| --------------------------------------------------------------------| ------------- | ----------------- |
+| [APNG](https://wikipedia.org/wiki/APNG)                             | RW            | libpng+APNG patch |
+| [AVIF](https://wikipedia.org/wiki/AV1#AV1_Image_File_Format_(AVIF)) | RW            | libavif           |
+| [BMP](https://wikipedia.org/wiki/BMP_file_format)                   | RW            |                   |
+| [GIF](https://wikipedia.org/wiki/GIF)                               | RW            | giflib            |
+| [HEIF](https://wikipedia.org/wiki/High_Efficiency_Image_File_Format)| RW            | libheif, libheif-plugin-x265 |
+| [JPEG](https://wikipedia.org/wiki/JPEG)                             | RW            | libjpeg-turbo     |
+| [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                   | RW            | openjpeg          |
+| [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | RW            | libjxl            |
+| [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
+| [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
+| [QOI](http://qoiformat.org)                                         | RW            |                   |
+| [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg/nanosvg     |
+| [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
+| [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
+| [WEBP](https://wikipedia.org/wiki/WebP)                             | RW            | libwebp           |
+| ...                                                                 |               |                   |
 
 See the full list [here](FORMATS.md). Work to add more image formats is ongoing.
 
