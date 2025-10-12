@@ -239,7 +239,7 @@ if (SAIL_BUILD_APPS)
 endif()
 
 if (SAIL_BUILD_EXAMPLES)
-    find_package(SDL2)
+    find_package(SDL2 QUIET)
     set(SAIL_SDL_EXAMPLE OFF)
 
     if (SDL2_FOUND)
