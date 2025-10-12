@@ -35,7 +35,7 @@ namespace sail
 /*
  * Expanding buffer I/O stream. A writable memory buffer that automatically
  * grows as data is written to it. Useful for encoding images to memory
- * without pre-allocating a fixed-size buffer.
+ * without pre-allocating a fixed-size buffer. The growth factor is 1.5x.
  */
 class SAIL_EXPORT io_expanding_buffer : public io_base
 {

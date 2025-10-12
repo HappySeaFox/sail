@@ -41,7 +41,7 @@ struct sail_io;
  * Allocates a new I/O object for an automatically expanding memory buffer.
  * The buffer starts with the specified initial capacity and grows automatically
  * using sail_realloc() when writing beyond the current capacity. The growth factor
- * is 1.25x.
+ * is 1.5x.
  *
  * The actual data size written can be retrieved with sail_io_expanding_buffer_size().
  * The underlying buffer can be extracted with sail_io_expanding_buffer_extract() or

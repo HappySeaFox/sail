@@ -36,7 +36,7 @@ struct expanding_buffer_stream
     size_t size;
     size_t pos;
     void* buffer;
-    double growth_factor; /* Growth factor (1.25x by default). */
+    double growth_factor; /* Growth factor (1.5x by default). */
 };
 
 /*
@@ -261,7 +261,7 @@ sail_status_t sail_alloc_io_write_expanding_buffer(size_t initial_capacity, stru
     expanding_buffer_stream->size          = 0;
     expanding_buffer_stream->pos           = 0;
     expanding_buffer_stream->buffer        = NULL;
-    expanding_buffer_stream->growth_factor = 1.25;
+    expanding_buffer_stream->growth_factor = 1.5;
 
     SAIL_TRY_OR_CLEANUP(sail_malloc(initial_capacity, &expanding_buffer_stream->buffer),
                         /* cleanup */ sail_free(expanding_buffer_stream), sail_destroy_io(io_local));
