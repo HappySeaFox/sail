@@ -85,32 +85,6 @@ sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr)
     return SAIL_OK;
 }
 
-sail_status_t sail_aligned_alloc(size_t alignment, size_t size, void** ptr)
-{
-    SAIL_CHECK_PTR(ptr);
-
-    void* ptr_local = aligned_alloc(alignment, size);
-
-    if (ptr_local == NULL)
-    {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
-    }
-
-    *ptr = ptr_local;
-
-    return SAIL_OK;
-}
-
-void* sail_aligned_alloc_std_signature(size_t alignment, size_t size)
-{
-    void* ptr;
-
-    SAIL_TRY_OR_EXECUTE(sail_aligned_alloc(alignment, size, &ptr),
-                        /* on error */ return NULL);
-
-    return ptr;
-}
-
 void sail_free(void* ptr)
 {
     free(ptr);

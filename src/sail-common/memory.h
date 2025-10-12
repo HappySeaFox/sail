@@ -66,23 +66,6 @@ SAIL_EXPORT sail_status_t sail_realloc(size_t size, void** ptr);
 SAIL_EXPORT sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr);
 
 /*
- * Interface to aligned_alloc(). The alignment must be a power of two and a multiple of sizeof(void*).
- * Use sail_free() to free the allocated memory.
- *
- * Returns SAIL_OK on success.
- */
-SAIL_EXPORT sail_status_t sail_aligned_alloc(size_t alignment, size_t size, void** ptr);
-
-/*
- * Calls sail_aligned_alloc() and returns the allocated pointer or NULL in case of error.
- * One can pass sail_aligned_alloc_std_signature() to memory management functions in third-party
- * imaging libraries to force them to use sail_aligned_alloc().
- *
- * Returns the allocated pointer on success or NULL on error.
- */
-SAIL_EXPORT void* sail_aligned_alloc_std_signature(size_t alignment, size_t size);
-
-/*
  * Interface to free().
  *
  * Returns SAIL_OK on success.
