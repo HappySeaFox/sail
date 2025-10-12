@@ -23,7 +23,6 @@
     SOFTWARE.
 */
 
-#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
 #include <stdio.h>
