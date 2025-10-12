@@ -93,7 +93,11 @@ sail_status_t io_base::flush()
 
 sail_status_t io_base::close()
 {
-    SAIL_TRY(d->sail_io_wrapper->close(d->sail_io_wrapper->stream));
+    if (d->sail_io_wrapper->stream != nullptr)
+    {
+        SAIL_TRY(d->sail_io_wrapper->close(d->sail_io_wrapper->stream));
+        d->sail_io_wrapper->stream = nullptr;
+    }
 
     return SAIL_OK;
 }
