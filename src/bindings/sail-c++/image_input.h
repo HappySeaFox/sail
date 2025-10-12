@@ -110,7 +110,9 @@ public:
     image next_frame();
 
     /*
-     * Finishes loading and closes the I/O stream. Call to finish() is optional.
+     * Finishes loading and flushes the I/O stream. Call to finish() is optional
+     * as it is automatically invoked in the destructor. The actual I/O close
+     * happens in the destructor.
      *
      * Returns SAIL_OK on success.
      */

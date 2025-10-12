@@ -105,8 +105,9 @@ public:
     sail_status_t next_frame(const sail::image& image);
 
     /*
-     * Finishes saving and closes the I/O stream. Call to finish() is recommended
-     * if you want to ensure the I/O stream is flushed and closed successfully.
+     * Finishes saving and flushes the I/O stream. Call to finish() is optional
+     * as it is automatically invoked in the destructor. The actual I/O close
+     * happens in the destructor.
      *
      * Returns SAIL_OK on success.
      */

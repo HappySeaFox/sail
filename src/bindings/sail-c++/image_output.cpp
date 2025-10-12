@@ -58,12 +58,17 @@ public:
     sail_status_t start();
 
 private:
-    const std::unique_ptr<sail::abstract_io> abstract_io;
-    sail::abstract_io &abstract_io_ref;
+    std::unique_ptr<sail::abstract_io> abstract_io;
+    sail::abstract_io& abstract_io_ref;
 
 public:
+    void flush()
+    {
+        abstract_io_ref.flush();
+    }
+
     const std::unique_ptr<sail::abstract_io_adapter> abstract_io_adapter;
-    void *state;
+    void* state;
 
     sail::codec_info codec_info;
     bool override_save_options;
@@ -166,10 +171,16 @@ sail_status_t image_output::next_frame(const sail::image &image)
 sail_status_t image_output::finish()
 {
     sail_status_t saved_status = SAIL_OK;
-    SAIL_TRY_OR_EXECUTE(sail_stop_saving(d->state),
-                        /* on error */ saved_status = __sail_status);
 
-    d->state = nullptr;
+    if (d->state != nullptr)
+    {
+        SAIL_TRY_OR_EXECUTE(sail_stop_saving(d->state),
+                            /* on error */ saved_status = __sail_status);
+
+        d->state = nullptr;
+
+        d->flush();
+    }
 
     return saved_status;
 }
