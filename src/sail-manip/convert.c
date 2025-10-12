@@ -37,6 +37,111 @@
  * Private functions.
  */
 
+/* Helper functions for float<->uint16 conversion */
+static inline uint16_t float_to_uint16(float value)
+{
+    /* Clamp to [0.0, 1.0] and scale to [0, 65535] */
+    if (value <= 0.0f) return 0;
+    if (value >= 1.0f) return 65535;
+    return (uint16_t)(value * 65535.0f + 0.5f);
+}
+
+static inline float uint16_to_float(uint16_t value)
+{
+    /* Scale [0, 65535] to [0.0, 1.0] */
+    return (float)value / 65535.0f;
+}
+
+/* Half-precision (IEEE 754 binary16) conversion helpers */
+static inline uint16_t float32_to_float16(float value)
+{
+    union { float f; uint32_t i; } v = { .f = value };
+    uint32_t i = v.i;
+
+    int32_t sign = (i >> 16) & 0x8000;
+    int32_t exponent = ((i >> 23) & 0xff) - 127 + 15;
+    int32_t mantissa = i & 0x007fffff;
+
+    if (exponent <= 0)
+    {
+        if (exponent < -10)
+        {
+            return (uint16_t)sign; /* Too small, return signed zero */
+        }
+        mantissa = (mantissa | 0x00800000) >> (1 - exponent);
+        return (uint16_t)(sign | (mantissa >> 13));
+    }
+    else if (exponent == 0xff - 127 + 15)
+    {
+        if (mantissa == 0)
+        {
+            return (uint16_t)(sign | 0x7c00); /* Infinity */
+        }
+        else
+        {
+            return (uint16_t)(sign | 0x7c00 | (mantissa >> 13)); /* NaN */
+        }
+    }
+    else if (exponent > 30)
+    {
+        return (uint16_t)(sign | 0x7c00); /* Overflow to infinity */
+    }
+
+    return (uint16_t)(sign | (exponent << 10) | (mantissa >> 13));
+}
+
+static inline float float16_to_float32(uint16_t value)
+{
+    uint32_t sign = (uint32_t)(value & 0x8000) << 16;
+    uint32_t exponent = (value >> 10) & 0x1f;
+    uint32_t mantissa = value & 0x3ff;
+
+    if (exponent == 0)
+    {
+        if (mantissa == 0)
+        {
+            /* Zero */
+            union { float f; uint32_t i; } v = { .i = sign };
+            return v.f;
+        }
+        else
+        {
+            /* Denormalized */
+            while (!(mantissa & 0x400))
+            {
+                mantissa <<= 1;
+                exponent--;
+            }
+            exponent++;
+            mantissa &= ~0x400;
+        }
+    }
+    else if (exponent == 31)
+    {
+        /* Infinity or NaN */
+        union { float f; uint32_t i; } v = { .i = sign | 0x7f800000 | (mantissa << 13) };
+        return v.f;
+    }
+
+    exponent = exponent + (127 - 15);
+    mantissa = mantissa << 13;
+
+    union { float f; uint32_t i; } v = { .i = sign | (exponent << 23) | mantissa };
+    return v.f;
+}
+
+static inline uint16_t half_to_uint16(uint16_t half_value)
+{
+    float f = float16_to_float32(half_value);
+    return float_to_uint16(f);
+}
+
+static inline uint16_t uint16_to_half(uint16_t value)
+{
+    float f = uint16_to_float(value);
+    return float32_to_float16(f);
+}
+
 struct output_context
 {
     struct sail_image* image;
@@ -427,6 +532,156 @@ static inline void pixel_consumer_yuv24(const struct output_context* output_cont
     *scan8 += 3;
 }
 
+/* Floating point pixel consumers */
+static inline void pixel_consumer_gray_half(const struct output_context* output_context,
+                                            uint8_t** scan8,
+                                            uint16_t** scan16,
+                                            const sail_rgba32_t* rgba32,
+                                            const sail_rgba64_t* rgba64)
+{
+    (void)scan8;
+
+    uint16_t gray;
+    if (rgba32 != NULL)
+    {
+        fill_gray16_pixel_from_uint8_values(rgba32, &gray, output_context->options);
+    }
+    else
+    {
+        fill_gray16_pixel_from_uint16_values(rgba64, &gray, output_context->options);
+    }
+
+    **scan16 = uint16_to_half(gray);
+    (*scan16)++;
+}
+
+static inline void pixel_consumer_gray_float(const struct output_context* output_context,
+                                             uint8_t** scan8,
+                                             uint16_t** scan16,
+                                             const sail_rgba32_t* rgba32,
+                                             const sail_rgba64_t* rgba64)
+{
+    (void)scan16;
+
+    uint16_t gray;
+    if (rgba32 != NULL)
+    {
+        fill_gray16_pixel_from_uint8_values(rgba32, &gray, output_context->options);
+    }
+    else
+    {
+        fill_gray16_pixel_from_uint16_values(rgba64, &gray, output_context->options);
+    }
+
+    float* scan_float = (float*)*scan8;
+    *scan_float = uint16_to_float(gray);
+    *scan8 = (uint8_t*)(scan_float + 1);
+}
+
+static inline void pixel_consumer_rgb_half(const struct output_context* output_context,
+                                           uint8_t** scan8,
+                                           uint16_t** scan16,
+                                           const sail_rgba32_t* rgba32,
+                                           const sail_rgba64_t* rgba64)
+{
+    (void)scan8;
+
+    if (rgba32 != NULL)
+    {
+        *((*scan16) + output_context->r) = uint16_to_half((uint16_t)(rgba32->component1 * 257));
+        *((*scan16) + output_context->g) = uint16_to_half((uint16_t)(rgba32->component2 * 257));
+        *((*scan16) + output_context->b) = uint16_to_half((uint16_t)(rgba32->component3 * 257));
+    }
+    else
+    {
+        *((*scan16) + output_context->r) = uint16_to_half(rgba64->component1);
+        *((*scan16) + output_context->g) = uint16_to_half(rgba64->component2);
+        *((*scan16) + output_context->b) = uint16_to_half(rgba64->component3);
+    }
+
+    *scan16 += 3;
+}
+
+static inline void pixel_consumer_rgba_half(const struct output_context* output_context,
+                                            uint8_t** scan8,
+                                            uint16_t** scan16,
+                                            const sail_rgba32_t* rgba32,
+                                            const sail_rgba64_t* rgba64)
+{
+    (void)scan8;
+
+    if (rgba32 != NULL)
+    {
+        *((*scan16) + output_context->r) = uint16_to_half((uint16_t)(rgba32->component1 * 257));
+        *((*scan16) + output_context->g) = uint16_to_half((uint16_t)(rgba32->component2 * 257));
+        *((*scan16) + output_context->b) = uint16_to_half((uint16_t)(rgba32->component3 * 257));
+        *((*scan16) + output_context->a) = uint16_to_half((uint16_t)(rgba32->component4 * 257));
+    }
+    else
+    {
+        *((*scan16) + output_context->r) = uint16_to_half(rgba64->component1);
+        *((*scan16) + output_context->g) = uint16_to_half(rgba64->component2);
+        *((*scan16) + output_context->b) = uint16_to_half(rgba64->component3);
+        *((*scan16) + output_context->a) = uint16_to_half(rgba64->component4);
+    }
+
+    *scan16 += 4;
+}
+
+static inline void pixel_consumer_rgb_float(const struct output_context* output_context,
+                                            uint8_t** scan8,
+                                            uint16_t** scan16,
+                                            const sail_rgba32_t* rgba32,
+                                            const sail_rgba64_t* rgba64)
+{
+    (void)scan16;
+
+    float* scan_float = (float*)*scan8;
+
+    if (rgba32 != NULL)
+    {
+        *(scan_float + output_context->r) = uint16_to_float((uint16_t)(rgba32->component1 * 257));
+        *(scan_float + output_context->g) = uint16_to_float((uint16_t)(rgba32->component2 * 257));
+        *(scan_float + output_context->b) = uint16_to_float((uint16_t)(rgba32->component3 * 257));
+    }
+    else
+    {
+        *(scan_float + output_context->r) = uint16_to_float(rgba64->component1);
+        *(scan_float + output_context->g) = uint16_to_float(rgba64->component2);
+        *(scan_float + output_context->b) = uint16_to_float(rgba64->component3);
+    }
+
+    *scan8 = (uint8_t*)(scan_float + 3);
+}
+
+static inline void pixel_consumer_rgba_float(const struct output_context* output_context,
+                                             uint8_t** scan8,
+                                             uint16_t** scan16,
+                                             const sail_rgba32_t* rgba32,
+                                             const sail_rgba64_t* rgba64)
+{
+    (void)scan16;
+
+    float* scan_float = (float*)*scan8;
+
+    if (rgba32 != NULL)
+    {
+        *(scan_float + output_context->r) = uint16_to_float((uint16_t)(rgba32->component1 * 257));
+        *(scan_float + output_context->g) = uint16_to_float((uint16_t)(rgba32->component2 * 257));
+        *(scan_float + output_context->b) = uint16_to_float((uint16_t)(rgba32->component3 * 257));
+        *(scan_float + output_context->a) = uint16_to_float((uint16_t)(rgba32->component4 * 257));
+    }
+    else
+    {
+        *(scan_float + output_context->r) = uint16_to_float(rgba64->component1);
+        *(scan_float + output_context->g) = uint16_to_float(rgba64->component2);
+        *(scan_float + output_context->b) = uint16_to_float(rgba64->component3);
+        *(scan_float + output_context->a) = uint16_to_float(rgba64->component4);
+    }
+
+    *scan8 = (uint8_t*)(scan_float + 4);
+}
+
 static bool verify_and_construct_rgba_indexes_silent(
     enum SailPixelFormat output_pixel_format, pixel_consumer_t* pixel_consumer, int* r, int* g, int* b, int* a)
 {
@@ -794,6 +1049,60 @@ static bool verify_and_construct_rgba_indexes_silent(
     {
         *pixel_consumer = pixel_consumer_yuv24;
         *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF:
+    {
+        *pixel_consumer = pixel_consumer_gray_half;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT:
+    {
+        *pixel_consumer = pixel_consumer_gray_float;
+        *r = *g = *b = *a = -1; /* unused. */
+        break;
+    }
+
+    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF:
+    {
+        *pixel_consumer = pixel_consumer_rgb_half;
+        *r = 0;
+        *g = 1;
+        *b = 2;
+        *a = -1; /* unused. */
+        break;
+    }
+
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF:
+    {
+        *pixel_consumer = pixel_consumer_rgba_half;
+        *r = 0;
+        *g = 1;
+        *b = 2;
+        *a = 3;
+        break;
+    }
+
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT:
+    {
+        *pixel_consumer = pixel_consumer_rgb_float;
+        *r = 0;
+        *g = 1;
+        *b = 2;
+        *a = -1; /* unused. */
+        break;
+    }
+
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT:
+    {
+        *pixel_consumer = pixel_consumer_rgba_float;
+        *r = 0;
+        *g = 1;
+        *b = 2;
+        *a = 3;
         break;
     }
 
@@ -1440,6 +1749,177 @@ static sail_status_t convert_from_bpp32_ycck(const struct sail_image* image,
     return SAIL_OK;
 }
 
+/* Floating point format conversions */
+static sail_status_t convert_from_bpp16_grayscale_half(const struct sail_image* image,
+                                                        pixel_consumer_t pixel_consumer,
+                                                        const struct output_context* output_context)
+{
+    unsigned row;
+
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            sail_rgba64_t rgba64;
+            uint16_t gray = half_to_uint16(*scan_input++);
+            spread_gray16_to_rgba64(gray, &rgba64);
+            pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
+        }
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp32_grayscale_float(const struct sail_image* image,
+                                                         pixel_consumer_t pixel_consumer,
+                                                         const struct output_context* output_context)
+{
+    unsigned row;
+
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const float* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8   = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16 = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            sail_rgba64_t rgba64;
+            uint16_t gray = float_to_uint16(*scan_input++);
+            spread_gray16_to_rgba64(gray, &rgba64);
+            pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
+        }
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp48_rgb_half(const struct sail_image* image,
+                                                  pixel_consumer_t pixel_consumer,
+                                                  const struct output_context* output_context)
+{
+    unsigned row;
+
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba64_t rgba64 = {
+                half_to_uint16(*(scan_input + 0)),
+                half_to_uint16(*(scan_input + 1)),
+                half_to_uint16(*(scan_input + 2)),
+                65535
+            };
+
+            pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
+            scan_input += 3;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp64_rgba_half(const struct sail_image* image,
+                                                   pixel_consumer_t pixel_consumer,
+                                                   const struct output_context* output_context)
+{
+    unsigned row;
+
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const uint16_t* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8      = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16    = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba64_t rgba64 = {
+                half_to_uint16(*(scan_input + 0)),
+                half_to_uint16(*(scan_input + 1)),
+                half_to_uint16(*(scan_input + 2)),
+                half_to_uint16(*(scan_input + 3))
+            };
+
+            pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
+            scan_input += 4;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp96_rgb_float(const struct sail_image* image,
+                                                   pixel_consumer_t pixel_consumer,
+                                                   const struct output_context* output_context)
+{
+    unsigned row;
+
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const float* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8   = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16 = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba64_t rgba64 = {
+                float_to_uint16(*(scan_input + 0)),
+                float_to_uint16(*(scan_input + 1)),
+                float_to_uint16(*(scan_input + 2)),
+                65535
+            };
+
+            pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
+            scan_input += 3;
+        }
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t convert_from_bpp128_rgba_float(const struct sail_image* image,
+                                                     pixel_consumer_t pixel_consumer,
+                                                     const struct output_context* output_context)
+{
+    unsigned row;
+
+#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    for (row = 0; row < image->height; row++)
+    {
+        const float* scan_input = sail_scan_line(image, row);
+        uint8_t* scan_output8   = sail_scan_line(output_context->image, row);
+        uint16_t* scan_output16 = sail_scan_line(output_context->image, row);
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            const sail_rgba64_t rgba64 = {
+                float_to_uint16(*(scan_input + 0)),
+                float_to_uint16(*(scan_input + 1)),
+                float_to_uint16(*(scan_input + 2)),
+                float_to_uint16(*(scan_input + 3))
+            };
+
+            pixel_consumer(output_context, &scan_output8, &scan_output16, NULL, &rgba64);
+            scan_input += 4;
+        }
+    }
+
+    return SAIL_OK;
+}
+
 static sail_status_t conversion_impl(const struct sail_image* image,
                                      struct sail_image* image_output,
                                      pixel_consumer_t pixel_consumer,
@@ -1657,6 +2137,36 @@ static sail_status_t conversion_impl(const struct sail_image* image,
     case SAIL_PIXEL_FORMAT_BPP32_YCCK:
     {
         SAIL_TRY(convert_from_bpp32_ycck(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF:
+    {
+        SAIL_TRY(convert_from_bpp16_grayscale_half(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT:
+    {
+        SAIL_TRY(convert_from_bpp32_grayscale_float(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF:
+    {
+        SAIL_TRY(convert_from_bpp48_rgb_half(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF:
+    {
+        SAIL_TRY(convert_from_bpp64_rgba_half(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT:
+    {
+        SAIL_TRY(convert_from_bpp96_rgb_float(image, pixel_consumer, &output_context));
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT:
+    {
+        SAIL_TRY(convert_from_bpp128_rgba_float(image, pixel_consumer, &output_context));
         break;
     }
     default:
@@ -1879,6 +2389,12 @@ bool sail_can_convert(enum SailPixelFormat input_pixel_format, enum SailPixelFor
     case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
     case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
     case SAIL_PIXEL_FORMAT_BPP24_YCBCR:
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF:
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF:
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF:
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT:
     {
         int r, g, b, a;
         pixel_consumer_t pixel_consumer;

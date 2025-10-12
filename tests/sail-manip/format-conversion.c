@@ -280,6 +280,149 @@ static MunitResult test_actual_conversion_cmyk(const MunitParameter params[], vo
     return MUNIT_OK;
 }
 
+/* Test floating point format conversions */
+static MunitResult test_float_grayscale_conversion(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Create a simple test image BPP16_GRAYSCALE */
+    struct sail_image* image;
+    munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
+
+    image->width          = 2;
+    image->height         = 2;
+    image->pixel_format   = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+    image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
+
+    const size_t pixels_size = (size_t)image->height * image->bytes_per_line;
+    munit_assert_int(sail_malloc(pixels_size, &image->pixels), ==, SAIL_OK);
+
+    /* Fill with test data */
+    uint16_t* pixels = image->pixels;
+    pixels[0] = 0;       /* Black */
+    pixels[1] = 32767;   /* Mid gray */
+    pixels[2] = 65535;   /* White */
+    pixels[3] = 16383;   /* Quarter gray */
+
+    /* Convert to BPP32_GRAYSCALE_FLOAT */
+    struct sail_image* converted_image;
+    munit_assert_int(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT, &converted_image), ==, SAIL_OK);
+
+    munit_assert_not_null(converted_image);
+    munit_assert_int(converted_image->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT);
+    munit_assert_int(converted_image->width, ==, 2);
+    munit_assert_int(converted_image->height, ==, 2);
+
+    /* Verify conversion - check that values are in range [0.0, 1.0] */
+    float* float_pixels = converted_image->pixels;
+    munit_assert(float_pixels[0] >= 0.0f && float_pixels[0] <= 0.01f);   /* ~0 */
+    munit_assert(float_pixels[1] >= 0.49f && float_pixels[1] <= 0.51f);  /* ~0.5 */
+    munit_assert(float_pixels[2] >= 0.99f && float_pixels[2] <= 1.0f);   /* ~1.0 */
+    munit_assert(float_pixels[3] >= 0.24f && float_pixels[3] <= 0.26f);  /* ~0.25 */
+
+    sail_destroy_image(image);
+    sail_destroy_image(converted_image);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_float_rgb_conversion(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Create a simple test image BPP24_RGB */
+    struct sail_image* image;
+    munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
+
+    image->width          = 2;
+    image->height         = 1;
+    image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
+
+    const size_t pixels_size = (size_t)image->height * image->bytes_per_line;
+    munit_assert_int(sail_malloc(pixels_size, &image->pixels), ==, SAIL_OK);
+
+    /* Fill with test data: pure red and pure blue */
+    uint8_t* pixels = image->pixels;
+    pixels[0] = 255; /* R */
+    pixels[1] = 0;   /* G */
+    pixels[2] = 0;   /* B */
+    pixels[3] = 0;   /* R */
+    pixels[4] = 0;   /* G */
+    pixels[5] = 255; /* B */
+
+    /* Convert to BPP96_RGB_FLOAT */
+    struct sail_image* converted_image;
+    munit_assert_int(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT, &converted_image), ==, SAIL_OK);
+
+    munit_assert_not_null(converted_image);
+    munit_assert_int(converted_image->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT);
+
+    /* Verify conversion */
+    float* float_pixels = converted_image->pixels;
+    munit_assert(float_pixels[0] >= 0.99f && float_pixels[0] <= 1.0f);  /* R = 1.0 */
+    munit_assert(float_pixels[1] <= 0.01f);                             /* G = 0.0 */
+    munit_assert(float_pixels[2] <= 0.01f);                             /* B = 0.0 */
+    munit_assert(float_pixels[3] <= 0.01f);                             /* R = 0.0 */
+    munit_assert(float_pixels[4] <= 0.01f);                             /* G = 0.0 */
+    munit_assert(float_pixels[5] >= 0.99f && float_pixels[5] <= 1.0f);  /* B = 1.0 */
+
+    sail_destroy_image(image);
+    sail_destroy_image(converted_image);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_float_to_integer_conversion(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Create a test image BPP96_RGB_FLOAT */
+    struct sail_image* image;
+    munit_assert_int(sail_alloc_image(&image), ==, SAIL_OK);
+
+    image->width          = 2;
+    image->height         = 1;
+    image->pixel_format   = SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT;
+    image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
+
+    const size_t pixels_size = (size_t)image->height * image->bytes_per_line;
+    munit_assert_int(sail_malloc(pixels_size, &image->pixels), ==, SAIL_OK);
+
+    /* Fill with float data */
+    float* pixels = image->pixels;
+    pixels[0] = 1.0f;  /* R */
+    pixels[1] = 0.5f;  /* G */
+    pixels[2] = 0.0f;  /* B */
+    pixels[3] = 0.25f; /* R */
+    pixels[4] = 0.75f; /* G */
+    pixels[5] = 1.0f;  /* B */
+
+    /* Convert to BPP24_RGB */
+    struct sail_image* converted_image;
+    munit_assert_int(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &converted_image), ==, SAIL_OK);
+
+    munit_assert_not_null(converted_image);
+    munit_assert_int(converted_image->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP24_RGB);
+
+    /* Verify conversion */
+    uint8_t* uint8_pixels = converted_image->pixels;
+    munit_assert_int(uint8_pixels[0], ==, 255); /* R = 1.0 -> 255 */
+    munit_assert(uint8_pixels[1] >= 127 && uint8_pixels[1] <= 128); /* G = 0.5 -> ~127 */
+    munit_assert_int(uint8_pixels[2], ==, 0);   /* B = 0.0 -> 0 */
+    munit_assert(uint8_pixels[3] >= 63 && uint8_pixels[3] <= 64);   /* R = 0.25 -> ~64 */
+    munit_assert(uint8_pixels[4] >= 191 && uint8_pixels[4] <= 192); /* G = 0.75 -> ~191 */
+    munit_assert_int(uint8_pixels[5], ==, 255); /* B = 1.0 -> 255 */
+
+    sail_destroy_image(image);
+    sail_destroy_image(converted_image);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/grayscale-alpha",        test_grayscale_alpha_conversion,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -290,6 +433,9 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/actual-grayscale-alpha", test_actual_conversion_grayscale_alpha, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/actual-rgb555",          test_actual_conversion_rgb555,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/actual-cmyk",            test_actual_conversion_cmyk,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/float-grayscale",        test_float_grayscale_conversion,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/float-rgb",              test_float_rgb_conversion,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/float-to-integer",       test_float_to_integer_conversion,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

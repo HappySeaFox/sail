@@ -116,6 +116,13 @@ struct sail_save_features;
  *
  *   - SAIL_PIXEL_FORMAT_BPP24_YUV
  *
+ *   - SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF
+ *   - SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT
+ *   - SAIL_PIXEL_FORMAT_BPP48_RGB_HALF
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF
+ *   - SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT
+ *   - SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT
+ *
  *   - SAIL_PIXEL_FORMAT_BPP1_INDEXED (2 colors, uses Wu quantization)
  *   - SAIL_PIXEL_FORMAT_BPP4_INDEXED (up to 16 colors, uses Wu quantization)
  *   - SAIL_PIXEL_FORMAT_BPP8_INDEXED (up to 256 colors, uses Wu quantization)
@@ -201,12 +208,19 @@ SAIL_EXPORT sail_status_t sail_convert_image(const struct sail_image* image,
  *
  *   - SAIL_PIXEL_FORMAT_BPP24_YUV
  *
+ *   - SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF
+ *   - SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT
+ *   - SAIL_PIXEL_FORMAT_BPP48_RGB_HALF
+ *   - SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF
+ *   - SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT
+ *   - SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT
+ *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_convert_image_with_options(const struct sail_image* image,
-                                                          enum SailPixelFormat output_pixel_format,
-                                                          const struct sail_conversion_options* options,
-                                                          struct sail_image** image_output);
+                                                           enum SailPixelFormat output_pixel_format,
+                                                           const struct sail_conversion_options* options,
+                                                           struct sail_image** image_output);
 
 /*
  * Updates the image to the pixel format. If the function fails, the image pixels

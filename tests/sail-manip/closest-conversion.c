@@ -249,16 +249,65 @@ static MunitResult test_best_conversion_yuv(const MunitParameter params[], void*
     return MUNIT_OK;
 }
 
+static MunitResult test_can_convert_float_formats(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Test float grayscale conversions */
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF,
+                                       SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT,
+                                       SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE,
+                                       SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT));
+
+    /* Test float RGB conversions */
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF,
+                                       SAIL_PIXEL_FORMAT_BPP24_RGB));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,
+                                       SAIL_PIXEL_FORMAT_BPP48_RGB));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP24_RGB,
+                                       SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+
+    /* Test float RGBA conversions */
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF,
+                                       SAIL_PIXEL_FORMAT_BPP32_RGBA));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,
+                                       SAIL_PIXEL_FORMAT_BPP64_RGBA));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP32_RGBA,
+                                       SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
+
+    /* Test float to indexed */
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,
+                                       SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,
+                                       SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+
+    /* Test bidirectional float conversions */
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF,
+                                       SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,
+                                       SAIL_PIXEL_FORMAT_BPP48_RGB_HALF));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF,
+                                       SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,
+                                       SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF));
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/grayscale",       test_best_conversion_grayscale,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed",         test_best_conversion_indexed,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/rgb",             test_best_conversion_rgb,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/grayscale-alpha", test_best_conversion_grayscale_alpha, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/rgb555-565",      test_best_conversion_rgb555_565,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/cmyk",            test_best_conversion_cmyk,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/rgba16",          test_best_conversion_rgba16,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/yuv",             test_best_conversion_yuv,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/grayscale",         test_best_conversion_grayscale,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed",           test_best_conversion_indexed,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/rgb",               test_best_conversion_rgb,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/grayscale-alpha",   test_best_conversion_grayscale_alpha, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/rgb555-565",        test_best_conversion_rgb555_565,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/cmyk",              test_best_conversion_cmyk,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/rgba16",            test_best_conversion_rgba16,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/yuv",               test_best_conversion_yuv,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/can-convert-float", test_can_convert_float_formats,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
