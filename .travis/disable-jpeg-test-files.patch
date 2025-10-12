@@ -1,8 +1,8 @@
 diff --git a/tests/images/acceptance/test-images.h.in b/tests/images/acceptance/test-images.h.in
-index 836913a7..241d8d79 100644
+index 836913a7..bc809d32 100644
 --- a/tests/images/acceptance/test-images.h.in
 +++ b/tests/images/acceptance/test-images.h.in
-@@ -89,9 +89,16 @@ static const char * const SAIL_TEST_IMAGES[] = {
+@@ -89,6 +89,12 @@ static const char * const SAIL_TEST_IMAGES[] = {
  #endif
  
  #ifdef SAIL_HAVE_BUILTIN_JPEG
@@ -15,7 +15,11 @@ index 836913a7..241d8d79 100644
      "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp8-grayscale.comment.iccp.jpeg",
      "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-rgb.jpeg",
      "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.comment.iccp.jpeg",
-+    */
-     "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.progressive.jpeg",
+@@ -96,6 +102,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
      "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.444.jpeg",
      "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.422.jpeg",
+     "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.420.jpeg",
++    */
+ #endif
+ 
+ #ifdef SAIL_HAVE_BUILTIN_JPEG2000
