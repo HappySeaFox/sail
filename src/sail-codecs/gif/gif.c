@@ -480,6 +480,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_gif(void* state, struct sail_
                         continue;
                     }
 
+                    /* Validate palette index to prevent buffer overflow. */
+                    if (gif_state->buf[i] >= gif_state->map->ColorCount)
+                    {
+                        SAIL_LOG_WARNING("GIF: Pixel index %d exceeds palette size %d, using background color",
+                                         gif_state->buf[i], gif_state->map->ColorCount);
+                        continue;
+                    }
+
                     unsigned char* pixel = scan + (gif_state->column + i) * 4;
 
                     *(pixel + 0) = gif_state->map->Colors[gif_state->buf[i]].Red;
@@ -555,9 +563,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
 {
     struct gif_state* gif_state = state;
 
-    int bpp;
-    SAIL_TRY(gif_private_pixel_format_to_bpp(image->pixel_format, &bpp));
-
     if (image->palette == NULL)
     {
         SAIL_LOG_ERROR("GIF: Indexed image must have a palette");
@@ -596,12 +601,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
         /* Write screen descriptor. */
         gif_state->gif->SWidth           = image->width;
         gif_state->gif->SHeight          = image->height;
-        gif_state->gif->SColorResolution = bpp;
+        gif_state->gif->SColorResolution = 7;
         gif_state->gif->SBackGroundColor = gif_state->background_color_index;
         gif_state->gif->SColorMap        = gif_state->color_map;
 
-        if (EGifPutScreenDesc(gif_state->gif, image->width, image->height, bpp, gif_state->background_color_index,
-                              gif_state->color_map)
+        if (EGifPutScreenDesc(gif_state->gif, image->width, image->height, gif_state->gif->SColorResolution,
+                              gif_state->background_color_index, gif_state->color_map)
             == GIF_ERROR)
         {
             SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
