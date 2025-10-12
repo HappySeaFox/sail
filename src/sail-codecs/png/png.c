@@ -26,7 +26,6 @@
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <string.h>
 
 #include <png.h>
 
@@ -887,12 +886,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_png(void** state)
         png_destroy_write_struct(&png_state->png_ptr, &png_state->info_ptr);
     }
 
-    destroy_png_state(png_state);
-
     if (png_state->libpng_error)
     {
+        destroy_png_state(png_state);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
+
+    destroy_png_state(png_state);
 
     return SAIL_OK;
 }
