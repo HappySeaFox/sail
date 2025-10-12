@@ -672,6 +672,11 @@ bool image::is_rgb_family(SailPixelFormat pixel_format)
     return sail_is_rgb_family(pixel_format);
 }
 
+bool image::is_floating_point(SailPixelFormat pixel_format)
+{
+    return sail_is_floating_point(pixel_format);
+}
+
 const char* image::pixel_format_to_string(SailPixelFormat pixel_format)
 {
     return sail_pixel_format_to_string(pixel_format);

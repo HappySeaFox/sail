@@ -106,6 +106,39 @@ typedef struct sail_pixel4_uint16 sail_abgr64_t;
 typedef struct sail_pixel4_uint16 sail_cmyk64_t;
 
 /*
+ * sail_pixel3_float represents a pixel with 3 32-bit float components. Typically, it's RGB.
+ */
+struct sail_pixel3_float
+{
+    float component1;
+    float component2;
+    float component3;
+};
+
+typedef struct sail_pixel3_float sail_rgb96_t;
+typedef struct sail_pixel3_float sail_bgr96_t;
+
+/*
+ * sail_pixel4_float represents a pixel with 4 32-bit float components. Typically, it's RGBA.
+ */
+struct sail_pixel4_float
+{
+    float component1;
+    float component2;
+    float component3;
+    float component4;
+};
+
+typedef struct sail_pixel4_float sail_rgbx128_t;
+typedef struct sail_pixel4_float sail_bgrx128_t;
+typedef struct sail_pixel4_float sail_xrgb128_t;
+typedef struct sail_pixel4_float sail_xbgr128_t;
+typedef struct sail_pixel4_float sail_rgba128_t;
+typedef struct sail_pixel4_float sail_bgra128_t;
+typedef struct sail_pixel4_float sail_argb128_t;
+typedef struct sail_pixel4_float sail_abgr128_t;
+
+/*
  * Reads a sail_pixel3_uint8 pixel byte by byte from the I/O stream.
  *
  * Returns SAIL_OK on success.
@@ -132,6 +165,20 @@ SAIL_EXPORT sail_status_t sail_read_pixel3_uint16(struct sail_io* io, struct sai
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_read_pixel4_uint16(struct sail_io* io, struct sail_pixel4_uint16* pixel);
+
+/*
+ * Reads a sail_pixel3_float pixel byte by byte from the I/O stream.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_pixel3_float(struct sail_io* io, struct sail_pixel3_float* pixel);
+
+/*
+ * Reads a sail_pixel4_float pixel byte by byte from the I/O stream.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_read_pixel4_float(struct sail_io* io, struct sail_pixel4_float* pixel);
 
 /* extern "C" */
 #ifdef __cplusplus

@@ -708,6 +708,12 @@ public:
     static bool is_rgb_family(SailPixelFormat pixel_format);
 
     /*
+     * Returns true if the specified pixel format uses floating point representation
+     * (half or single precision).
+     */
+    static bool is_floating_point(SailPixelFormat pixel_format);
+
+    /*
      * Returns a string representation of the specified pixel format.
      * For example: "BPP32-RGBA" is returned for SAIL_PIXEL_FORMAT_BPP32_RGBA.
      *

@@ -156,6 +156,11 @@ SAIL_EXPORT bool sail_is_grayscale(enum SailPixelFormat pixel_format);
 SAIL_EXPORT bool sail_is_rgb_family(enum SailPixelFormat pixel_format);
 
 /*
+ * Returns true if the given pixel format uses floating point representation (half or single precision).
+ */
+SAIL_EXPORT bool sail_is_floating_point(enum SailPixelFormat pixel_format);
+
+/*
  * Returns true if the given pixel format is CMYK, with or without alpha.
  */
 SAIL_EXPORT bool sail_is_cmyk(enum SailPixelFormat pixel_format);

@@ -487,6 +487,8 @@ bool sail_is_grayscale(enum SailPixelFormat pixel_format)
     case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:
     case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
     case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF:
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT:
     {
         return true;
     }
@@ -529,6 +531,11 @@ bool sail_is_rgb_family(enum SailPixelFormat pixel_format)
     case SAIL_PIXEL_FORMAT_BPP64_BGRA:
     case SAIL_PIXEL_FORMAT_BPP64_ARGB:
     case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+
+    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF:
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF:
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT:
     {
         return true;
     }
@@ -565,6 +572,26 @@ bool sail_is_ycbcr(enum SailPixelFormat pixel_format)
 bool sail_is_ycck(enum SailPixelFormat pixel_format)
 {
     return pixel_format == SAIL_PIXEL_FORMAT_BPP32_YCCK;
+}
+
+bool sail_is_floating_point(enum SailPixelFormat pixel_format)
+{
+    switch (pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF:
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF:
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF:
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT:
+    {
+        return true;
+    }
+    default:
+    {
+        return false;
+    }
+    }
 }
 
 void sail_print_errno(const char* format)
