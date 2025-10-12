@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.4.0
-priority=MEDIUM
+priority=LOW
 name=HDR
 description=Radiance High Dynamic Range
 magic-numbers=23 3f 52 41 44 49 41 4e 43 45;23 3f 52 47 42 45

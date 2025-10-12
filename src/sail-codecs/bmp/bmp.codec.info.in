@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=1.2.0
-priority=HIGH
+priority=LOW
 name=BMP
 description=Bitmap Picture
 magic-numbers=42 4d;02 00

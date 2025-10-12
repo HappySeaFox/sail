@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.6.1
-priority=LOW
+priority=HIGH
 name=ICO
 description=Windows Icon
 magic-numbers=00 00 01 00 ?? 00;00 00 02 00 ?? 00

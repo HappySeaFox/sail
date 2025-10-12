@@ -4,11 +4,11 @@ add_subdirectory(common/bmp)
 
 # List of codecs
 #
-set(HIGHEST_PRIORITY_CODECS gif jpeg png tiff)
-set(HIGH_PRIORITY_CODECS    bmp svg)
-set(MEDIUM_PRIORITY_CODECS  avif hdr heif jpeg2000 jpegxl openexr webp)
-set(LOW_PRIORITY_CODECS     ico jbig pcx pnm psd qoi tga)
-set(LOWEST_PRIORITY_CODECS  wal xbm xpm xwd)
+set(HIGHEST_PRIORITY_CODECS gif jpeg png svg webp)
+set(HIGH_PRIORITY_CODECS    avif ico)
+set(MEDIUM_PRIORITY_CODECS  heif openexr psd tiff)
+set(LOW_PRIORITY_CODECS     bmp hdr jpeg2000 jpegxl pnm qoi tga)
+set(LOWEST_PRIORITY_CODECS  jbig pcx wal xbm xpm xwd)
 
 set(CODECS ${HIGHEST_PRIORITY_CODECS}
            ${HIGH_PRIORITY_CODECS}
