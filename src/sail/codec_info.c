@@ -227,6 +227,12 @@ sail_status_t sail_codec_info_from_extension(const char* extension, const struct
 
     SAIL_LOG_DEBUG("Finding codec info for extension '%s'", extension);
 
+    if (strlen(extension) == 0)
+    {
+        SAIL_LOG_ERROR("Extension is empty");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
     struct sail_context* context;
     SAIL_TRY(fetch_global_context_guarded(&context));
 
@@ -235,6 +241,13 @@ sail_status_t sail_codec_info_from_extension(const char* extension, const struct
 
     /* Will compare in lower case. */
     sail_to_lower(extension_copy);
+
+    /* Skip leading dot if present. */
+    const char* extension_to_compare = extension_copy;
+    if (extension_to_compare[0] == '.')
+    {
+        extension_to_compare++;
+    }
 
     for (struct sail_codec_bundle_node* codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL;
          codec_bundle_node                                = codec_bundle_node->next)
@@ -246,7 +259,7 @@ sail_status_t sail_codec_info_from_extension(const char* extension, const struct
         {
             SAIL_LOG_TRACE("Check against %s extension '%s'", codec_bundle->codec_info->name, extension_node->string);
 
-            if (strcmp(extension_node->string, extension_copy) == 0)
+            if (strcmp(extension_node->string, extension_to_compare) == 0)
             {
                 sail_free(extension_copy);
                 *codec_info = codec_bundle->codec_info;
@@ -255,7 +268,7 @@ sail_status_t sail_codec_info_from_extension(const char* extension, const struct
             }
             else
             {
-                SAIL_LOG_TRACE("Extension mismatch '%s' != '%s'", extension_copy, extension_node->string);
+                SAIL_LOG_TRACE("Extension mismatch '%s' != '%s'", extension_to_compare, extension_node->string);
             }
 
             extension_node = extension_node->next;

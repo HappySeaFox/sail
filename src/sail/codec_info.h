@@ -168,7 +168,7 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
 
 /*
  * Finds a first codec info object that supports the specified file extension.
- * The comparison algorithm is case insensitive. For example: "jpg".
+ * The comparison algorithm is case insensitive. For example: ".jpg" or "jpg".
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *

@@ -200,7 +200,7 @@ public:
     /*
      * Returns a first codec info object that supports the specified file extension.
      * Returns an invalid codec info object if no suitable codec was found.
-     * The comparison algorithm is case-insensitive. For example: "jpg".
+     * The comparison algorithm is case-insensitive. For example: ".jpg" or "jpg".
      *
      * Typical usage: codec_info::from_extension() ->
      *                image_input::start()         ->
