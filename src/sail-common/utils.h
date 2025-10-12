@@ -94,8 +94,14 @@ SAIL_EXPORT sail_status_t sail_to_wchar(const char* input, wchar_t** output);
 SAIL_EXPORT uint64_t sail_string_hash(const char* str);
 
 /*
+ * Returns the number of channels in the specified pixel format.
+ * For example, for SAIL_PIXEL_FORMAT_BPP24_RGB 3 is returned. Returns 0 on unknown pixel layouts.
+ */
+SAIL_EXPORT unsigned sail_pixel_format_channels(enum SailPixelFormat pixel_format);
+
+/*
  * Returns the number of bits per pixel of the specified pixel format.
- * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned. Returns 0 on unknown pixel format.
+ * For example, for SAIL_PIXEL_FORMAT_BPP24_RGB 24 is returned. Returns 0 on unknown pixel format.
  */
 SAIL_EXPORT unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format);
 

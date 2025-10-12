@@ -66,11 +66,11 @@ static MunitResult test_pixel_format_binary_compatibility(const MunitParameter p
     /* Version < 1.0.0 */
     munit_assert_int(SAIL_PIXEL_FORMAT_BPP48_RGB, ==, 33);
     munit_assert_int(SAIL_PIXEL_FORMAT_BPP64_YUVA, ==, 76);
-    munit_assert_int(SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102, ==, 90);
+    munit_assert_int(SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102, ==, 92);
 
-    /* Version >= 1.0.0 */
-    munit_assert_int(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF, ==, 91);
-    munit_assert_int(SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT, ==, 102);
+    /* Version = 1.0.0 */
+    munit_assert_int(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF, ==, 93);
+    munit_assert_int(SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT, ==, 104);
 
     return MUNIT_OK;
 }
@@ -116,7 +116,7 @@ static MunitResult test_compression_binary_compatibility(const MunitParameter pa
     munit_assert_int(SAIL_COMPRESSION_QOI, ==, 29);
     munit_assert_int(SAIL_COMPRESSION_ZSTD, ==, 38);
 
-    /* Version >= 1.0.0 */
+    /* Version = 1.0.0 */
     munit_assert_int(SAIL_COMPRESSION_ASTC, ==, 39);
     munit_assert_int(SAIL_COMPRESSION_ZIPS, ==, 66);
 

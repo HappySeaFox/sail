@@ -647,6 +647,11 @@ SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format, 
     return sail_closest_pixel_format(input_pixel_format, save_features.pixel_formats().data(), save_features.pixel_formats().size());
 }
 
+unsigned image::pixel_format_channels(SailPixelFormat pixel_format)
+{
+    return sail_pixel_format_channels(pixel_format);
+}
+
 unsigned image::bits_per_pixel(SailPixelFormat pixel_format)
 {
     return sail_bits_per_pixel(pixel_format);

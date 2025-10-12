@@ -672,6 +672,12 @@ public:
                                                 const sail::save_features& save_features);
 
     /*
+     * Returns the number of channels in the specified pixel format.
+     * For example, for SAIL_PIXEL_FORMAT_BPP24_RGB 3 is returned. Returns 0 on unknown pixel layouts.
+     */
+    static unsigned pixel_format_channels(SailPixelFormat pixel_format);
+
+    /*
      * Returns the number of bits per pixel of the specified pixel format.
      * For example, for SAIL_PIXEL_FORMAT_RGB 24 is returned. Returns 0 on unknown pixel format.
      */

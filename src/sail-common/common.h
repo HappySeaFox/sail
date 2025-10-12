@@ -177,13 +177,15 @@ enum SailPixelFormat
     SAIL_PIXEL_FORMAT_BPP32_AYUV, /* 8-bit per channel  */
     SAIL_PIXEL_FORMAT_BPP64_AYUV, /* 16-bit per channel */
 
-    SAIL_PIXEL_FORMAT_BPP24_CIE_XYZ,  /* 8/8/8     */
-    SAIL_PIXEL_FORMAT_BPP48_CIE_XYZ,  /* 16/16/16  */
-    SAIL_PIXEL_FORMAT_BPP32_CIE_XYZA, /* 8/8/8/8   */
+    SAIL_PIXEL_FORMAT_BPP24_CIE_XYZ,  /* 8/8/8       */
+    SAIL_PIXEL_FORMAT_BPP48_CIE_XYZ,  /* 16/16/16    */
+    SAIL_PIXEL_FORMAT_BPP32_CIE_XYZA, /* 8/8/8/8     */
+    SAIL_PIXEL_FORMAT_BPP64_CIE_XYZA, /* 16/16/16/16 */
 
     SAIL_PIXEL_FORMAT_BPP24_HSV, /* 8-bit per channel  */
     SAIL_PIXEL_FORMAT_BPP24_HSL, /* 8-bit per channel  */
     SAIL_PIXEL_FORMAT_BPP48_HSV, /* 16-bit per channel */
+    SAIL_PIXEL_FORMAT_BPP48_HSL, /* 16-bit per channel */
 
     SAIL_PIXEL_FORMAT_BPP30_RGB,          /* RGB 10-bit per channel (R10G10B10) */
     SAIL_PIXEL_FORMAT_BPP30_BGR,          /* BGR 10-bit per channel */
