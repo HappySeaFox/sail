@@ -720,12 +720,134 @@ static MunitResult test_codec_feature_from_string(const MunitParameter params[],
     return MUNIT_OK;
 }
 
+/*
+ * Pixel format helpers.
+ */
+static MunitResult test_is_indexed(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Indexed formats should return true */
+    munit_assert_true(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP1_INDEXED));
+    munit_assert_true(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP2_INDEXED));
+    munit_assert_true(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP4_INDEXED));
+    munit_assert_true(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+    munit_assert_true(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP16_INDEXED));
+
+    /* Non-indexed formats should return false */
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP24_RGB));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP32_RGBA));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP48_RGB));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP64_RGBA));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP32_CMYK));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_false(sail_is_indexed(SAIL_PIXEL_FORMAT_UNKNOWN));
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_is_floating_point(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Floating point formats should return true */
+    munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF));
+    munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT));
+    munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF));
+    munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF));
+    munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
+
+    /* Non-floating point formats should return false */
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP24_RGB));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP32_RGBA));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP48_RGB));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP64_RGBA));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP32_CMYK));
+    munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_UNKNOWN));
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_is_grayscale_with_float(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Integer grayscale formats */
+    munit_assert_true(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE));
+    munit_assert_true(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
+    munit_assert_true(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
+    munit_assert_true(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA));
+    munit_assert_true(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA));
+
+    /* Floating point grayscale formats */
+    munit_assert_true(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF));
+    munit_assert_true(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT));
+
+    /* Non-grayscale formats */
+    munit_assert_false(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP24_RGB));
+    munit_assert_false(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP32_RGBA));
+    munit_assert_false(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_false(sail_is_grayscale(SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_is_rgb_family_with_float(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Integer RGB formats should return true */
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP24_RGB));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP24_BGR));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP32_RGBA));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP32_BGRA));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP32_ARGB));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP48_RGB));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP64_RGBA));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP16_RGB555));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP16_BGR565));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP16_RGB565));
+
+    /* Floating point RGB formats should return true */
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_true(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
+
+    /* Non-RGB formats should return false */
+    munit_assert_false(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
+    munit_assert_false(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
+    munit_assert_false(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF));
+    munit_assert_false(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT));
+    munit_assert_false(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP32_CMYK));
+    munit_assert_false(sail_is_rgb_family(SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+    munit_assert_false(sail_is_rgb_family(SAIL_PIXEL_FORMAT_UNKNOWN));
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/error-macros", test_error_macros, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { (char *)"/pixel-format-to-string",   test_pixel_format_to_string,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/pixel-format-from-string", test_pixel_format_from_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+
+    { (char *)"/is-indexed",               test_is_indexed,                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/is-floating-point",        test_is_floating_point,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/is-grayscale-with-float",  test_is_grayscale_with_float,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/is-rgb-family-with-float", test_is_rgb_family_with_float,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { (char *)"/chroma-subsampling-to-string",   test_chroma_subsampling_to_string,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/chroma-subsampling-from-string", test_chroma_subsampling_from_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
