@@ -223,13 +223,14 @@ sail_status_t xpm_private_parse_colors(
     for (unsigned i = 0; i < num_colors; i++)
     {
         SAIL_TRY_OR_CLEANUP(sail_read_string_from_io(io, buf, sizeof(buf)),
-                            /* cleanup */ sail_free(*colors));
+                            /* cleanup */ sail_free(*colors), *colors = NULL);
 
         const char* line = strchr(buf, '"');
         if (line == NULL)
         {
             SAIL_LOG_ERROR("XPM: Failed to parse color line");
             sail_free(*colors);
+            *colors = NULL;
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         line++;
@@ -239,6 +240,7 @@ sail_status_t xpm_private_parse_colors(
         {
             SAIL_LOG_ERROR("XPM: cpp too large");
             sail_free(*colors);
+            *colors = NULL;
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
@@ -269,7 +271,6 @@ sail_status_t xpm_private_parse_colors(
             {
                 color_ptr++;
             }
-
             if (*color_ptr == '\0' || *color_ptr == '"')
             {
                 break;
@@ -307,7 +308,7 @@ sail_status_t xpm_private_parse_colors(
                 {
                     SAIL_TRY_OR_CLEANUP(
                         parse_color_value(color_value, &(*colors)[i].r, &(*colors)[i].g, &(*colors)[i].b),
-                        /* cleanup */ sail_free(*colors));
+                        /* cleanup */ sail_free(*colors), *colors = NULL);
                 }
                 color_found = true;
                 break;
@@ -325,7 +326,7 @@ sail_status_t xpm_private_parse_colors(
                 {
                     SAIL_TRY_OR_CLEANUP(
                         parse_color_value(color_value, &(*colors)[i].r, &(*colors)[i].g, &(*colors)[i].b),
-                        /* cleanup */ sail_free(*colors));
+                        /* cleanup */ sail_free(*colors), *colors = NULL);
                 }
                 color_found = true;
             }
