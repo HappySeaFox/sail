@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2021 Dmitry Baryshev
+    Copyright (c) 2025 Dmitry Baryshev
 
     The MIT License
 
@@ -27,52 +27,35 @@
 
 #include <cstddef> /* std::size_t */
 
-#include <sail-c++/arbitrary_data.h>
 #include <sail-c++/io_base.h>
 
 namespace sail
 {
 
 /*
- * Memory I/O stream.
+ * Expanding buffer I/O stream. A writable memory buffer that automatically
+ * grows as data is written to it. Useful for encoding images to memory
+ * without pre-allocating a fixed-size buffer.
  */
-class SAIL_EXPORT io_memory : public io_base
+class SAIL_EXPORT io_expanding_buffer : public io_base
 {
 public:
     /*
-     * Opens the specified memory buffer for reading and writing.
+     * Creates a new expanding buffer with the specified initial capacity.
+     * The buffer will automatically grow using realloc as needed.
      */
-    io_memory(void* buffer, std::size_t buffer_size);
+    explicit io_expanding_buffer(std::size_t initial_capacity);
 
     /*
-     * Opens the specified memory buffer for reading.
+     * Destroys the expanding buffer I/O stream.
      */
-    io_memory(const void* buffer, std::size_t buffer_size);
+    ~io_expanding_buffer() override;
 
     /*
-     * Opens the specified memory buffer for the specified I/O operations.
+     * Returns the current size of data written to the buffer.
+     * This is different from the buffer capacity.
      */
-    io_memory(void* buffer, std::size_t buffer_size, Operation operation);
-
-    /*
-     * Opens the specified memory buffer for reading and writing.
-     */
-    explicit io_memory(sail::arbitrary_data& arbitrary_data);
-
-    /*
-     * Opens the specified memory buffer for reading.
-     */
-    explicit io_memory(const sail::arbitrary_data& arbitrary_data);
-
-    /*
-     * Opens the specified memory buffer for the specified I/O operations.
-     */
-    io_memory(sail::arbitrary_data& arbitrary_data, Operation operation);
-
-    /*
-     * Destroys the memory I/O stream.
-     */
-    ~io_memory() override;
+    std::size_t size() const;
 
     /*
      * Finds and returns the first codec info object that supports the magic number read

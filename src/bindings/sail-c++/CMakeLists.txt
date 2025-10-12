@@ -23,6 +23,8 @@ add_library(sail-c++
                 io_base.cpp
                 io_base.h
                 io_base_private.h
+                io_expanding_buffer.cpp
+                io_expanding_buffer.h
                 io_file.cpp
                 io_file.h
                 io_memory.cpp
@@ -74,6 +76,7 @@ set(PUBLIC_HEADERS abstract_io.h
                    image_input.h
                    image_output.h
                    io_base.h
+                   io_expanding_buffer.h
                    io_file.h
                    io_memory.h
                    load_features.h

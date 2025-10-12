@@ -23,6 +23,8 @@ add_library(sail
                 context_private.h
                 ini.c
                 ini.h
+                io_expanding_buffer.c
+                io_expanding_buffer.h
                 io_file.c
                 io_file.h
                 io_memory.c
@@ -51,6 +53,7 @@ set(PUBLIC_HEADERS codec_bundle.h
                    codec_info.h
                    codec_priority.h
                    context.h
+                   io_expanding_buffer.h
                    io_file.h
                    io_memory.h
                    io_noop.h

@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2025 Dmitry Baryshev
 
     The MIT License
 
@@ -25,35 +25,41 @@
 
 #pragma once
 
-/* Universal sail include. */
+#include <stddef.h> /* size_t */
 
-#include <sail-common/sail-common.h>
+#include <sail-common/export.h>
+#include <sail-common/status.h>
 
-#include <sail/codec_bundle.h>
-#include <sail/codec_bundle_node.h>
-#include <sail/codec_info.h>
-#include <sail/codec_priority.h>
-#include <sail/context.h>
-#include <sail/io_expanding_buffer.h>
-#include <sail/io_file.h>
-#include <sail/io_memory.h>
-#include <sail/io_noop.h>
-#include <sail/sail_advanced.h>
-#include <sail/sail_deep_diver.h>
-#include <sail/sail_junior.h>
-#include <sail/sail_technical_diver.h>
-
-#ifdef SAIL_BUILD
-#include <sail/codec.h>
-#include <sail/codec_bundle_node_private.h>
-#include <sail/codec_bundle_private.h>
-#include <sail/codec_info_private.h>
-#include <sail/codec_layout.h>
-#include <sail/context_private.h>
-#include <sail/ini.h>
-#include <sail/sail_private.h>
-#include <sail/sail_technical_diver_private.h>
-#ifdef SAIL_THREAD_SAFE
-#include <sail/threading.h>
+#ifdef __cplusplus
+extern "C"
+{
 #endif
+
+struct sail_io;
+
+/*
+ * Allocates a new I/O object for an automatically expanding memory buffer.
+ * The buffer starts with the specified initial capacity and grows automatically
+ * using sail_realloc() when writing beyond the current capacity. The growth factor
+ * is 1.25x.
+ *
+ * The actual data size written can be retrieved with sail_io_expanding_buffer_size().
+ * The underlying buffer can be extracted with sail_io_expanding_buffer_extract() or
+ * sail_io_expanding_buffer_data().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_io_write_expanding_buffer(size_t initial_capacity, struct sail_io** io);
+
+/*
+ * Returns the current size of data written to the expanding buffer.
+ * This is different from the buffer capacity.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_io_expanding_buffer_size(struct sail_io* io, size_t* size);
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif

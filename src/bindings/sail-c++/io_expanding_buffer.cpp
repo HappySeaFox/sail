@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2025 Dmitry Baryshev
 
     The MIT License
 
@@ -23,37 +23,44 @@
     SOFTWARE.
 */
 
-#pragma once
+#include <cstring>
+#include <stdexcept>
 
-/* Universal sail include. */
+#include <sail/sail.h>
 
-#include <sail-common/sail-common.h>
+#include <sail-c++/sail-c++.h>
 
-#include <sail/codec_bundle.h>
-#include <sail/codec_bundle_node.h>
-#include <sail/codec_info.h>
-#include <sail/codec_priority.h>
-#include <sail/context.h>
-#include <sail/io_expanding_buffer.h>
-#include <sail/io_file.h>
-#include <sail/io_memory.h>
-#include <sail/io_noop.h>
-#include <sail/sail_advanced.h>
-#include <sail/sail_deep_diver.h>
-#include <sail/sail_junior.h>
-#include <sail/sail_technical_diver.h>
+namespace sail
+{
 
-#ifdef SAIL_BUILD
-#include <sail/codec.h>
-#include <sail/codec_bundle_node_private.h>
-#include <sail/codec_bundle_private.h>
-#include <sail/codec_info_private.h>
-#include <sail/codec_layout.h>
-#include <sail/context_private.h>
-#include <sail/ini.h>
-#include <sail/sail_private.h>
-#include <sail/sail_technical_diver_private.h>
-#ifdef SAIL_THREAD_SAFE
-#include <sail/threading.h>
-#endif
-#endif
+io_expanding_buffer::io_expanding_buffer(std::size_t initial_capacity)
+    : io_base(nullptr)
+{
+    struct sail_io *sail_io_local;
+
+    SAIL_TRY_OR_EXECUTE(sail_alloc_io_write_expanding_buffer(initial_capacity, &sail_io_local),
+                        /* on error */ throw std::bad_alloc());
+
+    d->sail_io_wrapper.reset(sail_io_local);
+}
+
+io_expanding_buffer::~io_expanding_buffer()
+{
+}
+
+std::size_t io_expanding_buffer::size() const
+{
+    std::size_t result_size;
+
+    SAIL_TRY_OR_EXECUTE(sail_io_expanding_buffer_size(d->sail_io_wrapper.get(), &result_size),
+                        /* on error */ throw std::runtime_error("Failed to get expanding buffer size"));
+
+    return result_size;
+}
+
+codec_info io_expanding_buffer::codec_info()
+{
+    return sail::codec_info::from_magic_number(*this);
+}
+
+} // namespace sail

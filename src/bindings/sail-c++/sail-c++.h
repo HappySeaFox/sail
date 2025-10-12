@@ -52,6 +52,7 @@
 #include <sail-c++/image_input.h>
 #include <sail-c++/image_output.h>
 #include <sail-c++/io_base.h>
+#include <sail-c++/io_expanding_buffer.h>
 #include <sail-c++/io_file.h>
 #include <sail-c++/io_memory.h>
 #include <sail-c++/load_features.h>
