@@ -53,6 +53,20 @@ bool is_file(const std::string &path)
     return sail_is_file(path.c_str());
 }
 
+std::string temp_file_path(const std::string &prefix)
+{
+    char* path_c = nullptr;
+    auto* real_prefix = prefix.empty() ? "sail-tmp" : prefix.c_str();
+
+    SAIL_TRY_OR_EXECUTE(sail_temp_file_path(real_prefix, &path_c),
+                        /* on error */ throw std::runtime_error("Failed to create temporary file"));
+
+    std::string path{path_c};
+    sail_free(path_c);
+
+    return path;
+}
+
 sail_status_t file_size(const std::string &path, size_t *size) {
 
     SAIL_TRY(sail_file_size(path.c_str(), size));

@@ -27,12 +27,6 @@
 #include <memory>
 #include <string>
 
-#ifdef _WIN32
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
 #include <Imath/ImathBox.h>
 #include <OpenEXR/ImfChannelList.h>
 #include <OpenEXR/ImfFrameBuffer.h>
@@ -259,13 +253,17 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_init_v8_openexr(struct sail
     /* Create temporary file for writing. */
     try
     {
-        auto [path, fd]                = sail::openexr::create_temp_file("sail_exr_write");
-        openexr_state->temp_path_write = path;
-#ifdef _WIN32
-        _close(fd);
-#else
-        close(fd);
-#endif
+        char* path_c = nullptr;
+        const sail_status_t status = sail_temp_file_path("sail_exr_write", &path_c);
+
+        if (status != SAIL_OK)
+        {
+            SAIL_LOG_ERROR("OpenEXR: Failed to create temporary file");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+        }
+
+        openexr_state->temp_path_write = path_c;
+        sail_free(path_c);
     }
     catch (const std::exception& e)
     {

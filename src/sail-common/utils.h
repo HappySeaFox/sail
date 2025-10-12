@@ -207,6 +207,15 @@ SAIL_EXPORT bool sail_is_dir(const char* path);
 SAIL_EXPORT bool sail_is_file(const char* path);
 
 /*
+ * Returns a temporary file path with the specified prefix. The caller is responsible
+ * for deleting the file and the path when it's no longer needed. The prefix can be
+ * empty or NULL, in which case a default prefix will be used.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_temp_file_path(const char* prefix, char** path);
+
+/*
  * Retrieves the file size.
  *
  * Returns SAIL_OK on success.

@@ -29,8 +29,9 @@
 #include <stdexcept>
 #include <string>
 
-#ifdef _WIN32
 #include <fcntl.h>
+
+#ifdef _WIN32
 #include <io.h>
 #include <sys/stat.h>
 #include <windows.h>
@@ -172,69 +173,41 @@ const char* compression_to_string(int compression)
     }
 }
 
-std::tuple<std::string, int> create_temp_file(const std::string& prefix)
+std::string create_temp_file_from_io(sail_io* io)
 {
-    std::array<char, 512> path_template{};
+    auto path = []() {
+        char* path_c = nullptr;
 
+        SAIL_TRY_OR_EXECUTE(sail_temp_file_path("sail_exr", &path_c),
+                            /* on error */ throw std::runtime_error("Failed to create temporary file"));
+
+        std::string path{path_c};
+        sail_free(path_c);
+        return path;
+    }();
+
+    /* Open the file */
 #ifdef _WIN32
-    std::array<char, MAX_PATH> tmpdir{};
-    const auto len = GetTempPathA(static_cast<DWORD>(tmpdir.size()), tmpdir.data());
-    if (len == 0 || len > tmpdir.size())
-    {
-        SAIL_LOG_ERROR("OpenEXR: Failed to get temp directory on Windows");
-        throw std::runtime_error("Failed to get temp directory");
-    }
-
-    snprintf(path_template.data(), path_template.size(), "%s%s_XXXXXXXX", tmpdir.data(), prefix.c_str());
-
-    if (_mktemp_s(path_template.data(), path_template.size()) != 0)
-    {
-        SAIL_LOG_ERROR("OpenEXR: Failed to create temporary filename");
-        throw std::runtime_error("Failed to create temporary filename");
-    }
-
     int fd;
-    if (_sopen_s(&fd, path_template.data(), _O_RDWR | _O_CREAT | _O_EXCL | _O_TEMPORARY | _O_BINARY, _SH_DENYRW,
-                 _S_IREAD | _S_IWRITE)
-        != 0)
+    if (_sopen_s(&fd, path.c_str(), _O_RDWR | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE) != 0)
     {
-        SAIL_LOG_ERROR("OpenEXR: Failed to create temporary file");
-        throw std::runtime_error("Failed to create temporary file");
+        SAIL_LOG_ERROR("OpenEXR: Failed to open temporary file");
+        throw std::runtime_error("Failed to open temporary file");
     }
-
-    return {std::string(path_template.data()), fd};
 #else
-    const char* tmpdir = getenv("TMPDIR");
-    if (tmpdir == nullptr || tmpdir[0] == '\0')
-    {
-#ifdef P_tmpdir
-        tmpdir = P_tmpdir;
-#else
-        tmpdir = "/tmp";
-#endif
-    }
-
-    snprintf(path_template.data(), path_template.size(), "%s/%s_XXXXXXXX", tmpdir, prefix.c_str());
-    const int fd = mkstemp(path_template.data());
+    const int fd = open(path.c_str(), O_RDWR);
 
     if (fd < 0)
     {
-        SAIL_LOG_ERROR("OpenEXR: Failed to create temporary file");
-        throw std::runtime_error("Failed to create temporary file");
+        SAIL_LOG_ERROR("OpenEXR: Failed to open temporary file");
+        throw std::runtime_error("Failed to open temporary file");
     }
-
-    return {std::string(path_template.data()), fd};
 #endif
-}
-
-std::string create_temp_file_from_io(sail_io* io)
-{
-    auto [path, fd] = create_temp_file("sail_exr");
 
     // Copy data from SAIL I/O to the temp file
     if (io->seek(io->stream, 0, SEEK_SET) != SAIL_OK)
     {
-#ifdef _WIN32
+#ifdef _MSC_VER
         _close(fd);
 #else
         close(fd);

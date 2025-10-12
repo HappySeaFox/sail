@@ -64,6 +64,14 @@ SAIL_EXPORT bool is_dir(const std::string& path);
 SAIL_EXPORT bool is_file(const std::string& path);
 
 /*
+ * Returns a temporary file path with the specified prefix. The caller is responsible
+ * for deleting the file when it's no longer needed.
+ *
+ * Throws std::runtime_error on error.
+ */
+SAIL_EXPORT std::string temp_file_path(const std::string& prefix = {});
+
+/*
  * Retrieves the file size.
  *
  * Returns SAIL_OK on success.

@@ -232,12 +232,16 @@ static MunitResult test_custom_io_gzip_wrapper(const MunitParameter params[], vo
     (void)user_data;
 
     const char* input_path = SAIL_TEST_IMAGES[0];
-    char gz_path[512]      = "/tmp/sail_test_gzip_XXXXXX.png.gz";
 
-    int fd = mkstemps(gz_path, 7);
-    if (fd < 0)
+    char* temp_file = NULL;
+    if (sail_temp_file_path("sail_test_gzip", &temp_file) != SAIL_OK)
+    {
         return MUNIT_SKIP;
-    close(fd);
+    }
+
+    char gz_path[512];
+    snprintf(gz_path, sizeof(gz_path), "%s.png.gz", temp_file);
+    sail_free(temp_file);
 
     if (!compress_file_gzip(input_path, gz_path))
     {
@@ -470,15 +474,16 @@ static MunitResult test_custom_io_gzip_roundtrip(const MunitParameter params[], 
     struct sail_image* original_image = NULL;
     munit_assert(sail_load_from_file(input_path, &original_image) == SAIL_OK);
 
-    char gz_path[512] = "/tmp/sail_test_roundtrip_XXXXXX.png.gz";
-
-    int fd = mkstemps(gz_path, 7);
-    if (fd < 0)
+    char* temp_file = NULL;
+    if (sail_temp_file_path("sail_test_roundtrip", &temp_file) != SAIL_OK)
     {
         sail_destroy_image(original_image);
         return MUNIT_SKIP;
     }
-    close(fd);
+
+    char gz_path[512];
+    snprintf(gz_path, sizeof(gz_path), "%s.png.gz", temp_file);
+    sail_free(temp_file);
 
     if (!compress_file_gzip(input_path, gz_path))
     {

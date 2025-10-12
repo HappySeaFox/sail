@@ -64,8 +64,6 @@ int sail_compression_to_exr(SailCompression compression);
 
 const char* compression_to_string(int compression);
 
-std::tuple<std::string, int> create_temp_file(const std::string& prefix);
-
 std::string create_temp_file_from_io(sail_io* io);
 
 ChannelInfo analyze_channels(const OPENEXR_IMF_INTERNAL_NAMESPACE::ChannelList& channels);

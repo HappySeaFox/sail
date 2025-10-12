@@ -34,11 +34,13 @@
 #include <sys/types.h>
 
 #ifdef SAIL_WIN32
+#include <fcntl.h> /* _O_RDWR, _O_CREAT, etc. */
 #include <io.h>
 #include <share.h> /* _SH_DENYWR */
 #include <windows.h>
 #else
 #include <errno.h>
+#include <fcntl.h> /* O_RDWR, O_CREAT, etc. */
 #include <sys/time.h>
 #include <unistd.h>
 #endif
@@ -937,6 +939,59 @@ bool sail_is_file(const char* path)
     return S_ISREG(attrs.st_mode);
 #endif
 #endif
+}
+
+sail_status_t sail_temp_file_path(const char* prefix, char** path)
+{
+    SAIL_CHECK_PTR(path);
+
+    const char* real_prefix = (prefix == NULL || *prefix == '\0') ? "sail-tmp" : prefix;
+
+    char path_template[512];
+
+#ifdef SAIL_WIN32
+    char tmpdir[MAX_PATH];
+    const DWORD len = GetTempPathA((DWORD)sizeof(tmpdir), tmpdir);
+
+    if (len == 0 || len > sizeof(tmpdir))
+    {
+        SAIL_LOG_ERROR("Failed to get temp directory on Windows");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+    }
+
+    snprintf(path_template, sizeof(path_template), "%s%s_XXXXXXXX", tmpdir, real_prefix);
+
+    if (_mktemp_s(path_template, sizeof(path_template)) != 0)
+    {
+        SAIL_LOG_ERROR("Failed to create temporary filename");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+    }
+#else
+    const char* tmpdir = getenv("TMPDIR");
+    if (tmpdir == NULL || tmpdir[0] == '\0')
+    {
+#ifdef P_tmpdir
+        tmpdir = P_tmpdir;
+#else
+        tmpdir = "/tmp";
+#endif
+    }
+
+    snprintf(path_template, sizeof(path_template), "%s/%s_XXXXXXXX", tmpdir, real_prefix);
+    const int fd = mkstemp(path_template);
+
+    if (fd < 0)
+    {
+        sail_print_errno("Failed to create temporary file: %s");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
+    }
+
+    close(fd);
+#endif
+
+    SAIL_TRY(sail_strdup(path_template, path));
+
+    return SAIL_OK;
 }
 
 sail_status_t sail_file_size(const char* path, size_t* size)

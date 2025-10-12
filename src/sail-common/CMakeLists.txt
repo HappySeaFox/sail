@@ -97,8 +97,8 @@ set_target_properties(sail-common PROPERTIES
 
 sail_enable_asan(TARGET sail-common)
 
-# fileno
-sail_enable_posix_source(TARGET sail-common VERSION 200112L)
+# fileno, mkstemp
+sail_enable_posix_source(TARGET sail-common VERSION 200809L)
 
 sail_enable_pch(TARGET sail-common HEADER sail-common.h)
 
