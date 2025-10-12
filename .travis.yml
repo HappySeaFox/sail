@@ -14,6 +14,7 @@ addons:
       - libjpeg-dev
       - libjxl-dev
       - libnanosvg-dev
+      - libopenexr-dev
       - libopenjp2-7-dev
       - libpng-dev
       - libsdl2-dev

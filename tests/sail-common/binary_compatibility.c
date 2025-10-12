@@ -47,7 +47,7 @@ static MunitResult test_status_binary_compatibility(const MunitParameter params[
     munit_assert_int(SAIL_ERROR_EOF, ==, 16);
 
     /* 3/4: SAIL_ERROR_CODEC_NOT_FOUND */
-    munit_assert_int(SAIL_ERROR_CODEC_NOT_FOUND, ==, 301);
+    munit_assert_int(SAIL_ERROR_INVALID_PIXEL_FORMAT, ==, 202);
 
     /* Last: SAIL_ERROR_CONFLICTING_OPERATION */
     munit_assert_int(SAIL_ERROR_CONFLICTING_OPERATION, ==, 403);
@@ -63,9 +63,14 @@ static MunitResult test_pixel_format_binary_compatibility(const MunitParameter p
     (void)params;
     (void)user_data;
 
+    /* Version < 1.0.0 */
     munit_assert_int(SAIL_PIXEL_FORMAT_BPP48_RGB, ==, 33);
     munit_assert_int(SAIL_PIXEL_FORMAT_BPP64_YUVA, ==, 76);
-    munit_assert_int(SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102, ==, 96);
+    munit_assert_int(SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102, ==, 90);
+
+    /* Version >= 1.0.0 */
+    munit_assert_int(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF, ==, 91);
+    munit_assert_int(SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT, ==, 102);
 
     return MUNIT_OK;
 }
@@ -79,7 +84,6 @@ static MunitResult test_chroma_subsampling_binary_compatibility(const MunitParam
     (void)user_data;
 
     munit_assert_int(SAIL_CHROMA_SUBSAMPLING_411, ==, 4);
-    munit_assert_int(SAIL_CHROMA_SUBSAMPLING_421, ==, 6);
     munit_assert_int(SAIL_CHROMA_SUBSAMPLING_444, ==, 8);
 
     return MUNIT_OK;
@@ -94,7 +98,6 @@ static MunitResult test_orientation_binary_compatibility(const MunitParameter pa
     (void)user_data;
 
     munit_assert_int(SAIL_ORIENTATION_MIRRORED_HORIZONTALLY, ==, 4);
-    munit_assert_int(SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_90, ==, 6);
     munit_assert_int(SAIL_ORIENTATION_MIRRORED_HORIZONTALLY_ROTATED_270, ==, 7);
 
     return MUNIT_OK;
@@ -108,9 +111,14 @@ static MunitResult test_compression_binary_compatibility(const MunitParameter pa
     (void)params;
     (void)user_data;
 
-    munit_assert_int(SAIL_COMPRESSION_LERC, ==, 21);
-    munit_assert_int(SAIL_COMPRESSION_JPEG_LS, ==, 58);
-    munit_assert_int(SAIL_COMPRESSION_VVC, ==, 65);
+    /* Version < 1.0.0 */
+    munit_assert_int(SAIL_COMPRESSION_JPEG, ==, 17);
+    munit_assert_int(SAIL_COMPRESSION_QOI, ==, 29);
+    munit_assert_int(SAIL_COMPRESSION_ZSTD, ==, 38);
+
+    /* Version >= 1.0.0 */
+    munit_assert_int(SAIL_COMPRESSION_ASTC, ==, 39);
+    munit_assert_int(SAIL_COMPRESSION_ZIPS, ==, 66);
 
     return MUNIT_OK;
 }

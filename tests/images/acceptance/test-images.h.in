@@ -54,6 +54,21 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #endif
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_OPENEXR
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp16-grayscale-half.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp32-grayscale-alpha-half.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp48-rgb-half.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp64-rgba-half.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp64-rgba-half.b44.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp64-rgba-half.piz.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp64-rgba-half.rle.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp64-rgba-half.uncompressed.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp64-rgba-half.zips.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp32-grayscale-float.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp96-rgb-float.exr",
+    "@SAIL_TEST_IMAGES_PATH@/openexr/bpp128-rgba-float.exr",
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_ICO
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp1-indexed.ico",
     "@SAIL_TEST_IMAGES_PATH@/ico/bpp8-indexed.ico",

@@ -185,17 +185,23 @@ enum SailPixelFormat
     SAIL_PIXEL_FORMAT_BPP24_HSL, /* 8-bit per channel  */
     SAIL_PIXEL_FORMAT_BPP48_HSV, /* 16-bit per channel */
 
-    SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF, /* Half-precision grayscale */
-    SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT,/* Single-precision grayscale */
-    SAIL_PIXEL_FORMAT_BPP48_RGB_HALF,       /* Half-precision RGB (16-bit per channel) */
-    SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF,      /* Half-precision RGBA */
-    SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,      /* Single-precision RGB (32-bit per channel) */
-    SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,    /* Single-precision RGBA */
-
     SAIL_PIXEL_FORMAT_BPP30_RGB,          /* RGB 10-bit per channel (R10G10B10) */
     SAIL_PIXEL_FORMAT_BPP30_BGR,          /* BGR 10-bit per channel */
     SAIL_PIXEL_FORMAT_BPP32_RGBA_1010102, /* RGBA with 10-bit RGB + 2-bit alpha */
     SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102, /* BGRA with 10-bit BGR + 2-bit alpha */
+
+    SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF,       /* Half-precision grayscale */
+    SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF, /* Half-precision grayscale + alpha */
+    SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT,      /* Single-precision grayscale */
+    SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT,/* Single-precision grayscale + alpha */
+    SAIL_PIXEL_FORMAT_BPP48_RGB_HALF,             /* Half-precision RGB (16-bit per channel) */
+    SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF,            /* Half-precision RGBA */
+    SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,            /* Single-precision RGB (32-bit per channel) */
+    SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,          /* Single-precision RGBA */
+    SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT,       /* 32-bit unsigned int grayscale */
+    SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT, /* 32-bit unsigned int grayscale + alpha */
+    SAIL_PIXEL_FORMAT_BPP96_RGB_UINT,             /* 32-bit unsigned int RGB */
+    SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT,           /* 32-bit unsigned int RGBA */
 };
 
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */
@@ -297,6 +303,7 @@ enum SailCompression
     SAIL_COMPRESSION_PXR24,         /* Lossy 24-bit float compression (Pixar/OpenEXR). */
     SAIL_COMPRESSION_SNAPPY,        /* Fast compression by Google. */
     SAIL_COMPRESSION_VVC,           /* Versatile Video Coding (H.266). */
+    SAIL_COMPRESSION_ZIPS,          /* ZIP single scanline (OpenEXR). */
 };
 
 /* Meta data. */

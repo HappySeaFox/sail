@@ -448,6 +448,35 @@
 </tr>
 <tr>
     <td>12</td>
+    <td><a href="https://en.wikipedia.org/wiki/OpenEXR">OpenEXR</a></td>
+    <td>
+        <b>Grayscale:</b> 16-bit (half), 32-bit (float), 32-bit (uint).
+        <b>Grayscale+Alpha:</b> 32-bit (half), 64-bit (float), 64-bit (uint).
+        <b>RGB:</b> 48-bit (half), 96-bit (float), 96-bit (uint).
+        <b>RGBA:</b> 64-bit (half), 128-bit (float), 128-bit (uint).
+        <br/><br/>
+        <b>Compressions:</b> NONE, RLE, ZIPS, ZIP, PIZ, PXR24, B44, B44A, DWAA, DWAB.
+        <br/><br/>
+        <b>Content:</b> Static.
+    </td>
+    <td>Multipart, Deep images, Tiled images.</td>
+    <td>
+        <b>Grayscale:</b> 16-bit (half), 32-bit (float), 32-bit (uint).
+        <b>Grayscale+Alpha:</b> 32-bit (half), 64-bit (float), 64-bit (uint).
+        <b>RGB:</b> 48-bit (half), 96-bit (float), 96-bit (uint).
+        <b>RGBA:</b> 64-bit (half), 128-bit (float), 128-bit (uint).
+        <br/><br/>
+        <b>Compressions:</b> NONE, RLE, ZIPS, ZIP, PIZ, PXR24, B44, B44A, DWAA, DWAB.
+        <br/><br/>
+        <b>Content:</b> Static, HDR.
+        <br/><br/>
+        <b>Note:</b> Initial implementation uses simplified RGBA API. Full support for all channels and pixel types planned.
+    </td>
+    <td>Multipart, Deep images, Tiled images.</td>
+    <td>libopenexr-dev</td>
+</tr>
+<tr>
+    <td>13</td>
     <td><a href="https://wikipedia.org/wiki/PCX">PCX</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 4-bit, 8-bit.
@@ -472,7 +501,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>13</td>
+    <td>14</td>
     <td><a href="https://wikipedia.org/wiki/Portable_Network_Graphics">PNG</a></td>
     <td>
         <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
@@ -500,7 +529,7 @@
     <td>libpng</td>
 </tr>
 <tr>
-    <td>14</td>
+    <td>15</td>
     <td><a href="https://wikipedia.org/wiki/Portable_anymap">PNM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -531,7 +560,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>15</td>
+    <td>16</td>
     <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
@@ -564,7 +593,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>16</td>
+    <td>17</td>
     <td><a href="http://qoiformat.org">QOI</a></td>
     <td>
         <b>RGB:</b> 24-bit.
@@ -583,7 +612,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>17</td>
+    <td>18</td>
     <td><a href="https://wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td>
     <td>
         <b>Bit depth:</b> 32-bit.
@@ -602,7 +631,7 @@
     <td>resvg or nanosvg</td>
 </tr>
 <tr>
-    <td>18</td>
+    <td>19</td>
     <td><a href="https://wikipedia.org/wiki/Truevision_TGA">TGA</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -633,7 +662,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>19</td>
+    <td>20</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 40-bit, 48-bit, 64-bit, 80-bit.
@@ -677,7 +706,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>20</td>
+    <td>21</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -696,7 +725,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>21</td>
+    <td>22</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>RGBA:</b> 32-bit.
@@ -771,7 +800,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>22</td>
+    <td>23</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -800,7 +829,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>23</td>
+    <td>24</td>
     <td><a href="https://en.wikipedia.org/wiki/X_PixMap">XPM</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
@@ -827,7 +856,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>24</td>
+    <td>25</td>
     <td><a href="https://en.wikipedia.org/wiki/Xwd">XWD</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.

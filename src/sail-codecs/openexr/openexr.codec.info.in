@@ -1,0 +1,26 @@
+# OpenEXR codec information
+#
+[codec]
+layout=8
+version=0.9.0
+priority=MEDIUM
+name=OPENEXR
+description=OpenEXR
+magic-numbers=76 2F 31 01
+extensions=exr
+mime-types=image/x-exr;image/vnd.openexr
+
+[load-features]
+features=STATIC;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=STATIC
+pixel-formats=BPP16-GRAYSCALE-HALF;BPP32-GRAYSCALE-ALPHA-HALF;BPP48-RGB-HALF;BPP64-RGBA-HALF;BPP32-GRAYSCALE-FLOAT;BPP64-GRAYSCALE-ALPHA-FLOAT;BPP96-RGB-FLOAT;BPP128-RGBA-FLOAT;BPP32-GRAYSCALE-UINT;BPP64-GRAYSCALE-ALPHA-UINT;BPP96-RGB-UINT;BPP128-RGBA-UINT
+compressions=NONE;RLE;ZIPS;ZIP;PIZ;PXR24;B44;B44A;DWAA;DWAB
+default-compression=ZIP
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=
