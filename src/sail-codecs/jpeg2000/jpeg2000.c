@@ -52,6 +52,7 @@ struct jpeg2000_state
 
     int channel_depth_scaled;
     int shift;
+    unsigned image_min_dimension;
 };
 
 static void jpeg2000_private_error_callback(const char* msg, void* client_data)
@@ -92,6 +93,7 @@ static sail_status_t alloc_jpeg2000_state(struct sail_io* io,
         .opj_image            = NULL,
         .channel_depth_scaled = 0,
         .shift                = 0,
+        .image_min_dimension  = 0,
     };
 
     return SAIL_OK;
@@ -482,12 +484,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg2000(void* stat
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    jpeg2000_state->opj_image->x0 = 0;
-    jpeg2000_state->opj_image->y0 = 0;
-    jpeg2000_state->opj_image->x1 = image->width;
-    jpeg2000_state->opj_image->y1 = image->height;
-
+    jpeg2000_state->opj_image->x0        = 0;
+    jpeg2000_state->opj_image->y0        = 0;
+    jpeg2000_state->opj_image->x1        = image->width;
+    jpeg2000_state->opj_image->y1        = image->height;
     jpeg2000_state->channel_depth_scaled = prec;
+    jpeg2000_state->image_min_dimension  = image->width < image->height ? image->width : image->height;
 
     /*
      * OpenJPEG 2.5.4+ has ICC profile encoding bug fixed
@@ -577,6 +579,24 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpeg2000(void** state)
     /* Setup encoder parameters. */
     opj_cparameters_t parameters;
     opj_set_default_encoder_parameters(&parameters);
+
+    /* Calculate appropriate number of resolution levels for image size.
+     * Default is 6 levels, which requires minimum 64x64 image.
+     * For smaller images, we need to reduce the number of levels. */
+    if (jpeg2000_state->image_min_dimension > 0)
+    {
+        int max_numresolution = 1;
+        while ((1u << (max_numresolution - 1)) < jpeg2000_state->image_min_dimension && max_numresolution < 33)
+        {
+            max_numresolution++;
+        }
+        if (parameters.numresolution > max_numresolution)
+        {
+            parameters.numresolution = max_numresolution;
+            SAIL_LOG_TRACE("JPEG2000: Adjusted numresolution to %d for image min dimension %u", parameters.numresolution,
+                           jpeg2000_state->image_min_dimension);
+        }
+    }
 
     /* Set compression level. */
     const double compression_level = jpeg2000_state->save_options->compression_level;
