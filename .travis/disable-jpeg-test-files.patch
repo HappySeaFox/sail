@@ -1,9 +1,10 @@
 diff --git a/tests/images/acceptance/test-images.h.in b/tests/images/acceptance/test-images.h.in
+index 836913a7..241d8d79 100644
 --- a/tests/images/acceptance/test-images.h.in
 +++ b/tests/images/acceptance/test-images.h.in
 @@ -89,9 +89,16 @@ static const char * const SAIL_TEST_IMAGES[] = {
  #endif
-
+ 
  #ifdef SAIL_HAVE_BUILTIN_JPEG
 +    /*
 +     * These JPEG files fail to be read in Travis on Windows with a segfault.
