@@ -1,9 +1,9 @@
 diff --git a/tests/images/acceptance/test-images.h.in b/tests/images/acceptance/test-images.h.in
 --- a/tests/images/acceptance/test-images.h.in
 +++ b/tests/images/acceptance/test-images.h.in
-@@ -38,8 +38,15 @@ static const char * const SAIL_TEST_IMAGES[] = {
+@@ -89,9 +89,16 @@ static const char * const SAIL_TEST_IMAGES[] = {
  #endif
- 
+
  #ifdef SAIL_HAVE_BUILTIN_JPEG
 +    /*
 +     * These JPEG files fail to be read in Travis on Windows with a segfault.
@@ -12,8 +12,9 @@ diff --git a/tests/images/acceptance/test-images.h.in b/tests/images/acceptance/
 +     */
 +    /*
      "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp8-grayscale.comment.iccp.jpeg",
+     "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-rgb.jpeg",
      "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.comment.iccp.jpeg",
 +    */
- #endif
- 
- #ifdef SAIL_HAVE_BUILTIN_JPEG2000
+     "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.progressive.jpeg",
+     "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.444.jpeg",
+     "@SAIL_TEST_IMAGES_PATH@/jpeg/bpp24-ycbcr.422.jpeg",
