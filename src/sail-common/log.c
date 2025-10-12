@@ -25,9 +25,9 @@
 
 #ifdef SAIL_COLORED_OUTPUT
 #ifdef SAIL_WIN32
+#include <windows.h>
 #include <io.h>
 #include <versionhelpers.h>
-#include <windows.h>
 #define SAIL_ISATTY _isatty
 #define SAIL_FILENO _fileno
 #else
