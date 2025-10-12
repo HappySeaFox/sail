@@ -1,0 +1,24 @@
+/* XPM */
+static char *test[] = {
+"16 16 4 1",
+"r c #FF0000",
+"g c #00FF00",
+"b c #0000FF",
+"y c #FFFF00",
+"rrrrrrrrgggggggg",
+"rrrrrrrrgggggggg",
+"rrrrrrrrgggggggg",
+"rrrrrrrrgggggggg",
+"rrrrrrrrgggggggg",
+"rrrrrrrrgggggggg",
+"rrrrrrrrgggggggg",
+"rrrrrrrrgggggggg",
+"bbbbbbbbyyyyyyyy",
+"bbbbbbbbyyyyyyyy",
+"bbbbbbbbyyyyyyyy",
+"bbbbbbbbyyyyyyyy",
+"bbbbbbbbyyyyyyyy",
+"bbbbbbbbyyyyyyyy",
+"bbbbbbbbyyyyyyyy",
+"bbbbbbbbyyyyyyyy"
+};
