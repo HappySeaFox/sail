@@ -692,12 +692,12 @@ SailPixelFormat image::pixel_format_from_string(const std::string &str)
     return sail_pixel_format_from_string(str.c_str());
 }
 
-const char* chroma_subsampling_to_string(SailChromaSubsampling chroma_subsampling)
+const char* image::chroma_subsampling_to_string(SailChromaSubsampling chroma_subsampling)
 {
     return sail_chroma_subsampling_to_string(chroma_subsampling);
 }
 
-SailChromaSubsampling chroma_subsampling_from_string(const std::string &str)
+SailChromaSubsampling image::chroma_subsampling_from_string(const std::string& str)
 {
     return sail_chroma_subsampling_from_string(str.data());
 }
