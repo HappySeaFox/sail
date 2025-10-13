@@ -38,6 +38,11 @@ void set_barrier(SailLogLevel max_level)
     sail_set_log_barrier(max_level);
 }
 
+void set_logger(sail_logger logger)
+{
+    sail_set_logger(logger);
+}
+
 }
 
 }

@@ -41,10 +41,21 @@ namespace log
 /*
  * Sets a maximum log level barrier. Only the messages of the specified log level or lower will be displayed.
  *
- * This function is not thread-safe. It's recommended to call it in the main thread
+ * Call to this function is not thread-safe. It's recommended to call it in the main thread
  * before initializing SAIL.
  */
 SAIL_EXPORT void set_barrier(SailLogLevel max_level);
+
+/*
+ * Sets an external logger to pass all filtered log messages into.
+ *
+ * If the installed logger returns true, the log message is considered consumed.
+ * If the installed logger returns false, the log message is passed to the default logger.
+ *
+ * Call to this function is not thread-safe. It's recommended to call it in the main thread
+ * before initializing SAIL.
+ */
+SAIL_EXPORT void set_logger(sail_logger logger);
 
 } // namespace log
 
