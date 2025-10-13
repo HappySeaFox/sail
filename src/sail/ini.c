@@ -2,7 +2,7 @@
 
 SPDX-License-Identifier: BSD-3-Clause
 
-Copyright (C) 2009-2020, Ben Hoyt
+Copyright (C) 2009-2025, Ben Hoyt
 
 inih is released under the New BSD license (see LICENSE.txt). Go to the project
 home page for more info:
@@ -38,26 +38,23 @@ void* ini_realloc(void* ptr, size_t size);
 #define MAX_SECTION 50
 #define MAX_NAME 50
 
-/* sail-common. */
-#include <sail-common/sail-common.h>
-
 /* Used by ini_parse_string() to keep track of string parsing state. */
 typedef struct {
     const char* ptr;
     size_t num_left;
 } ini_parse_string_ctx;
 
-/* Strip whitespace chars off end of given string, in place. Return s. */
-static char* rstrip(char* s)
+/* Strip whitespace chars off end of given string, in place. end must be a
+   pointer to the NUL terminator at the end of the string. Return s. */
+static char* ini_rstrip(char* s, char* end)
 {
-    char* p = s + strlen(s);
-    while (p > s && isspace((unsigned char)(*--p)))
-        *p = '\0';
+    while (end > s && isspace((unsigned char)(*--end)))
+        *end = '\0';
     return s;
 }
 
 /* Return pointer to first non-whitespace char in given string. */
-static char* lskip(const char* s)
+static char* ini_lskip(const char* s)
 {
     while (*s && isspace((unsigned char)(*s)))
         s++;
@@ -67,7 +64,7 @@ static char* lskip(const char* s)
 /* Return pointer to first char (of chars) or inline comment in given string,
    or pointer to NUL at end of string if neither found. Inline comment must
    be prefixed by a whitespace character to register as a comment. */
-static char* find_chars_or_comment(const char* s, const char* chars)
+static char* ini_find_chars_or_comment(const char* s, const char* chars)
 {
 #if INI_ALLOW_INLINE_COMMENTS
     int was_space = 0;
@@ -86,7 +83,7 @@ static char* find_chars_or_comment(const char* s, const char* chars)
 
 /* Similar to strncpy, but ensures dest (size bytes) is
    NUL-terminated, and doesn't pad with NULs. */
-static char* strncpy0(char* dest, const char* src, size_t size)
+static char* ini_strncpy0(char* dest, const char* src, size_t size)
 {
 #ifdef _MSC_VER
     strncpy_s(dest, size, src, size - 1);
@@ -105,28 +102,33 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
     /* Uses a fair bit of stack (use heap instead if you need to) */
 #if INI_USE_STACK
     char line[INI_MAX_LINE];
-    int max_line = INI_MAX_LINE;
+    size_t max_line = INI_MAX_LINE;
 #else
     char* line;
     size_t max_line = INI_INITIAL_ALLOC;
 #endif
 #if INI_ALLOW_REALLOC && !INI_USE_STACK
     char* new_line;
-    size_t offset;
 #endif
     char section[MAX_SECTION] = "";
+#if INI_ALLOW_MULTILINE
     char prev_name[MAX_NAME] = "";
+#endif
 
+    size_t offset;
     char* start;
     char* end;
     char* name;
     char* value;
     int lineno = 0;
     int error = 0;
+    char abyss[16];  /* Used to consume input when a line is too long. */
 
 #if !INI_USE_STACK
-    SAIL_TRY_OR_EXECUTE(sail_malloc(INI_INITIAL_ALLOC, &line),
-                        /* on error */ return -2);
+    line = (char*)ini_malloc(INI_INITIAL_ALLOC);
+    if (!line) {
+        return -2;
+    }
 #endif
 
 #if INI_HANDLER_LINENO
@@ -137,24 +139,37 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
 
     /* Scan through stream line by line */
     while (reader(line, (int)max_line, stream) != NULL) {
-#if INI_ALLOW_REALLOC && !INI_USE_STACK
         offset = strlen(line);
-        while (offset == max_line - 1 && line[offset - 1] != '\n') {
+
+#if INI_ALLOW_REALLOC && !INI_USE_STACK
+        while (max_line < INI_MAX_LINE &&
+               offset == max_line - 1 && line[offset - 1] != '\n') {
             max_line *= 2;
             if (max_line > INI_MAX_LINE)
                 max_line = INI_MAX_LINE;
-            SAIL_TRY_OR_EXECUTE(sail_realloc(&new_line, line, max_line),
-                                /* on error */ sail_free(line), return -2);
+            new_line = ini_realloc(line, max_line);
+            if (!new_line) {
+                ini_free(line);
+                return -2;
+            }
             line = new_line;
             if (reader(line + offset, (int)(max_line - offset), stream) == NULL)
-                break;
-            if (max_line >= INI_MAX_LINE)
                 break;
             offset += strlen(line + offset);
         }
 #endif
 
         lineno++;
+
+        /* If line exceeded INI_MAX_LINE bytes, discard till end of line. */
+        if (offset == max_line - 1 && line[offset - 1] != '\n') {
+            while (reader(abyss, sizeof(abyss), stream) != NULL) {
+                if (!error)
+                    error = lineno;
+                if (abyss[strlen(abyss) - 1] == '\n')
+                    break;
+            }
+        }
 
         start = line;
 #if INI_ALLOW_BOM
@@ -164,7 +179,7 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
             start += 3;
         }
 #endif
-        start = lskip(rstrip(start));
+        start = ini_rstrip(ini_lskip(start), line + offset);
 
         if (strchr(INI_START_COMMENT_PREFIXES, *start)) {
             /* Start-of-line comment */
@@ -172,10 +187,9 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
 #if INI_ALLOW_MULTILINE
         else if (*prev_name && *start && start > line) {
 #if INI_ALLOW_INLINE_COMMENTS
-            end = find_chars_or_comment(start, NULL);
-            if (*end)
-                *end = '\0';
-            rstrip(start);
+            end = ini_find_chars_or_comment(start, NULL);
+            *end = '\0';
+            ini_rstrip(start, end);
 #endif
             /* Non-blank line with leading whitespace, treat as continuation
                of previous name's value (as per Python configparser). */
@@ -185,11 +199,13 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
 #endif
         else if (*start == '[') {
             /* A "[section]" line */
-            end = find_chars_or_comment(start + 1, "]");
+            end = ini_find_chars_or_comment(start + 1, "]");
             if (*end == ']') {
                 *end = '\0';
-                strncpy0(section, start + 1, sizeof(section));
+                ini_strncpy0(section, start + 1, sizeof(section));
+#if INI_ALLOW_MULTILINE
                 *prev_name = '\0';
+#endif
 #if INI_CALL_HANDLER_ON_NEW_SECTION
                 if (!HANDLER(user, section, NULL, NULL) && !error)
                     error = lineno;
@@ -202,33 +218,35 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
         }
         else if (*start) {
             /* Not a comment, must be a name[=:]value pair */
-            end = find_chars_or_comment(start, "=:");
+            end = ini_find_chars_or_comment(start, "=:");
             if (*end == '=' || *end == ':') {
                 *end = '\0';
-                name = rstrip(start);
+                name = ini_rstrip(start, end);
                 value = end + 1;
 #if INI_ALLOW_INLINE_COMMENTS
-                end = find_chars_or_comment(value, NULL);
-                if (*end)
-                    *end = '\0';
+                end = ini_find_chars_or_comment(value, NULL);
+                *end = '\0';
 #endif
-                value = lskip(value);
-                rstrip(value);
+                value = ini_lskip(value);
+                ini_rstrip(value, end);
 
+#if INI_ALLOW_MULTILINE
+                ini_strncpy0(prev_name, name, sizeof(prev_name));
+#endif
                 /* Valid name[=:]value pair found, call handler */
-                strncpy0(prev_name, name, sizeof(prev_name));
                 if (!HANDLER(user, section, name, value) && !error)
                     error = lineno;
             }
-            else if (!error) {
+            else {
                 /* No '=' or ':' found on name[=:]value line */
 #if INI_ALLOW_NO_VALUE
                 *end = '\0';
-                name = rstrip(start);
+                name = ini_rstrip(start, end);
                 if (!HANDLER(user, section, name, NULL) && !error)
                     error = lineno;
 #else
-                error = lineno;
+                if (!error)
+                    error = lineno;
 #endif
             }
         }
@@ -240,7 +258,7 @@ int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
     }
 
 #if !INI_USE_STACK
-    sail_free(line);
+    ini_free(line);
 #endif
 
     return error;
@@ -258,13 +276,7 @@ int ini_parse(const char* filename, ini_handler handler, void* user)
     FILE* file;
     int error;
 
-#ifdef _MSC_VER
-    errno_t err = fopen_s(&file, filename, "r");
-    if (err != 0)
-        return -1;
-#else
     file = fopen(filename, "r");
-#endif
     if (!file)
         return -1;
     error = ini_parse_file(file, handler, user);
@@ -301,10 +313,16 @@ static char* ini_reader_string(char* str, int num, void* stream) {
 
 /* See documentation in header file. */
 int ini_parse_string(const char* string, ini_handler handler, void* user) {
+    return ini_parse_string_length(string, strlen(string), handler, user);
+}
+
+/* See documentation in header file. */
+int ini_parse_string_length(const char* string, size_t length,
+                            ini_handler handler, void* user) {
     ini_parse_string_ctx ctx;
 
     ctx.ptr = string;
-    ctx.num_left = strlen(string);
+    ctx.num_left = length;
     return ini_parse_stream((ini_reader)ini_reader_string, &ctx, handler,
                             user);
 }

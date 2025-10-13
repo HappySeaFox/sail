@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2025 Dmitry Baryshev
 
     The MIT License
 
@@ -25,36 +25,33 @@
 
 #pragma once
 
-/* Universal sail include. */
+#include <stddef.h> /* size_t */
 
-#include <sail-common/sail-common.h>
+#include <sail-common/export.h>
+#include <sail-common/memory.h>
 
-#include <sail/codec_bundle.h>
-#include <sail/codec_bundle_node.h>
-#include <sail/codec_info.h>
-#include <sail/codec_priority.h>
-#include <sail/context.h>
-#include <sail/io_expanding_buffer.h>
-#include <sail/io_file.h>
-#include <sail/io_memory.h>
-#include <sail/io_noop.h>
-#include <sail/sail_advanced.h>
-#include <sail/sail_deep_diver.h>
-#include <sail/sail_junior.h>
-#include <sail/sail_technical_diver.h>
-
-#ifdef SAIL_BUILD
-#include <sail/codec.h>
-#include <sail/codec_bundle_node_private.h>
-#include <sail/codec_bundle_private.h>
-#include <sail/codec_info_private.h>
-#include <sail/codec_layout.h>
-#include <sail/context_private.h>
-#include <sail/ini.h>
-#include <sail/ini_malloc.h>
-#include <sail/sail_private.h>
-#include <sail/sail_technical_diver_private.h>
-#ifdef SAIL_THREAD_SAFE
-#include <sail/threading.h>
+#ifdef __cplusplus
+extern "C"
+{
 #endif
+
+SAIL_HIDDEN inline void* ini_malloc(size_t size)
+{
+    return sail_malloc_std_signature(size);
+}
+
+
+SAIL_HIDDEN inline void ini_free(void* ptr)
+{
+    sail_free(ptr);
+}
+
+SAIL_HIDDEN inline void* ini_realloc(void* ptr, size_t size)
+{
+    return sail_realloc_std_signature(ptr, size);
+}
+
+/* extern "C" */
+#ifdef __cplusplus
+}
 #endif

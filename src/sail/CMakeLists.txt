@@ -23,6 +23,7 @@ add_library(sail
                 context_private.h
                 ini.c
                 ini.h
+                ini_malloc.h
                 io_expanding_buffer.c
                 io_expanding_buffer.h
                 io_file.c
@@ -83,7 +84,7 @@ endif()
 #
 target_include_directories(sail PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>)
 # Simplify the INIH parser
-target_compile_definitions(sail PRIVATE INI_ALLOW_MULTILINE=0 INI_ALLOW_INLINE_COMMENTS=0 INI_CUSTOM_ALLOCATOR=0 INI_STOP_ON_FIRST_ERROR=1 INI_MAX_LINE=500 INI_API=SAIL_HIDDEN)
+target_compile_definitions(sail PRIVATE INI_ALLOW_MULTILINE=0 INI_ALLOW_INLINE_COMMENTS=0 INI_CUSTOM_ALLOCATOR=1 INI_STOP_ON_FIRST_ERROR=1 INI_MAX_LINE=500 INI_API=SAIL_HIDDEN)
 
 if (SAIL_COMBINE_CODECS)
     # Transfer user requirements
