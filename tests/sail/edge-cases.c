@@ -258,7 +258,7 @@ static MunitResult test_edge_nonexistent_file(const MunitParameter params[], voi
     (void)params;
     (void)user_data;
 
-    const char* path = "/tmp/this-file-does-not-exist-sail-test-12345.png";
+    const char* path = "this-file-does-not-exist-sail-test-123456789.png";
 
     struct sail_image* image = NULL;
     sail_status_t status     = sail_load_from_file(path, &image);
