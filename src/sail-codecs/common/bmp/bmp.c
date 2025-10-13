@@ -627,7 +627,7 @@ sail_status_t bmp_private_read_frame(void* state, struct sail_io* io, struct sai
                     SAIL_TRY(io->strict_read(io->stream, &index, sizeof(index)));
 
                     /* Round to the buffer size. */
-                    marker = (pixel_index + marker) <= image->width ? marker : (image->width - pixel_index);
+                    marker = (pixel_index + marker) <= image->width ? marker : (uint8_t)(image->width - pixel_index);
 
                     for (uint8_t k = 0; k < marker; k++)
                     {
