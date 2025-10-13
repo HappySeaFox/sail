@@ -32,7 +32,7 @@
 #include "helpers.h"
 
 /* PCX signature. */
-static const unsigned SAIL_PCX_SIGNATURE = 0x0A;
+static const uint8_t SAIL_PCX_SIGNATURE = 0x0A;
 
 /* RLE markers. */
 static const uint8_t SAIL_PCX_RLE_MARKER     = 0xC0;
@@ -219,7 +219,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
                 }
 
                 /* Round to the buffer size. */
-                count = (bytes + count) <= image->bytes_per_line ? count : (image->bytes_per_line - bytes);
+                count = (bytes + count) <= image->bytes_per_line ? count : (uint8_t)(image->bytes_per_line - bytes);
 
                 bytes += count;
 
