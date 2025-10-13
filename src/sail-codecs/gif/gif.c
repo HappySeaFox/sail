@@ -24,6 +24,7 @@
 */
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -659,7 +660,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
                     if (comment_len > 0 && comment_len <= 255)
                     {
                         if (EGifPutExtensionLeader(gif_state->gif, COMMENT_EXT_FUNC_CODE) == GIF_ERROR
-                            || EGifPutExtensionBlock(gif_state->gif, comment_len, (const unsigned char*)comment)
+                            || EGifPutExtensionBlock(gif_state->gif, (int)comment_len, comment)
                                    == GIF_ERROR
                             || EGifPutExtensionTrailer(gif_state->gif) == GIF_ERROR)
                         {
