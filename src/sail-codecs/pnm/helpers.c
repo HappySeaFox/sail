@@ -245,8 +245,13 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
         else if (strcmp(buffer, "WIDTH") == 0)
         {
             SAIL_TRY(pnm_private_read_word(io, buffer, sizeof(buffer)));
+#ifdef _MSC_VER
+            if (sscanf_s(buffer, "%u", width) != 1)
+            {
+#else
             if (sscanf(buffer, "%u", width) != 1)
             {
+#endif
                 SAIL_LOG_ERROR("PAM: Failed to read WIDTH");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
@@ -254,8 +259,13 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
         else if (strcmp(buffer, "HEIGHT") == 0)
         {
             SAIL_TRY(pnm_private_read_word(io, buffer, sizeof(buffer)));
+#ifdef _MSC_VER
+            if (sscanf_s(buffer, "%u", height) != 1)
+            {
+#else
             if (sscanf(buffer, "%u", height) != 1)
             {
+#endif
                 SAIL_LOG_ERROR("PAM: Failed to read HEIGHT");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
@@ -263,8 +273,13 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
         else if (strcmp(buffer, "DEPTH") == 0)
         {
             SAIL_TRY(pnm_private_read_word(io, buffer, sizeof(buffer)));
+#ifdef _MSC_VER
+            if (sscanf_s(buffer, "%u", depth) != 1)
+            {
+#else
             if (sscanf(buffer, "%u", depth) != 1)
             {
+#endif
                 SAIL_LOG_ERROR("PAM: Failed to read DEPTH");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
@@ -272,8 +287,13 @@ sail_status_t pnm_private_read_pam_header(struct sail_io* io,
         else if (strcmp(buffer, "MAXVAL") == 0)
         {
             SAIL_TRY(pnm_private_read_word(io, buffer, sizeof(buffer)));
+#ifdef _MSC_VER
+            if (sscanf_s(buffer, "%u", maxval) != 1)
+            {
+#else
             if (sscanf(buffer, "%u", maxval) != 1)
             {
+#endif
                 SAIL_LOG_ERROR("PAM: Failed to read MAXVAL");
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
