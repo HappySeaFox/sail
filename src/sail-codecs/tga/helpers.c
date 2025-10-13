@@ -464,7 +464,11 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
             const char* author_str = sail_variant_to_string(node->meta_data->value);
             if (author_str != NULL)
             {
+#ifdef _MSC_VER
+                strncpy_s(author, sizeof(author), author_str, 40);
+#else
                 strncpy(author, author_str, 40);
+#endif
             }
             break;
         }
@@ -480,7 +484,11 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
             const char* comment_str = sail_variant_to_string(node->meta_data->value);
             if (comment_str != NULL)
             {
+#ifdef _MSC_VER
+                strncpy_s(comments, sizeof(comments), comment_str, 323);
+#else
                 strncpy(comments, comment_str, 323);
+#endif
             }
             break;
         }
@@ -530,7 +538,11 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
             const char* job_str = sail_variant_to_string(node->meta_data->value);
             if (job_str != NULL)
             {
+#ifdef _MSC_VER
+                strncpy_s(job, sizeof(job), job_str, 40);
+#else
                 strncpy(job, job_str, 40);
+#endif
             }
             break;
         }
@@ -569,7 +581,11 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
             const char* software_str = sail_variant_to_string(node->meta_data->value);
             if (software_str != NULL)
             {
+#ifdef _MSC_VER
+                strncpy_s(software, sizeof(software), software_str, 40);
+#else
                 strncpy(software, software_str, 40);
+#endif
             }
             break;
         }

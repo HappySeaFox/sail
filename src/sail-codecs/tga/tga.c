@@ -24,6 +24,7 @@
 */
 
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -329,6 +330,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tga(void* state, co
 
     tga_state->frame_saved = true;
 
+    if (image->width > UINT16_MAX || image->height > UINT16_MAX)
+    {
+        SAIL_LOG_ERROR("TGA: Image dimensions are too large");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     /* Determine TGA format from pixel format. */
     uint8_t image_type, bpp;
     tga_private_pixel_format_to_tga_format(image->pixel_format, &image_type, &bpp);
@@ -362,8 +369,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tga(void* state, co
     tga_state->file_header.image_type = image_type;
     tga_state->file_header.x          = 0;
     tga_state->file_header.y          = 0;
-    tga_state->file_header.width      = image->width;
-    tga_state->file_header.height     = image->height;
+    tga_state->file_header.width      = (uint16_t)image->width;
+    tga_state->file_header.height     = (uint16_t)image->height;
     tga_state->file_header.bpp        = bpp;
 
     /* Descriptor byte: bits 3-0 = alpha bits, bit 5 = top-left origin. */
