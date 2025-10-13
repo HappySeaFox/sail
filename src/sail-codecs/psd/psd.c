@@ -291,7 +291,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                         SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
 
                         /* Round to the buffer size. */
-                        c = (count + c) <= image->width ? c : (image->width - count);
+                        c = (count + c) <= image->width ? c : (unsigned char)(image->width - count);
 
                         for (unsigned i = count; i < count + c; i++)
                         {
