@@ -69,6 +69,16 @@ sail_status_t sail_realloc(size_t size, void** ptr)
     return SAIL_OK;
 }
 
+void* sail_realloc_std_signature(void* ptr, size_t size)
+{
+    void* ptr_local = ptr;
+
+    SAIL_TRY_OR_EXECUTE(sail_realloc(size, &ptr_local),
+                        /* on error */ return NULL);
+
+    return ptr_local;
+}
+
 sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr)
 {
     SAIL_CHECK_PTR(ptr);

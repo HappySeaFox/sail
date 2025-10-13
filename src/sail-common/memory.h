@@ -59,6 +59,15 @@ SAIL_EXPORT void* sail_malloc_std_signature(size_t size);
 SAIL_EXPORT sail_status_t sail_realloc(size_t size, void** ptr);
 
 /*
+ * Calls sail_realloc() and returns the allocated pointer or NULL in case of error.
+ * One can pass sail_realloc_std_signature() to memory management functions in third-party
+ * imaging libraries to force them to use sail_realloc().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT void* sail_realloc_std_signature(void* ptr, size_t size);
+
+/*
  * Interface to calloc().
  *
  * Returns SAIL_OK on success.
