@@ -273,7 +273,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void* state, co
                 && meta_data_node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING)
             {
                 const char* name = sail_variant_to_string(meta_data_node->meta_data->value);
+#ifdef _MSC_VER
+                strncpy_s(wal_state->wal_header.name, sizeof(wal_state->wal_header.name), name, sizeof(wal_state->wal_header.name) - 1);
+#else
                 strncpy(wal_state->wal_header.name, name, sizeof(wal_state->wal_header.name) - 1);
+#endif
                 wal_state->wal_header.name[sizeof(wal_state->wal_header.name) - 1] = '\0';
                 break;
             }
