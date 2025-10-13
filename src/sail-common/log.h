@@ -26,6 +26,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include <stdbool.h>
 
 #include <sail-common/export.h>
 
@@ -48,14 +49,14 @@ enum SailLogLevel
     SAIL_LOG_LEVEL_TRACE,
 };
 
-typedef void (*sail_logger)(enum SailLogLevel level, const char* file, int line, const char* format, va_list args);
+typedef bool (*sail_logger)(enum SailLogLevel level, const char* file, int line, const char* format, va_list args);
 
 SAIL_EXPORT void sail_log(enum SailLogLevel level, const char* file, int line, const char* format, ...);
 
 /*
  * Sets a maximum log level barrier. Only messages of the specified log level or lower will be displayed.
  *
- * This function is not thread-safe. It's recommended to call it in the main thread
+ * Call to this function is not thread-safe. It's recommended to call it in the main thread
  * before initializing SAIL.
  */
 SAIL_EXPORT void sail_set_log_barrier(enum SailLogLevel max_level);
@@ -63,7 +64,10 @@ SAIL_EXPORT void sail_set_log_barrier(enum SailLogLevel max_level);
 /*
  * Sets an external logger to pass all filtered log messages into.
  *
- * This function is not thread-safe. It's recommended to call it in the main thread
+ * If the installed logger returns true, the log message is considered consumed.
+ * If the installed logger returns false, the log message is passed to the default logger.
+ *
+ * Call to this function is not thread-safe. It's recommended to call it in the main thread
  * before initializing SAIL.
  */
 SAIL_EXPORT void sail_set_logger(sail_logger logger);

@@ -133,10 +133,14 @@ void sail_log(enum SailLogLevel level, const char* file, int line, const char* f
         va_list args;
         va_start(args, format);
 
-        sail_external_logger(level, file, line, format, args);
+        bool consumed = sail_external_logger(level, file, line, format, args);
 
         va_end(args);
-        return;
+
+        if (consumed)
+        {
+            return;
+        }
     }
 
     const char* level_string = NULL;
