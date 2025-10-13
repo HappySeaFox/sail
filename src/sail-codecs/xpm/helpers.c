@@ -25,6 +25,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,8 +42,14 @@ static sail_status_t parse_color_value(const char* str, unsigned char* r, unsign
     /* Parse #RRGGBB format. */
     if (str[0] == '#')
     {
-        unsigned long color = strtoul(str + 1, NULL, 16);
-        int len             = strlen(str + 1);
+        if (str[1] == '\0')
+        {
+            SAIL_LOG_ERROR("XPM: Missing color value: %s", str);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
+        uint64_t color = strtoull(str + 1, NULL, 16);
+        size_t len     = strlen(str + 1);
 
         if (len == 6)
         {
@@ -173,7 +180,11 @@ sail_status_t xpm_private_parse_xpm_header(struct sail_io* io,
         {
             int w, h, nc, c;
             int xh = -1, yh = -1;
+#ifdef _MSC_VER
+            int scanned = sscanf_s(ptr + 1, "%d %d %d %d %d %d", &w, &h, &nc, &c, &xh, &yh);
+#else
             int scanned = sscanf(ptr + 1, "%d %d %d %d %d %d", &w, &h, &nc, &c, &xh, &yh);
+#endif
 
             if (scanned >= 4)
             {
@@ -389,7 +400,7 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
                     }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
                     {
-                        pixels[y * width + x] = c;
+                        pixels[y * width + x] = (unsigned char)c;
                     }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
                     {
@@ -616,7 +627,11 @@ bool xpm_private_tuning_key_value_callback(const char* key, const struct sail_va
 
             if (str_value != NULL)
             {
+#ifdef _MSC_VER
+                strncpy_s(xpm_state->var_name, sizeof(xpm_state->var_name), str_value, sizeof(xpm_state->var_name) - 1);
+#else
                 strncpy(xpm_state->var_name, str_value, sizeof(xpm_state->var_name) - 1);
+#endif
                 xpm_state->var_name[sizeof(xpm_state->var_name) - 1] = '\0';
                 SAIL_LOG_TRACE("XPM: Using variable name '%s'", xpm_state->var_name);
             }

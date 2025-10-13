@@ -181,7 +181,11 @@ bool xbm_private_tuning_key_value_callback(const char* key, const struct sail_va
 
             if (str_value != NULL)
             {
+#ifdef _MSC_VER
+                strncpy_s(xbm_state->var_name, sizeof(xbm_state->var_name), str_value, sizeof(xbm_state->var_name) - 1);
+#else
                 strncpy(xbm_state->var_name, str_value, sizeof(xbm_state->var_name) - 1);
+#endif
                 xbm_state->var_name[sizeof(xbm_state->var_name) - 1] = '\0';
                 SAIL_LOG_TRACE("XBM: Using variable name '%s'", xbm_state->var_name);
             }
