@@ -428,6 +428,14 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
     d->pixels_size                = static_cast<std::size_t>(sail_image_output->height) * sail_image_output->bytes_per_line;
     d->shallow_pixels             = false;
 
+    // Copy palette if present (indexed formats)
+    if (sail_image_output->palette != nullptr) {
+        d->palette = sail::palette(sail_image_output->palette);
+        sail_image_output->palette->data = nullptr; // Prevent double-free
+    } else {
+        d->palette = sail::palette();
+    }
+
     sail_image_output->pixels = nullptr;
     sail_destroy_image(sail_image_output);
 
