@@ -134,7 +134,11 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
         }
         else if (strncmp(line, "COLORCORR=", 10) == 0)
         {
+#ifdef _MSC_VER
+            sscanf_s(line + 10, "%f %f %f", &header->colorcorr[0], &header->colorcorr[1], &header->colorcorr[2]);
+#else
             sscanf(line + 10, "%f %f %f", &header->colorcorr[0], &header->colorcorr[1], &header->colorcorr[2]);
+#endif
         }
         else if (line[0] == '#' && line[1] == ' ')
         {
@@ -153,8 +157,13 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
     char y_axis, x_axis;
     int height, width;
 
+#ifdef _MSC_VER
+    if (sscanf_s(line, "%c%c %d %c%c %d", &y_sign, 1, &y_axis, 1, &height, &x_sign, 1, &x_axis, 1, &width) == 6)
+    {
+#else
     if (sscanf(line, "%c%c %d %c%c %d", &y_sign, &y_axis, &height, &x_sign, &x_axis, &width) == 6)
     {
+#endif
         if (y_axis == 'Y' && x_axis == 'X')
         {
             header->height       = height;
@@ -505,9 +514,9 @@ static sail_status_t write_new_rle_scanline(struct sail_io* io, int width, const
             if (run_length >= 4)
             {
                 /* Write run length encoding. */
-                uint8_t code = 128 | run_length;
-                SAIL_TRY(io->strict_write(io->stream, &code, 1));
-                SAIL_TRY(io->strict_write(io->stream, &value, 1));
+                uint8_t code = (uint8_t)(128 | run_length);
+                SAIL_TRY(io->strict_write(io->stream, &code, sizeof(code)));
+                SAIL_TRY(io->strict_write(io->stream, &value, sizeof(value)));
                 pos += run_length;
             }
             else
@@ -543,12 +552,12 @@ static sail_status_t write_new_rle_scanline(struct sail_io* io, int width, const
 
                 /* Write literal run. */
                 uint8_t code = literal_length;
-                SAIL_TRY(io->strict_write(io->stream, &code, 1));
+                SAIL_TRY(io->strict_write(io->stream, &code, sizeof(code)));
 
                 for (int i = 0; i < literal_length; i++)
                 {
                     uint8_t val = scanline[(literal_start + i) * 4 + channel];
-                    SAIL_TRY(io->strict_write(io->stream, &val, 1));
+                    SAIL_TRY(io->strict_write(io->stream, &val, sizeof(val)));
                 }
             }
         }
