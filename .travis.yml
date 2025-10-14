@@ -52,7 +52,8 @@ before_script:
 
   case "$TRAVIS_OS_NAME" in
     windows)
-      if [ ! -d vcpkg ]; then
+      if [ ! -f vcpkg/vcpkg ]; then
+        fail_on_error rm -rf vcpkg
         fail_on_error git clone https://github.com/microsoft/vcpkg.git
         fail_on_error vcpkg/bootstrap-vcpkg.sh
       fi
