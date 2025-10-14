@@ -58,9 +58,11 @@ before_script:
         fail_on_error vcpkg/bootstrap-vcpkg.sh
       fi
 
-      export VCPKG_CONSOLE_LOG=1
       fail_on_error git -C vcpkg pull
-      fail_on_error vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib
+      if ! vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib; then
+        cat vcpkg/buildtrees/libheif/install-x64-windows-dbg-out.log
+        exit 1
+      fi
     ;;
   esac
 
