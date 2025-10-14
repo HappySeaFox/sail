@@ -31,7 +31,7 @@ jobs:
         - PATH="/c/SAIL/bin:$PATH"
       cache:
         directories:
-          - extra/B
+          - vcpkg
     - os: linux
       dist: noble
       name: "Ubuntu 24.04 Noble"
@@ -52,24 +52,13 @@ before_script:
 
   case "$TRAVIS_OS_NAME" in
     windows)
-      # Build non-existing extra libs
-      if [ -d extra/B/bin ]; then
-        extra_bin_time=$(stat -c %Y extra/B/bin)
-        build_script_time=$(git log --pretty=format:%cd -n 1 --date=unix --date-order -- extra/build)
-
-        if [ $build_script_time -gt $extra_bin_time ]; then
-          fail_on_error extra/build
-        fi
-      else
-        fail_on_error extra/build
+      if [ ! -d vcpkg ]; then
+        fail_on_error git clone https://github.com/microsoft/vcpkg.git
+        fail_on_error vcpkg/bootstrap-vcpkg.sh
       fi
 
-      fail_on_error git apply -v .travis/disable-jpeg-test-files.patch
-    ;;
-    linux)
-      # Workaround ASAN bug in Jammy
-      # See https://github.com/google/sanitizers/issues/1614
-      sudo sysctl vm.mmap_rnd_bits=28
+      fail_on_error git -C vcpkg pull
+      fail_on_error vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib
     ;;
   esac
 
@@ -142,8 +131,6 @@ script:
     echo " *** Building with $@ ***"
     echo
 
-    local cmake_parallel_options="--parallel 2"
-
     eval $@
 
     cd "$TRAVIS_BUILD_DIR"
@@ -157,8 +144,9 @@ script:
         CMAKE_INSTALL_PREFIX="C:/SAIL"
 
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
-                                   -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
-        fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE $cmake_parallel_options --target install -j$(nproc)
+                                   -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" \
+                                   -DCMAKE_TOOLCHAIN_FILE="../../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="x64-windows" ..
+        fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
         cd tests
         fail_on_error ctest -C $CMAKE_BUILD_TYPE --output-on-failure
@@ -175,7 +163,7 @@ script:
 
         fail_on_error cmake -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
                             -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
-        fail_on_error cmake --build . $cmake_parallel_options -j$(nproc)
+        fail_on_error cmake --build . -j$(nproc)
         fail_on_error sudo make install
 
         if [ "$TRAVIS_OS_NAME" = "linux" ]; then
