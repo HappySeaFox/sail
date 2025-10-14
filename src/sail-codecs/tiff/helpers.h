@@ -27,6 +27,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <tiffio.h>
 
@@ -51,6 +52,11 @@ SAIL_HIDDEN sail_status_t tiff_private_sail_compression_to_compression(enum Sail
 SAIL_HIDDEN enum SailPixelFormat tiff_private_bpp_to_pixel_format(int bpp);
 
 SAIL_HIDDEN sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF* tiff, enum SailPixelFormat* result);
+
+SAIL_HIDDEN sail_status_t tiff_private_sail_pixel_format_to_tiff(enum SailPixelFormat pixel_format,
+                                                                  uint16_t* photometric,
+                                                                  uint16_t* bits_per_sample,
+                                                                  uint16_t* samples_per_pixel);
 
 SAIL_HIDDEN void tiff_private_zero_tiff_image(TIFFRGBAImage* img);
 

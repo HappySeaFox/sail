@@ -364,186 +364,22 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, c
     uint16_t bits_per_sample   = 0;
     uint16_t samples_per_pixel = 0;
 
-    switch (image->pixel_format)
-    {
-    /* Grayscale formats. */
-    case SAIL_PIXEL_FORMAT_BPP1_GRAYSCALE:
-    {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 1;
-        samples_per_pixel = 1;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP2_GRAYSCALE:
-    {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 2;
-        samples_per_pixel = 1;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE:
-    {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 4;
-        samples_per_pixel = 1;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
-    {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 8;
-        samples_per_pixel = 1;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
-    {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 16;
-        samples_per_pixel = 1;
-        break;
-    }
+    SAIL_TRY_OR_CLEANUP(tiff_private_sail_pixel_format_to_tiff(image->pixel_format,
+                                                                &photometric,
+                                                                &bits_per_sample,
+                                                                &samples_per_pixel),
+                        /* cleanup */ SAIL_LOG_ERROR("TIFF: Unsupported pixel format '%s' for saving",
+                                                     sail_pixel_format_to_string(image->pixel_format)));
 
-    /* Grayscale + alpha. */
-    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:
+    /*
+     * For JPEG compression, avoid YCbCr as it requires the height to be a multiple of 16.
+     * Convert YCbCr to RGB instead. While libjpeg itself supports any height via padding,
+     * libtiff does not handle this correctly and reports "fractional scanline discarded".
+     */
+    if (tiff_state->save_compression == COMPRESSION_JPEG && photometric == PHOTOMETRIC_YCBCR && image->height % 16 != 0)
     {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 4;
-        samples_per_pixel = 2;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
-    {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 8;
-        samples_per_pixel = 2;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
-    {
-        photometric       = PHOTOMETRIC_MINISBLACK;
-        bits_per_sample   = 16;
-        samples_per_pixel = 2;
-        break;
-    }
-
-    /* Indexed formats. */
-    case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
-    {
-        photometric       = PHOTOMETRIC_PALETTE;
-        bits_per_sample   = 1;
-        samples_per_pixel = 1;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
-    {
-        photometric       = PHOTOMETRIC_PALETTE;
-        bits_per_sample   = 2;
-        samples_per_pixel = 1;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
-    {
-        photometric       = PHOTOMETRIC_PALETTE;
-        bits_per_sample   = 4;
-        samples_per_pixel = 1;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
-    {
-        photometric       = PHOTOMETRIC_PALETTE;
-        bits_per_sample   = 8;
-        samples_per_pixel = 1;
-        break;
-    }
-
-    /* RGB formats. */
-    case SAIL_PIXEL_FORMAT_BPP24_RGB:
-    {
-        photometric       = PHOTOMETRIC_RGB;
-        bits_per_sample   = 8;
-        samples_per_pixel = 3;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP48_RGB:
-    {
-        photometric       = PHOTOMETRIC_RGB;
-        bits_per_sample   = 16;
-        samples_per_pixel = 3;
-        break;
-    }
-
-    /* RGBA formats. */
-    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-    {
-        photometric       = PHOTOMETRIC_RGB;
-        bits_per_sample   = 8;
-        samples_per_pixel = 4;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP64_RGBA:
-    {
-        photometric       = PHOTOMETRIC_RGB;
-        bits_per_sample   = 16;
-        samples_per_pixel = 4;
-        break;
-    }
-
-    /* CMYK formats for print. */
-    case SAIL_PIXEL_FORMAT_BPP32_CMYK:
-    {
-        photometric       = PHOTOMETRIC_SEPARATED;
-        bits_per_sample   = 8;
-        samples_per_pixel = 4;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP64_CMYK:
-    {
-        photometric       = PHOTOMETRIC_SEPARATED;
-        bits_per_sample   = 16;
-        samples_per_pixel = 4;
-        break;
-    }
-
-    /* CMYKA formats (CMYK with alpha). */
-    case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
-    {
-        photometric       = PHOTOMETRIC_SEPARATED;
-        bits_per_sample   = 8;
-        samples_per_pixel = 5;
-        break;
-    }
-    case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
-    {
-        photometric       = PHOTOMETRIC_SEPARATED;
-        bits_per_sample   = 16;
-        samples_per_pixel = 5;
-        break;
-    }
-
-    /* YCbCr format. */
-    case SAIL_PIXEL_FORMAT_BPP24_YCBCR:
-    {
-        photometric       = PHOTOMETRIC_YCBCR;
-        bits_per_sample   = 8;
-        samples_per_pixel = 3;
-        break;
-    }
-
-    /* CIE LAB format. */
-    case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:
-    {
-        photometric       = PHOTOMETRIC_CIELAB;
-        bits_per_sample   = 8;
-        samples_per_pixel = 3;
-        break;
-    }
-
-    default:
-    {
-        SAIL_LOG_ERROR("TIFF: Unsupported pixel format '%s' for saving",
-                       sail_pixel_format_to_string(image->pixel_format));
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-    }
+        photometric = PHOTOMETRIC_RGB;
+        SAIL_LOG_DEBUG("TIFF: Changed YCbCr to RGB for JPEG compression compatibility");
     }
 
     /* Write TIFF tags. */
