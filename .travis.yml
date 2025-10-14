@@ -59,7 +59,7 @@ before_script:
       fi
 
       fail_on_error git -C vcpkg pull
-      fail_on_error vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib
+      fail_on_error vcpkg/vcpkg install --debug giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib
     ;;
   esac
 
