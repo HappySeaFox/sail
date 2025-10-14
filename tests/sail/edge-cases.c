@@ -182,6 +182,10 @@ static MunitResult test_edge_invalid_codec_queries(const MunitParameter params[]
     munit_assert(sail_codec_info_from_path("", &codec_info) != SAIL_OK);
     munit_assert(sail_codec_info_from_path("file.xyz", &codec_info) != SAIL_OK);
 
+    munit_assert(sail_codec_info_from_name(NULL, &codec_info) != SAIL_OK);
+    munit_assert(sail_codec_info_from_name("", &codec_info) != SAIL_OK);
+    munit_assert(sail_codec_info_from_name("nonexistent_codec_xyz", &codec_info) != SAIL_OK);
+
     return MUNIT_OK;
 }
 

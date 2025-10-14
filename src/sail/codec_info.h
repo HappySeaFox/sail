@@ -208,6 +208,27 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char* extension,
 SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char* mime_type,
                                                          const struct sail_codec_info** codec_info);
 
+/*
+ * Finds a first codec info object by the specified codec name.
+ * The comparison algorithm is case insensitive. For example: "JPEG" or "jpeg".
+ *
+ * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Typical usage: sail_codec_info_from_name()     ->
+ *                sail_start_loading_from_file()  ->
+ *                sail_load_next_frame()          ->
+ *                sail_stop_loading().
+ *
+ * Or:            sail_codec_info_from_name()    ->
+ *                sail_start_saving_into_file()  ->
+ *                sail_write_next_frame()        ->
+ *                sail_stop_saving().
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_codec_info_from_name(const char* name,
+                                                    const struct sail_codec_info** codec_info);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

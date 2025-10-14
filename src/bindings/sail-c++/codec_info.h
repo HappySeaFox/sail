@@ -232,6 +232,23 @@ public:
     static codec_info from_mime_type(const std::string& mime_type);
 
     /*
+     * Returns a first codec info object by the specified codec name.
+     * Returns an invalid codec info object if no suitable codec was found.
+     * The comparison algorithm is case-insensitive. For example: "JPEG" or "jpeg".
+     *
+     * Typical usage: codec_info::from_name()  ->
+     *                image_input::start()     ->
+     *                image_input::next_frame()->
+     *                image_input::stop().
+     *
+     * Or:            codec_info::from_name()   ->
+     *                image_output::start()     ->
+     *                image_output::next_frame()->
+     *                image_output::stop().
+     */
+    static codec_info from_name(const std::string& name);
+
+    /*
      * Returns the list of found codec info objects. Use it to determine the list of possible
      * image formats, file extensions, and mime types that could be hypothetically loaded or saved by SAIL.
      */

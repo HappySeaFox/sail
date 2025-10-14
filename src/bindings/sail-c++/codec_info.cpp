@@ -203,6 +203,15 @@ codec_info codec_info::from_mime_type(const std::string &mime_type)
     return codec_info(sail_codec_info);
 }
 
+codec_info codec_info::from_name(const std::string &name)
+{
+    const struct sail_codec_info *sail_codec_info;
+    SAIL_TRY_OR_EXECUTE(sail_codec_info_from_name(name.c_str(), &sail_codec_info),
+                        /* on error */ return codec_info{});
+
+    return codec_info(sail_codec_info);
+}
+
 std::vector<codec_info> codec_info::list()
 {
     std::vector<codec_info> codec_info_list;

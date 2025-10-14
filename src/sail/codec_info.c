@@ -328,3 +328,59 @@ sail_status_t sail_codec_info_from_mime_type(const char* mime_type, const struct
     SAIL_LOG_ERROR("MIME type %s is not supported by any codec", mime_type);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }
+
+sail_status_t sail_codec_info_from_name(const char* name, const struct sail_codec_info** codec_info)
+{
+    SAIL_CHECK_PTR(name);
+    SAIL_CHECK_PTR(codec_info);
+
+    SAIL_LOG_DEBUG("Finding codec info for name '%s'", name);
+
+    if (strlen(name) == 0)
+    {
+        SAIL_LOG_ERROR("Name is empty");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    struct sail_context* context;
+    SAIL_TRY(fetch_global_context_guarded(&context));
+
+    char* name_copy;
+    SAIL_TRY(sail_strdup(name, &name_copy));
+
+    /* Will compare in lower case. */
+    sail_to_lower(name_copy);
+
+    for (struct sail_codec_bundle_node* codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL;
+         codec_bundle_node                                = codec_bundle_node->next)
+    {
+        const struct sail_codec_bundle* codec_bundle = codec_bundle_node->codec_bundle;
+
+        char* codec_name_copy;
+        SAIL_TRY_OR_CLEANUP(sail_strdup(codec_bundle->codec_info->name, &codec_name_copy),
+                            /* cleanup */ sail_free(name_copy));
+
+        sail_to_lower(codec_name_copy);
+
+        SAIL_LOG_TRACE("Check against codec name '%s'", codec_name_copy);
+
+        if (strcmp(codec_name_copy, name_copy) == 0)
+        {
+            sail_free(codec_name_copy);
+            sail_free(name_copy);
+            *codec_info = codec_bundle->codec_info;
+            SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
+            return SAIL_OK;
+        }
+        else
+        {
+            SAIL_LOG_TRACE("Name mismatch '%s' != '%s'", name_copy, codec_name_copy);
+        }
+
+        sail_free(codec_name_copy);
+    }
+
+    sail_free(name_copy);
+    SAIL_LOG_ERROR("Codec name %s is not supported", name);
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
+}
