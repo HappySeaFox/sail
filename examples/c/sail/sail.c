@@ -476,7 +476,7 @@ static sail_status_t extract_frames_impl(const char* input,
         dir_sep = strrchr(output_template, '\\');
     }
     const char* base_name_start = dir_sep ? (dir_sep + 1) : output_template;
-    int base_name_len           = base_name_end - base_name_start;
+    size_t base_name_len        = base_name_end - base_name_start;
 
     /* Extract all frames. */
     sail_status_t load_status;
@@ -495,25 +495,25 @@ static sail_status_t extract_frames_impl(const char* input,
         /* Construct output filename: base-N.ext */
         char output_filename[512];
         /* Ensure base_name_len doesn't exceed buffer size. */
-        int safe_base_name_len = base_name_len;
-        if (safe_base_name_len > (int)sizeof(output_filename) - 20)
+        size_t safe_base_name_len = base_name_len;
+        if (safe_base_name_len > sizeof(output_filename) - 20)
         {
             safe_base_name_len = sizeof(output_filename) - 20; /* Reserve space for "-N" and extension */
         }
-        sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", safe_base_name_len, base_name_start,
+        sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len, base_name_start,
                       frame_count + 1, ext ? ext : "");
 
         /* Add directory prefix if present. */
         if (dir_sep)
         {
             char full_path[1024]; /* Large enough for dir + filename */
-            int dir_len = dir_sep - output_template + 1;
+            size_t dir_len = dir_sep - output_template + 1;
             /* Ensure dir_len doesn't exceed reasonable size. */
             if (dir_len > 500)
             {
                 dir_len = 500;
             }
-            sail_snprintf(full_path, sizeof(full_path), "%.*s%s", dir_len, output_template, output_filename);
+            sail_snprintf(full_path, sizeof(full_path), "%.*s%s", (int)dir_len, output_template, output_filename);
             sail_strncpy(output_filename, full_path, sizeof(output_filename));
         }
 
