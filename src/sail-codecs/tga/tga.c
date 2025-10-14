@@ -48,8 +48,7 @@ struct tga_state
     struct TgaFileHeader file_header;
     struct TgaFooter footer;
 
-    bool frame_loaded;
-    bool frame_saved;
+    bool frame_processed;
     bool tga2;
     bool flipped_h;
     bool flipped_v;
@@ -71,9 +70,8 @@ static sail_status_t alloc_tga_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded = false,
-        .frame_saved  = false,
-        .tga2         = false,
+        .frame_processed = false,
+        .tga2            = false,
         .flipped_h    = false,
         .flipped_v    = false,
 
@@ -122,12 +120,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, st
 {
     struct tga_state* tga_state = state;
 
-    if (tga_state->frame_loaded)
+    if (tga_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    tga_state->frame_loaded = true;
+    tga_state->frame_processed = true;
 
     SAIL_TRY(tga_private_read_file_header(tga_state->io, &tga_state->file_header));
 
@@ -323,12 +321,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tga(void* state, co
 {
     struct tga_state* tga_state = state;
 
-    if (tga_state->frame_saved)
+    if (tga_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    tga_state->frame_saved = true;
+    tga_state->frame_processed = true;
 
     if (image->width > UINT16_MAX || image->height > UINT16_MAX)
     {

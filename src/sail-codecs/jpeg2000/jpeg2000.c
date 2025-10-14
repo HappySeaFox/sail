@@ -44,7 +44,7 @@ struct jpeg2000_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
+    bool frame_processed;
     struct sail_io* io;
     opj_stream_t* opj_stream;
     opj_codec_t* opj_codec;
@@ -86,7 +86,7 @@ static sail_status_t alloc_jpeg2000_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded         = false,
+        .frame_processed      = false,
         .io                   = io,
         .opj_stream           = NULL,
         .opj_codec            = NULL,
@@ -204,12 +204,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
 {
     struct jpeg2000_state* jpeg2000_state = state;
 
-    if (jpeg2000_state->frame_loaded)
+    if (jpeg2000_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    jpeg2000_state->frame_loaded = true;
+    jpeg2000_state->frame_processed = true;
 
     /* Read header. */
     if (!opj_read_header(jpeg2000_state->opj_stream, jpeg2000_state->opj_codec, &jpeg2000_state->opj_image))
@@ -443,12 +443,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg2000(void* stat
 {
     struct jpeg2000_state* jpeg2000_state = state;
 
-    if (jpeg2000_state->frame_loaded)
+    if (jpeg2000_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    jpeg2000_state->frame_loaded = true;
+    jpeg2000_state->frame_processed = true;
 
     /* Determine color space and channel configuration. */
     OPJ_COLOR_SPACE color_space;

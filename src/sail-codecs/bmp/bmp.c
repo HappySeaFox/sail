@@ -38,8 +38,7 @@ struct bmp_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
-    bool frame_saved;
+    bool frame_processed;
     void* common_bmp_state;
 };
 
@@ -57,8 +56,7 @@ static sail_status_t alloc_bmp_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded     = false,
-        .frame_saved      = false,
+        .frame_processed  = false,
         .common_bmp_state = NULL,
     };
 
@@ -100,12 +98,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_bmp(void* state, st
 {
     struct bmp_state* bmp_state = state;
 
-    if (bmp_state->frame_loaded)
+    if (bmp_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    bmp_state->frame_loaded = true;
+    bmp_state->frame_processed = true;
 
     SAIL_TRY(bmp_private_read_seek_next_frame(bmp_state->common_bmp_state, bmp_state->io, image));
 
@@ -163,12 +161,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_bmp(void* state, co
 {
     struct bmp_state* bmp_state = state;
 
-    if (bmp_state->frame_saved)
+    if (bmp_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    bmp_state->frame_saved = true;
+    bmp_state->frame_processed = true;
 
     SAIL_TRY(bmp_private_write_seek_next_frame(bmp_state->common_bmp_state, bmp_state->io, image));
 

@@ -258,7 +258,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io* io,
 
     if (png_state->frames == 0)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     if (png_state->is_apng)
@@ -372,7 +372,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, st
             else if (png_state->frames == 0)
             {
                 sail_destroy_image(image_local);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+                return SAIL_ERROR_NO_MORE_FRAMES;
             }
         }
 

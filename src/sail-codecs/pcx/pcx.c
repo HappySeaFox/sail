@@ -50,8 +50,7 @@ struct pcx_state
     struct SailPcxHeader pcx_header;
     unsigned char* scanline_buffer; /* buffer to read/write a single plane scan line. */
 
-    bool frame_loaded;
-    bool frame_saved;
+    bool frame_processed;
 };
 
 static sail_status_t alloc_pcx_state(struct sail_io* io,
@@ -69,8 +68,7 @@ static sail_status_t alloc_pcx_state(struct sail_io* io,
         .save_options = save_options,
 
         .scanline_buffer = NULL,
-        .frame_loaded    = false,
-        .frame_saved     = false,
+        .frame_processed = false,
     };
 
     return SAIL_OK;
@@ -129,12 +127,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void* state, st
 {
     struct pcx_state* pcx_state = state;
 
-    if (pcx_state->frame_loaded)
+    if (pcx_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    pcx_state->frame_loaded = true;
+    pcx_state->frame_processed = true;
 
     enum SailPixelFormat pixel_format;
     SAIL_TRY(pcx_private_sail_pixel_format(pcx_state->pcx_header.bits_per_plane, pcx_state->pcx_header.planes,
@@ -279,12 +277,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pcx(void* state, co
 {
     struct pcx_state* pcx_state = state;
 
-    if (pcx_state->frame_saved)
+    if (pcx_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    pcx_state->frame_saved = true;
+    pcx_state->frame_processed = true;
 
     /* Determine PCX format from pixel format. */
     uint8_t bits_per_plane, planes;

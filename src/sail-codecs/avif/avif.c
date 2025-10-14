@@ -435,7 +435,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_avif(void** state)
     {
         SAIL_LOG_ERROR("AVIF: No frames were added");
         destroy_avif_state(avif_state);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Finalize encoding. */

@@ -55,8 +55,7 @@ struct openexr_state
     std::string temp_path_read;
     std::string temp_path_write;
 
-    bool frame_loaded;
-    bool frame_saved;
+    bool frame_processed;
 
     unsigned width;
     unsigned height;
@@ -77,8 +76,7 @@ static sail_status_t alloc_openexr_state(struct sail_io* io,
         std::unique_ptr<OutputFile>(), // output_file
         {},                            // temp_path_read
         {},                            // temp_path_write
-        false,                         // frame_loaded
-        false,                         // frame_saved
+        false,                         // frame_processed
         0,                             // width
         0,                             // height
         {}                             // channel_info
@@ -140,7 +138,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_openexr(
 {
     struct openexr_state* openexr_state = static_cast<struct openexr_state*>(state);
 
-    if (openexr_state->frame_loaded)
+    if (openexr_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
@@ -218,7 +216,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_openexr(void* stat
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    openexr_state->frame_loaded = true;
+    openexr_state->frame_processed = true;
 
     return SAIL_OK;
 }
@@ -279,7 +277,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_openexr(
 {
     struct openexr_state* openexr_state = static_cast<struct openexr_state*>(state);
 
-    if (openexr_state->frame_saved)
+    if (openexr_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
@@ -338,7 +336,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_openexr(void* stat
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    openexr_state->frame_saved = true;
+    openexr_state->frame_processed = true;
 
     return SAIL_OK;
 }

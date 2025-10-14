@@ -40,7 +40,7 @@ struct xwd_codec_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
+    bool frame_processed;
 
     struct XWDFileHeader header;
     struct XWDColor* colormap;
@@ -60,7 +60,7 @@ static sail_status_t alloc_xwd_codec_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded = false,
+        .frame_processed = false,
 
         .colormap = NULL,
     };
@@ -103,12 +103,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xwd(void* state, st
 {
     struct xwd_codec_state* xwd_state = state;
 
-    if (xwd_state->frame_loaded)
+    if (xwd_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    xwd_state->frame_loaded = true;
+    xwd_state->frame_processed = true;
 
     /* Read XWD header. */
     SAIL_TRY(xwd_private_read_header(xwd_state->io, &xwd_state->header));
@@ -229,10 +229,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xwd(void* state, co
 
     struct xwd_codec_state* xwd_codec_state = state;
 
-    if (xwd_codec_state->frame_loaded)
+    if (xwd_codec_state->frame_processed)
     {
         SAIL_LOG_ERROR("XWD: Only single frame is supported for saving");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Create XWD header from image. */
@@ -250,7 +250,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xwd(void* state, co
         SAIL_TRY(xwd_private_write_colormap(xwd_codec_state->io, xwd_codec_state->colormap, ncolors));
     }
 
-    xwd_codec_state->frame_loaded = true;
+    xwd_codec_state->frame_processed = true;
 
     return SAIL_OK;
 }

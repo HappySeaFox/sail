@@ -58,8 +58,7 @@ struct jpeg_state
     struct jpeg_compress_struct* compress_context;
     struct jpeg_private_my_error_context error_context;
     bool libjpeg_error;
-    bool frame_loaded;
-    bool frame_saved;
+    bool frame_processed;
     bool started_compress;
 };
 
@@ -78,8 +77,7 @@ static sail_status_t alloc_jpeg_state(const struct sail_load_options* load_optio
         .decompress_context = NULL,
         .compress_context   = NULL,
         .libjpeg_error      = false,
-        .frame_loaded       = false,
-        .frame_saved        = false,
+        .frame_processed    = false,
         .started_compress   = false,
     };
 
@@ -168,12 +166,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void* state, s
 {
     struct jpeg_state* jpeg_state = state;
 
-    if (jpeg_state->frame_loaded)
+    if (jpeg_state->frame_processed)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    jpeg_state->frame_loaded = true;
+    jpeg_state->frame_processed = true;
 
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
     {
@@ -323,12 +321,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void* state, c
 {
     struct jpeg_state* jpeg_state = state;
 
-    if (jpeg_state->frame_saved)
+    if (jpeg_state->frame_processed)
     {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    jpeg_state->frame_saved = true;
+    jpeg_state->frame_processed = true;
 
     /* Error handling setup. */
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)

@@ -40,7 +40,7 @@ struct hdr_codec_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
+    bool frame_processed;
 
     struct hdr_header header;
     struct hdr_write_context write_ctx;
@@ -60,7 +60,7 @@ static sail_status_t alloc_hdr_codec_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded = false,
+        .frame_processed = false,
 
         .header =
             {
@@ -120,12 +120,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_hdr(void* state, st
 {
     struct hdr_codec_state* hdr_state = state;
 
-    if (hdr_state->frame_loaded)
+    if (hdr_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    hdr_state->frame_loaded = true;
+    hdr_state->frame_processed = true;
 
     /* Read HDR header. */
     SAIL_TRY(hdr_private_read_header(hdr_state->io, &hdr_state->header));
@@ -286,10 +286,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_hdr(void* state, co
 
     struct hdr_codec_state* hdr_codec_state = state;
 
-    if (hdr_codec_state->frame_loaded)
+    if (hdr_codec_state->frame_processed)
     {
         SAIL_LOG_ERROR("HDR: Only single frame is supported for saving");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* HDR only supports BPP96 (32-bit float RGB). */
@@ -299,9 +299,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_hdr(void* state, co
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    hdr_codec_state->frame_loaded  = true;
-    hdr_codec_state->header.width  = image->width;
-    hdr_codec_state->header.height = image->height;
+    hdr_codec_state->frame_processed = true;
+    hdr_codec_state->header.width    = image->width;
+    hdr_codec_state->header.height   = image->height;
 
     /* Fetch properties from special_properties. */
     if (image->source_image != NULL && image->source_image->special_properties != NULL)

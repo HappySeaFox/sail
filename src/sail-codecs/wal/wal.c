@@ -339,7 +339,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_wal(void** state)
         SAIL_LOG_ERROR("WAL: No frames were provided");
         destroy_wal_state(wal_state);
         *state = NULL;
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* If only one frame was provided, generate mipmaps automatically. */

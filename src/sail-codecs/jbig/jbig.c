@@ -42,7 +42,7 @@ struct jbig_codec_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
+    bool frame_processed;
 
     unsigned long width;
     unsigned long height;
@@ -63,7 +63,7 @@ static sail_status_t alloc_jbig_codec_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded = false,
+        .frame_processed = false,
 
         .width  = 0,
         .height = 0,
@@ -105,12 +105,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jbig(void* state, s
 {
     struct jbig_codec_state* jbig_state = state;
 
-    if (jbig_state->frame_loaded)
+    if (jbig_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    jbig_state->frame_loaded = true;
+    jbig_state->frame_processed = true;
 
     /* Read JBIG header to get image dimensions. */
     SAIL_TRY(jbig_private_read_header(jbig_state->io, &jbig_state->width, &jbig_state->height, &jbig_state->planes));
@@ -337,10 +337,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jbig(void* state, c
 
     struct jbig_codec_state* jbig_codec_state = state;
 
-    if (jbig_codec_state->frame_loaded)
+    if (jbig_codec_state->frame_processed)
     {
         SAIL_LOG_ERROR("JBIG: Only single frame is supported for saving");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* JBIG only supports BPP1. */
@@ -350,10 +350,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jbig(void* state, c
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    jbig_codec_state->frame_loaded = true;
-    jbig_codec_state->width        = image->width;
-    jbig_codec_state->height       = image->height;
-    jbig_codec_state->planes       = 1;
+    jbig_codec_state->frame_processed = true;
+    jbig_codec_state->width           = image->width;
+    jbig_codec_state->height          = image->height;
+    jbig_codec_state->planes          = 1;
 
     return SAIL_OK;
 }

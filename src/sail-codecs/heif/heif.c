@@ -191,7 +191,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_heif(struct sail_io* io,
     if (heif_state->num_images <= 0)
     {
         SAIL_LOG_ERROR("HEIF: No images found");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Allocate array for image handles. */
@@ -668,7 +668,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_heif(void** state)
     {
         SAIL_LOG_ERROR("HEIF: No frames were saved");
         destroy_heif_state(heif_state);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Setup writer. */

@@ -44,7 +44,7 @@ struct xbm_codec_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
+    bool frame_processed;
 
     enum SailXbmVersion version;
     struct xbm_state tuning_state;
@@ -64,8 +64,8 @@ static sail_status_t alloc_xbm_codec_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded = false,
-        .version      = SAIL_XBM_VERSION_11,
+        .frame_processed = false,
+        .version         = SAIL_XBM_VERSION_11,
     };
 
     (*xbm_codec_state)->tuning_state.version     = SAIL_XBM_VERSION_11;
@@ -106,12 +106,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
 {
     struct xbm_codec_state* xbm_state = state;
 
-    if (xbm_state->frame_loaded)
+    if (xbm_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    xbm_state->frame_loaded = true;
+    xbm_state->frame_processed = true;
 
     char buf[512 + 1];
 
@@ -374,10 +374,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xbm(void* state, co
 
     struct xbm_codec_state* xbm_codec_state = state;
 
-    if (xbm_codec_state->frame_loaded)
+    if (xbm_codec_state->frame_processed)
     {
         SAIL_LOG_ERROR("XBM: Only single frame is supported for saving");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* XBM only supports 1-bit indexed format. */
@@ -403,7 +403,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xbm(void* state, co
         (xbm_codec_state->tuning_state.var_name[0] != '\0') ? xbm_codec_state->tuning_state.var_name : NULL;
     SAIL_TRY(xbm_private_write_header(xbm_codec_state->io, image->width, image->height, name, xbm_codec_state->version));
 
-    xbm_codec_state->frame_loaded = true;
+    xbm_codec_state->frame_processed = true;
 
     return SAIL_OK;
 }

@@ -38,7 +38,7 @@ struct xpm_codec_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
+    bool frame_processed;
 
     unsigned width;
     unsigned height;
@@ -67,7 +67,7 @@ static sail_status_t alloc_xpm_codec_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded = false,
+        .frame_processed = false,
 
         .width      = 0,
         .height     = 0,
@@ -118,12 +118,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xpm(void* state, st
 {
     struct xpm_codec_state* xpm_state = state;
 
-    if (xpm_state->frame_loaded)
+    if (xpm_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    xpm_state->frame_loaded = true;
+    xpm_state->frame_processed = true;
 
     /* Parse XPM header. */
     SAIL_TRY(xpm_private_parse_xpm_header(xpm_state->io, &xpm_state->width, &xpm_state->height, &xpm_state->num_colors,
@@ -239,10 +239,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xpm(void* state, co
 
     struct xpm_codec_state* xpm_codec_state = state;
 
-    if (xpm_codec_state->frame_loaded)
+    if (xpm_codec_state->frame_processed)
     {
         SAIL_LOG_ERROR("XPM: Only single frame is supported for saving");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* XPM supports only indexed formats up to 256 colors. */
@@ -328,11 +328,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xpm(void* state, co
 
     sail_free(rgb_palette);
 
-    xpm_codec_state->width        = image->width;
-    xpm_codec_state->height       = image->height;
-    xpm_codec_state->num_colors   = num_colors;
-    xpm_codec_state->cpp          = cpp;
-    xpm_codec_state->frame_loaded = true;
+    xpm_codec_state->width          = image->width;
+    xpm_codec_state->height         = image->height;
+    xpm_codec_state->num_colors     = num_colors;
+    xpm_codec_state->cpp            = cpp;
+    xpm_codec_state->frame_processed = true;
 
     return SAIL_OK;
 }

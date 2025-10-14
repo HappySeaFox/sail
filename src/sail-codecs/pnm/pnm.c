@@ -43,8 +43,7 @@ struct pnm_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    bool frame_loaded;
-    bool frame_saved;
+    bool frame_processed;
     enum SailPnmVersion version;
     double multiplier_to_full_range;
     unsigned bpc;
@@ -68,8 +67,7 @@ static sail_status_t alloc_pnm_state(struct sail_io* io,
         .load_options = load_options,
         .save_options = save_options,
 
-        .frame_loaded = false,
-        .frame_saved  = false,
+        .frame_processed = false,
 
         .multiplier_to_full_range = 0,
         .bpc                      = 0,
@@ -138,12 +136,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
 {
     struct pnm_state* pnm_state = state;
 
-    if (pnm_state->frame_loaded)
+    if (pnm_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    pnm_state->frame_loaded = true;
+    pnm_state->frame_processed = true;
 
     unsigned w, h;
     enum SailPixelFormat pixel_format;
@@ -447,10 +445,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pnm(void* state, co
 
     struct pnm_state* pnm_state = state;
 
-    if (pnm_state->frame_saved)
+    if (pnm_state->frame_processed)
     {
         SAIL_LOG_ERROR("PNM: Only single frame is supported for saving");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+        return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
     /* Determine PNM format from pixel format. */
@@ -517,7 +515,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pnm(void* state, const struct
         }
     }
 
-    pnm_state->frame_saved = true;
+    pnm_state->frame_processed = true;
 
     return SAIL_OK;
 }
