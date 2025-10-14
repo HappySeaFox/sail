@@ -32,6 +32,8 @@ add_library(sail
                 io_memory.h
                 io_noop.c
                 io_noop.h
+                io_not_implemented.c
+                io_not_implemented.h
                 sail.h
                 sail_advanced.c
                 sail_advanced.h
@@ -58,6 +60,7 @@ set(PUBLIC_HEADERS codec_bundle.h
                    io_file.h
                    io_memory.h
                    io_noop.h
+                   io_not_implemented.h
                    sail.h
                    sail_advanced.h
                    sail_deep_diver.h

@@ -38,6 +38,7 @@
 #include <sail/io_file.h>
 #include <sail/io_memory.h>
 #include <sail/io_noop.h>
+#include <sail/io_not_implemented.h>
 #include <sail/sail_advanced.h>
 #include <sail/sail_deep_diver.h>
 #include <sail/sail_junior.h>

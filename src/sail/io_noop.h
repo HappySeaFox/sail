@@ -37,33 +37,33 @@ extern "C"
 #endif
 
 /*
- * No-op callbacks for I/O streams when specific operations cannot be executed.
- * For example, when we open a file for reading, its tolerant_write callback is set to
- * sail_io_noop_tolerant_write.
+ * No-op callbacks for I/O streams when specific operations have no sense and can be silently ignored.
+ * For example, when we open a file for reading, its flush callback is set to
+ * sail_io_noop_flush.
  */
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_tolerant_read(void* stream, void* buf, size_t size_to_read, size_t* read_size);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_strict_read(void* stream, void* buf, size_t size_to_read);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_seek(void* stream, long offset, int whence);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_tell(void* stream, size_t* offset);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_tolerant_write(void* stream,
                                                       const void* buf,
@@ -71,22 +71,22 @@ SAIL_EXPORT sail_status_t sail_io_noop_tolerant_write(void* stream,
                                                       size_t* written_size);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_strict_write(void* stream, const void* buf, size_t size_to_write);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_flush(void* stream);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_close(void* stream);
 
 /*
- * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ * No-op callback that just returns SAIL_OK.
  */
 SAIL_EXPORT sail_status_t sail_io_noop_eof(void* stream, bool* result);
 

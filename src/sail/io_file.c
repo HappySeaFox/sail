@@ -241,8 +241,8 @@ sail_status_t sail_alloc_io_read_file(const char* path, struct sail_io** io)
     (*io)->features       = SAIL_IO_FEATURE_SEEKABLE;
     (*io)->tolerant_read  = io_file_tolerant_read;
     (*io)->strict_read    = io_file_strict_read;
-    (*io)->tolerant_write = sail_io_noop_tolerant_write;
-    (*io)->strict_write   = sail_io_noop_strict_write;
+    (*io)->tolerant_write = sail_io_not_implemented_tolerant_write;
+    (*io)->strict_write   = sail_io_not_implemented_strict_write;
     (*io)->seek           = io_file_seek;
     (*io)->tell           = io_file_tell;
     (*io)->flush          = sail_io_noop_flush;
