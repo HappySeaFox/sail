@@ -11,7 +11,7 @@ See [README](README.md) for more.
 
 - 20 years anniversary!
 - codecs interface has been rewritten in C
-- implemented rich C and С++ client APIs to load and save images: junior, advanced, deep diver, technical diver
+- implemented rich C and C++ client APIs to load and save images: junior, advanced, deep diver, technical diver
 - load from everywhere: files, memory, custom I/O sources
 - codec-specific tuning options like PNG filters
 - step-by-step loading of multi-paged or animated images
