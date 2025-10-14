@@ -59,10 +59,8 @@ before_script:
       fi
 
       fail_on_error git -C vcpkg pull
-      if ! vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib; then
-        cat vcpkg/buildtrees/libheif/install-x64-windows-dbg-out.log
-        exit 1
-      fi
+      # libheif requires <bit> which is not available in this particular MSVC
+      fail_on_error vcpkg/vcpkg install giflib jbigkit libavif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib
     ;;
   esac
 
