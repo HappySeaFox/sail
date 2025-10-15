@@ -6,6 +6,7 @@ sail_test(TARGET hex-data             SOURCES hex_data.c             LINK sail-c
 sail_test(TARGET iccp                 SOURCES iccp.c                 LINK sail-common)
 sail_test(TARGET integrity            SOURCES integrity.c            LINK sail-common)
 sail_test(TARGET load-options         SOURCES load_options.c         LINK sail-common)
+sail_test(TARGET log                  SOURCES log.c                  LINK sail-common)
 sail_test(TARGET malloc               SOURCES malloc.c               LINK sail-common)
 sail_test(TARGET meta-data            SOURCES meta_data.c            LINK sail-common sail-comparators)
 sail_test(TARGET palette              SOURCES palette.c              LINK sail-common)

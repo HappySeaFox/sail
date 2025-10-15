@@ -54,6 +54,14 @@ typedef bool (*sail_logger)(enum SailLogLevel level, const char* file, int line,
 SAIL_EXPORT void sail_log(enum SailLogLevel level, const char* file, int line, const char* format, ...);
 
 /*
+ * Converts a string representation of a log level to enum SailLogLevel.
+ * Returns the corresponding log level on success, or SAIL_LOG_LEVEL_DEBUG on error.
+ *
+ * Supported strings: "silence", "error", "warning", "info", "message", "debug", "trace".
+ */
+SAIL_EXPORT enum SailLogLevel sail_log_level_from_string(const char* str);
+
+/*
  * Sets a maximum log level barrier. Only messages of the specified log level or lower will be displayed.
  *
  * Call to this function is not thread-safe. It's recommended to call it in the main thread

@@ -204,6 +204,46 @@ void sail_log(enum SailLogLevel level, const char* file, int line, const char* f
     va_end(args);
 }
 
+enum SailLogLevel sail_log_level_from_string(const char* str)
+{
+    if (str == NULL)
+    {
+        return SAIL_LOG_LEVEL_DEBUG;
+    }
+    else if (strcmp(str, "silence") == 0)
+    {
+        return SAIL_LOG_LEVEL_SILENCE;
+    }
+    else if (strcmp(str, "error") == 0)
+    {
+        return SAIL_LOG_LEVEL_ERROR;
+    }
+    else if (strcmp(str, "warning") == 0)
+    {
+        return SAIL_LOG_LEVEL_WARNING;
+    }
+    else if (strcmp(str, "info") == 0)
+    {
+        return SAIL_LOG_LEVEL_INFO;
+    }
+    else if (strcmp(str, "message") == 0)
+    {
+        return SAIL_LOG_LEVEL_MESSAGE;
+    }
+    else if (strcmp(str, "debug") == 0)
+    {
+        return SAIL_LOG_LEVEL_DEBUG;
+    }
+    else if (strcmp(str, "trace") == 0)
+    {
+        return SAIL_LOG_LEVEL_TRACE;
+    }
+    else
+    {
+        return SAIL_LOG_LEVEL_DEBUG;
+    }
+}
+
 void sail_set_log_barrier(enum SailLogLevel max_level)
 {
     sail_max_log_level = max_level;
