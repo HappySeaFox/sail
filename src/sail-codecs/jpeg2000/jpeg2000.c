@@ -605,7 +605,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpeg2000(void** state)
     {
         /* Lossy compression with quality. */
         parameters.tcp_numlayers  = 1;
-        parameters.tcp_rates[0]   = 100.0 / compression_level;
+        parameters.tcp_rates[0]   = (float)(100.0 / compression_level);
         parameters.cp_disto_alloc = 1;
     }
     else
