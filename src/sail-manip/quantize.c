@@ -561,8 +561,10 @@ static sail_status_t apply_floyd_steinberg_dithering(struct sail_image* indexed_
     SAIL_CHECK_PTR(original_g);
     SAIL_CHECK_PTR(original_b);
 
-    /* Only BPP8_INDEXED is supported for dithering currently. */
-    if (indexed_image->pixel_format != SAIL_PIXEL_FORMAT_BPP8_INDEXED)
+    /* Only BPP2/4/8_INDEXED are supported for dithering currently. */
+    if (indexed_image->pixel_format != SAIL_PIXEL_FORMAT_BPP2_INDEXED &&
+        indexed_image->pixel_format != SAIL_PIXEL_FORMAT_BPP4_INDEXED &&
+        indexed_image->pixel_format != SAIL_PIXEL_FORMAT_BPP8_INDEXED)
     {
         return SAIL_OK;
     }
@@ -634,7 +636,28 @@ static sail_status_t apply_floyd_steinberg_dithering(struct sail_image* indexed_
             const unsigned char best_idx = lookup[qr][qg][qb];
 
             /* Update pixel with best match. */
-            pixels[pixel_idx] = best_idx;
+            if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
+            {
+                pixels[pixel_idx] = best_idx;
+            }
+            else if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
+            {
+                int byte_idx = y * indexed_image->bytes_per_line + x / 2;
+                if (x % 2 == 0)
+                {
+                    pixels[byte_idx] = (pixels[byte_idx] & 0x0F) | ((best_idx & 0x0F) << 4);
+                }
+                else
+                {
+                    pixels[byte_idx] = (pixels[byte_idx] & 0xF0) | (best_idx & 0x0F);
+                }
+            }
+            else if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED)
+            {
+                int byte_idx = y * indexed_image->bytes_per_line + x / 4;
+                int shift = 6 - ((x % 4) * 2);
+                pixels[byte_idx] = (pixels[byte_idx] & ~(0x03 << shift)) | ((best_idx & 0x03) << shift);
+            }
 
             /* Calculate quantization error. */
             const int error_r = r - (int)lut_r[best_idx];
@@ -846,6 +869,10 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     {
         indexed_image->pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
     }
+    else if (state->K <= 4)
+    {
+        indexed_image->pixel_format = SAIL_PIXEL_FORMAT_BPP2_INDEXED;
+    }
     else if (state->K <= 16)
     {
         indexed_image->pixel_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
@@ -868,7 +895,6 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     }
     else
     {
-        /* TODO: Pack into BPP1/BPP4. */
         unsigned char* dest = (unsigned char*)indexed_image->pixels;
         memset(dest, 0, (size_t)indexed_image->bytes_per_line * indexed_image->height);
 
@@ -889,8 +915,14 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
                         dest[byte_idx] |= (idx & 0x0F);
                     }
                 }
+                else if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED)
+                {
+                    int byte_idx = y * indexed_image->bytes_per_line + x / 4;
+                    int shift = 6 - ((x % 4) * 2);
+                    dest[byte_idx] |= (idx & 0x03) << shift;
+                }
                 else
-                { /* BPP1_INDEXED. */
+                {
                     int byte_idx = y * indexed_image->bytes_per_line + x / 8;
                     int bit_idx  = 7 - (x % 8);
                     if (idx)

@@ -2206,17 +2206,23 @@ sail_status_t sail_convert_image_with_options(const struct sail_image* image,
     {
         /* Determine max colors based on target format. */
         unsigned max_colors;
-        if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED)
+        switch (output_pixel_format)
         {
+        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
             max_colors = 2;
-        }
-        else if (output_pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
-        {
+            break;
+        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+            max_colors = 4;
+            break;
+        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
             max_colors = 16;
-        }
-        else
-        {
+            break;
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
             max_colors = 256;
+            break;
+        default:
+            SAIL_LOG_ERROR("Conversion to %s is not supported", sail_pixel_format_to_string(output_pixel_format));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
         }
 
         /* For indexed formats, first convert to RGB if needed. */

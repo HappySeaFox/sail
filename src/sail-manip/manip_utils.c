@@ -942,7 +942,7 @@ void fill_rgba16_pixel_from_uint8_values(const sail_rgba32_t* rgba32,
 {
     (void)options;
 
-    const uint8_t shift = 8 - bits_per_component;
+    const uint8_t shift = (uint8_t)(8 - bits_per_component);
 
     uint16_t result = (uint16_t)(((rgba32->component1 >> shift) << r_shift) | ((rgba32->component2 >> shift) << g_shift)
                                  | ((rgba32->component3 >> shift) << b_shift));
