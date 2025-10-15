@@ -71,6 +71,8 @@ struct jpegxl_state
     bool frame_saved;
     unsigned current_frame;
     bool is_animation;
+    unsigned first_frame_width;
+    unsigned first_frame_height;
 };
 
 static sail_status_t alloc_jpegxl_state(struct sail_io* io,
@@ -121,6 +123,8 @@ static sail_status_t alloc_jpegxl_state(struct sail_io* io,
         .frame_saved       = false,
         .current_frame     = 0,
         .is_animation      = false,
+        .first_frame_width  = 0,
+        .first_frame_height = 0,
     };
 
     return SAIL_OK;
@@ -532,6 +536,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpegxl(void* state,
         basic_info.xsize = image->width;
         basic_info.ysize = image->height;
 
+        /* Remember first frame dimensions for validation of subsequent frames. */
+        jpegxl_state->first_frame_width = image->width;
+        jpegxl_state->first_frame_height = image->height;
+
         /* Check if this is animation. */
         if (image->delay > 0)
         {
@@ -596,6 +604,15 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpegxl(void* state,
     }
     else
     {
+        /* Validate that subsequent frames have the same dimensions. */
+        if (image->width != jpegxl_state->first_frame_width || image->height != jpegxl_state->first_frame_height)
+        {
+            SAIL_LOG_ERROR("JPEGXL: All frames must have the same dimensions. First frame: %ux%u, current frame: %ux%u",
+                          jpegxl_state->first_frame_width, jpegxl_state->first_frame_height,
+                          image->width, image->height);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+        }
+
         /* Reuse frame settings for subsequent frames. */
         if (jpegxl_state->frame_settings == NULL)
         {
