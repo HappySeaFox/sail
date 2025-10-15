@@ -32,7 +32,7 @@
 #include "helpers.h"
 
 /* 256-color palette signature. */
-static const unsigned SAIL_PCX_PALETTE_SIGNATURE = 0x0C;
+static const uint8_t SAIL_PCX_PALETTE_SIGNATURE = 0x0C;
 
 static const unsigned char SAIL_PCX_MONO_PALETTE[] = {0, 0, 0, 255, 255, 255};
 
