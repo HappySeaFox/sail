@@ -169,22 +169,22 @@ static MunitResult test_image_special_properties(const MunitParameter params[], 
         image.source_image().special_properties()["test-key-1"] = sail::variant(42u);
         image.source_image().special_properties()["test-key-2"] = sail::variant(std::string("test-value"));
 
-        munit_assert_uint(image.source_image().special_properties().size(), ==, 2);
+        munit_assert_uint(image.source_image().special_properties().size(), ==, 2ull);
         munit_assert_uint(image.source_image().special_properties()["test-key-1"].value<unsigned>(), ==, 42u);
         munit_assert_string_equal(image.source_image().special_properties()["test-key-2"].value<std::string>().c_str(),
                                   "test-value");
 
         // Copy and verify special_properties are copied
         sail::image image_copy = image;
-        munit_assert_uint(image_copy.source_image().special_properties().size(), ==, 2);
+        munit_assert_uint(image_copy.source_image().special_properties().size(), ==, 2ull);
         munit_assert_uint(image_copy.source_image().special_properties()["test-key-1"].value<unsigned>(), ==, 42u);
         munit_assert_string_equal(
             image_copy.source_image().special_properties()["test-key-2"].value<std::string>().c_str(), "test-value");
 
         // Modify copy and verify original is not affected
         image_copy.source_image().special_properties()["test-key-3"] = sail::variant(100u);
-        munit_assert_uint(image_copy.source_image().special_properties().size(), ==, 3);
-        munit_assert_uint(image.source_image().special_properties().size(), ==, 2);
+        munit_assert_uint(image_copy.source_image().special_properties().size(), ==, 3ull);
+        munit_assert_uint(image.source_image().special_properties().size(), ==, 2ull);
     }
 
     return MUNIT_OK;
