@@ -375,8 +375,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, c
      * For JPEG compression, avoid YCbCr as it requires the height to be a multiple of 16.
      * Convert YCbCr to RGB instead. While libjpeg itself supports any height via padding,
      * libtiff does not handle this correctly and reports "fractional scanline discarded".
+     *
+     * Checking for "image->height % 16 != 0" doesn't make sense because we may write
+     * frames with different heights.
      */
-    if (tiff_state->save_compression == COMPRESSION_JPEG && photometric == PHOTOMETRIC_YCBCR && image->height % 16 != 0)
+    if (tiff_state->save_compression == COMPRESSION_JPEG && photometric == PHOTOMETRIC_YCBCR)
     {
         photometric = PHOTOMETRIC_RGB;
         SAIL_LOG_DEBUG("TIFF: Changed YCbCr to RGB for JPEG compression compatibility");
