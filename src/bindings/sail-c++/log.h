@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <sail-common/export.h>
 #include <sail-common/log.h>
 #include <sail-common/status.h>
@@ -37,6 +39,22 @@ namespace sail
  */
 namespace log
 {
+
+/*
+ * Converts a string representation of a log level to SailLogLevel.
+ * Returns the corresponding log level on success, or SAIL_LOG_LEVEL_DEBUG on error.
+ *
+ * Supported strings: "silence", "error", "warning", "info", "message", "debug", "trace".
+ */
+SAIL_EXPORT SailLogLevel level_from_string(const char *str);
+
+/*
+ * Converts a string representation of a log level to SailLogLevel.
+ * Returns the corresponding log level on success, or SAIL_LOG_LEVEL_DEBUG on error.
+ *
+ * Supported strings: "silence", "error", "warning", "info", "message", "debug", "trace".
+ */
+SAIL_EXPORT SailLogLevel level_from_string(const std::string &str);
 
 /*
  * Sets a maximum log level barrier. Only the messages of the specified log level or lower will be displayed.
