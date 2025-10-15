@@ -523,7 +523,7 @@ static sail_status_t write_new_rle_scanline(struct sail_io* io, int width, const
             {
                 /* Find literal run. */
                 int literal_start  = pos;
-                int literal_length = 0;
+                uint8_t literal_length = 0;
 
                 while (pos < width && literal_length < 128)
                 {
