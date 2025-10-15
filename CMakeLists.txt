@@ -121,19 +121,6 @@ endif()
 #
 set(SAIL_MAGIC_BUFFER_SIZE 16)
 
-# Our bundled libs
-#
-if (WIN32 AND NOT SAIL_VCPKG)
-    set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${PROJECT_SOURCE_DIR}/extra/B)
-
-    # For check_c_source_runs() we need to update PATH
-    # so checks are able to find bundled libs
-    #
-    set(EXTRA_LIBS "${PROJECT_SOURCE_DIR}/extra/B/bin")
-    string(REPLACE "/" "\\" EXTRA_LIBS "${EXTRA_LIBS}")
-    set(ENV{PATH} "$ENV{PATH};${EXTRA_LIBS}")
-endif()
-
 # Enable strict C11
 #
 set(CMAKE_C_STANDARD 11)
@@ -258,9 +245,9 @@ if (NOT ENABLED_CODECS AND NOT SAIL_THIRD_PARTY_CODECS_PATH)
     message(FATAL_ERROR "No codecs are enabled and SAIL_THIRD_PARTY_CODECS_PATH is disabled.\nThis particular build of SAIL cannot load any image.")
 endif()
 
-# Install our bundled libs if they exist and when VCPKG is not used
+# Install VCPKG libs on Windows only. On Unix platforms vcpkg uses rpath
 #
-if (NOT SAIL_VCPKG)
+if (SAIL_VCPKG AND WIN32)
     # When SAIL_COMBINE_CODECS is ON, sail-codecs.dll directly depends on extra libs.
     # Copy them into the bin directory. Otherwise, client applications will fail to run.
     #
@@ -273,18 +260,11 @@ if (NOT SAIL_VCPKG)
         set(SAIL_EXTRA_LIBS_INSTALL_PATH "lib/sail/codecs/lib")
     endif()
 
-    if (WIN32)
-        if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/bin")
-            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/bin/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH})
-        endif()
-        if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/share/sail/licenses")
-            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/share/sail/licenses/" DESTINATION share/sail/licenses)
-        endif()
-    else()
-        if (EXISTS "${PROJECT_SOURCE_DIR}/extra/B/lib")
-            install(DIRECTORY "${PROJECT_SOURCE_DIR}/extra/B/lib/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH})
-        endif()
-    endif()
+    # ../../vcpkg/scripts/buildsystems/vcpkg.cmake -> C:/projects/vcpkg/installed/x64-windows/bin
+    #
+    set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/bin")
+    get_filename_component(SAIL_VCPKG_BIN_PATH "${SAIL_VCPKG_BIN_PATH}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    install(DIRECTORY "${SAIL_VCPKG_BIN_PATH}/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH})
 endif()
 
 if (ENABLED_CODECS)

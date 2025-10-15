@@ -684,13 +684,8 @@ static const char* sail_codecs_path(void)
     {
         char* lib_sail_codecs_path;
 
-#ifdef SAIL_VCPKG
-        /* "\bin" -> "\bin\sail\codecs" */
-        const char* CODECS_RELATIVE_PATH = "\\sail\\codecs";
-#else
         /* "\bin" -> "\bin\..\lib\sail\codecs" */
-        const char* CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
-#endif
+        const char* const CODECS_RELATIVE_PATH = "\\..\\lib\\sail\\codecs";
 
         if (sail_concat(&lib_sail_codecs_path, 2, dll_path, CODECS_RELATIVE_PATH) == SAIL_OK)
         {
