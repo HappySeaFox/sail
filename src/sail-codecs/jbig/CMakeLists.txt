@@ -10,7 +10,11 @@ endif()
 # This will add the following CMake rules to the CMake config for static builds so a client
 # application links against the required dependencies:
 #
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jbig,jbigd jbig" PARENT_SCOPE)
+# find_library(jbig_RELEASE_LIBRARY NAMES libjbig)
+# find_library(jbig_DEBUG_LIBRARY NAMES libjbig)
+# set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jbig_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jbig_DEBUG_LIBRARY}>)
+#
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,libjbig,libjbig" PARENT_SCOPE)
 
 # Common codec configuration
 #
