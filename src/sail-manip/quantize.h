@@ -37,7 +37,7 @@ extern "C"
 struct sail_image;
 
 /*
- * Quantizes the input RGB/RGBA image to indexed format with specified number of colors.
+ * Quantizes the input RGB/RGBA image to indexed format with specified output pixel format.
  * Uses Xiaolin Wu's color quantization algorithm (1992).
  *
  * The input image must be in one of the following pixel formats:
@@ -48,15 +48,18 @@ struct sail_image;
  *   - SAIL_PIXEL_FORMAT_BPP32_RGBX
  *   - SAIL_PIXEL_FORMAT_BPP32_BGRX
  *
- * The output image will be in indexed format:
- *   - SAIL_PIXEL_FORMAT_BPP8_INDEXED for 3-256 colors
- *   - SAIL_PIXEL_FORMAT_BPP4_INDEXED for 2-16 colors (rounded up)
- *   - SAIL_PIXEL_FORMAT_BPP1_INDEXED for 2 colors
+ * The output image will be in the specified indexed format:
+ *   - SAIL_PIXEL_FORMAT_BPP1_INDEXED (2 colors max)
+ *   - SAIL_PIXEL_FORMAT_BPP2_INDEXED (4 colors max)
+ *   - SAIL_PIXEL_FORMAT_BPP4_INDEXED (16 colors max)
+ *   - SAIL_PIXEL_FORMAT_BPP8_INDEXED (256 colors max)
  *
  * The output image will have a palette attached (BPP24_RGB format).
+ * The palette may have fewer colors than the maximum for the format, but the
+ * pixel data will always be in the requested format.
  *
- * max_colors: Maximum number of colors in the output palette (2-256).
- *             The actual number may be less if the image has fewer unique colors.
+ * output_pixel_format: The desired indexed pixel format for the output image.
+ *                      Must be one of the indexed formats listed above.
  *
  * dither: If true, apply Floyd-Steinberg dithering to reduce color banding.
  *         Currently only supported for BPP8_INDEXED output.
@@ -64,7 +67,7 @@ struct sail_image;
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_quantize_image(const struct sail_image* source_image,
-                                              unsigned max_colors,
+                                              enum SailPixelFormat output_pixel_format,
                                               bool dither,
                                               struct sail_image** target_image);
 

@@ -284,9 +284,28 @@ static sail_status_t convert_impl(const char** inputs,
                 }
 
                 /* Now quantize RGB to indexed. */
-                SAIL_LOG_INFO("Quantizing to %d colors%s", colors, dither ? " with dithering" : "");
+                /* Determine indexed pixel format based on requested colors. */
+                enum SailPixelFormat indexed_format;
+                if (colors <= 2)
+                {
+                    indexed_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+                }
+                else if (colors <= 4)
+                {
+                    indexed_format = SAIL_PIXEL_FORMAT_BPP2_INDEXED;
+                }
+                else if (colors <= 16)
+                {
+                    indexed_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
+                }
+                else
+                {
+                    indexed_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+                }
+
+                SAIL_LOG_INFO("Quantizing to %s%s", sail_pixel_format_to_string(indexed_format), dither ? " with dithering" : "");
                 struct sail_image* image_quantized;
-                SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, colors, dither, &image_quantized),
+                SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, indexed_format, dither, &image_quantized),
                                     sail_destroy_image(image);
                                     sail_stop_loading(load_state); sail_stop_saving(save_state);
                                     sail_destroy_save_options(save_options));
@@ -608,8 +627,27 @@ static sail_status_t extract_frames_impl(const char* input,
             }
 
             /* Now quantize RGB to indexed. */
+            /* Determine indexed pixel format based on requested colors. */
+            enum SailPixelFormat indexed_format;
+            if (colors <= 2)
+            {
+                indexed_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+            }
+            else if (colors <= 4)
+            {
+                indexed_format = SAIL_PIXEL_FORMAT_BPP2_INDEXED;
+            }
+            else if (colors <= 16)
+            {
+                indexed_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
+            }
+            else
+            {
+                indexed_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
+            }
+
             struct sail_image* image_quantized;
-            SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, colors, dither, &image_quantized), sail_destroy_image(image);
+            SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, indexed_format, dither, &image_quantized), sail_destroy_image(image);
                                 sail_stop_loading(load_state));
             sail_destroy_image(image);
             image = image_quantized;

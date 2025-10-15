@@ -732,17 +732,32 @@ static sail_status_t apply_floyd_steinberg_dithering(struct sail_image* indexed_
 }
 
 sail_status_t sail_quantize_image(const struct sail_image* source_image,
-                                  unsigned max_colors,
+                                  enum SailPixelFormat output_pixel_format,
                                   bool dither,
                                   struct sail_image** target_image)
 {
     SAIL_CHECK_PTR(source_image);
     SAIL_CHECK_PTR(target_image);
 
-    if (max_colors < 2 || max_colors > 256)
+    /* Determine max_colors based on output pixel format. */
+    unsigned max_colors;
+    switch (output_pixel_format)
     {
-        SAIL_LOG_ERROR("max_colors must be between 2 and 256");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
+        max_colors = 2;
+        break;
+    case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
+        max_colors = 4;
+        break;
+    case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
+        max_colors = 16;
+        break;
+    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
+        max_colors = 256;
+        break;
+    default:
+        SAIL_LOG_ERROR("Output pixel format must be indexed (BPP 1/2/4/8)");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
     wu_state_t* state = NULL;
@@ -864,24 +879,8 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     indexed_image->width  = source_image->width;
     indexed_image->height = source_image->height;
 
-    /* Determine indexed pixel format. */
-    if (state->K <= 2)
-    {
-        indexed_image->pixel_format = SAIL_PIXEL_FORMAT_BPP1_INDEXED;
-    }
-    else if (state->K <= 4)
-    {
-        indexed_image->pixel_format = SAIL_PIXEL_FORMAT_BPP2_INDEXED;
-    }
-    else if (state->K <= 16)
-    {
-        indexed_image->pixel_format = SAIL_PIXEL_FORMAT_BPP4_INDEXED;
-    }
-    else
-    {
-        indexed_image->pixel_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
-    }
-
+    /* Use the requested output pixel format. */
+    indexed_image->pixel_format = output_pixel_format;
     indexed_image->bytes_per_line = sail_bytes_per_line(indexed_image->width, indexed_image->pixel_format);
 
     SAIL_TRY_OR_CLEANUP(

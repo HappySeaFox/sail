@@ -235,15 +235,18 @@ static MunitResult test_indexed_requantization(const MunitParameter params[], vo
     /* Convert to BPP8_INDEXED (256 colors) */
     struct sail_image* indexed256 = NULL;
     munit_assert_int(sail_convert_image(rgb_image, SAIL_PIXEL_FORMAT_BPP8_INDEXED, &indexed256), ==, SAIL_OK);
+    munit_assert_int(indexed256->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP8_INDEXED);
 
     /* Re-quantize to BPP4_INDEXED (16 colors) */
     struct sail_image* indexed16 = NULL;
     munit_assert_int(sail_convert_image(indexed256, SAIL_PIXEL_FORMAT_BPP4_INDEXED, &indexed16), ==, SAIL_OK);
+    munit_assert_int(indexed16->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP4_INDEXED);
     munit_assert_true(indexed16->palette->color_count <= 16);
 
     /* Re-quantize to BPP1_INDEXED (2 colors) */
     struct sail_image* indexed2 = NULL;
     munit_assert_int(sail_convert_image(indexed16, SAIL_PIXEL_FORMAT_BPP1_INDEXED, &indexed2), ==, SAIL_OK);
+    munit_assert_int(indexed2->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP1_INDEXED);
     munit_assert_true(indexed2->palette->color_count <= 2);
 
     /* Cleanup */
@@ -287,12 +290,12 @@ static MunitResult test_floyd_steinberg_dithering(const MunitParameter params[],
 
     /* Quantize without dithering */
     struct sail_image* indexed_no_dither = NULL;
-    munit_assert_int(sail_quantize_image(rgb_image, 16, false, &indexed_no_dither), ==, SAIL_OK);
+    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP4_INDEXED, false, &indexed_no_dither), ==, SAIL_OK);
     munit_assert_int(indexed_no_dither->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP4_INDEXED);
 
     /* Quantize with dithering */
     struct sail_image* indexed_with_dither = NULL;
-    munit_assert_int(sail_quantize_image(rgb_image, 16, true, &indexed_with_dither), ==, SAIL_OK);
+    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP4_INDEXED, true, &indexed_with_dither), ==, SAIL_OK);
     munit_assert_int(indexed_with_dither->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP4_INDEXED);
 
     /* Both should have the same palette size */
@@ -309,15 +312,169 @@ static MunitResult test_floyd_steinberg_dithering(const MunitParameter params[],
     return MUNIT_OK;
 }
 
+/*
+ * Test that output format always matches requested format regardless of color count.
+ * This is the fix for the issue where BPP8_INDEXED was incorrectly converted to
+ * BPP1_INDEXED when the image had few colors.
+ */
+static MunitResult test_output_format_matches_request(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    struct {
+        unsigned color_count;     /* Number of unique colors in test image */
+        const char* description;  /* Test description */
+    } test_images[] = {
+        { 2,   "2 colors (black & white)" },
+        { 3,   "3 colors" },
+        { 5,   "5 colors" },
+        { 8,   "8 colors" },
+        { 15,  "15 colors" },
+        { 20,  "20 colors" },
+        { 100, "100 colors" },
+    };
+
+    enum SailPixelFormat requested_formats[] = {
+        SAIL_PIXEL_FORMAT_BPP1_INDEXED,
+        SAIL_PIXEL_FORMAT_BPP2_INDEXED,
+        SAIL_PIXEL_FORMAT_BPP4_INDEXED,
+        SAIL_PIXEL_FORMAT_BPP8_INDEXED,
+    };
+
+    const char* format_names[] = {
+        "BPP1_INDEXED",
+        "BPP2_INDEXED",
+        "BPP4_INDEXED",
+        "BPP8_INDEXED",
+    };
+
+    unsigned max_colors_for_format[] = { 2, 4, 16, 256 };
+
+    for (unsigned img = 0; img < sizeof(test_images) / sizeof(test_images[0]); img++)
+    {
+        /* Create RGB image with specific number of colors */
+        struct sail_image* rgb_image = NULL;
+        munit_assert_int(sail_alloc_image(&rgb_image), ==, SAIL_OK);
+        rgb_image->width          = 16;
+        rgb_image->height         = 16;
+        rgb_image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
+        rgb_image->bytes_per_line = sail_bytes_per_line(rgb_image->width, rgb_image->pixel_format);
+        munit_assert_int(sail_malloc(rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==, SAIL_OK);
+
+        /* Fill with exactly N colors */
+        unsigned char* pixels = (unsigned char*)rgb_image->pixels;
+        unsigned total_pixels = rgb_image->width * rgb_image->height;
+        for (unsigned i = 0; i < total_pixels; i++)
+        {
+            unsigned color_idx = i % test_images[img].color_count;
+            unsigned y = i / rgb_image->width;
+            unsigned x = i % rgb_image->width;
+            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+
+            /* Generate distinct colors */
+            pixels[idx + 0] = (unsigned char)((color_idx * 50) % 256);       /* R */
+            pixels[idx + 1] = (unsigned char)((color_idx * 100 + 50) % 256); /* G */
+            pixels[idx + 2] = (unsigned char)((color_idx * 150 + 100) % 256); /* B */
+        }
+
+        /* Test quantization to each indexed format */
+        for (unsigned fmt = 0; fmt < sizeof(requested_formats) / sizeof(requested_formats[0]); fmt++)
+        {
+            /* Skip if image has more colors than format can hold */
+            if (test_images[img].color_count > max_colors_for_format[fmt])
+            {
+                continue;
+            }
+
+            struct sail_image* indexed_image = NULL;
+            sail_status_t status = sail_quantize_image(rgb_image, requested_formats[fmt], false, &indexed_image);
+            munit_assert_int(status, ==, SAIL_OK);
+
+            /* The key assertion: output format MUST match requested format */
+            if (indexed_image->pixel_format != requested_formats[fmt])
+            {
+                printf("\nFAILED: Image with %s requested %s but got %s\n",
+                       test_images[img].description,
+                       format_names[fmt],
+                       sail_pixel_format_to_string(indexed_image->pixel_format));
+                sail_destroy_image(indexed_image);
+                sail_destroy_image(rgb_image);
+                munit_assert_int(indexed_image->pixel_format, ==, requested_formats[fmt]);
+            }
+
+            /* Verify palette exists and has reasonable color count */
+            munit_assert_not_null(indexed_image->palette);
+            munit_assert_true(indexed_image->palette->color_count <= max_colors_for_format[fmt]);
+            munit_assert_true(indexed_image->palette->color_count >= 1);
+
+            sail_destroy_image(indexed_image);
+        }
+
+        sail_destroy_image(rgb_image);
+    }
+
+    return MUNIT_OK;
+}
+
+/*
+ * Test edge case: image with 2 colors must still output as BPP8 when requested
+ */
+static MunitResult test_few_colors_bpp8_output(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Create RGB image with only 2 colors (black and white checkerboard) */
+    struct sail_image* rgb_image = NULL;
+    munit_assert_int(sail_alloc_image(&rgb_image), ==, SAIL_OK);
+    rgb_image->width          = 10;
+    rgb_image->height         = 10;
+    rgb_image->pixel_format   = SAIL_PIXEL_FORMAT_BPP24_RGB;
+    rgb_image->bytes_per_line = sail_bytes_per_line(rgb_image->width, rgb_image->pixel_format);
+    munit_assert_int(sail_malloc(rgb_image->bytes_per_line * rgb_image->height, &rgb_image->pixels), ==, SAIL_OK);
+
+    unsigned char* pixels = (unsigned char*)rgb_image->pixels;
+    for (unsigned y = 0; y < rgb_image->height; y++)
+    {
+        for (unsigned x = 0; x < rgb_image->width; x++)
+        {
+            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+            unsigned char color = ((x + y) % 2 == 0) ? 0 : 255;
+            pixels[idx + 0] = color; /* R */
+            pixels[idx + 1] = color; /* G */
+            pixels[idx + 2] = color; /* B */
+        }
+    }
+
+    /* Request BPP8_INDEXED even though image has only 2 colors */
+    struct sail_image* indexed_image = NULL;
+    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP8_INDEXED, false, &indexed_image), ==, SAIL_OK);
+
+    /* Must be BPP8_INDEXED, not BPP1_INDEXED */
+    munit_assert_int(indexed_image->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP8_INDEXED);
+
+    /* Palette should have 2 colors */
+    munit_assert_not_null(indexed_image->palette);
+    munit_assert_int(indexed_image->palette->color_count, ==, 2);
+
+    sail_destroy_image(rgb_image);
+    sail_destroy_image(indexed_image);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest tests[] = {
-    { (char *)"/rgb-to-indexed",            test_rgb_to_indexed_conversion, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-to-rgb",            test_indexed_to_rgb_conversion, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-roundtrip",         test_indexed_roundtrip,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-color-counts",      test_indexed_color_counts,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-requantization",    test_indexed_requantization,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/floyd-steinberg-dithering", test_floyd_steinberg_dithering, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { NULL,                                 NULL,                           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+    { (char *)"/rgb-to-indexed",                  test_rgb_to_indexed_conversion,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-to-rgb",                  test_indexed_to_rgb_conversion,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-roundtrip",               test_indexed_roundtrip,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-color-counts",            test_indexed_color_counts,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-requantization",          test_indexed_requantization,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/floyd-steinberg-dithering",       test_floyd_steinberg_dithering,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/output-format-matches-request",   test_output_format_matches_request,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/few-colors-bpp8-output",          test_few_colors_bpp8_output,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { NULL,                                       NULL,                                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite suite = {

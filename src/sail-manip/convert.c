@@ -2204,27 +2204,6 @@ sail_status_t sail_convert_image_with_options(const struct sail_image* image,
     /* Handle conversion to indexed formats using quantization. */
     if (sail_is_indexed(output_pixel_format))
     {
-        /* Determine max colors based on target format. */
-        unsigned max_colors;
-        switch (output_pixel_format)
-        {
-        case SAIL_PIXEL_FORMAT_BPP1_INDEXED:
-            max_colors = 2;
-            break;
-        case SAIL_PIXEL_FORMAT_BPP2_INDEXED:
-            max_colors = 4;
-            break;
-        case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
-            max_colors = 16;
-            break;
-        case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
-            max_colors = 256;
-            break;
-        default:
-            SAIL_LOG_ERROR("Conversion to %s is not supported", sail_pixel_format_to_string(output_pixel_format));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
-        }
-
         /* For indexed formats, first convert to RGB if needed. */
         struct sail_image* rgb_image = NULL;
 
@@ -2243,7 +2222,7 @@ sail_status_t sail_convert_image_with_options(const struct sail_image* image,
 
         /* Apply quantization with optional dithering. */
         bool dither = (options != NULL && (options->options & SAIL_CONVERSION_OPTION_DITHERING));
-        SAIL_TRY_OR_CLEANUP(sail_quantize_image(rgb_image, max_colors, dither, image_output),
+        SAIL_TRY_OR_CLEANUP(sail_quantize_image(rgb_image, output_pixel_format, dither, image_output),
                             /* cleanup */ sail_destroy_image(rgb_image));
         sail_destroy_image(rgb_image);
 
