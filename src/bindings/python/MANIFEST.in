@@ -1,0 +1,35 @@
+# Include documentation
+include README.md
+include LICENSE
+
+# Include configuration files
+include pyproject.toml
+include setup.py
+include CMakeLists.txt
+
+# Include all C++ source files
+recursive-include src *.cpp *.h *.hpp
+
+# Include test images (if distributing tests)
+recursive-include tests/images *
+
+# Include examples
+recursive-include sailpy/examples *.py *.md
+
+# Include type hints
+include sailpy/py.typed
+recursive-include sailpy *.pyi
+
+# Exclude build artifacts
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.so
+global-exclude *.dll
+global-exclude *.dylib
+global-exclude __pycache__
+prune build
+prune dist
+prune wheelhouse
+prune venv
+prune .pytest_cache
+prune *.egg-info

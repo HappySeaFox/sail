@@ -1,0 +1,95 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel",
+    "pybind11>=2.10.0",
+    "cmake>=3.12",
+    "numpy>=1.20.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sailpy"
+version = "@SAIL_VERSION@"
+description = "Python bindings for SAIL - Squirrel Abstract Imaging Library"
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    {name = "Dzmitry Baryshau", email = "dima8w@gmail.com"}
+]
+license = {text = "MIT"}
+keywords = [
+    "image",
+    "loading",
+    "decoding",
+    "encoding",
+    "jpeg",
+    "png",
+    "webp",
+    "avif",
+    "tiff",
+    "gif",
+    "bmp",
+    "heif",
+    "graphics",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: C",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "black",
+    "mypy",
+    "pillow",
+    "sphinx",
+    "sphinx-rtd-theme",
+]
+
+[project.urls]
+Homepage = "https://sail.software"
+Documentation = "https://sail.software/formats.html"
+Repository = "https://github.com/HappySeaFox/sail"
+Issues = "https://github.com/HappySeaFox/sail/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312']
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["sailpy*"]
+
+[tool.setuptools.package-data]
+"sailpy.examples" = ["*.py", "*.md"]
