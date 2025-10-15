@@ -534,18 +534,17 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_gif(struct sail_io* io,
 {
     *state = NULL;
 
+    /* Check compression. GIF always uses LZW. */
+    if (save_options->compression != SAIL_COMPRESSION_LZW)
+    {
+        SAIL_LOG_ERROR("GIF: Only LZW compression is supported");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
+    }
+
     /* Allocate a new state. */
     struct gif_state* gif_state;
     SAIL_TRY(alloc_gif_state(io, NULL, save_options, &gif_state));
     *state = gif_state;
-
-    /* Check compression. GIF always uses LZW. */
-    if (gif_state->save_options->compression != SAIL_COMPRESSION_LZW
-        && gif_state->save_options->compression != SAIL_COMPRESSION_NONE)
-    {
-        SAIL_LOG_ERROR("GIF: Only LZW and NONE compressions are supported");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
-    }
 
     /* Handle tuning options. */
     if (gif_state->save_options->tuning != NULL)
@@ -564,6 +563,18 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
 {
     struct gif_state* gif_state = state;
 
+    /*
+     * We support BPP8-INDEXED images only. GIF supports more indexed formats, but giflib expects
+     * pixels to occupy exactly 1 byte. I.e. a 1-bit indexed image 100 pixels wide should
+     * occupy 100 bytes per row, not 13. This is what EGifPutLine() expects. SAIL doesn't support
+     * this format, so we don't support other indexed formats.
+     */
+    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP8_INDEXED)
+    {
+        SAIL_LOG_ERROR("GIF: Only BPP8-INDEXED pixel format is supported for saving, got %s",
+                       sail_pixel_format_to_string(image->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
     if (image->palette == NULL)
     {
         SAIL_LOG_ERROR("GIF: Indexed image must have a palette");
@@ -599,14 +610,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
         /* Set GIF version to GIF89a (needed for animation). */
         EGifSetGifVersion(gif_state->gif, true);
 
-        /* Write screen descriptor. */
-        gif_state->gif->SWidth           = image->width;
-        gif_state->gif->SHeight          = image->height;
-        gif_state->gif->SColorResolution = 7;
-        gif_state->gif->SBackGroundColor = gif_state->background_color_index;
-        gif_state->gif->SColorMap        = gif_state->color_map;
-
-        if (EGifPutScreenDesc(gif_state->gif, image->width, image->height, gif_state->gif->SColorResolution,
+        if (EGifPutScreenDesc(gif_state->gif, image->width, image->height, 8,
                               gif_state->background_color_index, gif_state->color_map)
             == GIF_ERROR)
         {
@@ -615,7 +619,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
         }
 
         /* Write NETSCAPE2.0 application extension for looping animation. */
-        unsigned char netscape_ext[12] = "NETSCAPE2.0";
+        unsigned char netscape_ext[] = "NETSCAPE2.0";
         unsigned char netscape_params[3];
         netscape_params[0] = 1;
         netscape_params[1] = (unsigned char)(gif_state->loop_count & 0xFF);
@@ -627,7 +631,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
 
-        if (EGifPutExtensionBlock(gif_state->gif, 11, netscape_ext) == GIF_ERROR)
+        if (EGifPutExtensionBlock(gif_state->gif, sizeof(netscape_ext) - 1, netscape_ext) == GIF_ERROR)
         {
             SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);

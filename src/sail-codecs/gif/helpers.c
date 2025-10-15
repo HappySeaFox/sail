@@ -234,8 +234,8 @@ sail_status_t gif_private_build_color_map(const struct sail_palette* palette,
     }
 
     /* GIF requires power-of-2 palette sizes. */
-    int color_count_pow2 = 2;
-    while (color_count_pow2 < (int)palette_to_use->color_count)
+    unsigned color_count_pow2 = 2;
+    while (color_count_pow2 < palette_to_use->color_count)
     {
         color_count_pow2 *= 2;
     }
@@ -268,7 +268,7 @@ sail_status_t gif_private_build_color_map(const struct sail_palette* palette,
     }
 
     /* Fill remaining colors with black. */
-    for (unsigned i = palette_to_use->color_count; i < (unsigned)color_count_pow2; i++)
+    for (unsigned i = palette_to_use->color_count; i < color_count_pow2; i++)
     {
         (*color_map)->Colors[i].Red   = 0;
         (*color_map)->Colors[i].Green = 0;

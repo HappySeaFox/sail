@@ -16,7 +16,7 @@ tuning=
 
 [save-features]
 features=STATIC;ANIMATED;META-DATA
-pixel-formats=BPP1-INDEXED;BPP2-INDEXED;BPP4-INDEXED;BPP8-INDEXED
+pixel-formats=BPP8-INDEXED
 compressions=LZW
 default-compression=LZW
 compression-level-min=0
