@@ -1299,8 +1299,10 @@ static void help(const char* app)
     fprintf(stderr, "  decode <path>    Decode file and show information for all frames\n\n");
 
     fprintf(stderr, "Options:\n");
-    fprintf(stderr, "  %s -h, --help       Display this help message and exit\n", app);
-    fprintf(stderr, "  %s -v, --version    Display version information and exit\n", app);
+    fprintf(stderr, "  %s -h, --help                Display this help message and exit\n", app);
+    fprintf(stderr, "  %s -v, --version             Display version information and exit\n", app);
+    fprintf(stderr, "  %s -l, --log-level <level>   Set log level: silence, error, warning (default),\n", app);
+    fprintf(stderr, "                                              info, message, debug, trace\n");
 }
 
 int main(int argc, char* argv[])
@@ -1311,20 +1313,59 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)
+    /* Default log level. */
+    enum SailLogLevel log_level = SAIL_LOG_LEVEL_WARNING;
+    int arg_offset = 1;
+
+    /* Check for global options. */
+    while (arg_offset < argc && argv[arg_offset][0] == '-')
+    {
+        if (strcmp(argv[arg_offset], "-h") == 0 || strcmp(argv[arg_offset], "--help") == 0)
+        {
+            help(argv[0]);
+            return 0;
+        }
+
+        if (strcmp(argv[arg_offset], "-v") == 0 || strcmp(argv[arg_offset], "--version") == 0)
+        {
+            fprintf(stderr, "SAIL command-line utility 1.5.0\n");
+            fprintf(stderr, "SAIL library %s\n", SAIL_VERSION_STRING);
+            return 0;
+        }
+
+        if (strcmp(argv[arg_offset], "-l") == 0 || strcmp(argv[arg_offset], "--log-level") == 0)
+        {
+            if (arg_offset == argc - 1)
+            {
+                fprintf(stderr, "Error: Missing log level value.\n");
+                return 1;
+            }
+            enum SailLogLevel parsed_level = sail_log_level_from_string(argv[arg_offset + 1]);
+            if (parsed_level == SAIL_LOG_LEVEL_DEBUG && strcmp(argv[arg_offset + 1], "debug") != 0)
+            {
+                fprintf(stderr, "Error: Unknown log level '%s'\n", argv[arg_offset + 1]);
+                return 1;
+            }
+            log_level = parsed_level;
+            arg_offset += 2;
+            continue;
+        }
+
+        /* Not a global option, must be a command. */
+        break;
+    }
+
+    if (arg_offset >= argc)
     {
         help(argv[0]);
-        return 0;
+        return 1;
     }
 
-    if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0)
-    {
-        fprintf(stderr, "SAIL command-line utility 1.5.0\n");
-        fprintf(stderr, "SAIL library %s\n", SAIL_VERSION_STRING);
-        return 0;
-    }
+    sail_set_log_barrier(log_level);
 
-    sail_set_log_barrier(SAIL_LOG_LEVEL_WARNING);
+    /* Adjust argv to skip processed global options. */
+    argv += arg_offset - 1;
+    argc -= arg_offset - 1;
 
     if (strcmp(argv[1], "convert") == 0)
     {
