@@ -153,7 +153,7 @@ script:
         fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
         cd tests
-        fail_on_error ctest -C $CMAKE_BUILD_TYPE --output-on-failure
+        fail_on_error ctest -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
@@ -175,7 +175,7 @@ script:
         fi
 
         cd tests
-        fail_on_error ctest --output-on-failure
+        fail_on_error ctest --output-on-failure -j$(nproc)
         cd -
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
