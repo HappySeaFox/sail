@@ -152,7 +152,7 @@ if (NOT ${dependency_name}_RELEASE_LIBRARY OR NOT ${dependency_name}_DEBUG_LIBRA
     message(FATAL_ERROR \"Missing dependency: ${dependency_name}\")
 endif()
 
-set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \$<\$<CONFIG:Release>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:Debug>:\${${dependency_name}_DEBUG_LIBRARY}>)
+set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \$<\$<CONFIG:Release>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:RelWithDebInfo>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:Debug>:\${${dependency_name}_DEBUG_LIBRARY}>)
 ")
         else()
             message(FATAL_ERROR "Unsupported dependencies search mechanism '${dependency_search_mechanism}'")
