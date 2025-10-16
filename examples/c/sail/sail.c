@@ -512,7 +512,7 @@ static sail_status_t extract_frames_impl(const char* input,
         }
 
         /* Construct output filename: base-N.ext */
-        char output_filename[512];
+        char output_filename[1024];
         /* Ensure base_name_len doesn't exceed buffer size. */
         size_t safe_base_name_len = base_name_len;
         if (safe_base_name_len > sizeof(output_filename) - 20)
