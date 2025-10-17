@@ -80,12 +80,12 @@ def test_threading_concurrent_image_creation():
 
 
 def test_threading_list_codecs():
-    """Test list_codecs from multiple threads"""
+    """Test CodecInfo.list() from multiple threads"""
     results = []
     lock = threading.Lock()
 
     def list_all():
-        codecs = sailpy.list_codecs()
+        codecs = sailpy.CodecInfo.list()
         with lock:
             results.append(len(codecs))
 

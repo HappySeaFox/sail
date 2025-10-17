@@ -32,7 +32,7 @@ import sailpy
 
 def test_list_codecs():
     """Test listing all available codecs"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
 
     assert len(codecs) > 0
     assert all(isinstance(c, sailpy.CodecInfo) for c in codecs)
@@ -41,7 +41,7 @@ def test_list_codecs():
 
 def test_codec_info_properties():
     """Test CodecInfo properties"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
 
     # Find PNG codec
     png_codec = None
@@ -62,7 +62,7 @@ def test_codec_info_properties():
 
 def test_get_codec_info_by_extension():
     """Test getting codec info by extension"""
-    codec = sailpy.get_codec_info("jpg")
+    codec = sailpy.CodecInfo.from_extension("jpg")
 
     assert codec.is_valid
     assert codec.name == "JPEG"
@@ -71,7 +71,7 @@ def test_get_codec_info_by_extension():
 
 def test_get_codec_info_by_mime_type():
     """Test getting codec info by MIME type"""
-    codec = sailpy.get_codec_info("image/png")
+    codec = sailpy.CodecInfo.from_mime_type("image/png")
 
     assert codec.is_valid
     assert codec.name == "PNG"
@@ -161,14 +161,14 @@ def test_codec_info_mime_types():
 
 def test_get_codec_info_invalid():
     """Test getting codec info with invalid input"""
-    codec = sailpy.get_codec_info("invalid_format_xyz")
+    codec = sailpy.CodecInfo.from_extension("invalid_format_xyz")
 
     assert not codec.is_valid
 
 
 def test_codec_features():
     """Test checking codec features"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
 
     # At least some codecs should support loading
     assert any(c.can_load for c in codecs)

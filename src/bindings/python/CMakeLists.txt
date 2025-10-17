@@ -80,7 +80,6 @@ set(PYTHON_BINDING_SOURCES
     src/core_bindings.cpp
     src/enums_bindings.cpp
     src/image_bindings.cpp
-    src/io_bindings.cpp
     src/log_bindings.cpp
     src/options_bindings.cpp
     src/sail_python.cpp

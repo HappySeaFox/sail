@@ -102,7 +102,7 @@ def test_load_features_to_options():
 
 def test_load_features_all_codecs():
     """Test LoadFeatures for all codecs"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
 
     for codec in codecs:
         if codec.can_load:
@@ -188,7 +188,7 @@ def test_save_features_to_options():
 
 def test_save_features_to_options_all_codecs():
     """Test SaveFeatures.to_options() for ALL saveable codecs - CRITICAL"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
     tested_count = 0
 
     for codec in codecs:
@@ -284,7 +284,7 @@ def test_features_consistency():
 
 def test_compression_level_all_saveable_codecs():
     """Test compression_level for all saveable codecs"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
 
     for codec in codecs:
         if codec.can_save:

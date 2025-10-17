@@ -32,7 +32,6 @@ namespace py = pybind11;
 // Forward declarations for binding functions from other files
 void init_enums(py::module_& m);
 void init_image(py::module_& m);
-void init_io(py::module_& m);
 void init_log(py::module_& m);
 void init_core_classes(py::module_& m);
 void init_options_classes(py::module_& m);
@@ -49,6 +48,5 @@ PYBIND11_MODULE(_libsail, m)
     init_options_classes(m);
     init_codec_info(m);
     init_image(m);
-    init_io(m);
     init_log(m);
 }

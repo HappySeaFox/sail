@@ -214,7 +214,7 @@ def test_format_detection_by_extension():
 
 def test_all_codecs_have_extensions():
     """Test that all codecs have at least one extension"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
 
     for codec in codecs:
         assert len(codec.extensions) > 0, f"Codec {

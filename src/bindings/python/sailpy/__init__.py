@@ -74,8 +74,6 @@ from ._libsail import (
     LoadFeatures,
     SaveFeatures,
     CompressionLevel,
-    list_codecs,
-    get_codec_info,
 
     # Logging
     set_log_barrier,
@@ -126,8 +124,6 @@ __all__ = [
     "LoadFeatures",
     "SaveFeatures",
     "CompressionLevel",
-    "list_codecs",
-    "get_codec_info",
 
     # Logging
     "set_log_barrier",

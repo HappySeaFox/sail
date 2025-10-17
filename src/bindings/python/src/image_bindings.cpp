@@ -153,10 +153,12 @@ void init_image(py::module_& m)
     py::class_<sail::resolution>(m, "Resolution", "Image resolution (DPI)")
         .def(py::init<>())
         .def(py::init<SailResolutionUnit, double, double>(), py::arg("unit"), py::arg("x"), py::arg("y"))
+        .def_property("unit", &sail::resolution::unit, [](sail::resolution& r, SailResolutionUnit unit) { r.set_unit(unit); })
         .def_property("x", &sail::resolution::x, [](sail::resolution& r, double x) { r.set_x(x); })
         .def_property("y", &sail::resolution::y, [](sail::resolution& r, double y) { r.set_y(y); })
         .def("__repr__", [](const sail::resolution& r) {
-            return "Resolution(x=" + std::to_string(r.x()) + ", y=" + std::to_string(r.y()) + ")";
+            return "Resolution(unit=" + std::to_string(static_cast<int>(r.unit())) + 
+                   ", x=" + std::to_string(r.x()) + ", y=" + std::to_string(r.y()) + ")";
         });
 
     // ============================================================================

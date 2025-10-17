@@ -168,29 +168,4 @@ void init_codec_info(py::module_& m)
             return "CodecInfo(name='" + ci.name() + "', version='" + ci.version() + "')";
         });
 
-    // ============================================================================
-    // Utility functions for codec information
-    // ============================================================================
-
-    m.def("list_codecs", &sail::codec_info::list, "Get list of all available codecs");
-
-    m.def(
-        "get_codec_info",
-        [](const std::string& extension_or_mime) -> sail::codec_info {
-            // Try as extension first
-            auto codec = sail::codec_info::from_extension(extension_or_mime);
-            if (codec.is_valid())
-            {
-                return codec;
-            }
-            // Try as MIME type
-            codec = sail::codec_info::from_mime_type(extension_or_mime);
-            if (codec.is_valid())
-            {
-                return codec;
-            }
-            // Return invalid codec
-            return sail::codec_info();
-        },
-        py::arg("extension_or_mime"), "Get codec info by extension or MIME type");
 }

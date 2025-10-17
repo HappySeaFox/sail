@@ -86,7 +86,7 @@ import sailpy
 import numpy as np
 
 # Load an image
-image = sailpy.load_from_file("photo.jpg")
+image = sailpy.Image.from_file("photo.jpg")
 print(f"Size: {image.width}x{image.height}")
 
 # Convert to NumPy array (zero-copy!)
@@ -128,8 +128,10 @@ The package includes comprehensive examples demonstrating various features:
 # View all available examples
 import sailpy.examples
 print(sailpy.examples.__doc__)
+```
 
-# Run examples
+Run examples from command line:
+```bash
 python -m sailpy.examples.01_quickstart
 python -m sailpy.examples.12_image_viewer  # Qt-based image viewer
 ```
@@ -154,7 +156,7 @@ python -m sailpy.examples.12_image_viewer  # Qt-based image viewer
 import sailpy
 
 # Load
-image = sailpy.load_from_file("input.jpg")
+image = sailpy.Image.from_file("input.jpg")
 print(f"Format: {image.pixel_format}")
 print(f"Size: {image.width}x{image.height}")
 
@@ -167,15 +169,10 @@ image.save("output.png")
 ```python
 import sailpy
 
-image = sailpy.load_from_file("input.jpg")
+image = sailpy.Image.from_file("input.jpg")
 
-# Convert to RGB
-image.convert(sailpy.PixelFormat.BPP24_RGB)
-
-# Convert with options
-options = sailpy.ConversionOptions()
-options.background = True
-image.convert(sailpy.PixelFormat.BPP32_RGBA, options)
+# Convert to RGBA
+image.convert(sailpy.PixelFormat.BPP32_RGBA)
 
 image.save("output.png")
 ```
@@ -187,7 +184,7 @@ import sailpy
 import numpy as np
 
 # Load image
-image = sailpy.load_from_file("photo.jpg")
+image = sailpy.Image.from_file("photo.jpg")
 
 # Get NumPy array (zero-copy when possible!)
 pixels = image.to_numpy()
@@ -212,7 +209,7 @@ output_dir = Path("converted")
 output_dir.mkdir(exist_ok=True)
 
 for img_path in input_dir.glob("*.jpg"):
-    image = sailpy.load_from_file(str(img_path))
+    image = sailpy.Image.from_file(str(img_path))
     image.convert(sailpy.PixelFormat.BPP24_RGB)
     image.save(str(output_dir / f"{img_path.stem}.png"))
 ```
@@ -222,13 +219,149 @@ for img_path in input_dir.glob("*.jpg"):
 ```python
 import sailpy
 
-image = sailpy.load_from_file("photo.jpg")
+image = sailpy.Image.from_file("photo.jpg")
 
 print(f"Dimensions: {image.width}x{image.height}")
 print(f"Pixel format: {image.pixel_format}")
 print(f"Bits per pixel: {image.bits_per_pixel}")
-print(f"Is RGB: {image.is_rgb_family()}")
-print(f"Is grayscale: {image.is_grayscale()}")
+print(f"Is RGB: {image.is_rgb_family}")
+print(f"Is grayscale: {image.is_grayscale}")
+```
+
+### Creating Images from Scratch
+
+```python
+import sailpy
+import numpy as np
+
+# Create a new image
+image = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 640, 480)
+
+# Fill with color using NumPy
+pixels = image.to_numpy()
+pixels[:] = [0, 128, 255]  # Blue color
+
+# Or create gradient
+pixels[:, :, 0] = np.linspace(0, 255, 640)  # Red gradient
+
+image.save("created.png")
+```
+
+### Error Handling
+
+```python
+import sailpy
+
+# Check if format is supported before loading
+try:
+    codec = sailpy.CodecInfo.from_path("image.xyz")
+    if not codec.is_valid:
+        print("Format not supported")
+    elif not codec.can_load:
+        print(f"Format {codec.name} cannot load images")
+    else:
+        image = sailpy.Image.from_file("image.xyz")
+except FileNotFoundError:
+    print("File not found")
+except Exception as e:
+    print(f"Error loading image: {e}")
+```
+
+### Multi-Frame Images (Animations)
+
+```python
+import sailpy
+
+# Load animated GIF or multi-page TIFF
+reader = sailpy.ImageReader("animation.gif")
+frames = reader.read_all()
+
+print(f"Total frames: {len(frames)}")
+
+# Process each frame
+for i, frame in enumerate(frames):
+    print(f"Frame {i}: {frame.width}x{frame.height}, delay={frame.delay}ms")
+    # Extract individual frames
+    frame.save(f"frame_{i:03d}.png")
+
+# Or iterate frame by frame (memory efficient)
+reader = sailpy.ImageReader("animation.gif")
+for i, frame in enumerate(reader):
+    print(f"Processing frame {i}")
+    # Process frame...
+
+# Load with custom options
+options = sailpy.LoadOptions()
+reader = sailpy.ImageReader("image.tiff").with_options(options)
+frames = reader.read_all()
+```
+
+### Working with Memory (Bytes)
+
+```python
+import sailpy
+import requests
+
+# Load from HTTP
+response = requests.get("https://example.com/image.jpg")
+image = sailpy.Image.from_bytes(response.content)
+
+# Save to memory
+image_bytes = image.to_bytes("png")
+print(f"PNG size in memory: {len(image_bytes)} bytes")
+
+# Send over network, save to database, etc.
+```
+
+### Image Transformations
+
+```python
+import sailpy
+
+image = sailpy.Image.from_file("photo.jpg")
+
+# Rotate (creates new image)
+rotated = image.rotate_to(sailpy.Orientation.ROTATED_90)
+rotated.save("rotated_90.jpg")
+
+# Mirror (in-place)
+image.mirror(sailpy.Orientation.MIRRORED_HORIZONTALLY)
+image.save("mirrored.jpg")
+
+# Rotate in-place
+image.rotate(sailpy.Orientation.ROTATED_180)
+image.save("rotated_180.jpg")
+
+# Apply EXIF orientation
+if image.source_image and image.source_image.orientation:
+    corrected = image.rotate_to(image.source_image.orientation)
+    corrected.save("corrected.jpg")
+```
+
+### Advanced: Frame-by-Frame Writing
+
+```python
+import sailpy
+
+# Write multi-page TIFF (memory efficient for large datasets)
+writer = sailpy.ImageWriter("document.tiff")
+
+# Optional: Set save options
+options = sailpy.SaveOptions()
+options.compression = sailpy.Compression.DEFLATE
+options.compression_level = 6
+writer = writer.with_options(options)
+
+# Write pages one by one
+for page_num in range(10):
+    # Create or load page
+    page = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 1024, 768)
+    # ... fill page data ...
+
+    writer.write(page)
+
+writer.finish()
+print("Multi-page document created")
 ```
 
 ## API Reference
@@ -261,27 +394,43 @@ Image(pixel_format: PixelFormat, width: int, height: int)  # Create empty
 - `iccp: Iccp` - ICC profile
 - `palette: Palette` - Color palette (for indexed images)
 
+**Properties:**
+- `is_valid: bool` - Check if image is valid
+- `is_rgb_family: bool` - Check if RGB-like format
+- `is_grayscale: bool` - Check if grayscale
+- `is_indexed: bool` - Check if indexed (palette-based)
+
 **Methods:**
-- `is_valid() -> bool` - Check if image is valid
-- `is_rgb_family() -> bool` - Check if RGB-like format
-- `is_grayscale() -> bool` - Check if grayscale
-- `is_indexed() -> bool` - Check if indexed (palette-based)
-- `load(path: str)` - Load from file
-- `save(path: str, options: WriteOptions = None)` - Save to file
+- `from_file(path: str) -> Image` - Load from file (static)
+- `load(path: str)` - Load from file (instance method)
+- `save(path: str, options: SaveOptions = None)` - Save to file
 - `convert(pixel_format: PixelFormat)` - Convert pixel format (in-place)
-- `convert(save_features: SaveFeatures)` - Convert for saving
+- `convert_to(pixel_format: PixelFormat, options: ConversionOptions = None) -> Image` - Convert to new image
+- `rotate(orientation: Orientation)` - Rotate image (in-place)
+- `rotate_to(orientation: Orientation) -> Image` - Rotate to new image
+- `mirror(orientation: Orientation)` - Mirror image (in-place)
 - `to_numpy() -> np.ndarray` - Get NumPy array view (zero-copy when possible)
-- `from_numpy(array: np.ndarray, pixel_format: PixelFormat) -> Image` - Create from NumPy array
+- `from_numpy(array: np.ndarray, pixel_format: PixelFormat) -> Image` - Create from NumPy array (static)
 
 #### `ImageReader`
 
 Low-level interface for reading images with more control.
 
 ```python
+# Basic usage
 reader = ImageReader(path: str)
 frames = reader.read_all()  # Read all frames
 frame = reader.next_frame()  # Read next frame
 reader.stop()  # Stop reading
+
+# With custom options (builder pattern)
+options = LoadOptions()
+reader = ImageReader("image.tiff").with_options(options)
+frames = reader.read_all()
+
+# Force specific codec (for files with wrong/missing extension)
+codec = CodecInfo.from_name("png")
+reader = ImageReader("image.dat").with_codec(codec)
 ```
 
 #### `ImageWriter`
@@ -289,9 +438,21 @@ reader.stop()  # Stop reading
 Low-level interface for writing images with more control.
 
 ```python
+# Basic usage
 writer = ImageWriter(path: str)
-writer.write(image: Image, options: WriteOptions = None)
+writer.write(image: Image)
 writer.finish()
+
+# With save options (builder pattern)
+options = SaveOptions()
+options.compression = Compression.JPEG
+writer = ImageWriter("output.tiff").with_options(options)
+writer.write(image)
+writer.finish()
+
+# Force specific codec (for files with custom extension)
+codec = CodecInfo.from_name("tiff")
+writer = ImageWriter("output.dat").with_codec(codec)
 ```
 
 #### `CodecInfo`
@@ -310,8 +471,11 @@ Information about image format codecs.
 - `version: str` - Codec version
 - `extensions: List[str]` - Supported file extensions
 - `mime_types: List[str]` - Supported MIME types
+- `magic_numbers: List[bytes]` - Magic number patterns
 - `can_load: bool` - Can read images
 - `can_save: bool` - Can write images
+- `is_valid: bool` - Check if codec info is valid
+- `load_features: LoadFeatures` - Supported load features
 - `save_features: SaveFeatures` - Supported save features
 
 ### Enums
@@ -347,15 +511,36 @@ Values: `SILENCE`, `ERROR`, `WARNING`, `INFO`, `DEBUG`, `TRACE`
 
 ### Support Classes
 
-#### `WriteOptions`
+#### `SaveOptions`
 
 Options for saving images.
 
 ```python
-options = WriteOptions()
+options = SaveOptions()
 options.compression = Compression.DEFLATE
 options.compression_level = 6
-options.interlaced = True
+
+# Codec-specific tuning (dict)
+options.tuning["png-filter"] = "paeth"  # PNG: none, sub, up, avg, paeth
+
+# Use with ImageWriter
+writer = ImageWriter("output.png").with_options(options)
+writer.write(image)
+writer.finish()
+```
+
+#### `LoadOptions`
+
+Options for loading images.
+
+```python
+options = LoadOptions()
+# Most codecs don't require load options
+# LoadOptions.tuning is available for codec-specific settings if needed
+
+# Use with ImageReader
+reader = ImageReader("image.tiff").with_options(options)
+frames = reader.read_all()
 ```
 
 #### `Resolution`
@@ -363,10 +548,17 @@ options.interlaced = True
 Image resolution information.
 
 ```python
+# Create and set resolution for an image
 resolution = Resolution()
 resolution.x = 300
 resolution.y = 300
 resolution.unit = ResolutionUnit.INCH
+
+# Assign via property
+image.resolution = resolution
+
+# Access existing resolution
+print(f"DPI: {image.resolution.x}x{image.resolution.y} {image.resolution.unit}")
 ```
 
 #### `MetaData`
@@ -374,29 +566,28 @@ resolution.unit = ResolutionUnit.INCH
 Image metadata container.
 
 ```python
+# Read metadata from loaded image
+image = Image.from_file("photo.jpg")
 meta = image.meta_data
-entries = meta.to_dict()  # Get all metadata
-value = meta.get("Author")  # Get specific entry
-meta.set("Author", "John Doe")  # Set entry
+if meta:
+    print(f"Key: {meta.key()}")
+    value = meta.value  # Property, not method
+    if value.has_string():
+        print(f"Value: {value.to_string()}")
+
+# Create and set metadata
+new_meta = MetaData()
+new_meta.set_key(MetaDataType.ARTIST)
+
+variant = Variant()
+variant.set_string("John Doe")
+new_meta.set_value(variant)
+
+# Add to image
+image.set_meta_data([new_meta])
 ```
 
 ### Functions
-
-#### `load_from_file(path: str) -> Image`
-
-Convenience function to load an image.
-
-#### `save_into_file(image: Image, path: str)`
-
-Convenience function to save an image.
-
-#### `version() -> str`
-
-Get SAIL library version.
-
-#### `version_tuple() -> tuple`
-
-Get version as tuple (major, minor, patch).
 
 #### `set_log_barrier(level: LogLevel)`
 
@@ -406,13 +597,39 @@ Set minimum logging level.
 sailpy.set_log_barrier(sailpy.LogLevel.DEBUG)
 ```
 
+#### `set_logger(callback: Callable)`
+
+Set custom logging callback.
+
+```python
+def my_logger(level, message):
+    print(f"[SAIL {level}] {message}")
+
+sailpy.set_logger(my_logger)
+```
+
+
+### Version Information
+
+```python
+import sailpy
+
+# Get version string
+print(sailpy.__version__)  # e.g., "0.9.10"
+```
+
 ### Example Modules
 
 The `sailpy.examples` package contains working examples:
 
 ```python
+# Find examples location
 import sailpy.examples
-print(sailpy.examples.__path__)  # Find examples location
+print(sailpy.examples.__path__)
+
+# Run programmatically
+from sailpy.examples import example_01_quickstart
+# example_01_quickstart.main()  # If example has main()
 ```
 
 ## Performance
@@ -428,7 +645,7 @@ See [benchmarks](https://github.com/HappySeaFox/sail/blob/master/BENCHMARKS.md) 
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.9+
 - NumPy 1.20+
 
 ## Building from Source

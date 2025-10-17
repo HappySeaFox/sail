@@ -175,7 +175,7 @@ def test_multiframe_write_multiple():
 
 def test_multiframe_codec_features():
     """Test codec feature detection for multi-frame support"""
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
 
     # Find codecs that support multi-frame
     multi_frame_codecs = []
