@@ -38,7 +38,7 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 
 ## Features overview
 
-- [x] Easy-to-use thread-safe C and C++ interfaces
+- [x] Easy-to-use thread-safe C, C++, and Python interfaces
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams (see [custom-io.c](https://github.com/HappySeaFox/sail/blob/607de77843614e2ba873961d36a91256d6f9bf68/tests/sail/custom-io.c))
 - [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
@@ -91,9 +91,10 @@ Time to load and output default pixels (without explicit conversion) was measure
 
 ## Preferred installation method
 
-- Windows: [Conan](https://conan.io/center/recipes/sail), `vcpkg`
-- macOS: [brew](https://formulae.brew.sh/formula/libsail), [Conan](https://conan.io/center/recipes/sail), `vcpkg`
-- Linux: native packages if available, [Conan](https://conan.io/center/recipes/sail), `vcpkg`
+- **Python:** [PyPI](https://pypi.org/project/sailpy/) - `pip install sailpy`
+- **Windows:** [Conan](https://conan.io/center/recipes/sail), `vcpkg`
+- **macOS:** [brew](https://formulae.brew.sh/formula/libsail), [Conan](https://conan.io/center/recipes/sail), `vcpkg`
+- **Linux:** native packages if available, [Conan](https://conan.io/center/recipes/sail), `vcpkg`
 
 See [BUILDING](BUILDING.md).
 
@@ -130,12 +131,31 @@ sail::image image(path);
 // In particular, you can convert it to a different pixel format with image::convert().
 ```
 
+#### Python:
+```python
+import sailpy
+
+image = sailpy.Image.from_file(path)
+
+# Handle the image and its pixels here.
+# Use image.width, image.height, image.bytes_per_line,
+# image.pixel_format, and image.to_numpy() for that.
+#
+# In particular, you can convert it to a different pixel format with image.convert().
+
+# View documentation
+# python -m sailpy --readme
+
+# Run image viewer example
+# python -m sailpy.examples.12_image_viewer
+```
+
 It's pretty easy, isn't it? :smile: See also [FAQ](FAQ.md).
 
 ## Programming languages
 
 **Programming language:** C11<br/>
-**Bindings:** C++11
+**Bindings:** C++11, Python 3.9+
 
 ## Competitors
 
