@@ -1,24 +1,17 @@
+# This file is used for source distributions (sdist) only.
+# Binary wheel content is controlled by pyproject.toml [tool.setuptools.package-data]
+
 # Include documentation
 include README.md
 include LICENSE
 
-# Include configuration files
+# Include configuration files needed for sdist build
 include pyproject.toml
 include setup.py
 include CMakeLists.txt
 
-# Include all C++ source files
+# Include all C++ source files for building from source
 recursive-include src *.cpp *.h *.hpp
-
-# Include test images (if distributing tests)
-recursive-include tests/images *
-
-# Include examples
-recursive-include sailpy/examples *.py *.md
-
-# Include type hints
-include sailpy/py.typed
-recursive-include sailpy *.pyi
 
 # Exclude build artifacts
 global-exclude *.pyc

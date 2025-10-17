@@ -6,21 +6,21 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-# Check if we're in a virtual environment
-if [ -z "${VIRTUAL_ENV:-}" ]; then
-    if [ ! -d "venv" ]; then
-        echo "Creating virtual environment..."
-        python3 -m venv venv
-    fi
+# Set up a virtual environment
+if [ ! -x venv/bin/activate ]; then
+    echo "Creating virtual environment..."
+    python3 -m venv venv
+fi
 
+if [ -z "${VIRTUAL_ENV:-}" ]; then
     echo "Activating existing virtual environment..."
     source venv/bin/activate
     echo
 fi
 
-echo "================================="
-echo " Building Python Wheels for PyPI "
-echo "================================="
+echo "====================================="
+echo "=  Building Python Wheels for PyPI  ="
+echo "====================================="
 echo
 echo "Platform: $(uname -s)"
 echo
@@ -64,9 +64,9 @@ echo "[5/5] Checking wheel..."
 twine check $WHEEL_DIR/*.whl
 
 echo
-echo "==================================="
-echo " ✓ Wheels ready for distribution ✓ "
-echo "==================================="
+echo "====================================="
+echo " ✓  Wheels ready for distribution  ✓ "
+echo "====================================="
 echo
 
 echo "Wheels location: $WHEEL_DIR/"

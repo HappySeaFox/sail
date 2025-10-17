@@ -445,9 +445,8 @@ MIT License - see [LICENSE](https://github.com/HappySeaFox/sail/blob/master/LICE
 
 ## Links
 
-- **Homepage:** https://github.com/HappySeaFox/sail
-- **Documentation:** https://github.com/HappySeaFox/sail/wiki
-- **Issues:** https://github.com/HappySeaFox/sail/issues
+- **Homepage:** https://sail.software
+- **GitHub:** https://github.com/HappySeaFox/sail
 - **PyPI:** https://pypi.org/project/sailpy/
 
 ## Contributing

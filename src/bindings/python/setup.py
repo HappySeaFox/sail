@@ -27,10 +27,25 @@ import sys
 import subprocess
 import multiprocessing
 from pathlib import Path
+import re
 
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
+
+def get_version():
+    """Get version from root CMakeLists.txt."""
+    cmake = Path(__file__).resolve(
+    ).parent.parent.parent.parent / "CMakeLists.txt"
+    if not cmake.exists():
+        raise FileNotFoundError(f"Cannot find SAIL CMakeLists.txt: {cmake}")
+
+    match = re.search(
+        r'project\s*\(\s*SAIL\s+VERSION\s+([\d.]+)', cmake.read_text(), re.I)
+    if match:
+        return match.group(1)
+    else:
+        raise ValueError(f"Cannot find SAIL version in {cmake}")
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -141,6 +156,9 @@ class CMakeBuild(build_ext):
 
 setup(
     name='sailpy',
+    version=get_version(),
+    long_description=Path('README.md').read_text(encoding='utf-8'),
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     include_package_data=True,
     ext_modules=[CMakeExtension('sailpy._libsail')],
