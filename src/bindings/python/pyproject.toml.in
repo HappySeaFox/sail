@@ -10,6 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sailpy"
+version = "@SAIL_VERSION@"
 description = "Python bindings for SAIL - Squirrel Abstract Imaging Library"
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -62,13 +63,10 @@ dev = [
     "black",
     "mypy",
     "pillow",
-    "sphinx",
-    "sphinx-rtd-theme",
 ]
 
 [project.urls]
 Homepage = "https://sail.software"
-Documentation = "https://sail.software/formats.html"
 Repository = "https://github.com/HappySeaFox/sail"
 Issues = "https://github.com/HappySeaFox/sail/issues"
 
