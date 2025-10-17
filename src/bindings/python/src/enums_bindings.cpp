@@ -24,8 +24,8 @@
 */
 
 #include <pybind11/pybind11.h>
-#include <sail-common/common.h>
 #include <sail-c++/sail-c++.h>
+#include <sail-common/common.h>
 
 namespace py = pybind11;
 

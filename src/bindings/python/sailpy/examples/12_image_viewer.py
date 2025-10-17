@@ -178,8 +178,12 @@ class ImageViewer(QMainWindow):
         if not path:
             return
 
-        codec = sailpy.CodecInfo.from_path(path)
-        if not codec.is_valid or not codec.can_load:
+        try:
+            codec = sailpy.CodecInfo.from_path(path)
+            if not codec.can_load:
+                QMessageBox.critical(self, "Error", "SAIL doesn't support loading the selected image format")
+                return
+        except ValueError:
             QMessageBox.critical(self, "Error", "SAIL doesn't support loading the selected image format")
             return
 
@@ -206,6 +210,8 @@ class ImageViewer(QMainWindow):
             else:
                 QMessageBox.critical(self, "Error", "Failed to load the image")
 
+        except FileNotFoundError:
+            QMessageBox.critical(self, "Error", f"File not found: {path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to load image: {e}")
 
@@ -245,7 +251,7 @@ class ImageViewer(QMainWindow):
         try:
             # Get codec from file extension
             codec = sailpy.CodecInfo.from_path(path)
-            if not codec.is_valid or not codec.can_save:
+            if not codec.can_save:
                 QMessageBox.critical(self, "Error", "SAIL doesn't support saving to the selected image format")
                 return
 
@@ -264,6 +270,8 @@ class ImageViewer(QMainWindow):
 
             # Save converted frame
             save_frame.save(path)
+        except ValueError as e:
+            QMessageBox.warning(self, "Unsupported Format", f"Unsupported format: {e}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save: {e}")
 

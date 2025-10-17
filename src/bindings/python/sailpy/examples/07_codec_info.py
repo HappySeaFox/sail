@@ -26,7 +26,7 @@ def main():
     print("EXAMPLE 1: List All Available Codecs")
     print("=" * 70 + "\n")
 
-    codecs = sailpy.list_codecs()
+    codecs = sailpy.CodecInfo.list()
     print(f"Total codecs: {len(codecs)}\n")
 
     for codec in codecs:
@@ -36,7 +36,7 @@ def main():
         if len(codec.extensions) > 3:
             exts += "..."
         print(f"{codec.name:12} v{codec.version:8}  Load:{
-              load} Save:{save}  [{exts}]")
+              load}  Save:{save}  [{exts}]")
 
     print()
 
@@ -45,8 +45,8 @@ def main():
     print("EXAMPLE 2: Find Codec by Extension")
     print("=" * 70 + "\n")
 
-    jpeg_codec = sailpy.get_codec_info("jpg")
-    print(f"JPEG codec (by extension 'jpg'):")
+    jpeg_codec = sailpy.CodecInfo.from_name("JPEG") # case insensitive
+    print(f"JPEG codec (by name 'JPEG'):")
     print(f"  Name: {jpeg_codec.name}")
     print(f"  Extensions: {', '.join(jpeg_codec.extensions)}")
     print(f"  MIME types: {', '.join(jpeg_codec.mime_types)}")
@@ -81,9 +81,17 @@ def main():
             print(f"{codec.name}:")
             print(f"  Load: {'✓' if codec.can_load else '✗'}")
             print(f"  Save: {'✓' if codec.can_save else '✗'}")
+            print(f"  MIME types: {', '.join(codec.mime_types)}")
+            print(f"  Magic numbers: {codec.magic_numbers[0] if codec.magic_numbers else 'none'}")
             print(f"  Extensions: {', '.join(codec.extensions)}")
+
+            if codec.can_save:
+                print(f"  Save pixel formats: {len(codec.save_features.pixel_formats)} formats")
+                print(f"  Save compressions: {', '.join(c.name for c in codec.save_features.compressions)}")
+                print(f"  Save default compression: {codec.save_features.default_compression.name}")
+                print(f"  Compression level: {codec.save_features.compression_level}")
             print()
-        except RuntimeError:
+        except ValueError:
             print(f"{codec_name}: codec not available\n")
 
     print("=" * 70)

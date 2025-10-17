@@ -33,9 +33,9 @@ def show_readme():
     """Show README with examples."""
     try:
         m = metadata('sailpy')
-        body = m.get_body()
-        if body:
-            print(body)
+        description = m.get('Description')
+        if description:
+            print(description)
         else:
             print("No README found in package metadata.")
     except PackageNotFoundError:

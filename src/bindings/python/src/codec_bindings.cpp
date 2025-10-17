@@ -147,16 +147,57 @@ void init_codec_info(py::module_& m)
             "Check if codec can save images")
 
         // Static methods for codec discovery
-        .def_static("from_path", &sail::codec_info::from_path, py::arg("path"), "Find codec by file path extension")
+        .def_static(
+            "from_path",
+            [](const std::string& path) {
+                sail::codec_info codec = sail::codec_info::from_path(path);
+                if (!codec.is_valid())
+                {
+                    PyErr_SetString(PyExc_ValueError, ("No codec found for path: " + path).c_str());
+                    throw py::error_already_set();
+                }
+                return codec;
+            },
+            py::arg("path"), "Find codec by file path extension")
 
-        .def_static("from_extension", &sail::codec_info::from_extension, py::arg("extension"),
-                    "Find codec by file extension (e.g., '.jpg' or 'jpg')")
+        .def_static(
+            "from_extension",
+            [](const std::string& extension) {
+                sail::codec_info codec = sail::codec_info::from_extension(extension);
+                if (!codec.is_valid())
+                {
+                    PyErr_SetString(PyExc_ValueError, ("No codec found for extension: " + extension).c_str());
+                    throw py::error_already_set();
+                }
+                return codec;
+            },
+            py::arg("extension"), "Find codec by file extension (e.g., '.jpg' or 'jpg')")
 
-        .def_static("from_mime_type", &sail::codec_info::from_mime_type, py::arg("mime_type"),
-                    "Find codec by MIME type (e.g., 'image/jpeg')")
+        .def_static(
+            "from_mime_type",
+            [](const std::string& mime_type) {
+                sail::codec_info codec = sail::codec_info::from_mime_type(mime_type);
+                if (!codec.is_valid())
+                {
+                    PyErr_SetString(PyExc_ValueError, ("No codec found for MIME type: " + mime_type).c_str());
+                    throw py::error_already_set();
+                }
+                return codec;
+            },
+            py::arg("mime_type"), "Find codec by MIME type (e.g., 'image/jpeg')")
 
-        .def_static("from_name", &sail::codec_info::from_name, py::arg("name"),
-                    "Find codec by codec name (e.g., 'JPEG' or 'jpeg')")
+        .def_static(
+            "from_name",
+            [](const std::string& name) {
+                sail::codec_info codec = sail::codec_info::from_name(name);
+                if (!codec.is_valid())
+                {
+                    PyErr_SetString(PyExc_ValueError, ("No codec found with name: " + name).c_str());
+                    throw py::error_already_set();
+                }
+                return codec;
+            },
+            py::arg("name"), "Find codec by codec name (e.g., 'JPEG' or 'jpeg')")
 
         .def_static("list", &sail::codec_info::list, "Get list of all available codecs")
 
@@ -167,5 +208,4 @@ void init_codec_info(py::module_& m)
             }
             return "CodecInfo(name='" + ci.name() + "', version='" + ci.version() + "')";
         });
-
 }

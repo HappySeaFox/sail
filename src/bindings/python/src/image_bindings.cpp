@@ -29,6 +29,8 @@
 
 #include <sail-c++/sail-c++.h>
 
+#include <fstream>
+
 namespace py = pybind11;
 
 // Helper to check if pixel format uses 16-bit per channel
@@ -123,6 +125,13 @@ sail::image numpy_to_image(py::array arr, SailPixelFormat pixel_format)
     // Create image
     sail::image img(pixel_format, width, height);
 
+    if (!img.is_valid())
+    {
+        PyErr_SetString(PyExc_ValueError,
+                        "Failed to create image from NumPy array - invalid dimensions or pixel format");
+        throw py::error_already_set();
+    }
+
     // Determine element size
     size_t element_size = 0;
     if (buf.format == py::format_descriptor<uint8_t>::format())
@@ -153,12 +162,13 @@ void init_image(py::module_& m)
     py::class_<sail::resolution>(m, "Resolution", "Image resolution (DPI)")
         .def(py::init<>())
         .def(py::init<SailResolutionUnit, double, double>(), py::arg("unit"), py::arg("x"), py::arg("y"))
-        .def_property("unit", &sail::resolution::unit, [](sail::resolution& r, SailResolutionUnit unit) { r.set_unit(unit); })
+        .def_property("unit", &sail::resolution::unit,
+                      [](sail::resolution& r, SailResolutionUnit unit) { r.set_unit(unit); })
         .def_property("x", &sail::resolution::x, [](sail::resolution& r, double x) { r.set_x(x); })
         .def_property("y", &sail::resolution::y, [](sail::resolution& r, double y) { r.set_y(y); })
         .def("__repr__", [](const sail::resolution& r) {
-            return "Resolution(unit=" + std::to_string(static_cast<int>(r.unit())) + 
-                   ", x=" + std::to_string(r.x()) + ", y=" + std::to_string(r.y()) + ")";
+            return "Resolution(unit=" + std::to_string(static_cast<int>(r.unit())) + ", x=" + std::to_string(r.x())
+                   + ", y=" + std::to_string(r.y()) + ")";
         });
 
     // ============================================================================
@@ -189,11 +199,46 @@ void init_image(py::module_& m)
 
     py::class_<sail::image>(m, "Image", py::buffer_protocol(), "Image representation with direct access to pixel data")
         .def(py::init<>(), "Create an invalid image")
-        .def(py::init<const std::string&>(), py::arg("path"), "Load image from file")
-        .def(py::init<SailPixelFormat, unsigned, unsigned>(), py::arg("pixel_format"), py::arg("width"),
-             py::arg("height"), "Create empty image with specified format and dimensions")
-        .def(py::init<SailPixelFormat, unsigned, unsigned, unsigned>(), py::arg("pixel_format"), py::arg("width"),
-             py::arg("height"), py::arg("bytes_per_line"),
+        .def(py::init([](const std::string& path) {
+                 // Check if file exists first
+                {
+                    std::ifstream file(path);
+                    if (!file.good())
+                    {
+                        PyErr_SetString(PyExc_FileNotFoundError, ("File not found: " + path).c_str());
+                        throw py::error_already_set();
+                    }
+                }
+
+                 sail::image img(path);
+                 if (!img.is_valid())
+                 {
+                     throw std::runtime_error("Failed to load image from: " + path);
+                 }
+                 return img;
+             }),
+             py::arg("path"), "Load image from file")
+        .def(py::init([](SailPixelFormat pixel_format, unsigned width, unsigned height) {
+                 sail::image img(pixel_format, width, height);
+                 if (!img.is_valid())
+                 {
+                     PyErr_SetString(PyExc_ValueError, "Invalid image dimensions or pixel format");
+                     throw py::error_already_set();
+                 }
+                 return img;
+             }),
+             py::arg("pixel_format"), py::arg("width"), py::arg("height"),
+             "Create empty image with specified format and dimensions")
+        .def(py::init([](SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line) {
+                 sail::image img(pixel_format, width, height, bytes_per_line);
+                 if (!img.is_valid())
+                 {
+                     PyErr_SetString(PyExc_ValueError, "Invalid image dimensions, pixel format, or bytes per line");
+                     throw py::error_already_set();
+                 }
+                 return img;
+             }),
+             py::arg("pixel_format"), py::arg("width"), py::arg("height"), py::arg("bytes_per_line"),
              "Create empty image with specified format, dimensions and bytes per line")
 
         // Properties (read-only)
@@ -247,7 +292,25 @@ void init_image(py::module_& m)
 
         // Methods
 
-        .def("load", &sail::image::load, py::arg("path"), "Load image from file")
+        .def("load",
+             [](sail::image& img, const std::string& path) {
+                 // Check if file exists first
+                {
+                    std::ifstream file(path);
+                    if (!file.good())
+                    {
+                        PyErr_SetString(PyExc_FileNotFoundError, ("File not found: " + path).c_str());
+                        throw py::error_already_set();
+                    }
+                }
+
+                 auto status = img.load(path);
+                 if (status != SAIL_OK)
+                 {
+                     throw std::runtime_error("Failed to load image from: " + path);
+                 }
+             },
+             py::arg("path"), "Load image from file")
         .def(
             "save",
             [](sail::image& img, const std::string& path) {
@@ -341,15 +404,45 @@ void init_image(py::module_& m)
              },
              py::arg("save_features"), py::arg("options"), "Convert image to best pixel format for saving with options")
 
-        .def("convert_to", py::overload_cast<SailPixelFormat>(&sail::image::convert_to, py::const_),
+        .def("convert_to",
+             [](const sail::image& img, SailPixelFormat pixel_format) {
+                 sail::image result = img.convert_to(pixel_format);
+                 if (!result.is_valid())
+                 {
+                     throw std::runtime_error("Failed to convert image to specified pixel format");
+                 }
+                 return result;
+             },
              py::arg("pixel_format"), "Convert to specified pixel format and return new image")
         .def("convert_to",
-             py::overload_cast<SailPixelFormat, const sail::conversion_options&>(&sail::image::convert_to, py::const_),
+             [](const sail::image& img, SailPixelFormat pixel_format, const sail::conversion_options& options) {
+                 sail::image result = img.convert_to(pixel_format, options);
+                 if (!result.is_valid())
+                 {
+                     throw std::runtime_error("Failed to convert image with options");
+                 }
+                 return result;
+             },
              py::arg("pixel_format"), py::arg("options"), "Convert to specified pixel format with options and return new image")
-        .def("convert_to", py::overload_cast<const sail::save_features&>(&sail::image::convert_to, py::const_),
+        .def("convert_to",
+             [](const sail::image& img, const sail::save_features& save_features) {
+                 sail::image result = img.convert_to(save_features);
+                 if (!result.is_valid())
+                 {
+                     throw std::runtime_error("Failed to convert image for saving");
+                 }
+                 return result;
+             },
              py::arg("save_features"), "Convert to best pixel format for saving and return new image")
         .def("convert_to",
-             py::overload_cast<const sail::save_features&, const sail::conversion_options&>(&sail::image::convert_to, py::const_),
+             [](const sail::image& img, const sail::save_features& save_features, const sail::conversion_options& options) {
+                 sail::image result = img.convert_to(save_features, options);
+                 if (!result.is_valid())
+                 {
+                     throw std::runtime_error("Failed to convert image for saving with options");
+                 }
+                 return result;
+             },
              py::arg("save_features"), py::arg("options"),
              "Convert to best pixel format for saving with options and return new image")
 
@@ -362,12 +455,35 @@ void init_image(py::module_& m)
              py::overload_cast<const sail::save_features&>(&sail::image::closest_pixel_format, py::const_),
              py::arg("save_features"), "Find closest pixel format from save features")
 
-        .def("mirror", &sail::image::mirror, py::arg("orientation"), "Mirror image horizontally or vertically")
+        .def("mirror",
+             [](sail::image& img, SailOrientation orientation) {
+                 auto status = img.mirror(orientation);
+                 if (status != SAIL_OK)
+                 {
+                     throw std::runtime_error("Failed to mirror image");
+                 }
+             },
+             py::arg("orientation"), "Mirror image horizontally or vertically")
 
-        .def("rotate", &sail::image::rotate, py::arg("angle"),
-             "Rotate image in-place by 90, 180, or 270 degrees clockwise")
-        .def("rotate_to", py::overload_cast<SailOrientation>(&sail::image::rotate_to, py::const_), py::arg("angle"),
-             "Rotate image by 90, 180, or 270 degrees clockwise and return new image")
+        .def("rotate",
+             [](sail::image& img, SailOrientation angle) {
+                 auto status = img.rotate(angle);
+                 if (status != SAIL_OK)
+                 {
+                     throw std::runtime_error("Failed to rotate image");
+                 }
+             },
+             py::arg("angle"), "Rotate image in-place by 90, 180, or 270 degrees clockwise")
+        .def("rotate_to",
+             [](const sail::image& img, SailOrientation angle) {
+                 sail::image result = img.rotate_to(angle);
+                 if (!result.is_valid())
+                 {
+                     throw std::runtime_error("Failed to rotate image");
+                 }
+                 return result;
+             },
+             py::arg("angle"), "Rotate image by 90, 180, or 270 degrees clockwise and return new image")
 
         // NumPy integration
         .def("to_numpy", &image_to_numpy,
@@ -437,6 +553,16 @@ void init_image(py::module_& m)
         .def_static(
             "from_file",
             [](const std::string& path) {
+                // Check if file exists first
+                {
+                    std::ifstream file(path);
+                    if (!file.good())
+                    {
+                        PyErr_SetString(PyExc_FileNotFoundError, ("File not found: " + path).c_str());
+                        throw py::error_already_set();
+                    }
+                }
+
                 sail::image img(path);
                 if (!img.is_valid())
                 {
@@ -473,7 +599,17 @@ void init_image(py::module_& m)
     // ============================================================================
 
     py::class_<sail::image_input>(m, "ImageReader", "Read images with support for animations and multi-page formats")
-        .def(py::init<const std::string&>(), py::arg("path"), "Open image file for reading")
+        .def(py::init([](const std::string& path) {
+                 try
+                 {
+                     return new sail::image_input(path);
+                 }
+                 catch (const std::exception& e)
+                 {
+                     throw std::runtime_error("Failed to open image file for reading: " + path);
+                 }
+             }),
+             py::arg("path"), "Open image file for reading")
         .def(py::init([](py::bytes data) {
                  char* buf_ptr;
                  Py_ssize_t buf_size;
@@ -565,7 +701,16 @@ void init_image(py::module_& m)
             },
             py::arg("path"), "Probe image metadata without loading pixels (static method)")
 
-        .def("finish", &sail::image_input::finish, "Finish reading (file is closed in destructor)")
+        .def(
+            "finish",
+            [](sail::image_input& input) {
+                auto status = input.finish();
+                if (status != SAIL_OK)
+                {
+                    throw std::runtime_error("Failed to finish reading");
+                }
+            },
+            "Finish reading (file is closed in destructor)")
 
         // Options and codec override
         .def(
@@ -590,7 +735,17 @@ void init_image(py::module_& m)
     // ============================================================================
 
     py::class_<sail::image_output>(m, "ImageWriter", "Write images with support for animations and multi-page formats")
-        .def(py::init<const std::string&>(), py::arg("path"), "Open image file for writing")
+        .def(py::init([](const std::string& path) {
+                 try
+                 {
+                     return new sail::image_output(path);
+                 }
+                 catch (const std::exception& e)
+                 {
+                     throw std::runtime_error("Failed to open image file for writing: " + path);
+                 }
+             }),
+             py::arg("path"), "Open image file for writing")
 
         // Context manager (must keep object alive)
         .def(
@@ -628,7 +783,16 @@ void init_image(py::module_& m)
             },
             py::arg("images"), "Write multiple frames/images")
 
-        .def("finish", &sail::image_output::finish, "Finish writing (file is closed in destructor)")
+        .def(
+            "finish",
+            [](sail::image_output& output) {
+                auto status = output.finish();
+                if (status != SAIL_OK)
+                {
+                    throw std::runtime_error("Failed to finish writing");
+                }
+            },
+            "Finish writing (file is closed in destructor)")
 
         // Options and codec override
         .def(

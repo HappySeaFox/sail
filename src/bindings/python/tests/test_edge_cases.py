@@ -34,13 +34,13 @@ import os
 
 def test_edge_nonexistent_file():
     """Test loading from nonexistent file"""
-    with pytest.raises((RuntimeError, MemoryError)):
+    with pytest.raises(FileNotFoundError):
         sailpy.Image.from_file("/nonexistent/path/image.png")
 
 
 def test_edge_invalid_path():
     """Test loading from invalid path"""
-    with pytest.raises((RuntimeError, MemoryError)):
+    with pytest.raises(FileNotFoundError):
         sailpy.Image.from_file("")
 
 
@@ -66,23 +66,23 @@ def test_edge_truncated_data():
 
 def test_edge_zero_dimensions():
     """Test creating image with zero dimensions"""
-    # SAIL may allow creation but image will be invalid
-    img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 0, 0)
-    assert not img.is_valid
+    # Zero dimensions should raise ValueError
+    with pytest.raises(ValueError, match="Invalid image dimensions"):
+        sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 0, 0)
 
 
 def test_edge_zero_width():
     """Test creating image with zero width"""
-    # SAIL may allow creation but image will be invalid
-    img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 0, 10)
-    assert not img.is_valid
+    # Zero width should raise ValueError
+    with pytest.raises(ValueError, match="Invalid image dimensions"):
+        sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 0, 10)
 
 
 def test_edge_zero_height():
     """Test creating image with zero height"""
-    # SAIL may allow creation but image will be invalid
-    img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 10, 0)
-    assert not img.is_valid
+    # Zero height should raise ValueError
+    with pytest.raises(ValueError, match="Invalid image dimensions"):
+        sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 10, 0)
 
 
 def test_edge_huge_dimensions():
@@ -93,9 +93,9 @@ def test_edge_huge_dimensions():
 
 def test_edge_invalid_pixel_format():
     """Test creating image with invalid pixel format"""
-    # PixelFormat.UNKNOWN creates invalid image
-    img = sailpy.Image(sailpy.PixelFormat.UNKNOWN, 10, 10)
-    assert not img.is_valid
+    # PixelFormat.UNKNOWN should raise ValueError
+    with pytest.raises(ValueError, match="Invalid image dimensions"):
+        sailpy.Image(sailpy.PixelFormat.UNKNOWN, 10, 10)
 
 
 def test_edge_save_with_initialized_pixels():
@@ -157,14 +157,14 @@ def test_edge_writer_invalid_path():
 
 def test_edge_codec_info_invalid_extension():
     """Test getting codec info for invalid extension"""
-    codec = sailpy.CodecInfo.from_extension("unknownext")
-    assert not codec.is_valid
+    with pytest.raises(ValueError, match="No codec found for extension"):
+        sailpy.CodecInfo.from_extension("unknownext")
 
 
 def test_edge_codec_info_empty_extension():
     """Test getting codec info for empty extension"""
-    codec = sailpy.CodecInfo.from_extension("")
-    assert not codec.is_valid
+    with pytest.raises(ValueError, match="No codec found for extension"):
+        sailpy.CodecInfo.from_extension("")
 
 
 def test_edge_double_finish():

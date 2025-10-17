@@ -1,6 +1,6 @@
 # sailpy - Python bindings for SAIL
 
-Fast and easy-to-use image decoding library for Python.
+The missing small and fast image decoding library for humans (not for machines).
 
 ## Features
 
@@ -252,19 +252,27 @@ image.save("created.png")
 ```python
 import sailpy
 
+# Error handling with specific exceptions
+try:
+    image = sailpy.Image.from_file("image.xyz")
+except FileNotFoundError:
+    print("File not found")
+except ValueError as e:
+    print(f"Unsupported format or invalid parameters: {e}")
+except Exception as e:
+    print(f"Error loading image: {e}")
+
 # Check if format is supported before loading
 try:
     codec = sailpy.CodecInfo.from_path("image.xyz")
-    if not codec.is_valid:
-        print("Format not supported")
-    elif not codec.can_load:
+    if not codec.can_load:
         print(f"Format {codec.name} cannot load images")
     else:
         image = sailpy.Image.from_file("image.xyz")
+except ValueError:
+    print("Format not supported")
 except FileNotFoundError:
     print("File not found")
-except Exception as e:
-    print(f"Error loading image: {e}")
 ```
 
 ### Multi-Frame Images (Animations)

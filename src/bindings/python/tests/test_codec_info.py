@@ -27,6 +27,7 @@
 Tests for SAIL Python Codec Information
 """
 
+import pytest
 import sailpy
 
 
@@ -161,9 +162,8 @@ def test_codec_info_mime_types():
 
 def test_get_codec_info_invalid():
     """Test getting codec info with invalid input"""
-    codec = sailpy.CodecInfo.from_extension("invalid_format_xyz")
-
-    assert not codec.is_valid
+    with pytest.raises(ValueError, match="No codec found for extension"):
+        sailpy.CodecInfo.from_extension("invalid_format_xyz")
 
 
 def test_codec_features():
