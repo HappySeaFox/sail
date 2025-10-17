@@ -13,11 +13,15 @@ Supports single and multi-frame images with animation playback.
 Requirements:
     pip install PySide6
 
-Controls:
-    - Toolbar buttons or Ctrl+O/S to open/save
-    - Mouse wheel to zoom
-    - Left/Right arrows for frame navigation
-    - ESC to exit
+Keyboard Shortcuts:
+    Ctrl+O          - Open image
+    Ctrl+S          - Save image
+    Ctrl+Q          - Quit
+    +               - Zoom in
+    =               - Reset zoom (100%)
+    -               - Zoom out
+    Left/Right      - Previous/Next frame
+    PageUp/PageDown - Previous/Next frame
 """
 
 import sys
@@ -26,7 +30,7 @@ from pathlib import Path
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QLabel, QFileDialog, QMessageBox, QScrollArea
 )
-from PySide6.QtGui import QPixmap, QImage
+from PySide6.QtGui import QPixmap, QImage, QShortcut, QKeySequence
 from PySide6.QtCore import Qt, QTimer
 
 import sailpy
@@ -84,6 +88,7 @@ class ImageViewer(QMainWindow):
         self.animation_timer.timeout.connect(self.next_frame)
 
         self._create_toolbar()
+        self._create_shortcuts()
 
     def _create_toolbar(self):
         """Create toolbar."""
@@ -97,6 +102,25 @@ class ImageViewer(QMainWindow):
         toolbar.addSeparator()
         toolbar.addAction("◀ Prev", self.prev_frame)
         toolbar.addAction("Next ▶", self.next_frame)
+
+    def _create_shortcuts(self):
+        """Create application-wide keyboard shortcuts."""
+        # File operations
+        QShortcut(QKeySequence("Ctrl+O"), self).activated.connect(self.open_image)
+        QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.save_image)
+        QShortcut(QKeySequence("Ctrl+Q"), self).activated.connect(self.close)
+
+        # Zoom
+        QShortcut(QKeySequence("+"), self).activated.connect(lambda: self.change_zoom(1.25))
+        QShortcut(QKeySequence("="), self).activated.connect(lambda: self.change_zoom(1.0))
+        QShortcut(QKeySequence("-"), self).activated.connect(lambda: self.change_zoom(0.75))
+
+        # Frame navigation
+        QShortcut(QKeySequence("Left"), self).activated.connect(self.prev_frame)
+        QShortcut(QKeySequence("Right"), self).activated.connect(self.next_frame)
+        QShortcut(QKeySequence("PageUp"), self).activated.connect(self.prev_frame)
+        QShortcut(QKeySequence("PageDown"), self).activated.connect(self.next_frame)
+
 
     def update_info_position(self):
         """Update info label position (bottom-left)."""
