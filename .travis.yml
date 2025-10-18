@@ -60,9 +60,13 @@ before_script:
 
       fail_on_error git -C vcpkg pull
       # libheif requires <bit> which is not available in this particular MSVC
+
       # openexr also has some uninvestigated issues
       fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
-                                --clean-buildtrees-after-build
+                                --triplet x64-windows --clean-buildtrees-after-build
+
+      fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
+                                --triplet x64-windows-static --clean-buildtrees-after-build
     ;;
   esac
 
