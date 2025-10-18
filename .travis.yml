@@ -147,9 +147,15 @@ script:
       windows)
         CMAKE_INSTALL_PREFIX="C:/SAIL"
 
+        if [ "$BUILD_SHARED_LIBS" = "ON" ];
+            VCPKG_TARGET_TRIPLET="x64-windows"
+        else
+            VCPKG_TARGET_TRIPLET="x64-windows-static"
+        fi
+
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
                                    -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" \
-                                   -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="x64-windows" ..
+                                   -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" ..
         fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
         cd tests
@@ -188,11 +194,14 @@ script:
     esac
   }
 
-  # DEBUG, SHARED
+  # SHARED
   build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=ON
-  # DEBUG, SHARED, COMBINED
+
+  # SHARED, COMBINED
   build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=ON SAIL_COMBINE_CODECS=ON
-  # DEBUG, STATIC
-  if [ "$TRAVIS_OS_NAME" != "windows" ]; then
-    build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF
-  fi
+
+  # STATIC
+  build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF
+
+  # STATIC, COMBINED
+  build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF SAIL_COMBINE_CODECS=ON
