@@ -513,26 +513,37 @@ static sail_status_t extract_frames_impl(const char* input,
 
         /* Construct output filename: base-N.ext */
         char output_filename[1024];
-        /* Ensure base_name_len doesn't exceed buffer size. */
         size_t safe_base_name_len = base_name_len;
+
         if (safe_base_name_len > sizeof(output_filename) - 20)
         {
             safe_base_name_len = sizeof(output_filename) - 20; /* Reserve space for "-N" and extension */
         }
-        sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len, base_name_start,
-                      frame_count + 1, ext ? ext : "");
+
+        long written = sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len, base_name_start,
+                                     frame_count + 1, ext ? ext : "");
+        if (written < 0 || written >= (long)sizeof(output_filename))
+        {
+            SAIL_LOG_ERROR("Failed to construct path from '%s' and '%s'", input, output_template);
+            sail_destroy_image(image);
+            sail_stop_loading(load_state);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
 
         /* Add directory prefix if present. */
         if (dir_sep)
         {
-            char full_path[1024]; /* Large enough for dir + filename */
+            char full_path[1024];
             size_t dir_len = dir_sep - output_template + 1;
-            /* Ensure dir_len doesn't exceed reasonable size. */
-            if (dir_len > 500)
+
+            written = sail_snprintf(full_path, sizeof(full_path), "%.*s%s", (int)dir_len, output_template, output_filename);
+            if (written < 0 || written >= (long)sizeof(full_path))
             {
-                dir_len = 500;
+                SAIL_LOG_ERROR("Failed to construct path from '%s' and '%s'", output_template, output_filename);
+                sail_destroy_image(image);
+                sail_stop_loading(load_state);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
             }
-            sail_snprintf(full_path, sizeof(full_path), "%.*s%s", (int)dir_len, output_template, output_filename);
             sail_strncpy(output_filename, full_path, sizeof(output_filename));
         }
 
@@ -593,7 +604,6 @@ static sail_status_t extract_frames_impl(const char* input,
         /* Convert to the appropriate pixel format. */
         struct sail_image* image_converted;
 
-        /* If quantization is requested, convert to RGB for quantization input. */
         if (colors > 0)
         {
             if (conversion_options != NULL)
