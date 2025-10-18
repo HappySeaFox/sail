@@ -820,8 +820,8 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
         if (wu_Cut(&cube[next], &cube[i], state))
         {
             /* volume test ensures we won't try to cut one-cell box */
-            vv[next] = (cube[next].vol > 1) ? wu_Var(&cube[next], state) : 0.0;
-            vv[i]    = (cube[i].vol > 1) ? wu_Var(&cube[i], state) : 0.0;
+            vv[next] = (cube[next].vol > 1) ? wu_Var(&cube[next], state) : 0;
+            vv[i]    = (cube[i].vol > 1) ? wu_Var(&cube[i], state) : 0;
         }
         else
         {
@@ -859,9 +859,9 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
         long int weight = wu_Vol(&cube[k], state->wt);
         if (weight)
         {
-            lut_r[k] = wu_Vol(&cube[k], state->mr) / weight;
-            lut_g[k] = wu_Vol(&cube[k], state->mg) / weight;
-            lut_b[k] = wu_Vol(&cube[k], state->mb) / weight;
+            lut_r[k] = (unsigned char)(wu_Vol(&cube[k], state->mr) / weight);
+            lut_g[k] = (unsigned char)(wu_Vol(&cube[k], state->mg) / weight);
+            lut_b[k] = (unsigned char)(wu_Vol(&cube[k], state->mb) / weight);
         }
         else
         {
@@ -907,7 +907,7 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
         {
             for (unsigned int x = 0; x < source_image->width; x++)
             {
-                unsigned char idx = state->Qadd[y * source_image->width + x];
+                unsigned char idx = (unsigned char)state->Qadd[y * source_image->width + x];
                 if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
                 {
                     int byte_idx = y * indexed_image->bytes_per_line + x / 2;
