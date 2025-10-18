@@ -1,7 +1,8 @@
 # Don't use SAIL_CODEC_JPEGXL_REQUIRED_OPTION as it requires CMake 3.18
 #
-find_library(JPEGXL_LIBRARY jxl                 NAMES jxl jxl-static)
+find_library(JPEGXL_LIBRARY         jxl         NAMES jxl jxl-static)
 find_library(JPEGXL_THREADS_LIBRARY jxl_threads NAMES jxl_threads jxl_threads-static)
+find_library(JPEGXL_CMS_LIBRARY     jxl_cms     NAMES jxl_cms jxl_cms-static)
 find_path(JPEGXL_INCLUDE_DIRS jxl/decode.h)
 
 if (NOT JPEGXL_LIBRARY OR NOT JPEGXL_THREADS_LIBRARY OR NOT JPEGXL_INCLUDE_DIRS)
@@ -40,8 +41,11 @@ endif()
 #
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl jxl-static,jxl jxl-static")
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl_threads jxl_threads-static,jxl_threads jxl_threads-static")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl_cms jxl_cms-static,jxl_cms jxl_cms-static,OPTIONAL")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,lcms2,lcms2::lcms2,OPTIONAL")
+
+if (JPEGXL_CMS_LIBRARY)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl_cms jxl_cms-static,jxl_cms jxl_cms-static")
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,lcms2,lcms2::lcms2")
+endif()
 
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,hwy,hwy")
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,brotlidec brotlidec-static,brotlidec brotlidec-static")
