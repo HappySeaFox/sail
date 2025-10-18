@@ -147,7 +147,7 @@ script:
       windows)
         CMAKE_INSTALL_PREFIX="C:/SAIL"
 
-        if [ "$BUILD_SHARED_LIBS" = "ON" ];
+        if [ "$BUILD_SHARED_LIBS" = "ON" ]; then
             VCPKG_TARGET_TRIPLET="x64-windows"
         else
             VCPKG_TARGET_TRIPLET="x64-windows-static"
