@@ -138,7 +138,7 @@ if (NOT BUILD_SHARED_LIBS)
             if (dependency_optional STREQUAL "OPTIONAL")
                 set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_name}
-find_dependency(${dependency_name})
+find_dependency(${dependency_name} CONFIG)
 if (TARGET ${dependency_link_target})
     set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
 endif()
@@ -146,7 +146,7 @@ endif()
             else()
                 set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_name}
-find_dependency(${dependency_name} REQUIRED)
+find_dependency(${dependency_name} CONFIG REQUIRED)
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
 ")
             endif()
