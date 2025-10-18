@@ -128,22 +128,55 @@ if (NOT BUILD_SHARED_LIBS)
         if (dependency_search_mechanism STREQUAL "find_dependency")
             list(GET dependency 1 dependency_name)
             list(GET dependency 2 dependency_link_target)
+            list(LENGTH dependency dependency_length)
+            if (dependency_length GREATER 3)
+                list(GET dependency 3 dependency_optional)
+            else()
+                set(dependency_optional "")
+            endif()
 
-            set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+            if (dependency_optional STREQUAL "OPTIONAL")
+                set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+# ${dependency_name}
+find_dependency(${dependency_name})
+if (TARGET ${dependency_link_target})
+    set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
+endif()
+")
+            else()
+                set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_name}
 find_dependency(${dependency_name} REQUIRED)
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
 ")
+            endif()
         elseif(dependency_search_mechanism STREQUAL "find_library")
             list(GET dependency 1 dependency_release_names)
             list(GET dependency 2 dependency_debug_names)
+            list(LENGTH dependency dependency_length)
+            if (dependency_length GREATER 3)
+                list(GET dependency 3 dependency_optional)
+            else()
+                set(dependency_optional "")
+            endif()
 
             # Get "webp" from "webp libwebp"
             set(dependency_release_names_as_list ${dependency_release_names})
             string(REGEX REPLACE " +" ";" dependency_release_names_as_list ${dependency_release_names_as_list})
             list(GET dependency_release_names_as_list 0 dependency_name)
 
-            set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+            if (dependency_optional STREQUAL "OPTIONAL")
+                set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+# ${dependency_name}
+find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_names})
+find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_names})
+
+if (${dependency_name}_RELEASE_LIBRARY AND ${dependency_name}_DEBUG_LIBRARY)
+    set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \$<\$<CONFIG:Release>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:RelWithDebInfo>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:Debug>:\${${dependency_name}_DEBUG_LIBRARY}>)
+endif()
+")
+            else()
+                set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_name}
 find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_names})
 find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_names})
@@ -154,6 +187,7 @@ endif()
 
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \$<\$<CONFIG:Release>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:RelWithDebInfo>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:Debug>:\${${dependency_name}_DEBUG_LIBRARY}>)
 ")
+            endif()
         else()
             message(FATAL_ERROR "Unsupported dependencies search mechanism '${dependency_search_mechanism}'")
         endif()
