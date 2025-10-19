@@ -51,8 +51,6 @@
 /* Deprecated attribute. */
 #if defined __GNUC__ || defined __clang__
 #define SAIL_DEPRECATED __attribute__((deprecated))
-#elif defined _MSC_VER
-#define SAIL_DEPRECATED __declspec(deprecated)
 #else
 #define SAIL_DEPRECATED
 #endif
