@@ -274,15 +274,21 @@ AVIF, BMP, GIF, HEIF, ICO, JPEG, JPEG2000, PNG, TIFF, and other.
 Use \fBsail list\fR to see all supported formats and their capabilities.
 
 .SH EXIT STATUS
+sail returns 0 on success, or a SAIL error code on failure. Common error codes include:
 .TP
 .B 0
 Success
 .TP
-.B 1
-General error
+.B 3
+SAIL_ERROR_OPEN_FILE - Failed to open file (file not found, permission denied, etc.)
 .TP
 .B 9
-Invalid argument
+SAIL_ERROR_INVALID_ARGUMENT - Invalid command line arguments
+.TP
+.B 51
+SAIL_ERROR_INVALID_IMAGE - Invalid or corrupted image file
+.PP
+For a complete list of SAIL error codes, see the SAIL library documentation.
 
 .SH SEE ALSO
 For more information about SAIL, visit: https://sail.software
