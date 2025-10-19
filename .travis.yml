@@ -66,7 +66,7 @@ before_script:
                                 --triplet x64-windows --clean-buildtrees-after-build
 
       fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
-                                --triplet x64-windows-static-md --clean-buildtrees-after-build
+                                --triplet x64-windows-static --clean-buildtrees-after-build
     ;;
   esac
 
