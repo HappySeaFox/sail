@@ -47,7 +47,7 @@ public:
         sail_destroy_save_options(sail_save_options);
     }
 
-    struct sail_save_options *sail_save_options;
+    struct sail_save_options* sail_save_options;
     sail::tuning tuning;
 };
 
@@ -62,13 +62,13 @@ save_options::save_options(int options)
     set_options(options);
 }
 
-save_options::save_options(const save_options &wo)
+save_options::save_options(const save_options& wo)
     : save_options()
 {
     *this = wo;
 }
 
-save_options& save_options::operator=(const sail::save_options &save_options)
+save_options& save_options::operator=(const sail::save_options& save_options)
 {
     set_options(save_options.options());
     set_compression(save_options.compression());
@@ -78,12 +78,12 @@ save_options& save_options::operator=(const sail::save_options &save_options)
     return *this;
 }
 
-save_options::save_options(sail::save_options &&save_options) noexcept
+save_options::save_options(sail::save_options&& save_options) noexcept
 {
     *this = std::move(save_options);
 }
 
-save_options& save_options::operator=(sail::save_options &&save_options) noexcept
+save_options& save_options::operator=(sail::save_options&& save_options) noexcept
 {
     d = std::move(save_options.d);
 
@@ -134,15 +134,16 @@ void save_options::set_compression_level(double compression_level)
     d->sail_save_options->compression_level = compression_level;
 }
 
-void save_options::set_tuning(const sail::tuning &tuning)
+void save_options::set_tuning(const sail::tuning& tuning)
 {
     d->tuning = tuning;
 }
 
-save_options::save_options(const sail_save_options *wo)
+save_options::save_options(const sail_save_options* wo)
     : save_options()
 {
-    if (wo == nullptr) {
+    if (wo == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::save_options(). The object is untouched");
         return;
     }
@@ -153,11 +154,11 @@ save_options::save_options(const sail_save_options *wo)
     set_tuning(utils_private::to_cpp_tuning(wo->tuning));
 }
 
-sail_status_t save_options::to_sail_save_options(sail_save_options **save_options) const
+sail_status_t save_options::to_sail_save_options(sail_save_options** save_options) const
 {
     SAIL_CHECK_PTR(save_options);
 
-    sail_save_options *save_options_local;
+    sail_save_options* save_options_local;
 
     SAIL_TRY(sail_alloc_save_options(&save_options_local));
 
@@ -176,4 +177,4 @@ sail_status_t save_options::to_sail_save_options(sail_save_options **save_option
     return SAIL_OK;
 }
 
-}
+} // namespace sail

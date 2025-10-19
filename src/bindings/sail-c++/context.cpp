@@ -56,4 +56,4 @@ void context::finish()
     sail_finish();
 }
 
-}
+} // namespace sail

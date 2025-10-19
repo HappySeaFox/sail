@@ -300,10 +300,10 @@ static MunitResult test_float_grayscale_conversion(const MunitParameter params[]
 
     /* Fill with test data */
     uint16_t* pixels = image->pixels;
-    pixels[0] = 0;       /* Black */
-    pixels[1] = 32767;   /* Mid gray */
-    pixels[2] = 65535;   /* White */
-    pixels[3] = 16383;   /* Quarter gray */
+    pixels[0]        = 0;     /* Black */
+    pixels[1]        = 32767; /* Mid gray */
+    pixels[2]        = 65535; /* White */
+    pixels[3]        = 16383; /* Quarter gray */
 
     /* Convert to BPP32_GRAYSCALE_FLOAT */
     struct sail_image* converted_image;
@@ -316,10 +316,10 @@ static MunitResult test_float_grayscale_conversion(const MunitParameter params[]
 
     /* Verify conversion - check that values are in range [0.0, 1.0] */
     float* float_pixels = converted_image->pixels;
-    munit_assert(float_pixels[0] >= 0.0f && float_pixels[0] <= 0.01f);   /* ~0 */
-    munit_assert(float_pixels[1] >= 0.49f && float_pixels[1] <= 0.51f);  /* ~0.5 */
-    munit_assert(float_pixels[2] >= 0.99f && float_pixels[2] <= 1.0f);   /* ~1.0 */
-    munit_assert(float_pixels[3] >= 0.24f && float_pixels[3] <= 0.26f);  /* ~0.25 */
+    munit_assert(float_pixels[0] >= 0.0f && float_pixels[0] <= 0.01f);  /* ~0 */
+    munit_assert(float_pixels[1] >= 0.49f && float_pixels[1] <= 0.51f); /* ~0.5 */
+    munit_assert(float_pixels[2] >= 0.99f && float_pixels[2] <= 1.0f);  /* ~1.0 */
+    munit_assert(float_pixels[3] >= 0.24f && float_pixels[3] <= 0.26f); /* ~0.25 */
 
     sail_destroy_image(image);
     sail_destroy_image(converted_image);
@@ -346,12 +346,12 @@ static MunitResult test_float_rgb_conversion(const MunitParameter params[], void
 
     /* Fill with test data: pure red and pure blue */
     uint8_t* pixels = image->pixels;
-    pixels[0] = 255; /* R */
-    pixels[1] = 0;   /* G */
-    pixels[2] = 0;   /* B */
-    pixels[3] = 0;   /* R */
-    pixels[4] = 0;   /* G */
-    pixels[5] = 255; /* B */
+    pixels[0]       = 255; /* R */
+    pixels[1]       = 0;   /* G */
+    pixels[2]       = 0;   /* B */
+    pixels[3]       = 0;   /* R */
+    pixels[4]       = 0;   /* G */
+    pixels[5]       = 255; /* B */
 
     /* Convert to BPP96_RGB_FLOAT */
     struct sail_image* converted_image;
@@ -362,12 +362,12 @@ static MunitResult test_float_rgb_conversion(const MunitParameter params[], void
 
     /* Verify conversion */
     float* float_pixels = converted_image->pixels;
-    munit_assert(float_pixels[0] >= 0.99f && float_pixels[0] <= 1.0f);  /* R = 1.0 */
-    munit_assert(float_pixels[1] <= 0.01f);                             /* G = 0.0 */
-    munit_assert(float_pixels[2] <= 0.01f);                             /* B = 0.0 */
-    munit_assert(float_pixels[3] <= 0.01f);                             /* R = 0.0 */
-    munit_assert(float_pixels[4] <= 0.01f);                             /* G = 0.0 */
-    munit_assert(float_pixels[5] >= 0.99f && float_pixels[5] <= 1.0f);  /* B = 1.0 */
+    munit_assert(float_pixels[0] >= 0.99f && float_pixels[0] <= 1.0f); /* R = 1.0 */
+    munit_assert(float_pixels[1] <= 0.01f);                            /* G = 0.0 */
+    munit_assert(float_pixels[2] <= 0.01f);                            /* B = 0.0 */
+    munit_assert(float_pixels[3] <= 0.01f);                            /* R = 0.0 */
+    munit_assert(float_pixels[4] <= 0.01f);                            /* G = 0.0 */
+    munit_assert(float_pixels[5] >= 0.99f && float_pixels[5] <= 1.0f); /* B = 1.0 */
 
     sail_destroy_image(image);
     sail_destroy_image(converted_image);
@@ -394,12 +394,12 @@ static MunitResult test_float_to_integer_conversion(const MunitParameter params[
 
     /* Fill with float data */
     float* pixels = image->pixels;
-    pixels[0] = 1.0f;  /* R */
-    pixels[1] = 0.5f;  /* G */
-    pixels[2] = 0.0f;  /* B */
-    pixels[3] = 0.25f; /* R */
-    pixels[4] = 0.75f; /* G */
-    pixels[5] = 1.0f;  /* B */
+    pixels[0]     = 1.0f;  /* R */
+    pixels[1]     = 0.5f;  /* G */
+    pixels[2]     = 0.0f;  /* B */
+    pixels[3]     = 0.25f; /* R */
+    pixels[4]     = 0.75f; /* G */
+    pixels[5]     = 1.0f;  /* B */
 
     /* Convert to BPP24_RGB */
     struct sail_image* converted_image;
@@ -410,12 +410,12 @@ static MunitResult test_float_to_integer_conversion(const MunitParameter params[
 
     /* Verify conversion */
     uint8_t* uint8_pixels = converted_image->pixels;
-    munit_assert_int(uint8_pixels[0], ==, 255); /* R = 1.0 -> 255 */
+    munit_assert_int(uint8_pixels[0], ==, 255);                     /* R = 1.0 -> 255 */
     munit_assert(uint8_pixels[1] >= 127 && uint8_pixels[1] <= 128); /* G = 0.5 -> ~127 */
-    munit_assert_int(uint8_pixels[2], ==, 0);   /* B = 0.0 -> 0 */
+    munit_assert_int(uint8_pixels[2], ==, 0);                       /* B = 0.0 -> 0 */
     munit_assert(uint8_pixels[3] >= 63 && uint8_pixels[3] <= 64);   /* R = 0.25 -> ~64 */
     munit_assert(uint8_pixels[4] >= 191 && uint8_pixels[4] <= 192); /* G = 0.75 -> ~191 */
-    munit_assert_int(uint8_pixels[5], ==, 255); /* B = 1.0 -> 255 */
+    munit_assert_int(uint8_pixels[5], ==, 255);                     /* B = 1.0 -> 255 */
 
     sail_destroy_image(image);
     sail_destroy_image(converted_image);

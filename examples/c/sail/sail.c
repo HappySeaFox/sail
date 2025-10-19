@@ -204,7 +204,7 @@ static sail_status_t convert_impl(const char** inputs,
             }
 
             SAIL_LOG_DEBUG("Processing frame #%d (file #%d, frame #%d)", total_frame_count, file_idx + 1,
-                          file_frame_count);
+                           file_frame_count);
 
             /* Setup conversion options if needed. */
             struct sail_conversion_options* conversion_options = NULL;
@@ -322,7 +322,7 @@ static sail_status_t convert_impl(const char** inputs,
                 }
 
                 SAIL_LOG_DEBUG("Quantizing to %s%s", sail_pixel_format_to_string(indexed_format),
-                              dither ? " with dithering" : "");
+                               dither ? " with dithering" : "");
                 struct sail_image* image_quantized;
                 SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, indexed_format, dither, &image_quantized),
                                     sail_destroy_image(image);

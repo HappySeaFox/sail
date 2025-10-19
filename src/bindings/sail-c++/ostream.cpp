@@ -25,43 +25,43 @@
 
 #include <sail-c++/sail-c++.h>
 
-std::ostream& operator<<(std::ostream &os, SailPixelFormat pixel_format)
+std::ostream& operator<<(std::ostream& os, SailPixelFormat pixel_format)
 {
     os << sail_pixel_format_to_string(pixel_format);
     return os;
 }
 
-std::ostream& operator<<(std::ostream &os, SailChromaSubsampling chroma_subsampling)
+std::ostream& operator<<(std::ostream& os, SailChromaSubsampling chroma_subsampling)
 {
     os << sail_chroma_subsampling_to_string(chroma_subsampling);
     return os;
 }
 
-std::ostream& operator<<(std::ostream &os, SailOrientation orientation)
+std::ostream& operator<<(std::ostream& os, SailOrientation orientation)
 {
     os << sail_orientation_to_string(orientation);
     return os;
 }
 
-std::ostream& operator<<(std::ostream &os, SailCompression compression)
+std::ostream& operator<<(std::ostream& os, SailCompression compression)
 {
     os << sail_compression_to_string(compression);
     return os;
 }
 
-std::ostream& operator<<(std::ostream &os, SailMetaData meta_data)
+std::ostream& operator<<(std::ostream& os, SailMetaData meta_data)
 {
     os << sail_meta_data_to_string(meta_data);
     return os;
 }
 
-std::ostream& operator<<(std::ostream &os, SailResolutionUnit resolution_unit)
+std::ostream& operator<<(std::ostream& os, SailResolutionUnit resolution_unit)
 {
     os << sail_resolution_unit_to_string(resolution_unit);
     return os;
 }
 
-std::ostream& operator<<(std::ostream &os, SailCodecFeature codec_feature)
+std::ostream& operator<<(std::ostream& os, SailCodecFeature codec_feature)
 {
     os << sail_codec_feature_to_string(codec_feature);
     return os;

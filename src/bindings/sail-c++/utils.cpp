@@ -28,7 +28,7 @@
 namespace sail
 {
 
-void print_errno(const char *format)
+void print_errno(const char* format)
 {
     sail_print_errno(format);
 }
@@ -38,24 +38,24 @@ std::uint64_t now()
     return sail_now();
 }
 
-bool path_exists(const std::string &path)
+bool path_exists(const std::string& path)
 {
     return sail_path_exists(path.c_str());
 }
 
-bool is_dir(const std::string &path)
+bool is_dir(const std::string& path)
 {
     return sail_is_dir(path.c_str());
 }
 
-bool is_file(const std::string &path)
+bool is_file(const std::string& path)
 {
     return sail_is_file(path.c_str());
 }
 
-std::string temp_file_path(const std::string &prefix)
+std::string temp_file_path(const std::string& prefix)
 {
-    char* path_c = nullptr;
+    char* path_c      = nullptr;
     auto* real_prefix = prefix.empty() ? "sail-tmp" : prefix.c_str();
 
     SAIL_TRY_OR_EXECUTE(sail_temp_file_path(real_prefix, &path_c),
@@ -67,14 +67,16 @@ std::string temp_file_path(const std::string &prefix)
     return path;
 }
 
-sail_status_t file_size(const std::string &path, size_t *size) {
+sail_status_t file_size(const std::string& path, size_t* size)
+{
 
     SAIL_TRY(sail_file_size(path.c_str(), size));
 
     return SAIL_OK;
 }
 
-sail_status_t read_file_contents(const std::string &path, sail::arbitrary_data *contents) {
+sail_status_t read_file_contents(const std::string& path, sail::arbitrary_data* contents)
+{
 
     SAIL_CHECK_PTR(contents);
 
@@ -87,7 +89,8 @@ sail_status_t read_file_contents(const std::string &path, sail::arbitrary_data *
     return SAIL_OK;
 }
 
-sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail::arbitrary_data *contents) {
+sail_status_t read_io_contents(sail::abstract_io& abstract_io, sail::arbitrary_data* contents)
+{
 
     SAIL_CHECK_PTR(contents);
 
@@ -105,22 +108,19 @@ sail_status_t read_io_contents(sail::abstract_io &abstract_io, sail::arbitrary_d
     return SAIL_OK;
 }
 
-template<>
-SAIL_EXPORT std::uint16_t reverse_bytes<>(std::uint16_t v)
+template <> SAIL_EXPORT std::uint16_t reverse_bytes<>(std::uint16_t v)
 {
     return sail_reverse_uint16(v);
 }
 
-template<>
-SAIL_EXPORT std::uint32_t reverse_bytes<>(std::uint32_t v)
+template <> SAIL_EXPORT std::uint32_t reverse_bytes<>(std::uint32_t v)
 {
     return sail_reverse_uint32(v);
 }
 
-template<>
-SAIL_EXPORT std::uint64_t reverse_bytes<>(std::uint64_t v)
+template <> SAIL_EXPORT std::uint64_t reverse_bytes<>(std::uint64_t v)
 {
     return sail_reverse_uint64(v);
 }
 
-}
+} // namespace sail

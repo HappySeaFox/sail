@@ -39,54 +39,47 @@
 
 #include <sail-manip/sail-manip.h>
 
-//#define SAIL_CODEC_NAME jpeg
-//#include <sail/layout/v8.h>
+// #define SAIL_CODEC_NAME jpeg
+// #include <sail/layout/v8.h>
 
+#include "qimage_sail_pixel_formats.h"
 #include "qtsail.h"
 #include "ui_qtsail.h"
-#include "qimage_sail_pixel_formats.h"
 
-QtSail::QtSail(QWidget *parent)
+QtSail::QtSail(QWidget* parent)
     : QWidget(parent)
 {
     m_ui.reset(new Ui::QtSail);
     m_ui->setupUi(this);
-    QLabel *l = new QLabel;
+    QLabel* l = new QLabel;
     l->setAlignment(Qt::AlignCenter);
     m_ui->scrollArea->setWidget(l);
 
-    connect(m_ui->pushOpen,  &QPushButton::clicked, this, &QtSail::onOpenFile);
-    connect(m_ui->pushSave,  &QPushButton::clicked, this, &QtSail::onSave);
+    connect(m_ui->pushOpen, &QPushButton::clicked, this, &QtSail::onOpenFile);
+    connect(m_ui->pushSave, &QPushButton::clicked, this, &QtSail::onSave);
 }
 
 QtSail::~QtSail()
 {
 }
 
-sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
+sail_status_t QtSail::loadImage(const QString& path, QImage* qimage)
 {
-    struct sail_image *image;
+    struct sail_image* image;
     SAIL_TRY(sail_load_from_file(path.toLocal8Bit(), &image));
 
-    struct sail_image *image_converted;
-    SAIL_TRY_OR_CLEANUP(sail_convert_image(image,
-                                           SAIL_PIXEL_FORMAT_BPP32_RGBA,
-                                           &image_converted),
+    struct sail_image* image_converted;
+    SAIL_TRY_OR_CLEANUP(sail_convert_image(image, SAIL_PIXEL_FORMAT_BPP32_RGBA, &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
     // Construct QImage from the converted image pixels.
     //
-    *qimage = QImage(reinterpret_cast<const uchar *>(image_converted->pixels),
-                     image_converted->width,
-                     image_converted->height,
-                     image_converted->bytes_per_line,
-                     QImage::Format_RGBA8888).copy();
+    *qimage = QImage(reinterpret_cast<const uchar*>(image_converted->pixels), image_converted->width,
+                     image_converted->height, image_converted->bytes_per_line, QImage::Format_RGBA8888)
+                  .copy();
 
-    m_ui->labelStatus->setText(tr("%1  [%2x%3]")
-                                .arg(QFileInfo(path).fileName())
-                                .arg(image_converted->width)
-                                .arg(image_converted->height)
-                                );
+    m_ui->labelStatus->setText(
+        tr("%1  [%2x%3]").arg(QFileInfo(path).fileName()).arg(image_converted->width).arg(image_converted->height));
 
     sail_destroy_image(image_converted);
     sail_destroy_image(image);
@@ -94,19 +87,19 @@ sail_status_t QtSail::loadImage(const QString &path, QImage *qimage)
     return SAIL_OK;
 }
 
-sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
+sail_status_t QtSail::saveImage(const QString& path, const QImage& qimage)
 {
-    const struct sail_codec_info *codec_info;
+    const struct sail_codec_info* codec_info;
     SAIL_TRY(sail_codec_info_from_path(path.toLocal8Bit(), &codec_info));
 
-    struct sail_image *image;
+    struct sail_image* image;
     SAIL_TRY(sail_alloc_image(&image));
 
     image->pixels = malloc(qimage.sizeInBytes());
     memcpy(image->pixels, qimage.bits(), qimage.sizeInBytes());
-    image->width = qimage.width();
-    image->height = qimage.height();
-    image->pixel_format = qImageFormatToSailPixelFormat(qimage.format());
+    image->width          = qimage.width();
+    image->height         = qimage.height();
+    image->pixel_format   = qImageFormatToSailPixelFormat(qimage.format());
     image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
 
     /*
@@ -117,7 +110,7 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
      * You can prepare the image for saving by converting its pixel format on your own,
      * without using sail-manip.
      */
-    struct sail_image *image_converted;
+    struct sail_image* image_converted;
     SAIL_TRY_OR_CLEANUP(sail_convert_image_for_saving(image, codec_info->save_features, &image_converted),
                         /* cleanup */ sail_destroy_image(image));
 
@@ -134,49 +127,47 @@ sail_status_t QtSail::saveImage(const QString &path, const QImage &qimage)
 
 QStringList QtSail::filters() const
 {
-    return QStringList { QStringLiteral("All Files (*.*)") };
+    return QStringList{QStringLiteral("All Files (*.*)")};
 }
 
 void QtSail::onOpenFile()
 {
-    const QString path = QFileDialog::getOpenFileName(this,
-                                                      tr("Select a file"),
-                                                      QString(),
-                                                      filters().join(QStringLiteral(";;")));
+    const QString path =
+        QFileDialog::getOpenFileName(this, tr("Select a file"), QString(), filters().join(QStringLiteral(";;")));
 
-    if (path.isEmpty()) {
+    if (path.isEmpty())
+    {
         return;
     }
 
     sail_status_t res;
 
-    if ((res = loadImage(path, &m_qimage)) == SAIL_OK) {
+    if ((res = loadImage(path, &m_qimage)) == SAIL_OK)
+    {
         fit();
-    } else {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.")
-                              .arg(path)
-                              .arg(res));
+    }
+    else
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.").arg(path).arg(res));
         return;
     }
 }
 
 void QtSail::onSave()
 {
-    const QString path = QFileDialog::getSaveFileName(this,
-                                                      tr("Select a file"),
-                                                      QString(),
-                                                      filters().join(QStringLiteral(";;")));
+    const QString path =
+        QFileDialog::getSaveFileName(this, tr("Select a file"), QString(), filters().join(QStringLiteral(";;")));
 
-    if (path.isEmpty()) {
+    if (path.isEmpty())
+    {
         return;
     }
 
     sail_status_t res;
 
-    if ((res = saveImage(path, m_qimage)) != SAIL_OK) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.")
-                              .arg(path)
-                              .arg(res));
+    if ((res = saveImage(path, m_qimage)) != SAIL_OK)
+    {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.").arg(path).arg(res));
         return;
     }
 
@@ -187,14 +178,16 @@ void QtSail::fit()
 {
     QPixmap pixmap;
 
-    if (m_qimage.width() > m_ui->scrollArea->viewport()->width() ||
-            m_qimage.height() > m_ui->scrollArea->viewport()->height()) {
-        pixmap = QPixmap::fromImage(m_qimage.scaled(m_ui->scrollArea->viewport()->size(),
-                                                     Qt::KeepAspectRatio,
-                                                     Qt::SmoothTransformation));
-    } else {
-        pixmap =  QPixmap::fromImage(m_qimage);
+    if (m_qimage.width() > m_ui->scrollArea->viewport()->width()
+        || m_qimage.height() > m_ui->scrollArea->viewport()->height())
+    {
+        pixmap = QPixmap::fromImage(
+            m_qimage.scaled(m_ui->scrollArea->viewport()->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    else
+    {
+        pixmap = QPixmap::fromImage(m_qimage);
     }
 
-    qobject_cast<QLabel *>(m_ui->scrollArea->widget())->setPixmap(pixmap);
+    qobject_cast<QLabel*>(m_ui->scrollArea->widget())->setPixmap(pixmap);
 }

@@ -290,12 +290,14 @@ static MunitResult test_floyd_steinberg_dithering(const MunitParameter params[],
 
     /* Quantize without dithering */
     struct sail_image* indexed_no_dither = NULL;
-    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP4_INDEXED, false, &indexed_no_dither), ==, SAIL_OK);
+    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP4_INDEXED, false, &indexed_no_dither), ==,
+                     SAIL_OK);
     munit_assert_int(indexed_no_dither->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP4_INDEXED);
 
     /* Quantize with dithering */
     struct sail_image* indexed_with_dither = NULL;
-    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP4_INDEXED, true, &indexed_with_dither), ==, SAIL_OK);
+    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP4_INDEXED, true, &indexed_with_dither), ==,
+                     SAIL_OK);
     munit_assert_int(indexed_with_dither->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP4_INDEXED);
 
     /* Both should have the same palette size */
@@ -322,17 +324,18 @@ static MunitResult test_output_format_matches_request(const MunitParameter param
     (void)params;
     (void)user_data;
 
-    struct {
-        unsigned color_count;     /* Number of unique colors in test image */
-        const char* description;  /* Test description */
+    struct
+    {
+        unsigned color_count;    /* Number of unique colors in test image */
+        const char* description; /* Test description */
     } test_images[] = {
-        { 2,   "2 colors (black & white)" },
-        { 3,   "3 colors" },
-        { 5,   "5 colors" },
-        { 8,   "8 colors" },
-        { 15,  "15 colors" },
-        { 20,  "20 colors" },
-        { 100, "100 colors" },
+        {2, "2 colors (black & white)"},
+        {3, "3 colors"},
+        {5, "5 colors"},
+        {8, "8 colors"},
+        {15, "15 colors"},
+        {20, "20 colors"},
+        {100, "100 colors"},
     };
 
     enum SailPixelFormat requested_formats[] = {
@@ -349,7 +352,7 @@ static MunitResult test_output_format_matches_request(const MunitParameter param
         "BPP8_INDEXED",
     };
 
-    unsigned max_colors_for_format[] = { 2, 4, 16, 256 };
+    unsigned max_colors_for_format[] = {2, 4, 16, 256};
 
     for (unsigned img = 0; img < sizeof(test_images) / sizeof(test_images[0]); img++)
     {
@@ -368,13 +371,13 @@ static MunitResult test_output_format_matches_request(const MunitParameter param
         for (unsigned i = 0; i < total_pixels; i++)
         {
             unsigned color_idx = i % test_images[img].color_count;
-            unsigned y = i / rgb_image->width;
-            unsigned x = i % rgb_image->width;
-            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+            unsigned y         = i / rgb_image->width;
+            unsigned x         = i % rgb_image->width;
+            unsigned idx       = (y * rgb_image->bytes_per_line) + (x * 3);
 
             /* Generate distinct colors */
-            pixels[idx + 0] = (unsigned char)((color_idx * 50) % 256);       /* R */
-            pixels[idx + 1] = (unsigned char)((color_idx * 100 + 50) % 256); /* G */
+            pixels[idx + 0] = (unsigned char)((color_idx * 50) % 256);        /* R */
+            pixels[idx + 1] = (unsigned char)((color_idx * 100 + 50) % 256);  /* G */
             pixels[idx + 2] = (unsigned char)((color_idx * 150 + 100) % 256); /* B */
         }
 
@@ -394,10 +397,8 @@ static MunitResult test_output_format_matches_request(const MunitParameter param
             /* The key assertion: output format MUST match requested format */
             if (indexed_image->pixel_format != requested_formats[fmt])
             {
-                printf("\nFAILED: Image with %s requested %s but got %s\n",
-                       test_images[img].description,
-                       format_names[fmt],
-                       sail_pixel_format_to_string(indexed_image->pixel_format));
+                printf("\nFAILED: Image with %s requested %s but got %s\n", test_images[img].description,
+                       format_names[fmt], sail_pixel_format_to_string(indexed_image->pixel_format));
                 sail_destroy_image(indexed_image);
                 sail_destroy_image(rgb_image);
                 munit_assert_int(indexed_image->pixel_format, ==, requested_formats[fmt]);
@@ -439,17 +440,18 @@ static MunitResult test_few_colors_bpp8_output(const MunitParameter params[], vo
     {
         for (unsigned x = 0; x < rgb_image->width; x++)
         {
-            unsigned idx = (y * rgb_image->bytes_per_line) + (x * 3);
+            unsigned idx        = (y * rgb_image->bytes_per_line) + (x * 3);
             unsigned char color = ((x + y) % 2 == 0) ? 0 : 255;
-            pixels[idx + 0] = color; /* R */
-            pixels[idx + 1] = color; /* G */
-            pixels[idx + 2] = color; /* B */
+            pixels[idx + 0]     = color; /* R */
+            pixels[idx + 1]     = color; /* G */
+            pixels[idx + 2]     = color; /* B */
         }
     }
 
     /* Request BPP8_INDEXED even though image has only 2 colors */
     struct sail_image* indexed_image = NULL;
-    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP8_INDEXED, false, &indexed_image), ==, SAIL_OK);
+    munit_assert_int(sail_quantize_image(rgb_image, SAIL_PIXEL_FORMAT_BPP8_INDEXED, false, &indexed_image), ==,
+                     SAIL_OK);
 
     /* Must be BPP8_INDEXED, not BPP1_INDEXED */
     munit_assert_int(indexed_image->pixel_format, ==, SAIL_PIXEL_FORMAT_BPP8_INDEXED);

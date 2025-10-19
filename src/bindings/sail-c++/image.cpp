@@ -50,7 +50,8 @@ public:
 
     ~pimpl()
     {
-        if (shallow_pixels) {
+        if (shallow_pixels)
+        {
             sail_image->pixels = nullptr;
         }
 
@@ -59,7 +60,8 @@ public:
 
     void reset_pixels()
     {
-        if (!shallow_pixels) {
+        if (!shallow_pixels)
+        {
             sail_free(sail_image->pixels);
         }
 
@@ -68,7 +70,7 @@ public:
         shallow_pixels     = false;
     }
 
-    struct sail_image *sail_image;
+    struct sail_image* sail_image;
     sail::resolution resolution;
     sail::palette palette;
     std::vector<sail::meta_data> meta_data;
@@ -83,7 +85,7 @@ image::image()
 {
 }
 
-image::image(const std::string &path)
+image::image(const std::string& path)
     : image()
 {
     load(path);
@@ -115,7 +117,7 @@ image::image(SailPixelFormat pixel_format, unsigned width, unsigned height, unsi
                         /* on error */ throw std::bad_alloc());
 }
 
-image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height)
+image::image(void* pixels, SailPixelFormat pixel_format, unsigned width, unsigned height)
     : image()
 {
     set_dimensions(width, height);
@@ -124,7 +126,7 @@ image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigne
     set_shallow_pixels(pixels);
 }
 
-image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line)
+image::image(void* pixels, SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line)
     : image()
 {
     set_dimensions(width, height);
@@ -133,13 +135,13 @@ image::image(void *pixels, SailPixelFormat pixel_format, unsigned width, unsigne
     set_shallow_pixels(pixels);
 }
 
-image::image(const image &img)
+image::image(const image& img)
     : image()
 {
     *this = img;
 }
 
-image& image::operator=(const sail::image &image)
+image& image::operator=(const sail::image& image)
 {
     set_dimensions(image.width(), image.height());
     set_bytes_per_line(image.bytes_per_line());
@@ -156,12 +158,12 @@ image& image::operator=(const sail::image &image)
     return *this;
 }
 
-image::image(sail::image &&image) noexcept
+image::image(sail::image&& image) noexcept
 {
     *this = std::move(image);
 }
 
-image& image::operator=(sail::image &&image) noexcept
+image& image::operator=(sail::image&& image) noexcept
 {
     d = std::move(image.d);
 
@@ -174,8 +176,9 @@ image::~image()
 
 bool image::is_valid() const
 {
-    return d->sail_image != nullptr && d->sail_image->width > 0 && d->sail_image->height > 0 && d->sail_image->bytes_per_line > 0 &&
-            d->sail_image->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN && d->sail_image->pixels != nullptr;
+    return d->sail_image != nullptr && d->sail_image->width > 0 && d->sail_image->height > 0
+           && d->sail_image->bytes_per_line > 0 && d->sail_image->pixel_format != SAIL_PIXEL_FORMAT_UNKNOWN
+           && d->sail_image->pixels != nullptr;
 }
 
 bool image::is_indexed() const
@@ -275,12 +278,12 @@ const void* image::pixels() const
 
 void* image::scan_line(unsigned i)
 {
-    return reinterpret_cast<char *>(pixels()) + i * bytes_per_line();
+    return reinterpret_cast<char*>(pixels()) + i * bytes_per_line();
 }
 
 const void* image::scan_line(unsigned i) const
 {
-    return reinterpret_cast<const char *>(pixels()) + i * bytes_per_line();
+    return reinterpret_cast<const char*>(pixels()) + i * bytes_per_line();
 }
 
 std::size_t image::pixels_size() const
@@ -288,12 +291,12 @@ std::size_t image::pixels_size() const
     return d->pixels_size;
 }
 
-void image::set_resolution(const sail::resolution &resolution)
+void image::set_resolution(const sail::resolution& resolution)
 {
     d->resolution = resolution;
 }
 
-void image::set_resolution(sail::resolution &&resolution) noexcept
+void image::set_resolution(sail::resolution&& resolution) noexcept
 {
     d->resolution = std::move(resolution);
 }
@@ -308,38 +311,37 @@ void image::set_delay(int delay)
     d->sail_image->delay = delay;
 }
 
-void image::set_palette(const sail::palette &palette)
+void image::set_palette(const sail::palette& palette)
 {
     d->palette = palette;
 }
 
-void image::set_palette(sail::palette &&palette) noexcept
+void image::set_palette(sail::palette&& palette) noexcept
 {
     d->palette = std::move(palette);
 }
 
-void image::set_meta_data(const std::vector<sail::meta_data> &meta_data)
+void image::set_meta_data(const std::vector<sail::meta_data>& meta_data)
 {
     d->meta_data = meta_data;
 }
 
-void image::set_meta_data(std::vector<sail::meta_data> &&meta_data) noexcept
+void image::set_meta_data(std::vector<sail::meta_data>&& meta_data) noexcept
 {
     d->meta_data = std::move(meta_data);
 }
 
-void image::set_iccp(const sail::iccp &iccp)
+void image::set_iccp(const sail::iccp& iccp)
 {
     d->iccp = iccp;
 }
 
-void image::set_iccp(sail::iccp &&iccp) noexcept
+void image::set_iccp(sail::iccp&& iccp) noexcept
 {
     d->iccp = std::move(iccp);
 }
 
-
-sail_status_t image::load(const std::string &path)
+sail_status_t image::load(const std::string& path)
 {
     image_input input(path);
 
@@ -351,7 +353,7 @@ sail_status_t image::load(const std::string &path)
     return SAIL_OK;
 }
 
-sail_status_t image::save(const std::string &path)
+sail_status_t image::save(const std::string& path)
 {
     image_output output(path);
 
@@ -362,42 +364,45 @@ sail_status_t image::save(const std::string &path)
 
 bool image::can_convert(SailPixelFormat pixel_format)
 {
-    if (!is_valid()) {
+    if (!is_valid())
+    {
         return false;
     }
 
     return sail_can_convert(d->sail_image->pixel_format, pixel_format);
 }
 
-sail_status_t image::convert(SailPixelFormat pixel_format) {
+sail_status_t image::convert(SailPixelFormat pixel_format)
+{
 
     SAIL_TRY(convert(pixel_format, conversion_options{}));
 
     return SAIL_OK;
 }
 
-sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_options &options) {
+sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_options& options)
+{
 
-    if (!is_valid()) {
+    if (!is_valid())
+    {
         SAIL_LOG_ERROR("Conversion failed as the input image is invalid");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
-    sail_conversion_options *sail_conversion_options = nullptr;
-    sail_image *sail_img = nullptr;
+    sail_conversion_options* sail_conversion_options = nullptr;
+    sail_image* sail_img                             = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(
-        if (sail_img != nullptr) {
-            if (sail_img->palette != nullptr) {
-                sail_img->palette->data = nullptr;
-            }
-
-            sail_img->pixels = nullptr;
-            sail_destroy_image(sail_img);
+    SAIL_AT_SCOPE_EXIT(if (sail_img != nullptr) {
+        if (sail_img->palette != nullptr)
+        {
+            sail_img->palette->data = nullptr;
         }
 
-        sail_destroy_conversion_options(sail_conversion_options);
-    );
+        sail_img->pixels = nullptr;
+        sail_destroy_image(sail_img);
+    }
+
+                       sail_destroy_conversion_options(sail_conversion_options););
 
     SAIL_TRY(options.to_sail_conversion_options(&sail_conversion_options));
 
@@ -409,15 +414,16 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
     sail_img->pixel_format   = d->sail_image->pixel_format;
     sail_img->pixels         = d->sail_image->pixels;
 
-    if (d->palette.is_valid()) {
+    if (d->palette.is_valid())
+    {
         SAIL_TRY(sail_alloc_palette(&sail_img->palette));
 
-        sail_img->palette->data         = const_cast<void *>(reinterpret_cast<const void *>(d->palette.data().data()));
+        sail_img->palette->data         = const_cast<void*>(reinterpret_cast<const void*>(d->palette.data().data()));
         sail_img->palette->color_count  = d->palette.color_count();
         sail_img->palette->pixel_format = d->palette.pixel_format();
     }
 
-    sail_image *sail_image_output = nullptr;
+    sail_image* sail_image_output = nullptr;
     SAIL_TRY(sail_convert_image_with_options(sail_img, pixel_format, sail_conversion_options, &sail_image_output));
 
     d->reset_pixels();
@@ -425,14 +431,17 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
     d->sail_image->bytes_per_line = sail_image_output->bytes_per_line;
     d->sail_image->pixel_format   = sail_image_output->pixel_format;
     d->sail_image->pixels         = sail_image_output->pixels;
-    d->pixels_size                = static_cast<std::size_t>(sail_image_output->height) * sail_image_output->bytes_per_line;
-    d->shallow_pixels             = false;
+    d->pixels_size    = static_cast<std::size_t>(sail_image_output->height) * sail_image_output->bytes_per_line;
+    d->shallow_pixels = false;
 
     // Copy palette if present (indexed formats)
-    if (sail_image_output->palette != nullptr) {
-        d->palette = sail::palette(sail_image_output->palette);
+    if (sail_image_output->palette != nullptr)
+    {
+        d->palette                       = sail::palette(sail_image_output->palette);
         sail_image_output->palette->data = nullptr; // Prevent double-free
-    } else {
+    }
+    else
+    {
         d->palette = sail::palette();
     }
 
@@ -442,65 +451,73 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
     return SAIL_OK;
 }
 
-sail_status_t image::convert(const sail::save_features &save_features) {
+sail_status_t image::convert(const sail::save_features& save_features)
+{
 
     SAIL_TRY(convert(save_features, conversion_options{}));
 
     return SAIL_OK;
 }
 
-sail_status_t image::convert(const sail::save_features &save_features, const conversion_options &options) {
+sail_status_t image::convert(const sail::save_features& save_features, const conversion_options& options)
+{
 
-    if (!is_valid()) {
+    if (!is_valid())
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SailPixelFormat best_pixel_format = closest_pixel_format(d->sail_image->pixel_format, save_features);
 
-    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", sail_pixel_format_to_string(d->sail_image->pixel_format));
+    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN)
+    {
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image",
+                       sail_pixel_format_to_string(d->sail_image->pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    if (best_pixel_format == d->sail_image->pixel_format) {
+    if (best_pixel_format == d->sail_image->pixel_format)
+    {
         return SAIL_OK;
-    } else {
+    }
+    else
+    {
         SAIL_TRY(convert(best_pixel_format, options));
     }
 
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image *image) const
+sail_status_t image::convert_to(SailPixelFormat pixel_format, sail::image* image) const
 {
     SAIL_TRY(convert_to(pixel_format, conversion_options{}, image));
 
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_options &options, sail::image *image) const
+sail_status_t image::convert_to(SailPixelFormat pixel_format,
+                                const conversion_options& options,
+                                sail::image* image) const
 {
     SAIL_CHECK_PTR(image);
 
-    if (!is_valid()) {
+    if (!is_valid())
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
-    sail_conversion_options *sail_conversion_options = nullptr;
+    sail_conversion_options* sail_conversion_options = nullptr;
 
-    sail_image *sail_img;
+    sail_image* sail_img;
     SAIL_TRY(to_sail_image(&sail_img));
 
-    SAIL_AT_SCOPE_EXIT(
-        sail_img->pixels = nullptr;
-        sail_destroy_image(sail_img);
+    SAIL_AT_SCOPE_EXIT(sail_img->pixels = nullptr; sail_destroy_image(sail_img);
 
-        sail_destroy_conversion_options(sail_conversion_options);
-    );
+                       sail_destroy_conversion_options(sail_conversion_options););
 
     SAIL_TRY(options.to_sail_conversion_options(&sail_conversion_options));
 
-    sail_image *sail_image_output = nullptr;
+    sail_image* sail_image_output = nullptr;
     SAIL_TRY(sail_convert_image_with_options(sail_img, pixel_format, sail_conversion_options, &sail_image_output));
 
     *image = sail::image(sail_image_output);
@@ -511,30 +528,38 @@ sail_status_t image::convert_to(SailPixelFormat pixel_format, const conversion_o
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(const sail::save_features &save_features, sail::image *image) const
+sail_status_t image::convert_to(const sail::save_features& save_features, sail::image* image) const
 {
     SAIL_TRY(convert_to(save_features, conversion_options{}, image));
 
     return SAIL_OK;
 }
 
-sail_status_t image::convert_to(const sail::save_features &save_features, const conversion_options &options, sail::image *image) const
+sail_status_t image::convert_to(const sail::save_features& save_features,
+                                const conversion_options& options,
+                                sail::image* image) const
 {
-    if (!is_valid()) {
+    if (!is_valid())
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     SailPixelFormat best_pixel_format = closest_pixel_format(d->sail_image->pixel_format, save_features);
 
-    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN) {
-        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image", sail_pixel_format_to_string(d->sail_image->pixel_format));
+    if (best_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN)
+    {
+        SAIL_LOG_ERROR("Failed to find the best output format for saving %s image",
+                       sail_pixel_format_to_string(d->sail_image->pixel_format));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    if (best_pixel_format == d->sail_image->pixel_format) {
+    if (best_pixel_format == d->sail_image->pixel_format)
+    {
         *image = *this;
         return SAIL_OK;
-    } else {
+    }
+    else
+    {
         SAIL_TRY(convert_to(best_pixel_format, options, image));
     }
 
@@ -550,7 +575,7 @@ image image::convert_to(SailPixelFormat pixel_format) const
     return img;
 }
 
-image image::convert_to(SailPixelFormat pixel_format, const conversion_options &options) const
+image image::convert_to(SailPixelFormat pixel_format, const conversion_options& options) const
 {
     image img;
     SAIL_TRY_OR_EXECUTE(convert_to(pixel_format, options, &img),
@@ -559,7 +584,7 @@ image image::convert_to(SailPixelFormat pixel_format, const conversion_options &
     return img;
 }
 
-image image::convert_to(const sail::save_features &save_features) const
+image image::convert_to(const sail::save_features& save_features) const
 {
     image img;
     SAIL_TRY_OR_EXECUTE(convert_to(save_features, conversion_options{}, &img),
@@ -568,7 +593,7 @@ image image::convert_to(const sail::save_features &save_features) const
     return img;
 }
 
-image image::convert_to(const sail::save_features &save_features, const conversion_options &options) const
+image image::convert_to(const sail::save_features& save_features, const conversion_options& options) const
 {
     image img;
     SAIL_TRY_OR_EXECUTE(convert_to(save_features, options, &img),
@@ -577,14 +602,15 @@ image image::convert_to(const sail::save_features &save_features, const conversi
     return img;
 }
 
-SailPixelFormat image::closest_pixel_format(const std::vector<SailPixelFormat> &pixel_formats) const
+SailPixelFormat image::closest_pixel_format(const std::vector<SailPixelFormat>& pixel_formats) const
 {
     return sail_closest_pixel_format(d->sail_image->pixel_format, pixel_formats.data(), pixel_formats.size());
 }
 
-SailPixelFormat image::closest_pixel_format(const sail::save_features &save_features) const
+SailPixelFormat image::closest_pixel_format(const sail::save_features& save_features) const
 {
-    return sail_closest_pixel_format(d->sail_image->pixel_format, save_features.pixel_formats().data(), save_features.pixel_formats().size());
+    return sail_closest_pixel_format(d->sail_image->pixel_format, save_features.pixel_formats().data(),
+                                     save_features.pixel_formats().size());
 }
 
 sail_status_t image::mirror(SailOrientation orientation)
@@ -608,19 +634,17 @@ sail_status_t image::rotate_to(SailOrientation angle, sail::image* image) const
 {
     SAIL_CHECK_PTR(image);
 
-    if (!is_valid()) {
+    if (!is_valid())
+    {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
-    sail_image *sail_img;
+    sail_image* sail_img;
     SAIL_TRY(to_sail_image(&sail_img));
 
-    SAIL_AT_SCOPE_EXIT(
-        sail_img->pixels = nullptr;
-        sail_destroy_image(sail_img);
-    );
+    SAIL_AT_SCOPE_EXIT(sail_img->pixels = nullptr; sail_destroy_image(sail_img););
 
-    sail_image *sail_image_output = nullptr;
+    sail_image* sail_image_output = nullptr;
     SAIL_TRY(sail_rotate_image(sail_img, angle, &sail_image_output));
 
     *image = sail::image(sail_image_output);
@@ -645,14 +669,17 @@ bool image::can_convert(SailPixelFormat input_pixel_format, SailPixelFormat outp
     return sail_can_convert(input_pixel_format, output_pixel_format);
 }
 
-SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format, const std::vector<SailPixelFormat> &pixel_formats)
+SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format,
+                                            const std::vector<SailPixelFormat>& pixel_formats)
 {
     return sail_closest_pixel_format(input_pixel_format, pixel_formats.data(), pixel_formats.size());
 }
 
-SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format, const sail::save_features &save_features)
+SailPixelFormat image::closest_pixel_format(SailPixelFormat input_pixel_format,
+                                            const sail::save_features& save_features)
 {
-    return sail_closest_pixel_format(input_pixel_format, save_features.pixel_formats().data(), save_features.pixel_formats().size());
+    return sail_closest_pixel_format(input_pixel_format, save_features.pixel_formats().data(),
+                                     save_features.pixel_formats().size());
 }
 
 unsigned image::pixel_format_channels(SailPixelFormat pixel_format)
@@ -695,7 +722,7 @@ const char* image::pixel_format_to_string(SailPixelFormat pixel_format)
     return sail_pixel_format_to_string(pixel_format);
 }
 
-SailPixelFormat image::pixel_format_from_string(const std::string &str)
+SailPixelFormat image::pixel_format_from_string(const std::string& str)
 {
     return sail_pixel_format_from_string(str.c_str());
 }
@@ -715,7 +742,7 @@ const char* image::orientation_to_string(SailOrientation orientation)
     return sail_orientation_to_string(orientation);
 }
 
-SailOrientation image::orientation_from_string(const std::string &str)
+SailOrientation image::orientation_from_string(const std::string& str)
 {
     return sail_orientation_from_string(str.data());
 }
@@ -725,22 +752,24 @@ const char* image::compression_to_string(SailCompression compression)
     return sail_compression_to_string(compression);
 }
 
-SailCompression image::compression_from_string(const std::string &str)
+SailCompression image::compression_from_string(const std::string& str)
 {
     return sail_compression_from_string(str.c_str());
 }
 
-image::image(const sail_image *sail_image)
+image::image(const sail_image* sail_image)
     : image()
 {
-    if (sail_image == nullptr) {
+    if (sail_image == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::image(). The object is untouched");
         return;
     }
 
     std::vector<sail::meta_data> meta_data;
 
-    for(const sail_meta_data_node *node = sail_image->meta_data_node; node != nullptr; node = node->next) {
+    for (const sail_meta_data_node* node = sail_image->meta_data_node; node != nullptr; node = node->next)
+    {
         meta_data.push_back(sail::meta_data(node->meta_data));
     }
 
@@ -755,13 +784,14 @@ image::image(const sail_image *sail_image)
     set_iccp(sail::iccp(sail_image->iccp));
     set_source_image(sail::source_image(sail_image->source_image));
 
-    if (sail_image->pixels != nullptr) {
+    if (sail_image->pixels != nullptr)
+    {
         SAIL_TRY_OR_EXECUTE(transfer_pixels_pointer(sail_image),
                             /* on error */ return);
     }
 }
 
-sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
+sail_status_t image::transfer_pixels_pointer(const sail_image* sail_image)
 {
     SAIL_CHECK_PTR(sail_image);
 
@@ -771,7 +801,8 @@ sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
     d->pixels_size        = 0;
     d->shallow_pixels     = false;
 
-    if (sail_image->pixels == nullptr) {
+    if (sail_image->pixels == nullptr)
+    {
         return SAIL_OK;
     }
 
@@ -781,20 +812,17 @@ sail_status_t image::transfer_pixels_pointer(const sail_image *sail_image)
     return SAIL_OK;
 }
 
-sail_status_t image::to_sail_image(sail_image **image) const
+sail_status_t image::to_sail_image(sail_image** image) const
 {
     SAIL_CHECK_PTR(image);
 
-    sail_image *image_local = nullptr;
+    sail_image* image_local = nullptr;
 
     SAIL_AT_SCOPE_EXIT(
         // Pixels are shallow copied
-        if (image_local != nullptr) {
-            image_local->pixels = nullptr;
-        }
+        if (image_local != nullptr) { image_local->pixels = nullptr; }
 
-        sail_destroy_image(image_local);
-    );
+        sail_destroy_image(image_local););
 
     SAIL_TRY(sail_alloc_image(&image_local));
 
@@ -805,39 +833,44 @@ sail_status_t image::to_sail_image(sail_image **image) const
     image_local->bytes_per_line = d->sail_image->bytes_per_line;
 
     // Resulting meta entries
-    sail_meta_data_node **last_meta_data_node = &image_local->meta_data_node;
+    sail_meta_data_node** last_meta_data_node = &image_local->meta_data_node;
 
-    for (const sail::meta_data &meta_data : d->meta_data) {
-        sail_meta_data_node *meta_data_node;
+    for (const sail::meta_data& meta_data : d->meta_data)
+    {
+        sail_meta_data_node* meta_data_node;
 
         SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node));
         SAIL_TRY_OR_CLEANUP(meta_data.to_sail_meta_data(&meta_data_node->meta_data),
                             /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
 
         *last_meta_data_node = meta_data_node;
-        last_meta_data_node = &meta_data_node->next;
+        last_meta_data_node  = &meta_data_node->next;
     }
 
-    if (d->resolution.is_valid()) {
+    if (d->resolution.is_valid())
+    {
         SAIL_TRY(d->resolution.to_sail_resolution(&image_local->resolution));
     }
 
     image_local->pixel_format = d->sail_image->pixel_format;
     image_local->delay        = d->sail_image->delay;
 
-    if (d->palette.is_valid()) {
+    if (d->palette.is_valid())
+    {
         SAIL_TRY(d->palette.to_sail_palette(&image_local->palette));
     }
 
-    if (d->iccp.is_valid()) {
+    if (d->iccp.is_valid())
+    {
         SAIL_TRY(d->iccp.to_sail_iccp(&image_local->iccp));
     }
 
-    if (d->source_image.is_valid()) {
+    if (d->source_image.is_valid())
+    {
         SAIL_TRY(d->source_image.to_sail_source_image(&image_local->source_image));
     }
 
-    *image = image_local;
+    *image      = image_local;
     image_local = nullptr;
 
     return SAIL_OK;
@@ -845,7 +878,7 @@ sail_status_t image::to_sail_image(sail_image **image) const
 
 void image::set_dimensions(unsigned width, unsigned height)
 {
-    d->sail_image->width = width;
+    d->sail_image->width  = width;
     d->sail_image->height = height;
 }
 
@@ -866,16 +899,17 @@ void image::set_bytes_per_line_auto()
     set_bytes_per_line(bytes_per_line);
 }
 
-void image::set_pixels(const void *pixels)
+void image::set_pixels(const void* pixels)
 {
     set_pixels(pixels, static_cast<std::size_t>(bytes_per_line()) * height());
 }
 
-void image::set_pixels(const void *pixels, std::size_t pixels_size)
+void image::set_pixels(const void* pixels, std::size_t pixels_size)
 {
     d->reset_pixels();
 
-    if (pixels == nullptr || pixels_size == 0) {
+    if (pixels == nullptr || pixels_size == 0)
+    {
         return;
     }
 
@@ -887,16 +921,17 @@ void image::set_pixels(const void *pixels, std::size_t pixels_size)
     d->shallow_pixels = false;
 }
 
-void image::set_shallow_pixels(void *pixels)
+void image::set_shallow_pixels(void* pixels)
 {
     set_shallow_pixels(pixels, static_cast<std::size_t>(bytes_per_line()) * height());
 }
 
-void image::set_shallow_pixels(void *pixels, std::size_t pixels_size)
+void image::set_shallow_pixels(void* pixels, std::size_t pixels_size)
 {
     d->reset_pixels();
 
-    if (pixels == nullptr || pixels_size == 0) {
+    if (pixels == nullptr || pixels_size == 0)
+    {
         return;
     }
 
@@ -905,9 +940,9 @@ void image::set_shallow_pixels(void *pixels, std::size_t pixels_size)
     d->shallow_pixels     = true;
 }
 
-void image::set_source_image(const sail::source_image &source_image)
+void image::set_source_image(const sail::source_image& source_image)
 {
     d->source_image = source_image;
 }
 
-}
+} // namespace sail

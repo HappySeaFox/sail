@@ -28,9 +28,11 @@
 namespace sail
 {
 
-tuning utils_private::to_cpp_tuning(const sail_hash_map *c_tuning) {
+tuning utils_private::to_cpp_tuning(const sail_hash_map* c_tuning)
+{
 
-    if (c_tuning == nullptr) {
+    if (c_tuning == nullptr)
+    {
         return tuning{};
     }
 
@@ -41,12 +43,14 @@ tuning utils_private::to_cpp_tuning(const sail_hash_map *c_tuning) {
     return tuning;
 }
 
-sail_status_t utils_private::to_sail_tuning(const tuning &cpp_tuning, sail_hash_map *c_tuning) {
+sail_status_t utils_private::to_sail_tuning(const tuning& cpp_tuning, sail_hash_map* c_tuning)
+{
 
     sail_clear_hash_map(c_tuning);
 
-    for (const auto &kv : cpp_tuning) {
-        struct sail_variant *sail_variant;
+    for (const auto& kv : cpp_tuning)
+    {
+        struct sail_variant* sail_variant;
 
         SAIL_TRY(kv.second.to_sail_variant(&sail_variant));
 
@@ -58,18 +62,21 @@ sail_status_t utils_private::to_sail_tuning(const tuning &cpp_tuning, sail_hash_
     return SAIL_OK;
 }
 
-bool utils_private::sail_key_value_into_tuning(const char *key, const sail_variant *value, void *user_data) {
+bool utils_private::sail_key_value_into_tuning(const char* key, const sail_variant* value, void* user_data)
+{
 
-    tuning *cpp_tuning = reinterpret_cast<tuning *>(user_data);
+    tuning* cpp_tuning = reinterpret_cast<tuning*>(user_data);
 
     cpp_tuning->emplace(key, variant(value));
 
     return true;
 }
 
-special_properties utils_private::to_cpp_special_properties(const sail_hash_map *c_special_properties) {
+special_properties utils_private::to_cpp_special_properties(const sail_hash_map* c_special_properties)
+{
 
-    if (c_special_properties == nullptr) {
+    if (c_special_properties == nullptr)
+    {
         return special_properties{};
     }
 
@@ -80,12 +87,15 @@ special_properties utils_private::to_cpp_special_properties(const sail_hash_map 
     return special_properties;
 }
 
-sail_status_t utils_private::to_sail_special_properties(const special_properties &cpp_special_properties, sail_hash_map *c_special_properties) {
+sail_status_t utils_private::to_sail_special_properties(const special_properties& cpp_special_properties,
+                                                        sail_hash_map* c_special_properties)
+{
 
     sail_clear_hash_map(c_special_properties);
 
-    for (const auto &kv : cpp_special_properties) {
-        struct sail_variant *sail_variant;
+    for (const auto& kv : cpp_special_properties)
+    {
+        struct sail_variant* sail_variant;
 
         SAIL_TRY(kv.second.to_sail_variant(&sail_variant));
 
@@ -97,4 +107,4 @@ sail_status_t utils_private::to_sail_special_properties(const special_properties
     return SAIL_OK;
 }
 
-}
+} // namespace sail

@@ -188,8 +188,10 @@ static MunitResult test_multi_frame_special_properties(const MunitParameter para
 
     if (image->source_image->special_properties != NULL)
     {
-        const struct sail_variant* frames_variant = sail_hash_map_value(image->source_image->special_properties, "apng-frames");
-        const struct sail_variant* plays_variant  = sail_hash_map_value(image->source_image->special_properties, "apng-plays");
+        const struct sail_variant* frames_variant =
+            sail_hash_map_value(image->source_image->special_properties, "apng-frames");
+        const struct sail_variant* plays_variant =
+            sail_hash_map_value(image->source_image->special_properties, "apng-plays");
 
         if (frames_variant != NULL && frames_variant->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
         {

@@ -23,29 +23,27 @@
     SOFTWARE.
 */
 
-QtSail::QtSail(QWidget *parent)
+QtSail::QtSail(QWidget* parent)
     : QWidget(parent)
 {
     m_ui.reset(new Ui::QtSail);
     m_ui->setupUi(this);
 
-    QLabel *l = new QLabel;
+    QLabel* l = new QLabel;
     l->setAlignment(Qt::AlignCenter);
     m_ui->scrollArea->setWidget(l);
 
     m_animationTimer.reset(new QTimer);
     m_animationTimer->setSingleShot(true);
-    connect(m_animationTimer.data(), &QTimer::timeout, this, [&]{
-        onNext();
-    });
+    connect(m_animationTimer.data(), &QTimer::timeout, this, [&] { onNext(); });
 
-    connect(m_ui->pushOpen,     &QPushButton::clicked, this, &QtSail::onOpenFile);
-    connect(m_ui->pushProbe,    &QPushButton::clicked, this, &QtSail::onProbe);
-    connect(m_ui->pushSave,     &QPushButton::clicked, this, &QtSail::onSave);
-    connect(m_ui->checkFit,     &QCheckBox::toggled,   this, &QtSail::onFit);
+    connect(m_ui->pushOpen, &QPushButton::clicked, this, &QtSail::onOpenFile);
+    connect(m_ui->pushProbe, &QPushButton::clicked, this, &QtSail::onProbe);
+    connect(m_ui->pushSave, &QPushButton::clicked, this, &QtSail::onSave);
+    connect(m_ui->checkFit, &QCheckBox::toggled, this, &QtSail::onFit);
     connect(m_ui->pushPrevious, &QPushButton::clicked, this, &QtSail::onPrevious);
-    connect(m_ui->pushNext,     &QPushButton::clicked, this, &QtSail::onNext);
-    connect(m_ui->pushStop,     &QPushButton::clicked, this, &QtSail::onStop);
+    connect(m_ui->pushNext, &QPushButton::clicked, this, &QtSail::onNext);
+    connect(m_ui->pushStop, &QPushButton::clicked, this, &QtSail::onStop);
 
     init();
 }
@@ -54,37 +52,47 @@ void QtSail::onFit(bool fit)
 {
     QPixmap pixmap;
 
-    if (m_qimages.empty()) {
+    if (m_qimages.empty())
+    {
         return;
     }
 
-    const QImage &qimage = m_qimages[m_currentIndex];
+    const QImage& qimage = m_qimages[m_currentIndex];
 
-    if (fit) {
-        if (qimage.width() > m_ui->scrollArea->viewport()->width() ||
-                qimage.height() > m_ui->scrollArea->viewport()->height()) {
-            pixmap = QPixmap::fromImage(qimage.scaled(m_ui->scrollArea->viewport()->size(),
-                                                         Qt::KeepAspectRatio,
-                                                         Qt::SmoothTransformation));
-        } else {
-            pixmap =  QPixmap::fromImage(qimage);
+    if (fit)
+    {
+        if (qimage.width() > m_ui->scrollArea->viewport()->width()
+            || qimage.height() > m_ui->scrollArea->viewport()->height())
+        {
+            pixmap = QPixmap::fromImage(
+                qimage.scaled(m_ui->scrollArea->viewport()->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
-    } else {
-        pixmap =  QPixmap::fromImage(qimage);
+        else
+        {
+            pixmap = QPixmap::fromImage(qimage);
+        }
+    }
+    else
+    {
+        pixmap = QPixmap::fromImage(qimage);
     }
 
-    qobject_cast<QLabel *>(m_ui->scrollArea->widget())->setPixmap(pixmap);
+    qobject_cast<QLabel*>(m_ui->scrollArea->widget())->setPixmap(pixmap);
 }
 
 void QtSail::onPrevious()
 {
-    if (m_qimages.size() <= 1) {
+    if (m_qimages.size() <= 1)
+    {
         return;
     }
 
-    if (m_currentIndex == 0) {
-        m_currentIndex = m_qimages.size()-1;
-    } else {
+    if (m_currentIndex == 0)
+    {
+        m_currentIndex = m_qimages.size() - 1;
+    }
+    else
+    {
         m_currentIndex--;
     }
 
@@ -96,20 +104,25 @@ void QtSail::onPrevious()
 
 void QtSail::onNext()
 {
-    if (m_qimages.size() <= 1) {
+    if (m_qimages.size() <= 1)
+    {
         return;
     }
 
-    if (m_currentIndex == m_qimages.size()-1) {
+    if (m_currentIndex == m_qimages.size() - 1)
+    {
         m_currentIndex = 0;
-    } else {
+    }
+    else
+    {
         m_currentIndex++;
     }
 
     SAIL_LOG_DEBUG("Image index: %d", m_currentIndex);
     onFit(m_ui->checkFit->isChecked());
 
-    if (m_animated) {
+    if (m_animated)
+    {
         m_animationTimer->start(m_delays[m_currentIndex]);
     }
 
@@ -124,11 +137,10 @@ void QtSail::onStop()
 
 void QtSail::detectAnimated()
 {
-    m_animated = std::find_if(m_delays.begin(), m_delays.end(), [&](int v) {
-        return v > 0;
-    }) != m_delays.end();
+    m_animated = std::find_if(m_delays.begin(), m_delays.end(), [&](int v) { return v > 0; }) != m_delays.end();
 
-    if (m_animated) {
+    if (m_animated)
+    {
         m_animationTimer->start(m_delays.first());
     }
 
@@ -137,5 +149,5 @@ void QtSail::detectAnimated()
 
 void QtSail::updateCurrentFrameLabel()
 {
-    m_ui->labelFrame->setText(QString("%1/%2").arg(m_currentIndex+1).arg(m_qimages.size()));
+    m_ui->labelFrame->setText(QString("%1/%2").arg(m_currentIndex + 1).arg(m_qimages.size()));
 }

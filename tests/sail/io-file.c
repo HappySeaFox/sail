@@ -39,7 +39,7 @@ static MunitResult test_io_file_read(const MunitParameter params[], void* user_d
     char* test_file = NULL;
     munit_assert(sail_temp_file_path("sail_io_file_test_read", &test_file) == SAIL_OK);
 
-    const char* test_data = "Test data for reading";
+    const char* test_data       = "Test data for reading";
     const size_t test_data_size = strlen(test_data);
 
     /* Create test file */
@@ -75,7 +75,7 @@ static MunitResult test_io_file_write(const MunitParameter params[], void* user_
     char* test_file = NULL;
     munit_assert(sail_temp_file_path("sail_io_file_test_write", &test_file) == SAIL_OK);
 
-    const char* test_data = "Test data for writing";
+    const char* test_data       = "Test data for writing";
     const size_t test_data_size = strlen(test_data);
 
     /* Open for writing */
@@ -116,7 +116,7 @@ static MunitResult test_io_file_seek_tell(const MunitParameter params[], void* u
     char* test_file = NULL;
     munit_assert(sail_temp_file_path("sail_io_file_test_seek", &test_file) == SAIL_OK);
 
-    const char* test_data = "0123456789ABCDEF";
+    const char* test_data       = "0123456789ABCDEF";
     const size_t test_data_size = strlen(test_data);
 
     /* Create test file */

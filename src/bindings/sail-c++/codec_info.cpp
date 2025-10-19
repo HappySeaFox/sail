@@ -35,9 +35,10 @@ class SAIL_HIDDEN codec_info::pimpl
 public:
     pimpl()
         : sail_codec_info_c(nullptr)
-    {}
+    {
+    }
 
-    const sail_codec_info *sail_codec_info_c;
+    const sail_codec_info* sail_codec_info_c;
 
     std::string version;
     std::string name;
@@ -54,13 +55,13 @@ codec_info::codec_info()
 {
 }
 
-codec_info::codec_info(const codec_info &ci)
+codec_info::codec_info(const codec_info& ci)
     : codec_info()
 {
     *this = ci;
 }
 
-codec_info& codec_info::operator=(const codec_info &ci)
+codec_info& codec_info::operator=(const codec_info& ci)
 {
     d->sail_codec_info_c = ci.d->sail_codec_info_c;
 
@@ -76,12 +77,12 @@ codec_info& codec_info::operator=(const codec_info &ci)
     return *this;
 }
 
-codec_info::codec_info(codec_info &&ci) noexcept
+codec_info::codec_info(codec_info&& ci) noexcept
 {
     *this = std::move(ci);
 }
 
-codec_info& codec_info::operator=(codec_info &&ci) noexcept
+codec_info& codec_info::operator=(codec_info&& ci) noexcept
 {
     d = std::move(ci.d);
 
@@ -142,70 +143,70 @@ const char* codec_info::codec_feature_to_string(SailCodecFeature codec_feature)
     return sail_codec_feature_to_string(codec_feature);
 }
 
-SailCodecFeature codec_info::codec_feature_from_string(const std::string &str)
+SailCodecFeature codec_info::codec_feature_from_string(const std::string& str)
 {
     return sail_codec_feature_from_string(str.c_str());
 }
 
-codec_info codec_info::from_magic_number(const std::string &path)
+codec_info codec_info::from_magic_number(const std::string& path)
 {
-    const struct sail_codec_info *sail_codec_info;
+    const struct sail_codec_info* sail_codec_info;
     SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_path(path.c_str(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_magic_number(const void *buffer, size_t buffer_size)
+codec_info codec_info::from_magic_number(const void* buffer, size_t buffer_size)
 {
-    const struct sail_codec_info *sail_codec_info;
+    const struct sail_codec_info* sail_codec_info;
     SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_memory(buffer, buffer_size, &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_magic_number(sail::abstract_io &abstract_io)
+codec_info codec_info::from_magic_number(sail::abstract_io& abstract_io)
 {
     sail::abstract_io_adapter abstract_io_adapter(abstract_io);
 
-    const struct sail_codec_info *sail_codec_info;
+    const struct sail_codec_info* sail_codec_info;
     SAIL_TRY_OR_EXECUTE(sail_codec_info_by_magic_number_from_io(&abstract_io_adapter.sail_io_c(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_path(const std::string &path)
+codec_info codec_info::from_path(const std::string& path)
 {
-    const struct sail_codec_info *sail_codec_info;
+    const struct sail_codec_info* sail_codec_info;
     SAIL_TRY_OR_EXECUTE(sail_codec_info_from_path(path.c_str(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_extension(const std::string &suffix)
+codec_info codec_info::from_extension(const std::string& suffix)
 {
-    const struct sail_codec_info *sail_codec_info;
+    const struct sail_codec_info* sail_codec_info;
     SAIL_TRY_OR_EXECUTE(sail_codec_info_from_extension(suffix.c_str(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_mime_type(const std::string &mime_type)
+codec_info codec_info::from_mime_type(const std::string& mime_type)
 {
-    const struct sail_codec_info *sail_codec_info;
+    const struct sail_codec_info* sail_codec_info;
     SAIL_TRY_OR_EXECUTE(sail_codec_info_from_mime_type(mime_type.c_str(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
     return codec_info(sail_codec_info);
 }
 
-codec_info codec_info::from_name(const std::string &name)
+codec_info codec_info::from_name(const std::string& name)
 {
-    const struct sail_codec_info *sail_codec_info;
+    const struct sail_codec_info* sail_codec_info;
     SAIL_TRY_OR_EXECUTE(sail_codec_info_from_name(name.c_str(), &sail_codec_info),
                         /* on error */ return codec_info{});
 
@@ -216,17 +217,20 @@ std::vector<codec_info> codec_info::list()
 {
     std::vector<codec_info> codec_info_list;
 
-    for (const sail_codec_bundle_node *codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != nullptr; codec_bundle_node = codec_bundle_node->next) {
+    for (const sail_codec_bundle_node* codec_bundle_node = sail_codec_bundle_list(); codec_bundle_node != nullptr;
+         codec_bundle_node                               = codec_bundle_node->next)
+    {
         codec_info_list.push_back(codec_info(codec_bundle_node->codec_bundle->codec_info));
     }
 
     return codec_info_list;
 }
 
-codec_info::codec_info(const sail_codec_info *ci)
+codec_info::codec_info(const sail_codec_info* ci)
     : codec_info()
 {
-    if (ci == nullptr) {
+    if (ci == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::codec_info(). The object is untouched");
         return;
     }
@@ -238,17 +242,23 @@ codec_info::codec_info(const sail_codec_info *ci)
     std::vector<std::string> mime_types;
 
     // magic numbers
-    for (const sail_string_node *magic_number_node = ci->magic_number_node; magic_number_node != nullptr; magic_number_node = magic_number_node->next) {
+    for (const sail_string_node* magic_number_node = ci->magic_number_node; magic_number_node != nullptr;
+         magic_number_node                         = magic_number_node->next)
+    {
         magic_numbers.push_back(magic_number_node->string);
     }
 
     // extensions
-    for (const sail_string_node *extension_node = ci->extension_node; extension_node != nullptr; extension_node = extension_node->next) {
+    for (const sail_string_node* extension_node = ci->extension_node; extension_node != nullptr;
+         extension_node                         = extension_node->next)
+    {
         extensions.push_back(extension_node->string);
     }
 
     // mime types
-    for (const sail_string_node *mime_type_node = ci->mime_type_node; mime_type_node != nullptr; mime_type_node = mime_type_node->next) {
+    for (const sail_string_node* mime_type_node = ci->mime_type_node; mime_type_node != nullptr;
+         mime_type_node                         = mime_type_node->next)
+    {
         mime_types.push_back(mime_type_node->string);
     }
 
@@ -267,4 +277,4 @@ const sail_codec_info* codec_info::sail_codec_info_c() const
     return d->sail_codec_info_c;
 }
 
-}
+} // namespace sail

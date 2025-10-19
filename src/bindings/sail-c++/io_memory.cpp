@@ -30,13 +30,11 @@
 namespace sail
 {
 
-template<typename BufferType>
-static sail_io *construct_sail_io(BufferType buffer, std::size_t buffer_size);
+template <typename BufferType> static sail_io* construct_sail_io(BufferType buffer, std::size_t buffer_size);
 
-template<>
-sail_io *construct_sail_io<void *>(void *buffer, std::size_t buffer_size)
+template <> sail_io* construct_sail_io<void*>(void* buffer, std::size_t buffer_size)
 {
-    struct sail_io *sail_io;
+    struct sail_io* sail_io;
 
     SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_memory(buffer, buffer_size, &sail_io),
                         /* on error */ throw std::bad_alloc());
@@ -44,10 +42,9 @@ sail_io *construct_sail_io<void *>(void *buffer, std::size_t buffer_size)
     return sail_io;
 }
 
-template<>
-sail_io *construct_sail_io<const void *>(const void *buffer, std::size_t buffer_size)
+template <> sail_io* construct_sail_io<const void*>(const void* buffer, std::size_t buffer_size)
 {
-    struct sail_io *sail_io;
+    struct sail_io* sail_io;
 
     SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_memory(buffer, buffer_size, &sail_io),
                         /* on error */ throw std::bad_alloc());
@@ -55,33 +52,34 @@ sail_io *construct_sail_io<const void *>(const void *buffer, std::size_t buffer_
     return sail_io;
 }
 
-io_memory::io_memory(void *buffer, std::size_t buffer_size)
+io_memory::io_memory(void* buffer, std::size_t buffer_size)
     : io_base(construct_sail_io(buffer, buffer_size))
 {
 }
 
-io_memory::io_memory(const void *buffer, std::size_t buffer_size)
+io_memory::io_memory(const void* buffer, std::size_t buffer_size)
     : io_base(construct_sail_io(buffer, buffer_size))
 {
 }
 
-io_memory::io_memory(void *buffer, std::size_t buffer_size, Operation operation)
-    : io_base(construct_sail_io(operation == Operation::Read ? const_cast<const void *>(buffer) : buffer, buffer_size))
+io_memory::io_memory(void* buffer, std::size_t buffer_size, Operation operation)
+    : io_base(construct_sail_io(operation == Operation::Read ? const_cast<const void*>(buffer) : buffer, buffer_size))
 {
 }
 
-io_memory::io_memory(sail::arbitrary_data &arbitrary_data)
+io_memory::io_memory(sail::arbitrary_data& arbitrary_data)
     : io_memory(arbitrary_data.data(), arbitrary_data.size())
 {
 }
 
-io_memory::io_memory(const sail::arbitrary_data &arbitrary_data)
+io_memory::io_memory(const sail::arbitrary_data& arbitrary_data)
     : io_memory(arbitrary_data.data(), arbitrary_data.size())
 {
 }
 
-io_memory::io_memory(sail::arbitrary_data &arbitrary_data, Operation operation)
-    : io_memory(operation == Operation::Read ? const_cast<const sail::arbitrary_data &>(arbitrary_data).data() : arbitrary_data.data(),
+io_memory::io_memory(sail::arbitrary_data& arbitrary_data, Operation operation)
+    : io_memory(operation == Operation::Read ? const_cast<const sail::arbitrary_data&>(arbitrary_data).data()
+                                             : arbitrary_data.data(),
                 arbitrary_data.size())
 {
 }
@@ -95,4 +93,4 @@ codec_info io_memory::codec_info()
     return sail::codec_info::from_magic_number(*this);
 }
 
-}
+} // namespace sail

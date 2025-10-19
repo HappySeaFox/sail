@@ -27,7 +27,7 @@
 
 #include <sail-c++/sail-c++.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     const std::vector<sail::codec_info> codec_info_list = sail::codec_info::list();
 

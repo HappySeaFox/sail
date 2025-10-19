@@ -47,7 +47,7 @@ public:
         sail_destroy_load_options(sail_load_options);
     }
 
-    struct sail_load_options *sail_load_options;
+    struct sail_load_options* sail_load_options;
     sail::tuning tuning;
 };
 
@@ -62,13 +62,13 @@ load_options::load_options()
 {
 }
 
-load_options::load_options(const load_options &ro)
+load_options::load_options(const load_options& ro)
     : load_options()
 {
     *this = ro;
 }
 
-load_options& load_options::operator=(const sail::load_options &load_options)
+load_options& load_options::operator=(const sail::load_options& load_options)
 {
     set_options(load_options.options());
     set_tuning(load_options.tuning());
@@ -76,12 +76,12 @@ load_options& load_options::operator=(const sail::load_options &load_options)
     return *this;
 }
 
-load_options::load_options(sail::load_options &&load_options) noexcept
+load_options::load_options(sail::load_options&& load_options) noexcept
 {
     *this = std::move(load_options);
 }
 
-load_options& load_options::operator=(load_options &&ro) noexcept
+load_options& load_options::operator=(load_options&& ro) noexcept
 {
     d = std::move(ro.d);
 
@@ -112,15 +112,16 @@ void load_options::set_options(int options)
     d->sail_load_options->options = options;
 }
 
-void load_options::set_tuning(const sail::tuning &tuning)
+void load_options::set_tuning(const sail::tuning& tuning)
 {
     d->tuning = tuning;
 }
 
-load_options::load_options(const sail_load_options *ro)
+load_options::load_options(const sail_load_options* ro)
     : load_options()
 {
-    if (ro == nullptr) {
+    if (ro == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::load_options(). The object is untouched");
         return;
     }
@@ -129,11 +130,11 @@ load_options::load_options(const sail_load_options *ro)
     set_tuning(utils_private::to_cpp_tuning(ro->tuning));
 }
 
-sail_status_t load_options::to_sail_load_options(sail_load_options **load_options) const
+sail_status_t load_options::to_sail_load_options(sail_load_options** load_options) const
 {
     SAIL_CHECK_PTR(load_options);
 
-    sail_load_options *load_options_local;
+    sail_load_options* load_options_local;
 
     SAIL_TRY(sail_alloc_load_options(&load_options_local));
 
@@ -150,4 +151,4 @@ sail_status_t load_options::to_sail_load_options(sail_load_options **load_option
     return SAIL_OK;
 }
 
-}
+} // namespace sail

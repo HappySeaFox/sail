@@ -46,7 +46,7 @@ public:
     }
 
 public:
-    struct sail_source_image *sail_source_image;
+    struct sail_source_image* sail_source_image;
     sail::special_properties special_properties;
 };
 
@@ -55,13 +55,13 @@ source_image::source_image()
 {
 }
 
-source_image::source_image(const source_image &si)
+source_image::source_image(const source_image& si)
     : source_image()
 {
     *this = si;
 }
 
-source_image& source_image::operator=(const source_image &si)
+source_image& source_image::operator=(const source_image& si)
 {
     d->sail_source_image->pixel_format       = si.pixel_format();
     d->sail_source_image->chroma_subsampling = si.chroma_subsampling();
@@ -73,12 +73,12 @@ source_image& source_image::operator=(const source_image &si)
     return *this;
 }
 
-source_image::source_image(source_image &&si) noexcept
+source_image::source_image(source_image&& si) noexcept
 {
     *this = std::move(si);
 }
 
-source_image& source_image::operator=(source_image &&si) noexcept
+source_image& source_image::operator=(source_image&& si) noexcept
 {
     d = std::move(si.d);
 
@@ -129,10 +129,11 @@ sail::special_properties& source_image::special_properties()
     return d->special_properties;
 }
 
-source_image::source_image(const sail_source_image *si)
+source_image::source_image(const sail_source_image* si)
     : source_image()
 {
-    if (si == nullptr) {
+    if (si == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::source_image(). The object is untouched");
         return;
     }
@@ -145,11 +146,11 @@ source_image::source_image(const sail_source_image *si)
     d->special_properties                    = utils_private::to_cpp_special_properties(si->special_properties);
 }
 
-sail_status_t source_image::to_sail_source_image(sail_source_image **source_image) const
+sail_status_t source_image::to_sail_source_image(sail_source_image** source_image) const
 {
     SAIL_CHECK_PTR(source_image);
 
-    sail_source_image *source_image_local;
+    sail_source_image* source_image_local;
     SAIL_TRY(sail_alloc_source_image(&source_image_local));
 
     source_image_local->pixel_format       = d->sail_source_image->pixel_format;
@@ -162,8 +163,9 @@ sail_status_t source_image::to_sail_source_image(sail_source_image **source_imag
     {
         SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&source_image_local->special_properties),
                             /* cleanup */ sail_destroy_source_image(source_image_local));
-        SAIL_TRY_OR_CLEANUP(utils_private::to_sail_special_properties(d->special_properties, source_image_local->special_properties),
-                            /* cleanup */ sail_destroy_source_image(source_image_local));
+        SAIL_TRY_OR_CLEANUP(
+            utils_private::to_sail_special_properties(d->special_properties, source_image_local->special_properties),
+            /* cleanup */ sail_destroy_source_image(source_image_local));
     }
 
     *source_image = source_image_local;
@@ -171,4 +173,4 @@ sail_status_t source_image::to_sail_source_image(sail_source_image **source_imag
     return SAIL_OK;
 }
 
-}
+} // namespace sail

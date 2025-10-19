@@ -56,13 +56,13 @@ resolution::resolution(SailResolutionUnit unit, double x, double y)
     set_y(y);
 }
 
-resolution::resolution(const resolution &res)
+resolution::resolution(const resolution& res)
     : resolution()
 {
     *this = res;
 }
 
-resolution& resolution::operator=(const resolution &res)
+resolution& resolution::operator=(const resolution& res)
 {
     set_unit(res.unit());
     set_x(res.x());
@@ -71,12 +71,12 @@ resolution& resolution::operator=(const resolution &res)
     return *this;
 }
 
-resolution::resolution(resolution &&res) noexcept
+resolution::resolution(resolution&& res) noexcept
 {
     *this = std::move(res);
 }
 
-resolution& resolution::operator=(resolution &&res) noexcept
+resolution& resolution::operator=(resolution&& res) noexcept
 {
     d = std::move(res.d);
 
@@ -127,15 +127,16 @@ const char* resolution::resolution_unit_to_string(SailResolutionUnit resolution_
     return sail_resolution_unit_to_string(resolution_unit);
 }
 
-SailResolutionUnit resolution::resolution_unit_from_string(const std::string &str)
+SailResolutionUnit resolution::resolution_unit_from_string(const std::string& str)
 {
     return sail_resolution_unit_from_string(str.c_str());
 }
 
-resolution::resolution(const sail_resolution *res)
+resolution::resolution(const sail_resolution* res)
     : resolution()
 {
-    if (res == nullptr) {
+    if (res == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::resolution(). The object is untouched");
         return;
     }
@@ -143,7 +144,7 @@ resolution::resolution(const sail_resolution *res)
     d->resolution = *res;
 }
 
-sail_status_t resolution::to_sail_resolution(sail_resolution **resolution) const
+sail_status_t resolution::to_sail_resolution(sail_resolution** resolution) const
 {
     SAIL_CHECK_PTR(resolution);
 
@@ -153,4 +154,4 @@ sail_status_t resolution::to_sail_resolution(sail_resolution **resolution) const
     return SAIL_OK;
 }
 
-}
+} // namespace sail

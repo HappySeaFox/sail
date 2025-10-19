@@ -23,8 +23,8 @@
     SOFTWARE.
 */
 
-#include <stdexcept>
 #include <ios>
+#include <stdexcept>
 
 #include <sail/sail.h>
 
@@ -36,7 +36,7 @@ namespace sail
 class SAIL_HIDDEN io_file::io_file_pimpl
 {
 public:
-    io_file_pimpl(const std::string &path)
+    io_file_pimpl(const std::string& path)
         : codec_info(sail::codec_info::from_path(path))
     {
     }
@@ -44,33 +44,35 @@ public:
     const sail::codec_info codec_info;
 };
 
-static struct sail_io *construct_sail_io(const std::string &path, io_file::Operation operation)
+static struct sail_io* construct_sail_io(const std::string& path, io_file::Operation operation)
 {
-    struct sail_io *sail_io;
+    struct sail_io* sail_io;
 
-    switch (operation) {
-        case io_file::Operation::Read:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.c_str(), &sail_io),
-                                /* on error */ throw std::ios_base::failure("Failed to open file for reading: " + path));
+    switch (operation)
+    {
+    case io_file::Operation::Read:
+        SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.c_str(), &sail_io),
+                            /* on error */ throw std::ios_base::failure("Failed to open file for reading: " + path));
         break;
-        case io_file::Operation::ReadWrite:
-            SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_file(path.c_str(), &sail_io),
-                                /* on error */ throw std::ios_base::failure("Failed to open file for read/write: " + path));
+    case io_file::Operation::ReadWrite:
+        SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_file(path.c_str(), &sail_io),
+                            /* on error */ throw std::ios_base::failure("Failed to open file for read/write: " + path));
         break;
-        default: {
-            throw std::runtime_error("Unknown file operation");
-        }
+    default:
+    {
+        throw std::runtime_error("Unknown file operation");
+    }
     }
 
     return sail_io;
 }
 
-io_file::io_file(const std::string &path)
+io_file::io_file(const std::string& path)
     : io_file(path, Operation::Read)
 {
 }
 
-io_file::io_file(const std::string &path, io_file::Operation operation)
+io_file::io_file(const std::string& path, io_file::Operation operation)
     : io_base(construct_sail_io(path, operation))
     , file_d(new io_file_pimpl(path))
 {
@@ -85,4 +87,4 @@ codec_info io_file::codec_info()
     return file_d->codec_info;
 }
 
-}
+} // namespace sail

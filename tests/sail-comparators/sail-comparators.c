@@ -193,7 +193,8 @@ sail_status_t sail_test_compare_source_images(const struct sail_source_image* so
     }
     else
     {
-        munit_assert(sail_test_compare_hash_maps(source_image1->special_properties, source_image2->special_properties) == SAIL_OK);
+        munit_assert(sail_test_compare_hash_maps(source_image1->special_properties, source_image2->special_properties)
+                     == SAIL_OK);
     }
 
     return SAIL_OK;

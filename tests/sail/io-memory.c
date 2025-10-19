@@ -36,7 +36,7 @@ static MunitResult test_io_memory_read(const MunitParameter params[], void* user
     (void)params;
     (void)user_data;
 
-    const char* test_data = "Test data for reading";
+    const char* test_data       = "Test data for reading";
     const size_t test_data_size = strlen(test_data);
 
     /* Open for reading */
@@ -61,9 +61,9 @@ static MunitResult test_io_memory_write(const MunitParameter params[], void* use
     (void)params;
     (void)user_data;
 
-    const char* test_data = "Test data for writing";
+    const char* test_data       = "Test data for writing";
     const size_t test_data_size = strlen(test_data);
-    char buffer[256] = {0};
+    char buffer[256]            = {0};
 
     /* Open for writing */
     struct sail_io* io = NULL;
@@ -88,7 +88,7 @@ static MunitResult test_io_memory_seek_tell(const MunitParameter params[], void*
     (void)params;
     (void)user_data;
 
-    const char* test_data = "0123456789ABCDEF";
+    const char* test_data       = "0123456789ABCDEF";
     const size_t test_data_size = strlen(test_data);
 
     /* Open for reading */
@@ -131,7 +131,7 @@ static MunitResult test_io_memory_eof(const MunitParameter params[], void* user_
     (void)params;
     (void)user_data;
 
-    const char* test_data = "EOF";
+    const char* test_data       = "EOF";
     const size_t test_data_size = strlen(test_data);
 
     /* Open for reading */
@@ -162,8 +162,8 @@ static MunitResult test_io_memory_read_write(const MunitParameter params[], void
     (void)params;
     (void)user_data;
 
-    char buffer[256] = {0};
-    const char* test_data = "Read-write test";
+    char buffer[256]            = {0};
+    const char* test_data       = "Read-write test";
     const size_t test_data_size = strlen(test_data);
 
     /* Open for read-write */

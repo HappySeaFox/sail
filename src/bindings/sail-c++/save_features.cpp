@@ -35,9 +35,10 @@ class SAIL_HIDDEN save_features::pimpl
 public:
     pimpl()
         : sail_save_features_c(nullptr)
-    {}
+    {
+    }
 
-    const sail_save_features *sail_save_features_c;
+    const sail_save_features* sail_save_features_c;
 
     std::vector<SailPixelFormat> pixel_formats;
     std::vector<SailCompression> compressions;
@@ -45,13 +46,13 @@ public:
     sail::supported_tuning supported_tuning;
 };
 
-save_features::save_features(const save_features &wf)
+save_features::save_features(const save_features& wf)
     : save_features()
 {
     *this = wf;
 }
 
-save_features& save_features::operator=(const sail::save_features &save_features)
+save_features& save_features::operator=(const sail::save_features& save_features)
 {
     d->sail_save_features_c = save_features.d->sail_save_features_c;
     d->pixel_formats        = save_features.d->pixel_formats;
@@ -62,12 +63,12 @@ save_features& save_features::operator=(const sail::save_features &save_features
     return *this;
 }
 
-save_features::save_features(sail::save_features &&save_features) noexcept
+save_features::save_features(sail::save_features&& save_features) noexcept
 {
     *this = std::move(save_features);
 }
 
-save_features& save_features::operator=(sail::save_features &&save_features) noexcept
+save_features& save_features::operator=(sail::save_features&& save_features) noexcept
 {
     d = std::move(save_features.d);
 
@@ -108,12 +109,12 @@ const sail::supported_tuning& save_features::supported_tuning() const
     return d->supported_tuning;
 }
 
-sail_status_t save_features::to_options(sail::save_options *save_options) const
+sail_status_t save_features::to_options(sail::save_options* save_options) const
 {
     SAIL_CHECK_PTR(d->sail_save_features_c);
     SAIL_CHECK_PTR(save_options);
 
-    sail_save_options *sail_save_options;
+    sail_save_options* sail_save_options;
 
     SAIL_TRY(sail_alloc_save_options_from_features(d->sail_save_features_c, &sail_save_options));
 
@@ -129,10 +130,11 @@ save_features::save_features()
 {
 }
 
-save_features::save_features(const sail_save_features *wf)
+save_features::save_features(const sail_save_features* wf)
     : save_features()
 {
-    if (wf == nullptr) {
+    if (wf == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::save_features(). The object is untouched");
         return;
     }
@@ -142,10 +144,12 @@ save_features::save_features(const sail_save_features *wf)
     // Output pixel formats
     std::vector<SailPixelFormat> pixel_formats;
 
-    if (d->sail_save_features_c->pixel_formats != nullptr && d->sail_save_features_c->pixel_formats_length > 0) {
+    if (d->sail_save_features_c->pixel_formats != nullptr && d->sail_save_features_c->pixel_formats_length > 0)
+    {
         pixel_formats.reserve(d->sail_save_features_c->pixel_formats_length);
 
-        for (unsigned i = 0; i < d->sail_save_features_c->pixel_formats_length; i++) {
+        for (unsigned i = 0; i < d->sail_save_features_c->pixel_formats_length; i++)
+        {
             pixel_formats.push_back(d->sail_save_features_c->pixel_formats[i]);
         }
     }
@@ -155,10 +159,12 @@ save_features::save_features(const sail_save_features *wf)
     // Compressions
     std::vector<SailCompression> compressions;
 
-    if (d->sail_save_features_c->compressions != nullptr && d->sail_save_features_c->compressions_length > 0) {
+    if (d->sail_save_features_c->compressions != nullptr && d->sail_save_features_c->compressions_length > 0)
+    {
         compressions.reserve(d->sail_save_features_c->compressions_length);
 
-        for (unsigned i = 0; i < d->sail_save_features_c->compressions_length; i++) {
+        for (unsigned i = 0; i < d->sail_save_features_c->compressions_length; i++)
+        {
             compressions.push_back(d->sail_save_features_c->compressions[i]);
         }
     }
@@ -166,12 +172,14 @@ save_features::save_features(const sail_save_features *wf)
     d->compressions = compressions;
 
     // Compression level
-    if (wf->compression_level != nullptr) {
+    if (wf->compression_level != nullptr)
+    {
         d->compression_level = sail::compression_level(wf->compression_level);
     }
 
     // Supported tuning
-    for (const sail_string_node *node = wf->tuning; node != nullptr; node = node->next) {
+    for (const sail_string_node* node = wf->tuning; node != nullptr; node = node->next)
+    {
         d->supported_tuning.push_back(node->string);
     }
 }
@@ -181,4 +189,4 @@ const sail_save_features* save_features::sail_save_features_c() const
     return d->sail_save_features_c;
 }
 
-}
+} // namespace sail

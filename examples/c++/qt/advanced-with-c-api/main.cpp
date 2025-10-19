@@ -29,12 +29,12 @@
 
 #include "qtsail.h"
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
     // You could point SAIL to search codecs in a different location
-    //qsetenv("SAIL_CODECS_PATH", "/some/other/location");
+    // qsetenv("SAIL_CODECS_PATH", "/some/other/location");
 
     sail_set_log_barrier(SAIL_LOG_LEVEL_TRACE);
 

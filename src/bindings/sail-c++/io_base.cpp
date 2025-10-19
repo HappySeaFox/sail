@@ -28,7 +28,7 @@
 namespace sail
 {
 
-io_base::io_base(struct sail_io *sail_io)
+io_base::io_base(struct sail_io* sail_io)
     : d(new pimpl(sail_io))
 {
 }
@@ -42,28 +42,28 @@ int io_base::features() const
     return d->sail_io_wrapper->features;
 }
 
-sail_status_t io_base::tolerant_read(void *buf, std::size_t size_to_read, std::size_t *read_size)
+sail_status_t io_base::tolerant_read(void* buf, std::size_t size_to_read, std::size_t* read_size)
 {
     SAIL_TRY(d->sail_io_wrapper->tolerant_read(d->sail_io_wrapper->stream, buf, size_to_read, read_size));
 
     return SAIL_OK;
 }
 
-sail_status_t io_base::strict_read(void *buf, std::size_t size_to_read)
+sail_status_t io_base::strict_read(void* buf, std::size_t size_to_read)
 {
     SAIL_TRY(d->sail_io_wrapper->strict_read(d->sail_io_wrapper->stream, buf, size_to_read));
 
     return SAIL_OK;
 }
 
-sail_status_t io_base::tolerant_write(const void *buf, std::size_t size_to_write, std::size_t *written_size)
+sail_status_t io_base::tolerant_write(const void* buf, std::size_t size_to_write, std::size_t* written_size)
 {
     SAIL_TRY(d->sail_io_wrapper->tolerant_write(d->sail_io_wrapper->stream, buf, size_to_write, written_size));
 
     return SAIL_OK;
 }
 
-sail_status_t io_base::strict_write(const void *buf, std::size_t size_to_write)
+sail_status_t io_base::strict_write(const void* buf, std::size_t size_to_write)
 {
     SAIL_TRY(d->sail_io_wrapper->strict_write(d->sail_io_wrapper->stream, buf, size_to_write));
 
@@ -77,7 +77,7 @@ sail_status_t io_base::seek(long offset, int whence)
     return SAIL_OK;
 }
 
-sail_status_t io_base::tell(std::size_t *offset)
+sail_status_t io_base::tell(std::size_t* offset)
 {
     SAIL_TRY(d->sail_io_wrapper->tell(d->sail_io_wrapper->stream, offset));
 
@@ -102,11 +102,11 @@ sail_status_t io_base::close()
     return SAIL_OK;
 }
 
-sail_status_t io_base::eof(bool *result)
+sail_status_t io_base::eof(bool* result)
 {
     SAIL_TRY(d->sail_io_wrapper->eof(d->sail_io_wrapper->stream, result));
 
     return SAIL_OK;
 }
 
-}
+} // namespace sail

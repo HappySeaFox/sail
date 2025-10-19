@@ -36,7 +36,7 @@ static MunitResult test_expanding_buffer_write(const MunitParameter params[], vo
     (void)user_data;
 
     const std::size_t initial_capacity = 1024;
-    const std::string test_data = "Hello, C++ expanding buffer!";
+    const std::string test_data        = "Hello, C++ expanding buffer!";
 
     sail::io_expanding_buffer io(initial_capacity);
 
@@ -99,7 +99,7 @@ static MunitResult test_expanding_buffer_expansion(const MunitParameter params[]
     (void)user_data;
 
     const std::size_t initial_capacity = 16;
-    const std::size_t large_size = 1024;
+    const std::size_t large_size       = 1024;
 
     sail::io_expanding_buffer io(initial_capacity);
 
@@ -130,7 +130,7 @@ static MunitResult test_expanding_buffer_flush(const MunitParameter params[], vo
     (void)user_data;
 
     const std::size_t initial_capacity = 1024;
-    const std::string test_data = "Flush test!";
+    const std::string test_data        = "Flush test!";
 
     sail::io_expanding_buffer io(initial_capacity);
 
@@ -153,7 +153,7 @@ static MunitResult test_expanding_buffer_read(const MunitParameter params[], voi
     (void)user_data;
 
     const std::size_t initial_capacity = 1024;
-    const std::string test_data = "Read this back!";
+    const std::string test_data        = "Read this back!";
 
     sail::io_expanding_buffer io(initial_capacity);
 
@@ -216,7 +216,7 @@ static MunitResult test_expanding_buffer_eof(const MunitParameter params[], void
     (void)user_data;
 
     const std::size_t initial_capacity = 1024;
-    const std::string test_data = "EOF test";
+    const std::string test_data        = "EOF test";
 
     sail::io_expanding_buffer io(initial_capacity);
 

@@ -185,16 +185,22 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP48_HSV), "BPP48-HSV");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP48_HSL), "BPP48-HSL");
 
-    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF), "BPP16-GRAYSCALE-HALF");
-    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF), "BPP32-GRAYSCALE-ALPHA-HALF");
-    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT), "BPP32-GRAYSCALE-FLOAT");
-    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT), "BPP64-GRAYSCALE-ALPHA-FLOAT");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF),
+                              "BPP16-GRAYSCALE-HALF");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF),
+                              "BPP32-GRAYSCALE-ALPHA-HALF");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT),
+                              "BPP32-GRAYSCALE-FLOAT");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT),
+                              "BPP64-GRAYSCALE-ALPHA-FLOAT");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF), "BPP48-RGB-HALF");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF), "BPP64-RGBA-HALF");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT), "BPP96-RGB-FLOAT");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT), "BPP128-RGBA-FLOAT");
-    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT), "BPP32-GRAYSCALE-UINT");
-    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT), "BPP64-GRAYSCALE-ALPHA-UINT");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT),
+                              "BPP32-GRAYSCALE-UINT");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT),
+                              "BPP64-GRAYSCALE-ALPHA-UINT");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP96_RGB_UINT), "BPP96-RGB-UINT");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT), "BPP128-RGBA-UINT");
 
@@ -317,15 +323,18 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
     munit_assert(sail_pixel_format_from_string("BPP48-HSL") == SAIL_PIXEL_FORMAT_BPP48_HSL);
 
     munit_assert(sail_pixel_format_from_string("BPP16-GRAYSCALE-HALF") == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF);
-    munit_assert(sail_pixel_format_from_string("BPP32-GRAYSCALE-ALPHA-HALF") == SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF);
+    munit_assert(sail_pixel_format_from_string("BPP32-GRAYSCALE-ALPHA-HALF")
+                 == SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF);
     munit_assert(sail_pixel_format_from_string("BPP32-GRAYSCALE-FLOAT") == SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT);
-    munit_assert(sail_pixel_format_from_string("BPP64-GRAYSCALE-ALPHA-FLOAT") == SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT);
+    munit_assert(sail_pixel_format_from_string("BPP64-GRAYSCALE-ALPHA-FLOAT")
+                 == SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT);
     munit_assert(sail_pixel_format_from_string("BPP48-RGB-HALF") == SAIL_PIXEL_FORMAT_BPP48_RGB_HALF);
     munit_assert(sail_pixel_format_from_string("BPP64-RGBA-HALF") == SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF);
     munit_assert(sail_pixel_format_from_string("BPP96-RGB-FLOAT") == SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT);
     munit_assert(sail_pixel_format_from_string("BPP128-RGBA-FLOAT") == SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT);
     munit_assert(sail_pixel_format_from_string("BPP32-GRAYSCALE-UINT") == SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT);
-    munit_assert(sail_pixel_format_from_string("BPP64-GRAYSCALE-ALPHA-UINT") == SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT);
+    munit_assert(sail_pixel_format_from_string("BPP64-GRAYSCALE-ALPHA-UINT")
+                 == SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT);
     munit_assert(sail_pixel_format_from_string("BPP96-RGB-UINT") == SAIL_PIXEL_FORMAT_BPP96_RGB_UINT);
     munit_assert(sail_pixel_format_from_string("BPP128-RGBA-UINT") == SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT);
 
@@ -783,7 +792,7 @@ static MunitResult test_is_floating_point(const MunitParameter params[], void* u
     munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF));
     munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
     munit_assert_true(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
-    
+
     munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT));
     munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT));
     munit_assert_false(sail_is_floating_point(SAIL_PIXEL_FORMAT_BPP96_RGB_UINT));

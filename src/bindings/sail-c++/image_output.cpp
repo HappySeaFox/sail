@@ -35,7 +35,7 @@ namespace sail
 class SAIL_HIDDEN image_output::pimpl
 {
 public:
-    pimpl(sail::abstract_io *abstract_io_ext, const sail::codec_info &other_codec_info)
+    pimpl(sail::abstract_io* abstract_io_ext, const sail::codec_info& other_codec_info)
         : abstract_io(abstract_io_ext)
         , abstract_io_ref(*abstract_io)
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
@@ -45,7 +45,7 @@ public:
     {
     }
 
-    pimpl(sail::abstract_io &abstract_io_ext, const sail::codec_info &other_codec_info)
+    pimpl(sail::abstract_io& abstract_io_ext, const sail::codec_info& other_codec_info)
         : abstract_io()
         , abstract_io_ref(abstract_io_ext)
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
@@ -77,71 +77,72 @@ public:
 
 sail_status_t image_output::pimpl::start()
 {
-    const sail_codec_info *sail_codec_info = codec_info.sail_codec_info_c();
+    const sail_codec_info* sail_codec_info = codec_info.sail_codec_info_c();
 
-    sail_save_options *sail_save_options = nullptr;
+    sail_save_options* sail_save_options = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_save_options(sail_save_options);
-    );
+    SAIL_AT_SCOPE_EXIT(sail_destroy_save_options(sail_save_options););
 
-    if (override_save_options) {
+    if (override_save_options)
+    {
         SAIL_TRY(save_options.to_sail_save_options(&sail_save_options));
     }
 
-    SAIL_TRY(sail_start_saving_into_io_with_options(&abstract_io_adapter->sail_io_c(), sail_codec_info, sail_save_options, &state));
+    SAIL_TRY(sail_start_saving_into_io_with_options(&abstract_io_adapter->sail_io_c(), sail_codec_info,
+                                                    sail_save_options, &state));
 
     return SAIL_OK;
 }
 
-image_output::image_output(const std::string &path)
+image_output::image_output(const std::string& path)
     : d(new pimpl(new io_file(path, io_file::Operation::ReadWrite), sail::codec_info::from_path(path)))
 {
 }
 
-image_output::image_output(void *buffer, std::size_t buffer_size, const sail::codec_info &codec_info)
+image_output::image_output(void* buffer, std::size_t buffer_size, const sail::codec_info& codec_info)
     : d(new pimpl(new io_memory(buffer, buffer_size), codec_info))
 {
 }
 
-image_output::image_output(sail::arbitrary_data *arbitrary_data, const sail::codec_info &codec_info)
+image_output::image_output(sail::arbitrary_data* arbitrary_data, const sail::codec_info& codec_info)
     : image_output(arbitrary_data->data(), arbitrary_data->size(), codec_info)
 {
 }
 
-image_output::image_output(sail::abstract_io &abstract_io, const sail::codec_info &codec_info)
+image_output::image_output(sail::abstract_io& abstract_io, const sail::codec_info& codec_info)
     : d(new pimpl(abstract_io, codec_info))
 {
 }
 
 image_output::~image_output()
 {
-    if (d) {
+    if (d)
+    {
         finish();
     }
 }
 
-image_output::image_output(image_output &&other) noexcept
+image_output::image_output(image_output&& other) noexcept
 {
     *this = std::move(other);
 }
 
-image_output& image_output::operator=(image_output &&other) noexcept
+image_output& image_output::operator=(image_output&& other) noexcept
 {
-    d = std::move(other.d);
+    d       = std::move(other.d);
     other.d = {};
 
     return *this;
 }
 
-image_output& image_output::with(const sail::codec_info &codec_info)
+image_output& image_output::with(const sail::codec_info& codec_info)
 {
     d->codec_info = codec_info;
 
     return *this;
 }
 
-image_output& image_output::with(const sail::save_options &save_options)
+image_output& image_output::with(const sail::save_options& save_options)
 {
     d->override_save_options = true;
     d->save_options          = save_options;
@@ -149,19 +150,17 @@ image_output& image_output::with(const sail::save_options &save_options)
     return *this;
 }
 
-sail_status_t image_output::next_frame(const sail::image &image)
+sail_status_t image_output::next_frame(const sail::image& image)
 {
-    if (d->state == nullptr) {
+    if (d->state == nullptr)
+    {
         SAIL_TRY(d->start());
     }
 
-    sail_image *sail_image = nullptr;
+    sail_image* sail_image = nullptr;
     SAIL_TRY(image.to_sail_image(&sail_image));
 
-    SAIL_AT_SCOPE_EXIT(
-        sail_image->pixels = nullptr;
-        sail_destroy_image(sail_image);
-    );
+    SAIL_AT_SCOPE_EXIT(sail_image->pixels = nullptr; sail_destroy_image(sail_image););
 
     SAIL_TRY(sail_write_next_frame(d->state, sail_image));
 
@@ -185,4 +184,4 @@ sail_status_t image_output::finish()
     return saved_status;
 }
 
-}
+} // namespace sail

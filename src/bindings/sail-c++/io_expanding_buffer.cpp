@@ -36,7 +36,7 @@ namespace sail
 io_expanding_buffer::io_expanding_buffer(std::size_t initial_capacity)
     : io_base(nullptr)
 {
-    struct sail_io *sail_io_local;
+    struct sail_io* sail_io_local;
 
     SAIL_TRY_OR_EXECUTE(sail_alloc_io_write_expanding_buffer(initial_capacity, &sail_io_local),
                         /* on error */ throw std::bad_alloc());

@@ -414,7 +414,8 @@ static MunitResult test_advanced_roundtrip(const MunitParameter params[], void* 
     if (image_to_save->source_image != NULL && image_to_save->source_image->special_properties != NULL)
     {
         /* Copy special properties to tuning hash map for roundtrip. */
-        munit_assert(sail_copy_hash_map(image_to_save->source_image->special_properties, &save_options->tuning) == SAIL_OK);
+        munit_assert(sail_copy_hash_map(image_to_save->source_image->special_properties, &save_options->tuning)
+                     == SAIL_OK);
     }
 
     void* state2              = NULL;

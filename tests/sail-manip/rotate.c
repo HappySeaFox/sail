@@ -32,16 +32,17 @@
 #include "munit.h"
 
 /* Helper function to create a simple test image with a pattern */
-static sail_status_t create_test_image(unsigned width, unsigned height,
-                                      enum SailPixelFormat pixel_format,
-                                      struct sail_image** image_output)
+static sail_status_t create_test_image(unsigned width,
+                                       unsigned height,
+                                       enum SailPixelFormat pixel_format,
+                                       struct sail_image** image_output)
 {
     struct sail_image* image = NULL;
     SAIL_TRY(sail_alloc_image(&image));
 
-    image->width = width;
-    image->height = height;
-    image->pixel_format = pixel_format;
+    image->width          = width;
+    image->height         = height;
+    image->pixel_format   = pixel_format;
     image->bytes_per_line = sail_bytes_per_line(width, pixel_format);
 
     /* Allocate pixels */
@@ -50,13 +51,13 @@ static sail_status_t create_test_image(unsigned width, unsigned height,
 
     /* Fill with a simple pattern: each pixel value is row * width + col */
     const unsigned bytes_per_pixel = sail_bits_per_pixel(pixel_format) / 8;
-    uint8_t* pixels = (uint8_t*)image->pixels;
+    uint8_t* pixels                = (uint8_t*)image->pixels;
 
     for (unsigned row = 0; row < height; row++)
     {
         for (unsigned col = 0; col < width; col++)
         {
-            uint8_t value = (uint8_t)((row * width + col) % 256);
+            uint8_t value  = (uint8_t)((row * width + col) % 256);
             uint8_t* pixel = pixels + (row * width + col) * bytes_per_pixel;
 
             for (unsigned b = 0; b < bytes_per_pixel; b++)
@@ -76,7 +77,7 @@ static MunitResult test_rotate_90(const MunitParameter params[], void* user_data
     (void)user_data;
 
     struct sail_image* original = NULL;
-    struct sail_image* rotated = NULL;
+    struct sail_image* rotated  = NULL;
 
     /* Create a 4x3 test image */
     munit_assert_int(create_test_image(4, 3, SAIL_PIXEL_FORMAT_BPP24_RGB, &original), ==, SAIL_OK);
@@ -91,18 +92,18 @@ static MunitResult test_rotate_90(const MunitParameter params[], void* user_data
 
     /* Verify pixel transformation: new[x][y] = old[height-1-y][x] */
     const unsigned bytes_per_pixel = 3;
-    const uint8_t* orig_pixels = (const uint8_t*)original->pixels;
-    const uint8_t* rot_pixels = (const uint8_t*)rotated->pixels;
+    const uint8_t* orig_pixels     = (const uint8_t*)original->pixels;
+    const uint8_t* rot_pixels      = (const uint8_t*)rotated->pixels;
 
     /* Check a few key pixels */
     /* Original [0][0] should be at rotated [0][2] */
     const uint8_t* orig_00 = orig_pixels + (0 * 4 + 0) * bytes_per_pixel;
-    const uint8_t* rot_02 = rot_pixels + (0 * 3 + 2) * bytes_per_pixel;
+    const uint8_t* rot_02  = rot_pixels + (0 * 3 + 2) * bytes_per_pixel;
     munit_assert_memory_equal(bytes_per_pixel, orig_00, rot_02);
 
     /* Original [0][3] should be at rotated [3][2] */
     const uint8_t* orig_03 = orig_pixels + (0 * 4 + 3) * bytes_per_pixel;
-    const uint8_t* rot_32 = rot_pixels + (3 * 3 + 2) * bytes_per_pixel;
+    const uint8_t* rot_32  = rot_pixels + (3 * 3 + 2) * bytes_per_pixel;
     munit_assert_memory_equal(bytes_per_pixel, orig_03, rot_32);
 
     sail_destroy_image(original);
@@ -117,7 +118,7 @@ static MunitResult test_rotate_180(const MunitParameter params[], void* user_dat
     (void)user_data;
 
     struct sail_image* original = NULL;
-    struct sail_image* rotated = NULL;
+    struct sail_image* rotated  = NULL;
 
     /* Create a 4x3 test image */
     munit_assert_int(create_test_image(4, 3, SAIL_PIXEL_FORMAT_BPP32_RGBA, &original), ==, SAIL_OK);
@@ -132,17 +133,17 @@ static MunitResult test_rotate_180(const MunitParameter params[], void* user_dat
 
     /* Verify pixel transformation: new[x][y] = old[width-1-x][height-1-y] */
     const unsigned bytes_per_pixel = 4;
-    const uint8_t* orig_pixels = (const uint8_t*)original->pixels;
-    const uint8_t* rot_pixels = (const uint8_t*)rotated->pixels;
+    const uint8_t* orig_pixels     = (const uint8_t*)original->pixels;
+    const uint8_t* rot_pixels      = (const uint8_t*)rotated->pixels;
 
     /* Original [0][0] should be at rotated [3][2] (bottom-right) */
     const uint8_t* orig_00 = orig_pixels + (0 * 4 + 0) * bytes_per_pixel;
-    const uint8_t* rot_23 = rot_pixels + (2 * 4 + 3) * bytes_per_pixel;
+    const uint8_t* rot_23  = rot_pixels + (2 * 4 + 3) * bytes_per_pixel;
     munit_assert_memory_equal(bytes_per_pixel, orig_00, rot_23);
 
     /* Original [2][3] (bottom-right) should be at rotated [0][0] (top-left) */
     const uint8_t* orig_23 = orig_pixels + (2 * 4 + 3) * bytes_per_pixel;
-    const uint8_t* rot_00 = rot_pixels + (0 * 4 + 0) * bytes_per_pixel;
+    const uint8_t* rot_00  = rot_pixels + (0 * 4 + 0) * bytes_per_pixel;
     munit_assert_memory_equal(bytes_per_pixel, orig_23, rot_00);
 
     sail_destroy_image(original);
@@ -157,7 +158,7 @@ static MunitResult test_rotate_270(const MunitParameter params[], void* user_dat
     (void)user_data;
 
     struct sail_image* original = NULL;
-    struct sail_image* rotated = NULL;
+    struct sail_image* rotated  = NULL;
 
     /* Create a 4x3 test image */
     munit_assert_int(create_test_image(4, 3, SAIL_PIXEL_FORMAT_BPP24_RGB, &original), ==, SAIL_OK);
@@ -172,17 +173,17 @@ static MunitResult test_rotate_270(const MunitParameter params[], void* user_dat
 
     /* Verify pixel transformation: new[x][y] = old[y][width-1-x] */
     const unsigned bytes_per_pixel = 3;
-    const uint8_t* orig_pixels = (const uint8_t*)original->pixels;
-    const uint8_t* rot_pixels = (const uint8_t*)rotated->pixels;
+    const uint8_t* orig_pixels     = (const uint8_t*)original->pixels;
+    const uint8_t* rot_pixels      = (const uint8_t*)rotated->pixels;
 
     /* Original [0][0] should be at rotated [3][0] */
     const uint8_t* orig_00 = orig_pixels + (0 * 4 + 0) * bytes_per_pixel;
-    const uint8_t* rot_30 = rot_pixels + (3 * 3 + 0) * bytes_per_pixel;
+    const uint8_t* rot_30  = rot_pixels + (3 * 3 + 0) * bytes_per_pixel;
     munit_assert_memory_equal(bytes_per_pixel, orig_00, rot_30);
 
     /* Original [0][3] should be at rotated [0][0] */
     const uint8_t* orig_03 = orig_pixels + (0 * 4 + 3) * bytes_per_pixel;
-    const uint8_t* rot_00 = rot_pixels + (0 * 3 + 0) * bytes_per_pixel;
+    const uint8_t* rot_00  = rot_pixels + (0 * 3 + 0) * bytes_per_pixel;
     munit_assert_memory_equal(bytes_per_pixel, orig_03, rot_00);
 
     sail_destroy_image(original);
@@ -196,7 +197,7 @@ static MunitResult test_rotate_180_inplace(const MunitParameter params[], void* 
     (void)params;
     (void)user_data;
 
-    struct sail_image* image = NULL;
+    struct sail_image* image     = NULL;
     struct sail_image* reference = NULL;
 
     /* Create a 4x3 test image */
@@ -229,7 +230,7 @@ static MunitResult test_rotate_with_palette(const MunitParameter params[], void*
     (void)user_data;
 
     struct sail_image* original = NULL;
-    struct sail_image* rotated = NULL;
+    struct sail_image* rotated  = NULL;
 
     /* Create a test image */
     munit_assert_int(create_test_image(4, 3, SAIL_PIXEL_FORMAT_BPP24_RGB, &original), ==, SAIL_OK);
@@ -259,13 +260,12 @@ static MunitResult test_rotate_invalid_angle(const MunitParameter params[], void
     (void)user_data;
 
     struct sail_image* original = NULL;
-    struct sail_image* rotated = NULL;
+    struct sail_image* rotated  = NULL;
 
     munit_assert_int(create_test_image(4, 3, SAIL_PIXEL_FORMAT_BPP24_RGB, &original), ==, SAIL_OK);
 
     /* Try to rotate with invalid angle */
-    munit_assert_int(sail_rotate_image(original, SAIL_ORIENTATION_NORMAL, &rotated),
-                    ==, SAIL_ERROR_INVALID_ARGUMENT);
+    munit_assert_int(sail_rotate_image(original, SAIL_ORIENTATION_NORMAL, &rotated), ==, SAIL_ERROR_INVALID_ARGUMENT);
     munit_assert_ptr_null(rotated);
 
     sail_destroy_image(original);
@@ -274,28 +274,18 @@ static MunitResult test_rotate_invalid_angle(const MunitParameter params[], void
 }
 
 /* Test suite */
-static MunitTest test_suite_tests[] =
-{
-    { (char*)"/rotate-90",               test_rotate_90,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char*)"/rotate-180",              test_rotate_180,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char*)"/rotate-270",              test_rotate_270,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char*)"/rotate-180-inplace",      test_rotate_180_inplace,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char*)"/rotate-with-palette",     test_rotate_with_palette,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char*)"/rotate-invalid-angle",    test_rotate_invalid_angle,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
-};
+static MunitTest test_suite_tests[] = {
+    {(char*)"/rotate-90", test_rotate_90, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {(char*)"/rotate-180", test_rotate_180, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {(char*)"/rotate-270", test_rotate_270, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {(char*)"/rotate-180-inplace", test_rotate_180_inplace, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {(char*)"/rotate-with-palette", test_rotate_with_palette, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {(char*)"/rotate-invalid-angle", test_rotate_invalid_angle, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+    {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
-static const MunitSuite test_suite =
-{
-    (char*)"/rotate",
-    test_suite_tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
-};
+static const MunitSuite test_suite = {(char*)"/rotate", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};
 
 int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {
     return munit_suite_main(&test_suite, NULL, argc, argv);
 }
-

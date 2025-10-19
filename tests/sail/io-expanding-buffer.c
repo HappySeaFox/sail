@@ -37,8 +37,8 @@ static MunitResult test_expanding_buffer_write(const MunitParameter params[], vo
     (void)user_data;
 
     const size_t initial_capacity = 1024;
-    const char* test_data = "Hello, expanding buffer!";
-    const size_t test_data_size = strlen(test_data);
+    const char* test_data         = "Hello, expanding buffer!";
+    const size_t test_data_size   = strlen(test_data);
 
     struct sail_io* io = NULL;
     munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);
@@ -73,7 +73,7 @@ static MunitResult test_expanding_buffer_multiple_writes(const MunitParameter pa
     (void)user_data;
 
     const size_t initial_capacity = 64;
-    struct sail_io* io = NULL;
+    struct sail_io* io            = NULL;
     munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);
 
     /* Write multiple chunks. */
@@ -113,7 +113,7 @@ static MunitResult test_expanding_buffer_expansion(const MunitParameter params[]
     (void)user_data;
 
     const size_t initial_capacity = 16;
-    const size_t large_size = 1024;
+    const size_t large_size       = 1024;
 
     struct sail_io* io = NULL;
     munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);
@@ -154,8 +154,8 @@ static MunitResult test_expanding_buffer_flush(const MunitParameter params[], vo
     (void)user_data;
 
     const size_t initial_capacity = 1024;
-    const char* test_data = "Flush test!";
-    const size_t test_data_size = strlen(test_data);
+    const char* test_data         = "Flush test!";
+    const size_t test_data_size   = strlen(test_data);
 
     struct sail_io* io = NULL;
     munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);
@@ -183,8 +183,8 @@ static MunitResult test_expanding_buffer_read(const MunitParameter params[], voi
     (void)user_data;
 
     const size_t initial_capacity = 1024;
-    const char* test_data = "Read this back!";
-    const size_t test_data_size = strlen(test_data);
+    const char* test_data         = "Read this back!";
+    const size_t test_data_size   = strlen(test_data);
 
     struct sail_io* io = NULL;
     munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);
@@ -214,7 +214,7 @@ static MunitResult test_expanding_buffer_seek_tell(const MunitParameter params[]
     (void)user_data;
 
     const size_t initial_capacity = 1024;
-    struct sail_io* io = NULL;
+    struct sail_io* io            = NULL;
     munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);
 
     /* Write some data. */
@@ -253,8 +253,8 @@ static MunitResult test_expanding_buffer_eof(const MunitParameter params[], void
     (void)user_data;
 
     const size_t initial_capacity = 1024;
-    const char* test_data = "EOF test";
-    const size_t test_data_size = strlen(test_data);
+    const char* test_data         = "EOF test";
+    const size_t test_data_size   = strlen(test_data);
 
     struct sail_io* io = NULL;
     munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);

@@ -35,19 +35,20 @@ class SAIL_HIDDEN load_features::pimpl
 public:
     pimpl()
         : sail_load_features_c(nullptr)
-    {}
+    {
+    }
 
-    const sail_load_features *sail_load_features_c;
+    const sail_load_features* sail_load_features_c;
     sail::supported_tuning supported_tuning;
 };
 
-load_features::load_features(const load_features &rf)
+load_features::load_features(const load_features& rf)
     : load_features()
 {
     *this = rf;
 }
 
-load_features& load_features::operator=(const sail::load_features &load_features)
+load_features& load_features::operator=(const sail::load_features& load_features)
 {
     d->sail_load_features_c = load_features.d->sail_load_features_c;
     d->supported_tuning     = load_features.d->supported_tuning;
@@ -55,12 +56,12 @@ load_features& load_features::operator=(const sail::load_features &load_features
     return *this;
 }
 
-load_features::load_features(sail::load_features &&load_features) noexcept
+load_features::load_features(sail::load_features&& load_features) noexcept
 {
     *this = std::move(load_features);
 }
 
-load_features& load_features::operator=(sail::load_features &&load_features) noexcept
+load_features& load_features::operator=(sail::load_features&& load_features) noexcept
 {
     d = std::move(load_features.d);
 
@@ -81,12 +82,12 @@ const sail::supported_tuning& load_features::supported_tuning() const
     return d->supported_tuning;
 }
 
-sail_status_t load_features::to_options(sail::load_options *load_options) const
+sail_status_t load_features::to_options(sail::load_options* load_options) const
 {
     SAIL_CHECK_PTR(d->sail_load_features_c);
     SAIL_CHECK_PTR(load_options);
 
-    sail_load_options *sail_load_options;
+    sail_load_options* sail_load_options;
 
     SAIL_TRY(sail_alloc_load_options_from_features(d->sail_load_features_c, &sail_load_options));
 
@@ -102,17 +103,19 @@ load_features::load_features()
 {
 }
 
-load_features::load_features(const sail_load_features *rf)
+load_features::load_features(const sail_load_features* rf)
     : load_features()
 {
-    if (rf == nullptr) {
+    if (rf == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::load_features(). The object is untouched");
         return;
     }
 
     d->sail_load_features_c = rf;
 
-    for (const sail_string_node *node = rf->tuning; node != nullptr; node = node->next) {
+    for (const sail_string_node* node = rf->tuning; node != nullptr; node = node->next)
+    {
         d->supported_tuning.push_back(node->string);
     }
 }
@@ -122,4 +125,4 @@ const sail_load_features* load_features::sail_load_features_c() const
     return d->sail_load_features_c;
 }
 
-}
+} // namespace sail

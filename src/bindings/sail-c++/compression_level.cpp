@@ -45,16 +45,16 @@ public:
         sail_destroy_compression_level(sail_compression_level);
     }
 
-    struct sail_compression_level *sail_compression_level;
+    struct sail_compression_level* sail_compression_level;
 };
 
-compression_level::compression_level(const sail::compression_level &cl)
+compression_level::compression_level(const sail::compression_level& cl)
     : compression_level()
 {
     *this = cl;
 }
 
-compression_level& compression_level::operator=(const sail::compression_level &compression_level)
+compression_level& compression_level::operator=(const sail::compression_level& compression_level)
 {
     d->sail_compression_level->min_level     = compression_level.min_level();
     d->sail_compression_level->max_level     = compression_level.max_level();
@@ -64,12 +64,12 @@ compression_level& compression_level::operator=(const sail::compression_level &c
     return *this;
 }
 
-compression_level::compression_level(sail::compression_level &&compression_level) noexcept
+compression_level::compression_level(sail::compression_level&& compression_level) noexcept
 {
     *this = std::move(compression_level);
 }
 
-compression_level& compression_level::operator=(sail::compression_level &&compression_level) noexcept
+compression_level& compression_level::operator=(sail::compression_level&& compression_level) noexcept
 {
     d = std::move(compression_level.d);
 
@@ -82,9 +82,9 @@ compression_level::~compression_level()
 
 bool compression_level::is_valid() const
 {
-    return d->sail_compression_level->min_level < d->sail_compression_level->max_level &&
-            d->sail_compression_level->default_level >= d->sail_compression_level->min_level &&
-            d->sail_compression_level->default_level <= d->sail_compression_level->max_level;
+    return d->sail_compression_level->min_level < d->sail_compression_level->max_level
+           && d->sail_compression_level->default_level >= d->sail_compression_level->min_level
+           && d->sail_compression_level->default_level <= d->sail_compression_level->max_level;
 }
 
 double compression_level::min_level() const
@@ -112,10 +112,11 @@ compression_level::compression_level()
 {
 }
 
-compression_level::compression_level(const sail_compression_level *cl)
+compression_level::compression_level(const sail_compression_level* cl)
     : compression_level()
 {
-    if (cl == nullptr) {
+    if (cl == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::compression_level(). The object is untouched");
         return;
     }
@@ -126,4 +127,4 @@ compression_level::compression_level(const sail_compression_level *cl)
     d->sail_compression_level->step          = cl->step;
 }
 
-}
+} // namespace sail

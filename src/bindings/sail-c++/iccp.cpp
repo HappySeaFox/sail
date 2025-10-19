@@ -52,41 +52,42 @@ iccp::iccp()
 {
 }
 
-iccp::iccp(const void *data, std::size_t data_size)
+iccp::iccp(const void* data, std::size_t data_size)
     : iccp()
 {
     set_data(data, data_size);
 }
 
-iccp::iccp(const arbitrary_data &data)
+iccp::iccp(const arbitrary_data& data)
     : iccp()
 {
     set_data(data);
 }
 
-iccp::iccp(const sail::iccp &ic)
+iccp::iccp(const sail::iccp& ic)
     : iccp()
 {
     *this = ic;
 }
 
-iccp& iccp::operator=(const sail::iccp &iccp)
+iccp& iccp::operator=(const sail::iccp& iccp)
 {
     d->reset();
 
-    if (iccp.is_valid()) {
+    if (iccp.is_valid())
+    {
         set_data(iccp.data());
     }
 
     return *this;
 }
 
-iccp::iccp(sail::iccp &&iccp) noexcept
+iccp::iccp(sail::iccp&& iccp) noexcept
 {
     *this = std::move(iccp);
 }
 
-iccp& iccp::operator=(sail::iccp &&iccp) noexcept
+iccp& iccp::operator=(sail::iccp&& iccp) noexcept
 {
     d = std::move(iccp.d);
 
@@ -107,22 +108,23 @@ const arbitrary_data& iccp::data() const
     return d->data;
 }
 
-void iccp::set_data(const void *data, std::size_t data_size)
+void iccp::set_data(const void* data, std::size_t data_size)
 {
     d->reset();
 
     copy(data, data_size);
 }
 
-void iccp::set_data(const arbitrary_data &data)
+void iccp::set_data(const arbitrary_data& data)
 {
     set_data(data.data(), data.size());
 }
 
-iccp::iccp(const sail_iccp *ic)
+iccp::iccp(const sail_iccp* ic)
     : iccp()
 {
-    if (ic == nullptr) {
+    if (ic == nullptr)
+    {
         SAIL_LOG_TRACE("NULL pointer has been passed to sail::iccp(). The object is untouched");
         return;
     }
@@ -130,11 +132,11 @@ iccp::iccp(const sail_iccp *ic)
     set_data(ic->data, ic->size);
 }
 
-sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
+sail_status_t iccp::to_sail_iccp(sail_iccp** iccp) const
 {
     SAIL_CHECK_PTR(iccp);
 
-    sail_iccp *iccp_local;
+    sail_iccp* iccp_local;
     SAIL_TRY(sail_alloc_iccp_from_data(d->data.data(), static_cast<std::size_t>(d->data.size()), &iccp_local));
 
     *iccp = iccp_local;
@@ -142,13 +144,14 @@ sail_status_t iccp::to_sail_iccp(sail_iccp **iccp) const
     return SAIL_OK;
 }
 
-void iccp::copy(const void *data, std::size_t data_size)
+void iccp::copy(const void* data, std::size_t data_size)
 {
     d->data.resize(data_size);
 
-    if (data_size > 0) {
+    if (data_size > 0)
+    {
         memcpy(d->data.data(), data, data_size);
     }
 }
 
-}
+} // namespace sail

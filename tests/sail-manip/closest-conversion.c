@@ -255,44 +255,29 @@ static MunitResult test_can_convert_float_formats(const MunitParameter params[],
     (void)user_data;
 
     /* Test float grayscale conversions */
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF,
-                                       SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT,
-                                       SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE,
-                                       SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF, SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT, SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE, SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT));
 
     /* Test float RGB conversions */
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF,
-                                       SAIL_PIXEL_FORMAT_BPP24_RGB));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,
-                                       SAIL_PIXEL_FORMAT_BPP48_RGB));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP24_RGB,
-                                       SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF, SAIL_PIXEL_FORMAT_BPP24_RGB));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT, SAIL_PIXEL_FORMAT_BPP48_RGB));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP24_RGB, SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
 
     /* Test float RGBA conversions */
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF,
-                                       SAIL_PIXEL_FORMAT_BPP32_RGBA));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,
-                                       SAIL_PIXEL_FORMAT_BPP64_RGBA));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP32_RGBA,
-                                       SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF, SAIL_PIXEL_FORMAT_BPP32_RGBA));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT, SAIL_PIXEL_FORMAT_BPP64_RGBA));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP32_RGBA, SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
 
     /* Test float to indexed */
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,
-                                       SAIL_PIXEL_FORMAT_BPP8_INDEXED));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,
-                                       SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT, SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT, SAIL_PIXEL_FORMAT_BPP8_INDEXED));
 
     /* Test bidirectional float conversions */
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF,
-                                       SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT,
-                                       SAIL_PIXEL_FORMAT_BPP48_RGB_HALF));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF,
-                                       SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
-    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT,
-                                       SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF, SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT, SAIL_PIXEL_FORMAT_BPP48_RGB_HALF));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF, SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
+    munit_assert_true(sail_can_convert(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT, SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF));
 
     return MUNIT_OK;
 }

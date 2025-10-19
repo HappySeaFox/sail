@@ -33,12 +33,12 @@ namespace sail
 namespace log
 {
 
-SailLogLevel level_from_string(const char *str)
+SailLogLevel level_from_string(const char* str)
 {
     return sail_log_level_from_string(str);
 }
 
-SailLogLevel level_from_string(const std::string &str)
+SailLogLevel level_from_string(const std::string& str)
 {
     return sail_log_level_from_string(str.c_str());
 }
@@ -53,6 +53,6 @@ void set_logger(sail_logger logger)
     sail_set_logger(logger);
 }
 
-}
+} // namespace log
 
-}
+} // namespace sail

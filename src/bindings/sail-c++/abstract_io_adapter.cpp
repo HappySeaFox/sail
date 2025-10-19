@@ -34,81 +34,90 @@ namespace sail
  * Private functions.
  */
 
-static sail_status_t wrapped_tolerant_read(void *stream, void *buf, size_t size_to_read, size_t *read_size) {
+static sail_status_t wrapped_tolerant_read(void* stream, void* buf, size_t size_to_read, size_t* read_size)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.tolerant_read(buf, size_to_read, read_size));
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_strict_read(void *stream, void *buf, size_t size_to_read) {
+static sail_status_t wrapped_strict_read(void* stream, void* buf, size_t size_to_read)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.strict_read(buf, size_to_read));
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_tolerant_write(void *stream, const void *buf, size_t size_to_write, size_t *written_size) {
+static sail_status_t wrapped_tolerant_write(void* stream, const void* buf, size_t size_to_write, size_t* written_size)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.tolerant_write(buf, size_to_write, written_size));
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_strict_write(void *stream, const void *buf, size_t size_to_write) {
+static sail_status_t wrapped_strict_write(void* stream, const void* buf, size_t size_to_write)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.strict_write(buf, size_to_write));
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_seek(void *stream, long offset, int whence) {
+static sail_status_t wrapped_seek(void* stream, long offset, int whence)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.seek(offset, whence));
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_tell(void *stream, size_t *offset) {
+static sail_status_t wrapped_tell(void* stream, size_t* offset)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.tell(offset));
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_flush(void *stream) {
+static sail_status_t wrapped_flush(void* stream)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.flush());
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_close(void *stream) {
+static sail_status_t wrapped_close(void* stream)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.close());
 
     return SAIL_OK;
 }
 
-static sail_status_t wrapped_eof(void *stream, bool *result) {
+static sail_status_t wrapped_eof(void* stream, bool* result)
+{
 
-    sail::abstract_io &abstract_io = *reinterpret_cast<sail::abstract_io *&>(stream);
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.eof(result));
 
@@ -118,7 +127,7 @@ static sail_status_t wrapped_eof(void *stream, bool *result) {
 class SAIL_HIDDEN abstract_io_adapter::pimpl
 {
 public:
-    explicit pimpl(sail::abstract_io &other_abstract_io)
+    explicit pimpl(sail::abstract_io& other_abstract_io)
         : abstract_io(other_abstract_io)
     {
         sail_io.features       = abstract_io.features();
@@ -134,11 +143,11 @@ public:
         sail_io.eof            = wrapped_eof;
     }
 
-    sail::abstract_io &abstract_io;
+    sail::abstract_io& abstract_io;
     struct sail_io sail_io;
 };
 
-abstract_io_adapter::abstract_io_adapter(sail::abstract_io &abstract_io)
+abstract_io_adapter::abstract_io_adapter(sail::abstract_io& abstract_io)
     : d(new pimpl(abstract_io))
 {
 }
@@ -152,4 +161,4 @@ struct sail_io& abstract_io_adapter::sail_io_c() const
     return d->sail_io;
 }
 
-}
+} // namespace sail

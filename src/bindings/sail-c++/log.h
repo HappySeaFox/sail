@@ -46,7 +46,7 @@ namespace log
  *
  * Supported strings: "silence", "error", "warning", "info", "message", "debug", "trace".
  */
-SAIL_EXPORT SailLogLevel level_from_string(const char *str);
+SAIL_EXPORT SailLogLevel level_from_string(const char* str);
 
 /*
  * Converts a string representation of a log level to SailLogLevel.
@@ -54,7 +54,7 @@ SAIL_EXPORT SailLogLevel level_from_string(const char *str);
  *
  * Supported strings: "silence", "error", "warning", "info", "message", "debug", "trace".
  */
-SAIL_EXPORT SailLogLevel level_from_string(const std::string &str);
+SAIL_EXPORT SailLogLevel level_from_string(const std::string& str);
 
 /*
  * Sets a maximum log level barrier. Only the messages of the specified log level or lower will be displayed.
