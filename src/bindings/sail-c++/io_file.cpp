@@ -24,6 +24,7 @@
 */
 
 #include <stdexcept>
+#include <ios>
 
 #include <sail/sail.h>
 
@@ -50,11 +51,11 @@ static struct sail_io *construct_sail_io(const std::string &path, io_file::Opera
     switch (operation) {
         case io_file::Operation::Read:
             SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_file(path.c_str(), &sail_io),
-                                /* on error */ throw std::bad_alloc());
+                                /* on error */ throw std::ios_base::failure("Failed to open file for reading: " + path));
         break;
         case io_file::Operation::ReadWrite:
             SAIL_TRY_OR_EXECUTE(sail_alloc_io_read_write_file(path.c_str(), &sail_io),
-                                /* on error */ throw std::bad_alloc());
+                                /* on error */ throw std::ios_base::failure("Failed to open file for read/write: " + path));
         break;
         default: {
             throw std::runtime_error("Unknown file operation");
