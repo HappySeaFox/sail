@@ -59,14 +59,13 @@ before_script:
       fi
 
       fail_on_error git -C vcpkg pull
+
       # libheif requires <bit> which is not available in this particular MSVC
-
       # openexr also has some uninvestigated issues
-      fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
-                                --triplet x64-windows --clean-buildtrees-after-build
-
-      fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
-                                --triplet x64-windows-static --clean-buildtrees-after-build
+      for triplet in x64-windows x64-windows-static x64-windows-static-md; do
+        fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
+                                  --triplet $triplet --clean-buildtrees-after-build
+      done
     ;;
   esac
 
@@ -154,7 +153,11 @@ script:
         if [ "$BUILD_SHARED_LIBS" = "ON" ]; then
             VCPKG_TARGET_TRIPLET="x64-windows"
         else
-            VCPKG_TARGET_TRIPLET="x64-windows-static"
+            if [ "$SAIL_WINDOWS_STATIC_CRT" = "ON" ]; then
+                VCPKG_TARGET_TRIPLET="x64-windows-static"
+            else
+                VCPKG_TARGET_TRIPLET="x64-windows-static-md"
+            fi
         fi
 
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
@@ -204,5 +207,10 @@ script:
   # SHARED, COMBINED
   build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=ON SAIL_COMBINE_CODECS=ON
 
-  # STATIC (turns on SAIL_COMBINE_CODECS=ON)
-  build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF SAIL_WINDOWS_STATIC_CRT=ON
+  # STATIC
+  if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+    build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF SAIL_WINDOWS_STATIC_CRT=ON  # /MT
+    build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF SAIL_WINDOWS_STATIC_CRT=OFF # /MD
+  else
+    build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF
+  fi
