@@ -49,6 +49,7 @@ struct qoi_state
     void* image_data;
     size_t image_data_size;
     void* pixels;
+    int encoded_size;
 
     qoi_desc qoi_desc;
 };
@@ -72,6 +73,7 @@ static sail_status_t alloc_qoi_state(struct sail_io* io,
         .image_data      = NULL,
         .image_data_size = 0,
         .pixels          = NULL,
+        .encoded_size    = 0,
     };
 
     return SAIL_OK;
@@ -238,11 +240,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_qoi(void* state, co
     }
     }
 
-    int written;
     qoi_state->pixels = qoi_encode(
         image->pixels,
         &(qoi_desc){.width = image->width, .height = image->height, .channels = channels, .colorspace = QOI_SRGB},
-        &written);
+        &qoi_state->encoded_size);
 
     if (qoi_state->pixels == NULL)
     {
@@ -257,9 +258,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_qoi(void* state, const struct
 {
     struct qoi_state* qoi_state = state;
 
-    const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
+    (void)image; /* Not used in this implementation */
 
-    SAIL_TRY(qoi_state->io->strict_write(qoi_state->io->stream, qoi_state->pixels, pixels_size));
+    SAIL_TRY(qoi_state->io->strict_write(qoi_state->io->stream, qoi_state->pixels, qoi_state->encoded_size));
 
     return SAIL_OK;
 }
