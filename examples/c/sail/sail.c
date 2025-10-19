@@ -1064,7 +1064,7 @@ static sail_status_t convert(int argc, char* argv[])
 
 static bool special_properties_printf_callback(const char* key, const struct sail_variant* value)
 {
-    printf("  %s : ", key);
+    printf("    %s : ", key);
     sail_printf_variant(value);
     printf("\n");
 
@@ -1073,26 +1073,26 @@ static bool special_properties_printf_callback(const char* key, const struct sai
 
 static void print_aligned_image_info(const struct sail_image* image)
 {
-    printf("Size          : %ux%u\n", image->width, image->height);
+    printf("  Size        : %ux%u\n", image->width, image->height);
 
     if (image->resolution == NULL)
     {
-        printf("Resolution:   : -\n");
+        printf("  Resolution  : -\n");
     }
     else
     {
-        printf("Resolution:   : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
+        printf("  Resolution  : %.1fx%.1f\n", image->resolution->x, image->resolution->y);
     }
 
-    printf("Pixel format  : %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
-    printf("Compression   : %s\n", sail_compression_to_string(image->source_image->compression));
-    printf("ICC profile   : %s\n", image->iccp == NULL ? "no" : "yes");
-    printf("Interlaced    : %s\n", image->source_image->interlaced ? "yes" : "no");
-    printf("Delay         : %d ms.\n", image->delay);
+    printf("  Pixel format: %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
+    printf("  Compression : %s\n", sail_compression_to_string(image->source_image->compression));
+    printf("  ICC profile : %s\n", image->iccp == NULL ? "no" : "yes");
+    printf("  Interlaced  : %s\n", image->source_image->interlaced ? "yes" : "no");
+    printf("  Delay       : %d ms.\n", image->delay);
 
     if (image->meta_data_node != NULL)
     {
-        printf("Meta data     :\n");
+        printf("  Meta data   :\n");
 
         for (const struct sail_meta_data_node* meta_data_node = image->meta_data_node; meta_data_node != NULL;
              meta_data_node                                   = meta_data_node->next)
@@ -1117,7 +1117,7 @@ static void print_aligned_image_info(const struct sail_image* image)
 
     if (image->source_image->special_properties != NULL)
     {
-        printf("Special properties :\n");
+        printf("  Special properties:\n");
         sail_traverse_hash_map(image->source_image->special_properties, special_properties_printf_callback);
     }
 }
