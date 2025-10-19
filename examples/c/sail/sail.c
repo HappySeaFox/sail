@@ -61,6 +61,7 @@ static sail_status_t convert_impl(const char** inputs,
                                   enum SailPixelFormat pixel_format,
                                   int compression,
                                   int max_frames,
+                                  int target_frame,
                                   int delay,
                                   int colors,
                                   bool dither,
@@ -108,6 +109,12 @@ static sail_status_t convert_impl(const char** inputs,
             SAIL_LOG_WARNING("Output format doesn't support animation/multi-page, forcing to 1 frame");
         }
         max_frames = 1;
+    }
+
+    /* If target_frame is specified, adjust max_frames to allow reaching that frame. */
+    if (target_frame > 0)
+    {
+        max_frames = target_frame;
     }
 
     /* Log the output mode. */
@@ -177,6 +184,17 @@ static sail_status_t convert_impl(const char** inputs,
 
         while ((load_status = sail_load_next_frame(load_state, &image)) == SAIL_OK)
         {
+            /* Check if we need to skip frames to reach target frame. */
+            if (target_frame > 0 && total_frame_count < target_frame - 1)
+            {
+                SAIL_LOG_DEBUG("Skipping frame #%d (file #%d, frame #%d, waiting for frame #%d", total_frame_count,
+                               file_idx + 1, file_frame_count, target_frame);
+                sail_destroy_image(image);
+                total_frame_count++;
+                file_frame_count++;
+                continue;
+            }
+
             /* Check max frames limit. */
             if (max_frames > 0 && total_frame_count >= max_frames)
             {
@@ -303,7 +321,8 @@ static sail_status_t convert_impl(const char** inputs,
                     indexed_format = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
                 }
 
-                SAIL_LOG_INFO("Quantizing to %s%s", sail_pixel_format_to_string(indexed_format), dither ? " with dithering" : "");
+                SAIL_LOG_INFO("Quantizing to %s%s", sail_pixel_format_to_string(indexed_format),
+                              dither ? " with dithering" : "");
                 struct sail_image* image_quantized;
                 SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, indexed_format, dither, &image_quantized),
                                     sail_destroy_image(image);
@@ -404,8 +423,8 @@ static sail_status_t convert_impl(const char** inputs,
             }
             /* Otherwise keep original delay for animation. */
 
-            /* Start saving on first frame. */
-            if (total_frame_count == 0)
+            /* Start saving on first frame to be processed (not skipped). */
+            if (save_state == NULL)
             {
                 SAIL_TRY_OR_CLEANUP(
                     sail_start_saving_into_file_with_options(output, output_codec_info, save_options, &save_state),
@@ -421,6 +440,13 @@ static sail_status_t convert_impl(const char** inputs,
             sail_destroy_image(image);
             total_frame_count++;
             file_frame_count++;
+
+            /* If we're extracting a specific frame, stop after processing it. */
+            if (target_frame > 0 && total_frame_count >= target_frame)
+            {
+                SAIL_LOG_DEBUG("Extracted target frame #%d, stopping", target_frame);
+                break;
+            }
         }
 
         SAIL_TRY_OR_CLEANUP(sail_stop_loading(load_state), sail_stop_saving(save_state);
@@ -457,6 +483,7 @@ static sail_status_t extract_frames_impl(const char* input,
                                          enum SailPixelFormat pixel_format,
                                          int compression,
                                          int max_frames,
+                                         int target_frame,
                                          int colors,
                                          bool dither,
                                          const char* background,
@@ -497,12 +524,27 @@ static sail_status_t extract_frames_impl(const char* input,
     const char* base_name_start = dir_sep ? (dir_sep + 1) : output_template;
     size_t base_name_len        = base_name_end - base_name_start;
 
+    /* If target_frame is specified, adjust max_frames to allow reaching that frame. */
+    if (target_frame > 0)
+    {
+        max_frames = target_frame;
+    }
+
     /* Extract all frames. */
     sail_status_t load_status;
     int frame_count = 0;
 
     while ((load_status = sail_load_next_frame(load_state, &image)) == SAIL_OK)
     {
+        /* Check if we need to skip frames to reach target frame. */
+        if (target_frame > 0 && frame_count < target_frame - 1)
+        {
+            SAIL_LOG_DEBUG("Skipping frame #%d, waiting for frame #%d", frame_count, target_frame);
+            sail_destroy_image(image);
+            frame_count++;
+            continue;
+        }
+
         /* Check max frames limit. */
         if (max_frames > 0 && frame_count >= max_frames)
         {
@@ -520,8 +562,8 @@ static sail_status_t extract_frames_impl(const char* input,
             safe_base_name_len = sizeof(output_filename) - 20; /* Reserve space for "-N" and extension */
         }
 
-        long written = sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len, base_name_start,
-                                     frame_count + 1, ext ? ext : "");
+        long written = sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len,
+                                     base_name_start, frame_count + 1, ext ? ext : "");
         if (written < 0 || written >= (long)sizeof(output_filename))
         {
             SAIL_LOG_ERROR("Failed to construct path from '%s' and '%s'", input, output_template);
@@ -536,7 +578,8 @@ static sail_status_t extract_frames_impl(const char* input,
             char full_path[1024];
             size_t dir_len = dir_sep - output_template + 1;
 
-            written = sail_snprintf(full_path, sizeof(full_path), "%.*s%s", (int)dir_len, output_template, output_filename);
+            written =
+                sail_snprintf(full_path, sizeof(full_path), "%.*s%s", (int)dir_len, output_template, output_filename);
             if (written < 0 || written >= (long)sizeof(full_path))
             {
                 SAIL_LOG_ERROR("Failed to construct path from '%s' and '%s'", output_template, output_filename);
@@ -657,7 +700,8 @@ static sail_status_t extract_frames_impl(const char* input,
             }
 
             struct sail_image* image_quantized;
-            SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, indexed_format, dither, &image_quantized), sail_destroy_image(image);
+            SAIL_TRY_OR_CLEANUP(sail_quantize_image(image, indexed_format, dither, &image_quantized),
+                                sail_destroy_image(image);
                                 sail_stop_loading(load_state));
             sail_destroy_image(image);
             image = image_quantized;
@@ -755,6 +799,13 @@ static sail_status_t extract_frames_impl(const char* input,
         sail_destroy_image(image);
         sail_destroy_save_options(save_options);
         frame_count++;
+
+        /* If we're extracting a specific frame, stop after processing it. */
+        if (target_frame > 0 && frame_count >= target_frame)
+        {
+            SAIL_LOG_DEBUG("Extracted target frame #%d, stopping", target_frame);
+            break;
+        }
     }
 
     SAIL_TRY(sail_stop_loading(load_state));
@@ -783,6 +834,8 @@ static sail_status_t convert(int argc, char* argv[])
     int compression = -1;
     /* 0: convert all frames. */
     int max_frames = 0;
+    /* 0: no specific frame target, >0: extract specific frame number. */
+    int target_frame = 0;
     /* UNKNOWN: auto-select best format. */
     enum SailPixelFormat pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
     /* -1: no delay specified, use original or default based on format. */
@@ -936,6 +989,24 @@ static sail_status_t convert(int argc, char* argv[])
                 continue;
             }
 
+            if (strcmp(argv[i], "-n") == 0 || strcmp(argv[i], "--frame-number") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing frame number value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                int frame_number = atoi(argv[i + 1]);
+                if (frame_number < 1)
+                {
+                    fprintf(stderr, "Error: Frame number must be positive.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                target_frame  = frame_number;
+                i            += 2;
+                continue;
+            }
+
             fprintf(stderr, "Error: Unrecognized option '%s'.\n", argv[i]);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
         }
@@ -979,13 +1050,13 @@ static sail_status_t convert(int argc, char* argv[])
             fprintf(stderr, "Warning: --delay option is ignored in extract frames mode.\n");
         }
 
-        SAIL_TRY(extract_frames_impl(files[0], output, pixel_format, compression, max_frames, colors, dither,
-                                     background, strip_metadata, flip_horizontal, flip_vertical));
+        SAIL_TRY(extract_frames_impl(files[0], output, pixel_format, compression, max_frames, target_frame, colors,
+                                     dither, background, strip_metadata, flip_horizontal, flip_vertical));
     }
     else
     {
-        SAIL_TRY(convert_impl(files, input_count, output, pixel_format, compression, max_frames, delay, colors, dither,
-                              background, strip_metadata, flip_horizontal, flip_vertical));
+        SAIL_TRY(convert_impl(files, input_count, output, pixel_format, compression, max_frames, target_frame, delay,
+                              colors, dither, background, strip_metadata, flip_horizontal, flip_vertical));
     }
 
     return SAIL_OK;
@@ -1318,7 +1389,8 @@ static void help(const char* app)
             "        -b, --background <color>     Blend alpha channel with background (white, black, #RRGGBB)\n");
     fprintf(stderr, "        -s, --strip                  Remove all metadata from output files\n");
     fprintf(stderr, "        -H, --flip-horizontal        Flip image horizontally (mirror left-right)\n");
-    fprintf(stderr, "        -V, --flip-vertical          Flip image vertically (mirror top-bottom)\n\n");
+    fprintf(stderr, "        -V, --flip-vertical          Flip image vertically (mirror top-bottom)\n");
+    fprintf(stderr, "        -n, --frame-number <N>       Extract specific frame number N (1-based)\n\n");
     fprintf(stderr, "      Use cases:\n");
     fprintf(stderr, "        # Simple format conversion between codecs\n");
     fprintf(stderr, "        %s convert input.jpg output.png\n\n", app);
@@ -1342,6 +1414,8 @@ static void help(const char* app)
     fprintf(stderr, "        %s convert photo.jpg clean.jpg --strip\n\n", app);
     fprintf(stderr, "        # Flip image horizontally or vertically\n");
     fprintf(stderr, "        %s convert photo.jpg flipped.jpg -H -V\n\n", app);
+    fprintf(stderr, "        # Extract frame #2 from animation\n");
+    fprintf(stderr, "        %s convert animation.gif frame2.png -n 2\n\n", app);
 
     fprintf(stderr, "  probe <path>     Display detailed information about image file\n");
     fprintf(stderr, "  decode <path>    Decode file and show information for all frames\n\n");
@@ -1363,7 +1437,7 @@ int main(int argc, char* argv[])
 
     /* Default log level. */
     enum SailLogLevel log_level = SAIL_LOG_LEVEL_WARNING;
-    int arg_offset = 1;
+    int arg_offset              = 1;
 
     /* Check for global options. */
     while (arg_offset < argc && argv[arg_offset][0] == '-')
@@ -1394,7 +1468,7 @@ int main(int argc, char* argv[])
                 fprintf(stderr, "Error: Unknown log level '%s'\n", argv[arg_offset + 1]);
                 return 1;
             }
-            log_level = parsed_level;
+            log_level   = parsed_level;
             arg_offset += 2;
             continue;
         }
