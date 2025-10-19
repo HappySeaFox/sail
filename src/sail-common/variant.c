@@ -44,6 +44,10 @@ static sail_status_t set_variant_value_asymmetric(struct sail_variant* variant,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
+    /* Free old value before allocating new one. */
+    sail_free(variant->value);
+    variant->value = NULL;
+
     void** ptr = &variant->value;
     SAIL_TRY(sail_realloc(variant_size, ptr));
     memcpy(variant->value, value, value_size);
