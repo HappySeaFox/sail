@@ -165,8 +165,7 @@ script:
                                    -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" ..
         fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
-        cd tests
-        fail_on_error ctest -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
+        fail_on_error ctest --test-dir tests -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
@@ -181,15 +180,11 @@ script:
         fail_on_error cmake -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
                             -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
         fail_on_error cmake --build . -j$(nproc)
+
         fail_on_error sudo make install
+        fail_on_error sudo ldconfig
 
-        if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-            fail_on_error sudo ldconfig
-        fi
-
-        cd tests
-        fail_on_error ctest --output-on-failure -j$(nproc)
-        cd -
+        fail_on_error ctest --test-dir tests --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
