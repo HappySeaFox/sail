@@ -82,7 +82,7 @@ static OPJ_BOOL jpeg2000_private_stream_seek(OPJ_OFF_T bytes, void* user_data)
 
 opj_stream_t* jpeg2000_private_sail_io_src(struct sail_io* io)
 {
-    opj_stream_t* stream = opj_stream_create(OPJ_J2K_STREAM_CHUNK_SIZE, OPJ_TRUE);
+    opj_stream_t* stream = opj_stream_create(OPJ_J2K_STREAM_CHUNK_SIZE, OPJ_FALSE);
 
     if (stream == NULL)
     {
