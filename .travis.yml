@@ -158,7 +158,7 @@ script:
         fi
 
         fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
-                                   -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" \
+                                   -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" -DSAIL_WINDOWS_STATIC_CRT="$SAIL_WINDOWS_STATIC_CRT" \
                                    -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" ..
         fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
@@ -205,4 +205,4 @@ script:
   build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=ON SAIL_COMBINE_CODECS=ON
 
   # STATIC (turns on SAIL_COMBINE_CODECS=ON)
-  build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF
+  build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF SAIL_WINDOWS_STATIC_CRT=ON
