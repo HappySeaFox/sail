@@ -580,15 +580,24 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpeg2000(void** state)
     opj_cparameters_t parameters;
     opj_set_default_encoder_parameters(&parameters);
 
-    /* Calculate appropriate number of resolution levels for image size.
+    /*
+     * Calculate appropriate number of resolution levels for image size.
      * Default is 6 levels, which requires minimum 64x64 image.
-     * For smaller images, we need to reduce the number of levels. */
+     * For smaller images, we need to reduce the number of levels.
+     * OpenJPEG requires: min_dimension >= 2^(numresolution-1)
+     */
     if (jpeg2000_state->image_min_dimension > 0)
     {
         int max_numresolution = 1;
-        while ((1u << (max_numresolution - 1)) < jpeg2000_state->image_min_dimension && max_numresolution < 33)
+        /* Find the maximum numresolution where 2^(numresolution-1) <= min_dimension */
+        while ((1u << (max_numresolution - 1)) <= jpeg2000_state->image_min_dimension && max_numresolution < 33)
         {
             max_numresolution++;
+        }
+        /* Be more conservative: reduce by 1 for very small images */
+        if (jpeg2000_state->image_min_dimension < 32)
+        {
+            max_numresolution = max_numresolution > 1 ? max_numresolution - 1 : 1;
         }
         if (parameters.numresolution > max_numresolution)
         {

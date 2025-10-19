@@ -79,6 +79,7 @@ opj_stream_t* jpeg2000_private_sail_io_dest(struct sail_io* io)
     }
 
     opj_stream_set_user_data(stream, io, NULL);
+    opj_stream_set_user_data_length(stream, 0);
     opj_stream_set_write_function(stream, jpeg2000_private_stream_write);
     opj_stream_set_skip_function(stream, jpeg2000_private_stream_skip_write);
     opj_stream_set_seek_function(stream, jpeg2000_private_stream_seek_write);
