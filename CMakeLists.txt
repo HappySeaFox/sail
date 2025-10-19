@@ -233,6 +233,7 @@ endif()
 
 if (SAIL_BUILD_APPS)
     add_subdirectory(examples/c/sail)
+    add_subdirectory(man)
 endif()
 
 if (SAIL_BUILD_EXAMPLES)

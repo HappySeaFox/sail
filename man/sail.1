@@ -1,0 +1,294 @@
+.TH SAIL 1 "October 2025" "SAIL 0.9.10" "SAIL command-line utility"
+.SH NAME
+sail \- SAIL command-line utility for image conversion
+.SH SYNOPSIS
+.B sail
+[\fIOPTIONS\fR] \fICOMMAND\fR [\fIARGUMENTS\fR]
+.SH DESCRIPTION
+SAIL (Simple Abstract Imaging Library) is a cross-platform imaging library that provides
+a unified API for loading, saving, and manipulating images in various formats.
+
+.SH GLOBAL OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Display help message and exit.
+.TP
+.BR \-v ", " \-\-version
+Display version information and exit.
+.TP
+.BR \-l ", " \-\-log-level " " \fILEVEL\fR
+Set log level. Valid levels are:
+.RS
+.IP \(bu 2
+.B silence
+\- No output
+.IP \(bu 2
+.B error
+\- Error messages only
+.IP \(bu 2
+.B warning
+\- Warnings and errors (default)
+.IP \(bu 2
+.B info
+\- Informational messages
+.IP \(bu 2
+.B message
+\- All messages
+.IP \(bu 2
+.B debug
+\- Debug information
+.IP \(bu 2
+.B trace
+\- Detailed trace information
+.RE
+
+.SH COMMANDS
+.SS list
+List all supported image codecs with details.
+
+.B Usage:
+.RS
+sail list [\fB\-v\fR]
+.RE
+
+.TP
+.BR \-v
+Verbose output with detailed codec information.
+
+.SS convert
+Convert, compose, and extract image files.
+
+.B Usage:
+.RS
+sail convert [\fIOPTIONS\fR] \fIINPUT\fR... \fIOUTPUT\fR
+.RE
+
+.TP
+.BR \-p ", " \-\-pixel-format " " \fIFORMAT\fR
+Force specific output pixel format. Common formats include:
+.RS
+.IP \(bu 2
+.B BPP24-RGB
+\- 24-bit RGB
+.IP \(bu 2
+.B BPP32-RGBA
+\- 32-bit RGBA
+.IP \(bu 2
+.B BPP8-GRAYSCALE
+\- 8-bit grayscale
+.IP \(bu 2
+.B BPP8-INDEXED
+\- 8-bit indexed color
+.RE
+
+.TP
+.BR \-c ", " \-\-compression " " \fILEVEL\fR
+Set compression quality level (codec-specific). Use \-1 for default compression.
+
+.TP
+.BR \-m ", " \-\-max-frames " " \fICOUNT\fR
+Limit number of frames to process. Use 0 to process all frames.
+
+.TP
+.BR \-n ", " \-\-frame-number " " \fIN\fR
+Extract specific frame number N (1-based). This is useful for extracting
+a single frame from animated images.
+
+.TP
+.BR \-d ", " \-\-delay " " \fIMS\fR
+Set frame delay for animations in milliseconds.
+
+.TP
+.BR \-e ", " \-\-extract-frames
+Extract each frame to separate file. Output filename will be in the format
+\fIBASE\fR-\fIN\fR.\fIEXT\fR where N is the frame number.
+
+.TP
+.BR \-C ", " \-\-colors " " \fIN\fR
+Quantize image to N colors (2-256) using Wu algorithm. This reduces the
+number of colors in the image for smaller file sizes.
+
+.TP
+.BR \-D ", " \-\-dither
+Apply Floyd-Steinberg dithering for better gradients when reducing colors.
+
+.TP
+.BR \-b ", " \-\-background " " \fICOLOR\fR
+Blend alpha channel with background color. Valid colors are:
+.RS
+.IP \(bu 2
+.B white
+\- White background
+.IP \(bu 2
+.B black
+\- Black background
+.IP \(bu 2
+.B #RRGGBB
+\- Hex color code (e.g., #FF0000 for red)
+.RE
+
+.TP
+.BR \-s ", " \-\-strip
+Remove all metadata from output files.
+
+.TP
+.BR \-H ", " \-\-flip-horizontal
+Flip image horizontally (mirror left-right).
+
+.TP
+.BR \-V ", " \-\-flip-vertical
+Flip image vertically (mirror top-bottom).
+
+.SS probe
+Display detailed information about image file.
+
+.B Usage:
+.RS
+sail probe \fIPATH\fR
+.RE
+
+.SS decode
+Decode file and show information for all frames.
+
+.B Usage:
+.RS
+sail decode \fIPATH\fR
+.RE
+
+.SH EXAMPLES
+.PP
+.B Basic conversion:
+.RS
+.PP
+# Convert JPEG to PNG:
+.nf
+sail convert input.jpg output.png
+.fi
+.PP
+# Convert with custom quality:
+.nf
+sail convert input.png output.jpg \-c 90 \-p BPP24-RGB
+.fi
+.RE
+
+.PP
+.B Animation handling:
+.RS
+.PP
+# Convert animation with specified frame delay:
+.nf
+sail convert animation.gif output.webp \-d 100
+.fi
+.PP
+# Convert animation to multi-page document:
+.nf
+sail convert animation.gif output.tiff
+.fi
+.PP
+# Compose multiple images into single animation:
+.nf
+sail convert frame1.png frame2.png frame3.png animation.gif \-d 100
+.fi
+.RE
+
+.PP
+.B Frame extraction:
+.RS
+.PP
+# Extract all frames from animation:
+.nf
+sail convert animation.gif frame.jpg \-e
+.fi
+.PP
+# Extract first 5 frames only:
+.nf
+sail convert animation.webp frame.png \-e \-m 5
+.fi
+.PP
+# Extract specific frame (e.g., frame 2):
+.nf
+sail convert animation.gif frame2.png \-n 2
+.fi
+.RE
+
+.PP
+.B Color reduction:
+.RS
+.PP
+# Reduce colors to 16 with dithering:
+.nf
+sail convert photo.jpg output.gif \-\-colors 16 \-\-dither
+.fi
+.RE
+
+.PP
+.B Alpha channel handling:
+.RS
+.PP
+# Convert RGBA to RGB with white background:
+.nf
+sail convert transparent.png opaque.jpg \-\-background white
+.fi
+.RE
+
+.PP
+.B Metadata and transformations:
+.RS
+.PP
+# Strip metadata for privacy:
+.nf
+sail convert photo.jpg clean.jpg \-\-strip
+.fi
+.PP
+# Flip image horizontally and vertically:
+.nf
+sail convert photo.jpg flipped.jpg \-H \-V
+.fi
+.RE
+
+.PP
+.B Information display:
+.RS
+.PP
+# Show detailed image information:
+.nf
+sail probe image.png
+.fi
+.PP
+# Decode and show all frame information:
+.nf
+sail decode animation.gif
+.fi
+.PP
+# List all supported codecs:
+.nf
+sail list \-v
+.fi
+.RE
+
+.SH SUPPORTED FORMATS
+SAIL supports a wide range of image formats including:
+
+AVIF, BMP, GIF, HEIF, ICO, JPEG, JPEG2000, PNG, TIFF, and other.
+
+Use \fBsail list\fR to see all supported formats and their capabilities.
+
+.SH EXIT STATUS
+.TP
+.B 0
+Success
+.TP
+.B 1
+General error
+.TP
+.B 9
+Invalid argument
+
+.SH SEE ALSO
+For more information about SAIL, visit: https://sail.software
+
+.SH AUTHOR
+SAIL was written by Dzmitry Baryshau and contributors.
+
+.SH COPYRIGHT
+Copyright (c) 2020-2025 Dzmitry Baryshau. Licensed under the MIT License.
