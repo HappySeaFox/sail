@@ -62,7 +62,7 @@ before_script:
 
       # libheif requires <bit> which is not available in this particular MSVC
       # openexr also has some uninvestigated issues
-      for triplet in x64-windows x64-windows-static; do
+      for triplet in x64-windows x64-windows-static-md; do
         fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
                                   --triplet $triplet --clean-buildtrees-after-build
       done
@@ -209,7 +209,7 @@ script:
 
   # STATIC
   if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-    build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF SAIL_WINDOWS_STATIC_CRT=ON  # /MT
+    build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF SAIL_WINDOWS_STATIC_CRT=OFF # /MD
   else
     build CMAKE_BUILD_TYPE=RelWithDebInfo BUILD_SHARED_LIBS=OFF
   fi
