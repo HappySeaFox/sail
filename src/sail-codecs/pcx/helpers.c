@@ -255,19 +255,32 @@ sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_
 
 void pcx_private_palette_to_rgb(const struct sail_palette* palette, unsigned char* rgb_output, unsigned color_count)
 {
+    /* Use the actual number of colors in the palette, not the requested count. */
+    unsigned actual_color_count = palette->color_count < color_count ? palette->color_count : color_count;
+
     if (palette->pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
     {
-        memcpy(rgb_output, palette->data, color_count * 3);
+        memcpy(rgb_output, palette->data, actual_color_count * 3);
+        /* Fill remaining colors with black. */
+        if (actual_color_count < color_count)
+        {
+            memset(rgb_output + actual_color_count * 3, 0, (color_count - actual_color_count) * 3);
+        }
     }
     else
     {
         /* Convert RGBA to RGB. */
         const unsigned char* src = (const unsigned char*)palette->data;
-        for (unsigned i = 0; i < color_count; i++)
+        for (unsigned i = 0; i < actual_color_count; i++)
         {
             rgb_output[i * 3 + 0] = src[i * 4 + 0];
             rgb_output[i * 3 + 1] = src[i * 4 + 1];
             rgb_output[i * 3 + 2] = src[i * 4 + 2];
+        }
+        /* Fill remaining colors with black. */
+        if (actual_color_count < color_count)
+        {
+            memset(rgb_output + actual_color_count * 3, 0, (color_count - actual_color_count) * 3);
         }
     }
 }
