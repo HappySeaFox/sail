@@ -51,6 +51,11 @@ sail_status_t tga_private_read_file_header(struct sail_io* io, struct TgaFileHea
     SAIL_TRY(io->strict_read(io->stream, &file_header->bpp, sizeof(file_header->bpp)));
     SAIL_TRY(io->strict_read(io->stream, &file_header->descriptor, sizeof(file_header->descriptor)));
 
+    if (file_header->bpp > 32) {
+        SAIL_LOG_ERROR("TGA: Invalid bpp %d in file header, maximum supported is 32", file_header->bpp);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     return SAIL_OK;
 }
 
