@@ -842,9 +842,9 @@ sail_status_t tiff_private_fetch_xmp(TIFF* tiff, struct sail_meta_data_node*** l
                                 /* cleanup */ sail_destroy_meta_data_node(meta_data_node));
             memcpy(xmp_copy, xmp_data, xmp_size);
 
-            SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node->meta_data->value, xmp_copy, xmp_size),
-                                /* cleanup */ sail_free(xmp_copy);
-                                sail_destroy_meta_data_node(meta_data_node));
+            SAIL_TRY_OR_CLEANUP(sail_set_variant_shallow_data(meta_data_node->meta_data->value, xmp_copy, xmp_size),
+                                /* cleanup */ sail_free(xmp_copy),
+                                              sail_destroy_meta_data_node(meta_data_node));
 
             **last_meta_data_node = meta_data_node;
             *last_meta_data_node  = &meta_data_node->next;
