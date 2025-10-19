@@ -478,10 +478,18 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr,
 
                 if (meta_data->key == SAIL_META_DATA_UNKNOWN)
                 {
-                    meta_data_key           = meta_data->key_unknown;
-                    const char* variant_str = sail_variant_to_string(meta_data->value);
-                    SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
-                                        /* on error */ continue);
+                    meta_data_key = meta_data->key_unknown;
+                    if (meta_data->value->type == SAIL_VARIANT_TYPE_STRING)
+                    {
+                        const char* variant_str = sail_variant_to_string(meta_data->value);
+                        SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
+                                            /* on error */ continue);
+                    }
+                    else
+                    {
+                        SAIL_LOG_ERROR("PNG: Unknown meta data must have STRING type");
+                        continue;
+                    }
                 }
                 else
                 {
@@ -506,10 +514,18 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr,
                     }
                     else
                     {
-                        meta_data_key           = sail_meta_data_to_string(meta_data->key);
-                        const char* variant_str = sail_variant_to_string(meta_data->value);
-                        SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
-                                            /* on error */ continue);
+                        meta_data_key = sail_meta_data_to_string(meta_data->key);
+                        if (meta_data->value->type == SAIL_VARIANT_TYPE_STRING)
+                        {
+                            const char* variant_str = sail_variant_to_string(meta_data->value);
+                            SAIL_TRY_OR_EXECUTE(sail_strdup(variant_str, &meta_data_value),
+                                                /* on error */ continue);
+                        }
+                        else
+                        {
+                            SAIL_LOG_ERROR("PNG: Meta data must have STRING type for key %s", meta_data_key);
+                            continue;
+                        }
                     }
                 }
 
