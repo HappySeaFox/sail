@@ -87,9 +87,7 @@ if (NOT BUILD_SHARED_LIBS)
     find_library(MATH_LIBRARY m)
 
     if (MATH_LIBRARY)
-        set(EXTRA_LINK stdc++ ${MATH_LIBRARY})
-    else()
-        set(EXTRA_LINK stdc++)
+        set(EXTRA_LINK ${MATH_LIBRARY})
     endif()
 endif()
 
