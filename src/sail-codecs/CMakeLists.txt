@@ -145,8 +145,14 @@ set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $
 
             set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_name}
-find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_names})
-find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_names})
+set(_sail_vcpkg ${SAIL_VCPKG}) # SAIL_VCPKG
+if (_sail_vcpkg)
+    find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_names} PATHS \"${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib\" NO_DEFAULT_PATH)
+    find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_names} PATHS \"${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/lib\" NO_DEFAULT_PATH)
+else()
+    find_library(${dependency_name}_RELEASE_LIBRARY NAMES ${dependency_release_names})
+    find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_names})
+endif()
 
 if (NOT ${dependency_name}_RELEASE_LIBRARY OR NOT ${dependency_name}_DEBUG_LIBRARY)
     message(FATAL_ERROR \"Missing dependency: ${dependency_name}\")
