@@ -271,9 +271,13 @@ if (SAIL_VCPKG AND WIN32)
         set(SAIL_EXTRA_LIBS_INSTALL_PATH "lib/sail/codecs/lib")
     endif()
 
+    if (NOT CMAKE_BUILD_TYPE)
+        message(FATAL_ERROR "CMAKE_BUILD_TYPE is required for VCPKG build")
+    endif()
+
     # ../../vcpkg/scripts/buildsystems/vcpkg.cmake -> C:/projects/vcpkg/installed/x64-windows/bin
     #
-    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo" OR NOT CMAKE_BUILD_TYPE)
+    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
         set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/bin")
     else()
         set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/debug/bin")

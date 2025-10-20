@@ -163,7 +163,7 @@ script:
         fail_on_error git -C .. apply .travis/disable-jpeg-test-files.patch
         fail_on_error git -C .. apply .travis/relax-cmake-version-to-3.17.patch
 
-        fail_on_error cmake -A x64 -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
+        fail_on_error cmake -A x64 -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
                                    -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" -DSAIL_WINDOWS_STATIC_CRT="$SAIL_WINDOWS_STATIC_CRT" \
                                    -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" ..
         fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
@@ -180,8 +180,8 @@ script:
       linux)
         CMAKE_INSTALL_PREFIX="/usr/local"
 
-        fail_on_error cmake -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" \
-                            -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
+        fail_on_error cmake -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
+                            -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
         fail_on_error cmake --build . -j$(nproc)
 
         fail_on_error sudo make install
