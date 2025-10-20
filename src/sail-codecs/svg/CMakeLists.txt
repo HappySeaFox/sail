@@ -57,18 +57,12 @@ endif()
 # Fall back to NanoSVG
 #
 if (NOT SAIL_RESVG)
-    # Don't use SAIL_CODEC_SVG_REQUIRED_OPTION as it requires CMake 3.18
-    #
-    find_path(NANOSVG_INCLUDE_DIRS nanosvg/nanosvg.h)
+    find_path(NANOSVG_INCLUDE_DIRS nanosvg/nanosvg.h ${SAIL_CODEC_SVG_REQUIRED_OPTION})
 
     if (NANOSVG_INCLUDE_DIRS)
         set(SVG_INCLUDE_DIRS ${NANOSVG_INCLUDE_DIRS})
     else()
-        if (SAIL_CODEC_SVG_REQUIRED_OPTION STREQUAL "REQUIRED")
-            message(FATAL_ERROR "SVG: Missing dependencies (ReSVG or NanoSVG)")
-        else()
-            return()
-        endif()
+        return()
     endif()
 endif()
 

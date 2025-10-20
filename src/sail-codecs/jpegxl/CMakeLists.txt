@@ -20,7 +20,8 @@ foreach(i RANGE ${VAR_PREFIXES_LAST_INDEX})
     list(GET LIBS_SHARED  ${i} lib_shared)
     list(GET LIBS_STATIC  ${i} lib_static)
 
-    # Don't use SAIL_CODEC_JPEGXL_REQUIRED_OPTION as it requires CMake 3.18
+    # Some libraries are required, some not. Using SAIL_CODEC_JPEGXL_REQUIRED_OPTION overcomplicates
+    # the searching mechanism.
     #
     if (SAIL_VCPKG)
         find_library("${var_prefix}_LIBRARY_RELEASE" NAMES ${lib_shared} ${lib_static} PATHS "${JPEGXL_INCLUDE_DIR}/../lib"       NO_DEFAULT_PATH)
