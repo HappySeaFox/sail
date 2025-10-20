@@ -166,6 +166,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp32-bgra.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/test-metadata.tga",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_TIFF
