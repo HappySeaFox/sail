@@ -1,7 +1,7 @@
 # Try to find JBIG library
 #
-find_library(JBIG_LIBRARY NAMES jbig)
-find_path(JBIG_INCLUDE_DIR NAMES jbig.h)
+find_library(JBIG_LIBRARY NAMES jbig libjbig ${SAIL_CODEC_JBIG_REQUIRED_OPTION}) # support libjbig in vcpkg
+find_path(JBIG_INCLUDE_DIR NAMES jbig.h      ${SAIL_CODEC_JBIG_REQUIRED_OPTION})
 
 if (NOT JBIG_LIBRARY OR NOT JBIG_INCLUDE_DIR)
     return()
@@ -14,7 +14,7 @@ endif()
 # find_library(jbig_DEBUG_LIBRARY NAMES jbig)
 # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jbig_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jbig_DEBUG_LIBRARY}>)
 #
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jbig libjbig,jbig libjbig" PARENT_SCOPE) # support libjbig in vcpkg
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jbig libjbig,jbig libjbig" PARENT_SCOPE)
 
 # Common codec configuration
 #
