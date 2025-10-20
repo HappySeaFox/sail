@@ -365,6 +365,9 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
     char buf[8192];
     char pixel_chars[8];
 
+    unsigned pixel_size = sail_bytes_per_line(width, pixel_format) * height;
+    memset(pixels, 0, pixel_size);
+
     for (unsigned y = 0; y < height; y++)
     {
         SAIL_TRY(sail_read_string_from_io(io, buf, sizeof(buf)));
@@ -497,8 +500,8 @@ sail_status_t xpm_private_write_colors(struct sail_io* io,
         unsigned idx = i;
         for (unsigned j = 0; j < cpp; j++)
         {
-            chars[cpp - 1 - j]  = XPM_CHARS[idx % sizeof(XPM_CHARS)];
-            idx                /= sizeof(XPM_CHARS);
+            chars[cpp - 1 - j]  = XPM_CHARS[idx % (sizeof(XPM_CHARS) - 1)];
+            idx                /= (sizeof(XPM_CHARS) - 1);
         }
         chars[cpp] = '\0';
 
@@ -581,7 +584,7 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
 
             if (pixel_index >= num_colors)
             {
-                SAIL_LOG_ERROR("XPM: Pixel index %u out of range (max %u)", pixel_index, num_colors - 1);
+                SAIL_LOG_ERROR("XPM: Pixel index %u out of range (max %u) at (%u,%u)", pixel_index, num_colors - 1, x, y);
                 sail_free(line);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
@@ -590,8 +593,8 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
             unsigned idx = pixel_index;
             for (unsigned j = 0; j < cpp; j++)
             {
-                line[pos + cpp - 1 - j]  = XPM_CHARS[idx % sizeof(XPM_CHARS)];
-                idx                     /= sizeof(XPM_CHARS);
+                line[pos + cpp - 1 - j]  = XPM_CHARS[idx % (sizeof(XPM_CHARS) - 1)];
+                idx                     /= (sizeof(XPM_CHARS) - 1);
             }
             pos += cpp;
         }
