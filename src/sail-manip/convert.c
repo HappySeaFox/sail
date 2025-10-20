@@ -1160,8 +1160,9 @@ static sail_status_t convert_from_indexed(const struct sail_image* image,
             {
                 const uint8_t index = (byte & bit_mask) >> bit_shift;
 
-                /* Direct lookup in pre-converted palette (no bounds check needed - already validated) */
-                const sail_rgba32_t rgba32 = preconverted_palette[index];
+                /* Direct lookup in pre-converted palette. */
+                const uint8_t safe_index   = (index < image->palette->color_count) ? index : 0;
+                const sail_rgba32_t rgba32 = preconverted_palette[safe_index];
                 pixel_consumer(output_context, &scan_output8, &scan_output16, &rgba32, NULL);
 
                 bit_shift  -= bit_shift_decrease_by;
