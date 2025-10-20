@@ -51,8 +51,17 @@ sail_status_t tga_private_read_file_header(struct sail_io* io, struct TgaFileHea
     SAIL_TRY(io->strict_read(io->stream, &file_header->bpp, sizeof(file_header->bpp)));
     SAIL_TRY(io->strict_read(io->stream, &file_header->descriptor, sizeof(file_header->descriptor)));
 
-    if (file_header->bpp > 32) {
-        SAIL_LOG_ERROR("TGA: Invalid bpp %d in file header, maximum supported is 32", file_header->bpp);
+    /* Validate TGA header fields to detect non-TGA files */
+    if (file_header->bpp > 32 || file_header->bpp == 0) {
+        SAIL_LOG_ERROR("TGA: Invalid bpp %d in file header, must be 1-32", file_header->bpp);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+    if (file_header->image_type > 11) {
+        SAIL_LOG_ERROR("TGA: Invalid image type %d, must be 0-11", file_header->image_type);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+    if (file_header->color_map_type > 1) {
+        SAIL_LOG_ERROR("TGA: Invalid color map type %d, must be 0-1", file_header->color_map_type);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
