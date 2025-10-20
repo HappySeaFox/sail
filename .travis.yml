@@ -67,8 +67,8 @@ before_script:
                                   --triplet $triplet --clean-buildtrees-after-build
       done
 
-      fail_on_error git -C .. apply .travis/disable-jpeg-test-files.patch
-      fail_on_error git -C .. apply .travis/relax-cmake-version-to-3.17.patch
+      fail_on_error git apply .travis/disable-jpeg-test-files.patch
+      fail_on_error git apply .travis/relax-cmake-version-to-3.17.patch
     ;;
   esac
 
