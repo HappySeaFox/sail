@@ -203,12 +203,12 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
 
     /* Comments. */
     {
-        char comments[80 * 4 + 1];
+        char comments[81 * 4 + 1];
         SAIL_TRY(io->strict_read(io->stream, comments, 81));
-        SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
-        SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
-        SAIL_TRY(io->strict_read(io->stream, comments + strlen(comments), 81));
-        comments[80 * 4] = '\0';
+        SAIL_TRY(io->strict_read(io->stream, comments + 81, 81));
+        SAIL_TRY(io->strict_read(io->stream, comments + 81 * 2, 81));
+        SAIL_TRY(io->strict_read(io->stream, comments + 81 * 3, 81));
+        comments[81 * 4] = '\0';
 
         if (strlen(comments) > 0)
         {

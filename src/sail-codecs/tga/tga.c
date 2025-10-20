@@ -72,8 +72,8 @@ static sail_status_t alloc_tga_state(struct sail_io* io,
 
         .frame_processed = false,
         .tga2            = false,
-        .flipped_h    = false,
-        .flipped_v    = false,
+        .flipped_h       = false,
+        .flipped_v       = false,
 
         .extension_offset = 0,
     };
@@ -235,6 +235,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_
     case TGA_GRAY_RLE:
     {
         const unsigned pixel_size = (tga_state->file_header.bpp + 7) / 8;
+
+        /* Validate pixel size to prevent buffer overflow. */
+        if (pixel_size > 16 || pixel_size == 0)
+        {
+            SAIL_LOG_ERROR("TGA: Invalid pixel size %u (bpp=%d), must be 1-16 bytes", pixel_size,
+                           tga_state->file_header.bpp);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
         const unsigned pixels_num = image->width * image->height;
 
         unsigned char* pixels = image->pixels;
