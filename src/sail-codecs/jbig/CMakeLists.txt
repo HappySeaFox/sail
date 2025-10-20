@@ -14,7 +14,7 @@ endif()
 # find_library(jbig_DEBUG_LIBRARY NAMES jbig)
 # set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jbig_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jbig_DEBUG_LIBRARY}>)
 #
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jbig,jbig" PARENT_SCOPE)
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jbig libjbig,jbig libjbig" PARENT_SCOPE)
 
 # Common codec configuration
 #
