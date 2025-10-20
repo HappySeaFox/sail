@@ -85,7 +85,12 @@ set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} PARENT_SCOPE)
 
 if (NOT BUILD_SHARED_LIBS)
     find_library(MATH_LIBRARY m)
-    set(EXTRA_LINK stdc++ ${MATH_LIBRARY})
+
+    if (MATH_LIBRARY)
+        set(EXTRA_LINK stdc++ ${MATH_LIBRARY})
+    else()
+        set(EXTRA_LINK stdc++)
+    endif()
 endif()
 
 
