@@ -80,6 +80,11 @@ SAIL_EXPORT sail_status_t sail_concat(char** output, int num, ...);
 SAIL_EXPORT void sail_to_lower(char* str);
 
 /*
+ * Converts the specified string to an upper case.
+ */
+SAIL_EXPORT void sail_to_upper(char* str);
+
+/*
  * Converts the specified char* string into a wchar_t* string.
  *
  * Returns SAIL_OK on success.

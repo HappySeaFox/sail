@@ -203,6 +203,21 @@ void sail_to_lower(char* str)
     }
 }
 
+void sail_to_upper(char* str)
+{
+    if (str == NULL)
+    {
+        return;
+    }
+
+    size_t length = strlen(str);
+
+    for (size_t i = 0; i < length; i++)
+    {
+        str[i] = (char)toupper(str[i]);
+    }
+}
+
 sail_status_t sail_to_wchar(const char* input, wchar_t** output)
 {
     SAIL_CHECK_PTR(input);
