@@ -82,7 +82,7 @@ option(SAIL_BUILD_APPS "Build applications." ON)
 option(SAIL_BUILD_BINDINGS "Build the C++ and other bindings." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
-option(SAIL_ENABLE_OPENMP "Enable OpenMP support if it's available in the compiler." ON)
+option(SAIL_ENABLE_OPENMP "Enable OpenMP support if it's available in the compiler. See also SAIL_OPENMP_SCHEDULE." ON)
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. \
