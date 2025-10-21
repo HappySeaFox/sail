@@ -614,7 +614,7 @@ void init_image(py::module_& m)
                  }
                  catch (const std::exception& e)
                  {
-                     throw std::runtime_error("Failed to open image file '" + path + "' for reading: " + a.what());
+                     throw std::runtime_error("Failed to open image file '" + path + "' for reading: " + e.what());
                  }
              }),
              py::arg("path"), "Open image file for reading")
