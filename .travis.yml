@@ -97,16 +97,14 @@ script:
     echo "External Windows Test '$project_path' '$build_type'"
     echo
 
-    cd "$TRAVIS_BUILD_DIR"
-
     rm -rf "$project_path/build"
     mkdir "$project_path/build"
 
     fail_on_error cmake -A x64 -S "$project_path" -B "$project_path/build" \
                         -DSAIL_DEV=ON -DCMAKE_PREFIX_PATH="$sail_cmake_path" \
-                        -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$vcpkg_triplet"
+                        -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$vcpkg_triplet"
 
-    fail_on_error cmake --build "$project_path/build" --config $build_type
+    fail_on_error cmake --build "$project_path/build" --config $build_type -j$(nproc)
   }
 
   test_external_unix()
@@ -114,24 +112,17 @@ script:
     local project_path="$1"
     local build_type="$2"
     local exe="$3"
-    local old_dir="$PWD"
 
     echo
     echo "External Unix Test '$project_path' '$build_type'"
     echo
 
-    cd "$TRAVIS_BUILD_DIR"
+    rm -rf "$project_path/build"
+    mkdir "$project_path/build"
 
-    cd "$project_path"
-    rm -rf build
-    mkdir build
-    cd build
-
-    fail_on_error cmake -DSAIL_DEV=ON -DCMAKE_BUILD_TYPE="$build_type" ..
-    fail_on_error cmake --build . -j$(nproc)
-    fail_on_error "$exe"
-
-    cd "$old_dir"
+    fail_on_error cmake -S "$project_path" -B "$project_path/build" -DSAIL_DEV=ON -DCMAKE_BUILD_TYPE="$build_type"
+    fail_on_error cmake --build "$project_path/build" -j$(nproc)
+    fail_on_error "$project_path/build/$exe"
   }
 
   build()
@@ -142,11 +133,8 @@ script:
 
     eval $@
 
-    cd "$TRAVIS_BUILD_DIR"
-
     rm -rf build
     mkdir build
-    cd build
 
     case "$TRAVIS_OS_NAME" in
       windows)
@@ -162,13 +150,14 @@ script:
             fi
         fi
 
-        fail_on_error cmake -A x64 -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
-                                   -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" -DSAIL_WINDOWS_STATIC_CRT="$SAIL_WINDOWS_STATIC_CRT" \
-                                   -DCMAKE_TOOLCHAIN_FILE="../vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET" ..
+        fail_on_error cmake -A x64 -S . -B build \
+                                -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
+                                -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" -DSAIL_WINDOWS_STATIC_CRT="$SAIL_WINDOWS_STATIC_CRT" \
+                                -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET"
 
-        fail_on_error cmake --build . --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
+        fail_on_error cmake --build build --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
-        fail_on_error ctest --test-dir tests -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
+        fail_on_error ctest --test-dir build/tests -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
@@ -180,22 +169,23 @@ script:
       linux)
         CMAKE_INSTALL_PREFIX="/usr/local"
 
-        fail_on_error cmake -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
-                            -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" ..
+        fail_on_error cmake -S . -B build \
+                            -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
+                            -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS"
 
-        fail_on_error cmake --build . -j$(nproc)
+        fail_on_error cmake --build build -j$(nproc)
 
-        fail_on_error sudo make install
+        fail_on_error sudo make -C build install
         fail_on_error sudo ldconfig
 
-        fail_on_error ctest --test-dir tests --output-on-failure -j$(nproc)
+        fail_on_error ctest --test-dir build/tests --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
-        test_external_unix "tests/external/link/c"   "$CMAKE_BUILD_TYPE" "./external-c-api-link"
-        test_external_unix "tests/external/link/c++" "$CMAKE_BUILD_TYPE" "./external-c++-api-link"
+        test_external_unix "tests/external/link/c"   "$CMAKE_BUILD_TYPE" "external-c-api-link"
+        test_external_unix "tests/external/link/c++" "$CMAKE_BUILD_TYPE" "external-c++-api-link"
 
-        xargs sudo rm -v < install_manifest.txt
+        xargs sudo rm -v < build/install_manifest.txt
       ;;
     esac
   }
