@@ -30,6 +30,7 @@
 #include <sail-c++/sail-c++.h>
 
 #include <fstream>
+#include <limits>
 
 namespace py = pybind11;
 
@@ -119,8 +120,15 @@ sail::image numpy_to_image(py::array arr, SailPixelFormat pixel_format)
         throw std::runtime_error("Array must be 2D or 3D");
     }
 
-    unsigned height = buf.shape[0];
-    unsigned width  = buf.shape[1];
+    if (buf.shape[0] > std::numeric_limits<unsigned>::max() || buf.shape[1] > std::numeric_limits<unsigned>::max())
+    {
+        PyErr_SetString(PyExc_ValueError,
+                        "Failed to create image from NumPy array: the array is too large");
+        throw py::error_already_set();
+    }
+
+    unsigned height = static_cast<unsigned>(buf.shape[0]);
+    unsigned width  = static_cast<unsigned>(buf.shape[1]);
 
     // Create image
     sail::image img(pixel_format, width, height);
@@ -128,7 +136,7 @@ sail::image numpy_to_image(py::array arr, SailPixelFormat pixel_format)
     if (!img.is_valid())
     {
         PyErr_SetString(PyExc_ValueError,
-                        "Failed to create image from NumPy array - invalid dimensions or pixel format");
+                        "Failed to create image from NumPy array: invalid dimensions or pixel format");
         throw py::error_already_set();
     }
 
@@ -606,7 +614,7 @@ void init_image(py::module_& m)
                  }
                  catch (const std::exception& e)
                  {
-                     throw std::runtime_error("Failed to open image file for reading: " + path);
+                     throw std::runtime_error("Failed to open image file '" + path + "' for reading: " + a.what());
                  }
              }),
              py::arg("path"), "Open image file for reading")
@@ -742,7 +750,7 @@ void init_image(py::module_& m)
                  }
                  catch (const std::exception& e)
                  {
-                     throw std::runtime_error("Failed to open image file for writing: " + path);
+                     throw std::runtime_error("Failed to open image file '" + path + "' for writing: " + e.what());
                  }
              }),
              py::arg("path"), "Open image file for writing")
