@@ -94,6 +94,10 @@ target_link_libraries(_libsail PRIVATE
     sail-manip
 )
 
+if (MSVC)
+    target_compile_options(_libsail PRIVATE "/EHsc")
+endif()
+
 target_include_directories(_libsail PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/../../..
