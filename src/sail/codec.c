@@ -30,7 +30,7 @@
 
 #ifdef SAIL_WIN32
 #include <windows.h>
-#else
+#elif defined SAIL_HAVE_DLFCN_H
 #include <dlfcn.h>
 #endif
 
@@ -79,7 +79,7 @@ static sail_status_t load_combined_codec(const struct sail_codec_info* codec_inf
     SAIL_LOG_ERROR("Failed to find combined %s codec", codec_info->name);
     SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
 }
-#endif
+#else
 
 static sail_status_t load_codec_from_file(const struct sail_codec_info* codec_info, struct sail_codec* codec)
 {
@@ -92,13 +92,15 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info* codec_in
     {
         SAIL_LOG_ERROR("Failed to load '%s'. Error: 0x%X", codec_info->path, GetLastError());
     }
-#else
+#elif defined SAIL_HAVE_DLFCN_H
     void* handle = dlopen(codec_info->path, RTLD_LAZY | RTLD_LOCAL);
 
     if (handle == NULL)
     {
         SAIL_LOG_ERROR("Failed to load '%s': %s", codec_info->path, dlerror());
     }
+#else
+    void* handle = NULL;
 #endif
 
     if (handle == NULL)
@@ -112,12 +114,13 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info* codec_in
 #define SAIL_RESOLVE_FUNC GetProcAddress
 #define SAIL_RESOLVE_LOG_ERROR(symbol)                                                                                 \
     SAIL_LOG_ERROR("Failed to resolve '%s' in '%s'. Error: 0x%X", symbol, codec_info->path, GetLastError())
-#else
+#elif defined SAIL_HAVE_DLFCN_H
 #define SAIL_RESOLVE_FUNC dlsym
 #define SAIL_RESOLVE_LOG_ERROR(symbol)                                                                                 \
     SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", symbol, codec_info->path, dlerror())
 #endif
 
+#ifdef SAIL_RESOLVE_FUNC
 #define SAIL_RESOLVE(target, handle, symbol, name)                                                                     \
     {                                                                                                                  \
         char* full_symbol_name;                                                                                        \
@@ -152,8 +155,12 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info* codec_in
     SAIL_RESOLVE(codec->v8->save_finish, handle, sail_codec_save_finish_v8, codec_info->name);
 
     return SAIL_OK;
+#else
+    SAIL_LOG_ERROR("Failed to look up symbol with no SDL_RESOLVE_FUNC defined");
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_SYMBOL_RESOLVE);
+#endif
 }
-
+#endif
 /*
  * Public functions.
  */
@@ -213,8 +220,9 @@ sail_status_t alloc_and_load_codec(const struct sail_codec_info* codec_info, str
     }
     else
     {
-        SAIL_TRY_OR_CLEANUP(load_codec_from_file(codec_info, codec_local),
-                            /* cleanup */ destroy_codec(codec_local));
+        SAIL_LOG_ERROR("Failed to load %s codec without fetch_combinded_codec disabled when SAIL_COMBINE_CODECS is enabled",
+                       codec_info->name);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CODEC_NOT_FOUND);
     }
 #else
     SAIL_TRY_OR_CLEANUP(load_codec_from_file(codec_info, codec_local),
@@ -237,7 +245,7 @@ void destroy_codec(struct sail_codec* codec)
     {
 #ifdef SAIL_WIN32
         FreeLibrary((HMODULE)codec->handle);
-#else
+#elif defined SAIL_HAVE_DLFCN_H
         dlclose(codec->handle);
 #endif
     }

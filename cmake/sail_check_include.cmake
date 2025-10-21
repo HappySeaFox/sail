@@ -11,7 +11,7 @@ macro(sail_check_include)
 
     check_include_files(${SAIL_CHECK_INCLUDE} ${SAIL_HAVE_THIS_H})
 
-    if (NOT ${${SAIL_HAVE_THIS_H}})
+    if (NOT ${SAIL_HAVE_THIS_H})
         message(FATAL_ERROR "${SAIL_CHECK_INCLUDE} include file is not found. Please check the required development packages are installed.")
     endif()
 endmacro()

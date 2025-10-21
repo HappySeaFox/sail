@@ -28,6 +28,57 @@
 
 #include "sail-common.h"
 
+
+#ifdef PSP
+#define _GNU_SOURCE
+#include <errno.h>                // errno
+#include <fcntl.h>                // fcntl()
+#include <unistd.h>               // close()
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <errno.h>
+
+pid_t
+waitpid (pid_t pid, int *stat_loc, int options)
+{
+  errno = (ENOSYS);
+  return (pid_t) -1;
+}
+
+int
+dup(int fd1)
+{
+    int fd2 = -1;
+#ifndef F_DUPFD
+    errno = ENOTSUP;
+    return -1;
+#else
+    if(fcntl(fd1, F_GETFL) < 0 || fcntl(fd1, F_DUPFD, fd2) < 0)
+    	return -1;
+#endif
+    return fd2;
+}
+
+int
+dup2(int fd1, int fd2)
+{
+    if (fd1 != fd2) {
+#ifdef F_DUPFD
+        if (fcntl(fd1, F_GETFL) < 0)
+            return -1;
+        if (fcntl(fd2, F_GETFL) >= 0)
+            close(fd2);
+        if (fcntl(fd1, F_DUPFD, fd2) < 0)
+            return -1;
+#else
+        errno = ENOTSUP;
+        return -1;
+#endif
+    }
+    return fd2;
+}
+#endif
+
 sail_status_t sail_alloc_io(struct sail_io** io)
 {
     SAIL_CHECK_PTR(io);

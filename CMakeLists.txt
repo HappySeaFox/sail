@@ -60,7 +60,7 @@ sail_check_include(sys/stat.h)
 sail_check_include(sys/types.h)
 sail_check_include(wchar.h)
 
-if (UNIX)
+if (UNIX OR PSP)
     sail_check_include(dirent.h)
     sail_check_include(dlfcn.h)
     sail_check_include(sys/time.h)
@@ -271,9 +271,17 @@ if (SAIL_VCPKG AND WIN32)
         set(SAIL_EXTRA_LIBS_INSTALL_PATH "lib/sail/codecs/lib")
     endif()
 
+    if (NOT CMAKE_BUILD_TYPE)
+        message(FATAL_ERROR "CMAKE_BUILD_TYPE is required for VCPKG build")
+    endif()
+
     # ../../vcpkg/scripts/buildsystems/vcpkg.cmake -> C:/projects/vcpkg/installed/x64-windows/bin
     #
-    set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/bin")
+    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/bin")
+    else()
+        set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/debug/bin")
+    endif()
     get_filename_component(SAIL_VCPKG_BIN_PATH "${SAIL_VCPKG_BIN_PATH}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     install(DIRECTORY "${SAIL_VCPKG_BIN_PATH}/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH} OPTIONAL)
 endif()
