@@ -50,6 +50,8 @@ before_script:
     set +e
   }
 
+  fail_on_error cd "$TRAVIS_BUILD_DIR"
+
   case "$TRAVIS_OS_NAME" in
     windows)
       if [ ! -f vcpkg/vcpkg ]; then
@@ -133,6 +135,8 @@ script:
 
     eval $@
 
+    fail_on_error cd "$TRAVIS_BUILD_DIR"
+
     rm -rf build
     mkdir build
 
@@ -157,7 +161,10 @@ script:
 
         fail_on_error cmake --build build --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
-        fail_on_error ctest --test-dir build/tests -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
+echo "*********************"
+pwd
+
+        fail_on_error ctest --test-dir build -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
@@ -178,7 +185,7 @@ script:
         fail_on_error sudo make -C build install
         fail_on_error sudo ldconfig
 
-        fail_on_error ctest --test-dir build/tests --output-on-failure -j$(nproc)
+        fail_on_error ctest --test-dir build --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
