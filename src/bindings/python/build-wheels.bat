@@ -98,9 +98,9 @@ echo Wheels location: %WHEEL_DIR%\
 dir /b %WHEEL_DIR%\*.whl
 
 echo.
-echo Next steps:
+echo Next steps (use full names in CMD):
 echo   Install locally: python -m pip install --force-reinstall %WHEEL_DIR%\*.whl
-echo   Run tests: pytest tests
+echo   Run tests:       pytest tests
 echo.
 echo   Upload to Test PyPI:    twine upload --repository testpypi %WHEEL_DIR%\*.whl
 echo   Install from Test PyPI: pip install --index-url https://test.pypi.org/simple sailpy
