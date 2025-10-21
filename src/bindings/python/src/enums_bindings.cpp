@@ -32,7 +32,7 @@ namespace py = pybind11;
 void init_enums(py::module_& m)
 {
     // ============================================================================
-    // SailPixelFormat - Complete list
+    // SailPixelFormat
     // ============================================================================
 
     py::enum_<SailPixelFormat>(m, "PixelFormat", py::arithmetic(), "Pixel format enumeration")
@@ -157,7 +157,7 @@ void init_enums(py::module_& m)
                     "Parse PixelFormat from SAIL string (e.g., 'BPP24-RGB')");
 
     // ============================================================================
-    // SailCompression - Complete list
+    // SailCompression
     // ============================================================================
 
     py::enum_<SailCompression>(m, "Compression", py::arithmetic(), "Compression type enumeration")
@@ -233,7 +233,7 @@ void init_enums(py::module_& m)
                     "Parse Compression from SAIL string (e.g., 'JPEG')");
 
     // ============================================================================
-    // SailOrientation - Complete list
+    // SailOrientation
     // ============================================================================
 
     py::enum_<SailOrientation>(m, "Orientation", py::arithmetic(), "Image orientation")
@@ -330,7 +330,7 @@ void init_enums(py::module_& m)
         .export_values();
 
     // ============================================================================
-    // SailStatus - Complete error codes
+    // SailStatus
     // ============================================================================
 
     py::enum_<sail_status_t>(m, "Status", py::arithmetic(), "SAIL status codes")
@@ -400,7 +400,7 @@ void init_enums(py::module_& m)
         .export_values();
 
     // ============================================================================
-    // SailLogLevel - Logging levels
+    // SailLogLevel
     // ============================================================================
 
     py::enum_<SailLogLevel>(m, "LogLevel", py::arithmetic(), "SAIL logging levels")
