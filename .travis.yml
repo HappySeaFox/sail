@@ -64,7 +64,7 @@ before_script:
       # openexr also has some uninvestigated issues
       for triplet in x64-windows x64-windows-static-md; do
         fail_on_error vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
-                                  --triplet $triplet --clean-buildtrees-after-build
+                                  --triplet $triplet --clean-buildtrees-after-build --clean-downloads-after-build
       done
 
       fail_on_error git apply .travis/disable-jpeg-test-files.patch
