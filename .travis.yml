@@ -132,7 +132,7 @@ script:
     echo
     echo " *** Building with $@ ***"
     echo
-
+set -x
     eval $@
 
     fail_on_error cd "$TRAVIS_BUILD_DIR"
@@ -161,8 +161,9 @@ script:
 
         fail_on_error cmake --build build --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
-echo "*********************"
+echo "======================"
 pwd
+exit 1
 
         fail_on_error ctest --test-dir build -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
 
