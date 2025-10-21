@@ -21,7 +21,7 @@ else()
     # Some SDL2 configs export SDL2::SDL2, some ${SDL2_LIBRARIES}
     #
     if (TARGET SDL2::SDL2)
-        target_link_libraries(sail-sdl-viewer PRIVATE SDL2::SDL2)
+        target_link_libraries(sail-sdl-viewer PRIVATE SDL2::SDL2 SDL2::SDL2main)
     else()
         # Strip whitespaces.
         #
