@@ -100,6 +100,7 @@ def test_regression_reader_after_error():
         loaded = reader.read()
         assert loaded.is_valid
     finally:
+        del reader  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 
