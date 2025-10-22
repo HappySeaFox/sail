@@ -113,15 +113,20 @@ def test_edge_save_with_initialized_pixels():
 
 def test_edge_save_to_readonly_path():
     """Test saving to read-only location"""
-    import os as os_mod
-    if os_mod.getuid() == 0:
-        pytest.skip("Running as root")
+    import sys
 
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 10, 10)
     img.to_numpy()[:] = 0
 
-    with pytest.raises((RuntimeError, MemoryError)):
-        img.save("/root/test.png")
+    # Use platform-specific protected path
+    if sys.platform == 'win32':
+        win_dir = os.environ.get('SYSTEMROOT') or os.environ.get('WINDIR') or r'C:\Windows'
+        protected_path = os.path.join(win_dir, 'System32', 'test_sail.png')
+    else:
+        protected_path = "/root/test.png"
+
+    with pytest.raises((RuntimeError, MemoryError, PermissionError, OSError)):
+        img.save(protected_path)
 
 
 def test_edge_save_to_invalid_extension():
@@ -145,14 +150,19 @@ def test_edge_reader_invalid_file():
         sailpy.ImageReader("/nonexistent.png")
 
 
-def test_edge_writer_invalid_path():
-    """Test ImageWriter with invalid path"""
-    import os as os_mod
-    if os_mod.getuid() == 0:
-        pytest.skip("Running as root")
+def test_edge_writer_to_readonly_path():
+    """Test ImageWriter with protected path"""
+    import sys
 
-    with pytest.raises((RuntimeError, MemoryError)):
-        sailpy.ImageWriter("/root/test.png")
+    # Use platform-specific protected path
+    if sys.platform == 'win32':
+        win_dir = os.environ.get('SYSTEMROOT') or os.environ.get('WINDIR') or r'C:\Windows'
+        protected_path = os.path.join(win_dir, 'System32', 'test_sail.png')
+    else:
+        protected_path = "/root/test.png"
+
+    with pytest.raises((RuntimeError, MemoryError, PermissionError, OSError)):
+        sailpy.ImageWriter(protected_path)
 
 
 def test_edge_codec_info_invalid_extension():
@@ -180,6 +190,7 @@ def test_edge_double_finish():
         reader.finish()
         reader.finish()  # Second finish should not crash
     finally:
+        del reader  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 
@@ -203,6 +214,7 @@ def test_edge_finish_then_read_fails():
         with pytest.raises(RuntimeError):
             reader.read()
     finally:
+        del reader  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 

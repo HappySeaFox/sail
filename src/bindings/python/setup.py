@@ -91,15 +91,33 @@ class CMakeBuild(build_ext):
         build_dir = python_bindings_dir / 'build-python'
 
         cmake_args = [
-            f'-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={build_dir}',
             f'-DPYTHON_EXECUTABLE={sys.executable}',
             f'-DCMAKE_BUILD_TYPE={cfg}',
             f'-DSAIL_ROOT_DIR={sail_root}',
-            '-DSAIL_COMBINE_CODECS=ON',
             '-DSAIL_BUILD_TESTS=OFF',
             '-DSAIL_BUILD_EXAMPLES=OFF',
             '-DSAIL_BUILD_APPS=OFF',
+            '-DSAIL_COMBINE_CODECS=ON',
+            '-DSAIL_THIRD_PARTY_CODECS_PATH=OFF',
         ]
+
+        # On Windows, force output to build_dir root (MSVC creates Debug/Release subdirs anyway)
+        is_windows = sys.platform.startswith('win')
+        if is_windows:
+            cmake_args.extend([
+                f'-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={build_dir}',
+                f'-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={build_dir}',
+                f'-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={build_dir}',
+            ])
+        else:
+            cmake_args.append(f'-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={build_dir}')
+
+        # Add vcpkg toolchain if available (from CMAKE_ARGS environment variable)
+        # This is used on Windows via build-wheels.bat
+        cmake_args_env = os.environ.get('CMAKE_ARGS', '')
+        if cmake_args_env:
+            cmake_args.extend(cmake_args_env.split())
+            print(f"Adding CMAKE_ARGS from environment: {cmake_args_env}")
 
         build_args = ['--config', cfg]
         build_args += ['--parallel', f'{multiprocessing.cpu_count()}']
@@ -124,34 +142,46 @@ class CMakeBuild(build_ext):
         import shutil
         import glob
         sailpy_dir = python_bindings_dir / 'sailpy'
-
-        # Copy the Python extension module (_libsail.*.so) to both extdir and sailpy
-        ext_pattern = str(build_dir / '_libsail*.so')
-        ext_files = glob.glob(ext_pattern)
-        if not ext_files:
-            raise RuntimeError(f"Python extension not found at {ext_pattern}")
-
         os.makedirs(extdir, exist_ok=True)
 
-        for ext_file in ext_files:
-            # Copy to extdir for setuptools
-            shutil.copy2(ext_file, extdir)
-            print(f"Copied {Path(ext_file).name} to {extdir}")
-            # Also copy to sailpy for runtime
-            shutil.copy2(ext_file, sailpy_dir)
-            print(f"Copied {Path(ext_file).name} to {sailpy_dir}")
+        # On Windows, MSVC puts files in Debug/Release subdirectories
+        if is_windows:
+            search_dirs = [build_dir, build_dir / cfg]
+        else:
+            search_dirs = [build_dir]
 
-        # Copy SAIL libraries to sailpy directory so they can be found at runtime
-        # Libraries are in build_dir root due to CMAKE_LIBRARY_OUTPUT_DIRECTORY
-        sail_lib_patterns = [
-            'libsail*.so*',
-        ]
-        for pattern in sail_lib_patterns:
-            for lib_file in glob.glob(str(build_dir / pattern)):
-                lib_path = Path(lib_file)
-                if lib_path.is_file():
-                    shutil.copy2(lib_path, sailpy_dir)
-                    print(f"Copied {lib_path.name} to {sailpy_dir}")
+        # Find and copy Python extension module
+        ext_pattern = '_libsail*.pyd' if is_windows else '_libsail*.so'
+        ext_file = None
+        for search_dir in search_dirs:
+            files = list(search_dir.glob(ext_pattern))
+            if files:
+                ext_file = files[0]
+                break
+
+        if not ext_file:
+            raise RuntimeError(f"Python extension not found in {build_dir}")
+
+        shutil.copy2(ext_file, extdir)
+        shutil.copy2(ext_file, sailpy_dir)
+        print(f"Copied {ext_file.name}")
+
+        # Copy all DLL/SO files (SAIL libs + dependencies)
+        # Must copy to both extdir (for wheel) and sailpy_dir (for local development)
+        lib_pattern = '*.dll' if is_windows else 'libsail*.so*'
+        copied_count = 0
+        for search_dir in search_dirs:
+            for lib_file in search_dir.glob(lib_pattern):
+                if lib_file.is_file():
+                    # Copy to extdir for wheel packaging
+                    if not (Path(extdir) / lib_file.name).exists():
+                        shutil.copy2(lib_file, extdir)
+                    # Copy to sailpy_dir for local development
+                    if not (sailpy_dir / lib_file.name).exists():
+                        shutil.copy2(lib_file, sailpy_dir)
+                        copied_count += 1
+
+        print(f"Copied {copied_count} library files to {sailpy_dir} and {extdir}")
 
 
 setup(

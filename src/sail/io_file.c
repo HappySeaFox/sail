@@ -201,7 +201,18 @@ static sail_status_t alloc_io_file(const char* path, const char* mode, struct sa
     FILE* fptr;
 
 #ifdef _MSC_VER
-    fptr = _fsopen(path, mode, _SH_DENYWR);
+    /* On Windows, use wide character API for UTF-8 support */
+    wchar_t* wpath;
+    SAIL_TRY(sail_multibyte_to_wchar(path, &wpath));
+
+    wchar_t* wmode;
+    SAIL_TRY_OR_CLEANUP(sail_multibyte_to_wchar(mode, &wmode),
+                        /* cleanup */ sail_free(wpath));
+
+    fptr = _wfsopen(wpath, wmode, _SH_DENYWR);
+
+    sail_free(wpath);
+    sail_free(wmode);
 #else
     /* Fallback to a regular fopen() */
     fptr = fopen(path, mode);
