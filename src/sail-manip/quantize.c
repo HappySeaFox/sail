@@ -901,9 +901,9 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
          * Extract the lower byte from each short (palette index 0-255).
          */
         unsigned char* dest = indexed_image->pixels;
-        for (int i = 0; i < state->size; i++)
+        for (int k = 0; k < state->size; k++)
         {
-            dest[i] = (unsigned char)state->Qadd[i];
+            dest[k] = (unsigned char)state->Qadd[k];
         }
     }
     else
