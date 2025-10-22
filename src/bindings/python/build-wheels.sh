@@ -97,6 +97,8 @@ mkdir -p wheelhouse
 echo "[2/3] Building wheels..."
 
 if [[ "$MULTI_VERSION" == "true" ]]; then
+    pyenv update
+
     for version in "${PYTHON_VERSIONS[@]}"; do
         if ! pyenv versions | grep -q "$version"; then
             echo "Installing Python $version with pyenv..."
