@@ -16,7 +16,7 @@ readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     {name = "Dzmitry Baryshau", email = "dima8w@gmail.com"}
 ]
-license = {text = "MIT"}
+license = "MIT"
 keywords = [
     "image",
     "loading",
@@ -36,7 +36,6 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: C",
     "Programming Language :: C++",
     "Programming Language :: Python :: 3",
@@ -93,5 +92,5 @@ include-package-data = true
 include = ["sailpy*"]
 
 [tool.setuptools.package-data]
-sailpy = ["_version.py", "py.typed"]
+sailpy = ["*.dll", "*.pyd", "*.so", "*.so.*", "_version.py", "py.typed"]
 "sailpy.examples" = ["*.py", "*.md"]

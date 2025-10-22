@@ -320,8 +320,6 @@ sail_status_t sail_codec_info_from_mime_type(const char* mime_type, const struct
 
             mime_type_node = mime_type_node->next;
         }
-
-        codec_bundle_node = codec_bundle_node->next;
     }
 
     sail_free(mime_type_copy);
@@ -348,25 +346,19 @@ sail_status_t sail_codec_info_from_name(const char* name, const struct sail_code
     char* name_copy;
     SAIL_TRY(sail_strdup(name, &name_copy));
 
-    /* Will compare in lower case. */
-    sail_to_lower(name_copy);
+    /* Will compare in upper case. */
+    sail_to_upper(name_copy);
 
     for (struct sail_codec_bundle_node* codec_bundle_node = context->codec_bundle_node; codec_bundle_node != NULL;
          codec_bundle_node                                = codec_bundle_node->next)
     {
         const struct sail_codec_bundle* codec_bundle = codec_bundle_node->codec_bundle;
+        const char* codec_name                       = codec_bundle->codec_info->name;
 
-        char* codec_name_copy;
-        SAIL_TRY_OR_CLEANUP(sail_strdup(codec_bundle->codec_info->name, &codec_name_copy),
-                            /* cleanup */ sail_free(name_copy));
+        SAIL_LOG_TRACE("Check against codec name '%s'", codec_name);
 
-        sail_to_lower(codec_name_copy);
-
-        SAIL_LOG_TRACE("Check against codec name '%s'", codec_name_copy);
-
-        if (strcmp(codec_name_copy, name_copy) == 0)
+        if (strcmp(codec_name, name_copy) == 0)
         {
-            sail_free(codec_name_copy);
             sail_free(name_copy);
             *codec_info = codec_bundle->codec_info;
             SAIL_LOG_DEBUG("Found codec info: %s", (*codec_info)->name);
@@ -374,10 +366,8 @@ sail_status_t sail_codec_info_from_name(const char* name, const struct sail_code
         }
         else
         {
-            SAIL_LOG_TRACE("Name mismatch '%s' != '%s'", name_copy, codec_name_copy);
+            SAIL_LOG_TRACE("Name mismatch '%s' != '%s'", name_copy, codec_name);
         }
-
-        sail_free(codec_name_copy);
     }
 
     sail_free(name_copy);

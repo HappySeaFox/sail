@@ -13,12 +13,9 @@ include CMakeLists.txt
 # Include all C++ source files for building from source
 recursive-include src *.cpp *.h *.hpp
 
-# Exclude build artifacts
+# Exclude build artifacts and cache
 global-exclude *.pyc
 global-exclude *.pyo
-global-exclude *.so
-global-exclude *.dll
-global-exclude *.dylib
 global-exclude __pycache__
 prune build
 prune dist

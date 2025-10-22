@@ -140,6 +140,7 @@ def test_multiframe_iterator_then_read():
         with pytest.raises(RuntimeError):
             reader.read()
     finally:
+        del reader  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 
@@ -165,6 +166,7 @@ def test_multiframe_write_multiple():
             writer.write(frame)
 
         writer.finish()
+        del writer  # Explicitly destroy to close file
 
         # Verify file was created
         assert os.path.exists(output_path)
@@ -201,6 +203,7 @@ def test_multiframe_write_all_single():
         writer = sailpy.ImageWriter(output_path)
         writer.write_all([img])
         writer.finish()
+        del writer  # Explicitly destroy to close file
 
         assert os.path.exists(output_path)
     finally:
@@ -221,6 +224,7 @@ def test_multiframe_single_frame_write_all():
         writer = sailpy.ImageWriter(output_path)
         writer.write_all([img])
         writer.finish()
+        del writer  # Explicitly destroy to close file
 
         # Load and verify
         loaded = sailpy.Image.from_file(output_path)

@@ -896,7 +896,15 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     /* Copy indexed pixels. */
     if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
     {
-        memcpy(indexed_image->pixels, state->Qadd, state->size);
+        /*
+         * state->Qadd is unsigned short*, but we need unsigned char* for BPP8_INDEXED.
+         * Extract the lower byte from each short (palette index 0-255).
+         */
+        unsigned char* dest = indexed_image->pixels;
+        for (int i = 0; i < state->size; i++)
+        {
+            dest[i] = (unsigned char)state->Qadd[i];
+        }
     }
     else
     {

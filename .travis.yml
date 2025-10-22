@@ -104,7 +104,7 @@ script:
 
     fail_on_error cmake -A x64 -S "$project_path" -B "$project_path/build" \
                         -DSAIL_DEV=ON -DCMAKE_PREFIX_PATH="$sail_cmake_path" \
-                        -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$vcpkg_triplet"
+                        -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$vcpkg_triplet"
 
     fail_on_error cmake --build "$project_path/build" --config $build_type -j$(nproc)
   }
@@ -132,7 +132,7 @@ script:
     echo
     echo " *** Building with $@ ***"
     echo
-set -x
+
     eval $@
 
     fail_on_error cd "$TRAVIS_BUILD_DIR"
@@ -157,15 +157,11 @@ set -x
         fail_on_error cmake -A x64 -S . -B build \
                                 -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -DCMAKE_INSTALL_PREFIX="$CMAKE_INSTALL_PREFIX" -DBUILD_SHARED_LIBS="$BUILD_SHARED_LIBS" \
                                 -DSAIL_DEV=ON -DSAIL_COMBINE_CODECS="$SAIL_COMBINE_CODECS" -DSAIL_WINDOWS_STATIC_CRT="$SAIL_WINDOWS_STATIC_CRT" \
-                                -DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET"
+                                -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" -DVCPKG_TARGET_TRIPLET="$VCPKG_TARGET_TRIPLET"
 
         fail_on_error cmake --build build --config $CMAKE_BUILD_TYPE --target install -j$(nproc)
 
-echo "======================"
-pwd
-exit 1
-
-        fail_on_error ctest --test-dir build -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
+        fail_on_error ctest --test-dir build/tests -C $CMAKE_BUILD_TYPE --output-on-failure -j$(nproc)
 
         fail_on_error "$CMAKE_INSTALL_PREFIX/bin/sail" --version
 
