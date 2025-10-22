@@ -15,7 +15,6 @@ set MULTI_VERSION=false
 where pyenv >nul 2>&1
 if not errorlevel 1 (
     set MULTI_VERSION=true
-    set PYTHON_MANAGER=pyenv-win
 )
 
 echo =====================================
@@ -25,7 +24,7 @@ echo.
 echo Platform: Windows
 
 if "%MULTI_VERSION%"=="true" (
-    echo Python Manager: %PYTHON_MANAGER%
+    echo Python Manager: pyenv
     echo Target versions: %PYTHON_VERSIONS%
 ) else (
     echo Mode: Single Python version ^(current^)
@@ -71,6 +70,12 @@ mkdir wheelhouse 2>nul
 echo [2/3] Building wheels...
 
 if "%MULTI_VERSION%"=="true" (
+    pyenv update
+    if errorlevel 1 (
+        echo Error: Failed to update pyenv
+        exit /b 1
+    )
+
     REM Build for multiple Python versions
     for %%v in (%PYTHON_VERSIONS%) do (
         echo.
@@ -212,7 +217,7 @@ for %%f in (wheelhouse\*.whl) do (
 
 echo.
 echo =====================================
-echo   ✓  Wheels ready for distribution  ✓
+echo  ✓  Wheels ready for distribution  ✓
 echo =====================================
 echo.
 
