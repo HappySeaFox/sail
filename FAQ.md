@@ -461,6 +461,7 @@ Yes. See the `examples` directory in the source tree.
 Yes. Currently SAIL supports the following bindings:
 
 1. C++
+2. Python
 
 Pull requests to support more programming languages are highly welcomed.
 
