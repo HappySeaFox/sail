@@ -38,14 +38,15 @@ static const char XPM_CHARS[] =
     " .XoO+@#$%&*=-;:>,<1234567890qwertyuipasdfghjklzxcvbnmMNBVCZASDFGHJKLPIUYTREWQ!~^/()_`'[]{}|";
 
 /* X11 color database. */
-typedef struct {
+struct xpm_x11_color
+{
     const char* name;
     unsigned char r;
     unsigned char g;
     unsigned char b;
-} xpm_x11_color_t;
+};
 
-static const xpm_x11_color_t XPM_X11_COLORS[] = {
+static const struct xpm_x11_color XPM_X11_COLORS[] = {
     {"alice", 240, 248, 255},
     {"AliceBlue", 240, 248, 255},
     {"antique", 250, 235, 215},
