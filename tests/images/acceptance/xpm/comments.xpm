@@ -1,0 +1,30 @@
+/* XPM */
+static const char *comments_xpm[] = {
+/* This file tests C comment handling */
+/* Multiple comments should be skipped correctly */
+"8 8 4 1",
+/* Comments between header and colors */
+"  c gray27",
+/* Comment after first color */
+". c gray100",
+/* Another comment */
+"X c gray0",
+/* More comments */
+"o c gray50",
+/* Comments before pixel data section */
+/* Even more comments here */
+/* pixels */
+"  ......",
+/* Comment between pixel lines */
+"  ......",
+"XX  ....",
+"XX  ....",
+/* Multiple comments in pixel section */
+/* to test robustness */
+"ooXX  ..",
+"ooXX  ..",
+"....ooXX",
+/* Final comment */
+"....ooXX"
+};
+

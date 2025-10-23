@@ -127,6 +127,8 @@ class CMakeBuild(build_ext):
         if not os.path.exists(build_dir):
             os.makedirs(build_dir)
 
+        print(f"CMake arguments: {cmake_args}")
+
         # Configure with CMake - pass the Python bindings directory
         subprocess.check_call(
             ['cmake', str(python_bindings_dir)] + cmake_args,

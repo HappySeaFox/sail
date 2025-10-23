@@ -1,10 +1,14 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.18) # Require CMake 3.18 or later for SAIL
 project(sail-python)
 
 # Require C++14 (for pybind11)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Use Python executable if provided, otherwise find it
+if (PYTHON_EXECUTABLE)
+    set(Python3_EXECUTABLE ${PYTHON_EXECUTABLE})
+endif()
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 CONFIG)
 
