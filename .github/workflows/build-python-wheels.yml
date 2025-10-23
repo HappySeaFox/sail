@@ -93,6 +93,9 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: src/bindings/python
       run: |
+        BREW_PREFIX=$(brew --prefix)
+        export CMAKE_PREFIX_PATH="${BREW_PREFIX}"
+        export PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig"
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
