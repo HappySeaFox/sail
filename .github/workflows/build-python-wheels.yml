@@ -45,7 +45,8 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install                  giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
-        brew link --force --overwrite giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
+        brew unlink                   giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
+        brew link --force --overwrite giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
