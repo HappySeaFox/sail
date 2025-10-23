@@ -92,9 +92,7 @@ jobs:
       working-directory: src/bindings/python
       run: |
         export CMAKE_PREFIX_PATH="$(brew --prefix)"
-        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$(brew --prefix)"
-        export CPATH="$(brew --prefix)/include:$CPATH"
-        export LIBRARY_PATH="$(brew --prefix)/lib:$LIBRARY_PATH"
+        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$(brew --prefix) -DCMAKE_INCLUDE_PATH=$(brew --prefix)/include -DCMAKE_LIBRARY_PATH=$(brew --prefix)/lib"
 
         python -m build --wheel
         mkdir -p wheelhouse
