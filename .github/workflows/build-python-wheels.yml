@@ -49,7 +49,7 @@ jobs:
     - name: Apply CMake patches (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew --prefix libtiff
+        brew info libtiff
         ls -l $(brew --prefix libtiff)/lib
         #git apply .github/gif.patch
         #git apply .github/png.patch
