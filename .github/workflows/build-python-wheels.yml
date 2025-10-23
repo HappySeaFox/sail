@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
@@ -62,7 +62,6 @@ jobs:
           libheif \
           libpng \
           libtiff \
-          nanosvg \
           openexr \
           openjpeg \
           webp \
@@ -135,7 +134,7 @@ jobs:
     - name: Check wheels
       working-directory: src/bindings/python
       run: |
-        twine check --strictwheelhouse/*.whl
+        twine check --strict wheelhouse/*.whl
 
     - name: Test wheel installation
       working-directory: src/bindings/python
