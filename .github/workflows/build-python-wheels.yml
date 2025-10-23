@@ -84,7 +84,9 @@ jobs:
       run: |
         # Force CMake to use Homebrew libraries instead of system ones
         BREW_PREFIX=$(brew --prefix)
-        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=${BREW_PREFIX};/usr/local"
+        echo "Using Homebrew prefix: ${BREW_PREFIX}"
+        export CMAKE_PREFIX_PATH="${BREW_PREFIX}"
+        export PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig"
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
