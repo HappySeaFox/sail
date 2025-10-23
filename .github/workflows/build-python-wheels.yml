@@ -44,18 +44,7 @@ jobs:
     - name: Install build dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        # Update Homebrew and upgrade giflib to latest version
-        brew update
-        brew upgrade giflib || brew install giflib
-        brew install jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
-        # Unlink and relink to ensure latest versions are used
-        brew unlink giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib 2>/dev/null || true
-        brew link --force --overwrite giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
-        # Verify giflib version
-        BREW_PREFIX=$(brew --prefix)
-        echo "Installed giflib version:"
-        ls -la ${BREW_PREFIX}/lib/libgif* || true
-        ls -la ${BREW_PREFIX}/Cellar/giflib/ || true
+        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -94,8 +83,10 @@ jobs:
       working-directory: src/bindings/python
       run: |
         BREW_PREFIX=$(brew --prefix)
-        export CMAKE_PREFIX_PATH="${BREW_PREFIX}"
-        export PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig"
+        # Explicitly set paths to giflib to ensure correct version is found
+        export GIF_INCLUDE=$(find ${BREW_PREFIX}/Cellar/giflib -name gif_lib.h -exec dirname {} \; | head -1)
+        export GIF_LIBRARY=$(find ${BREW_PREFIX}/Cellar/giflib -name "libgif.dylib" | head -1)
+
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
