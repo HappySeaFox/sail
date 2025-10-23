@@ -50,6 +50,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         git apply .github/gif.patch
+        git apply .github/png.patch
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
