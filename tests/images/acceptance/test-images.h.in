@@ -204,6 +204,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/xpm/bpp4-indexed.xpm",
     "@SAIL_TEST_IMAGES_PATH@/xpm/bpp8-indexed.xpm",
     "@SAIL_TEST_IMAGES_PATH@/xpm/bpp24-rgb.xpm",
+    "@SAIL_TEST_IMAGES_PATH@/xpm/comments.xpm",
     "@SAIL_TEST_IMAGES_PATH@/xpm/grayscale.xpm",
     "@SAIL_TEST_IMAGES_PATH@/xpm/hotspot.xpm",
     "@SAIL_TEST_IMAGES_PATH@/xpm/multichar.xpm",
