@@ -1,0 +1,11 @@
+diff --git a/src/sail-codecs/gif/CMakeLists.txt b/src/sail-codecs/gif/CMakeLists.txt
+index c2ef5deb..a79076bb 100644
+--- a/src/sail-codecs/gif/CMakeLists.txt
++++ b/src/sail-codecs/gif/CMakeLists.txt
+@@ -1,3 +1,6 @@
++set(GIF_INCLUDE_DIR "/opt/homebrew/opt/giflib/include")
++set(GIF_LIBRARY "/opt/homebrew/opt/giflib/lib/libgif.dylib")
++
+ find_package(GIF ${SAIL_CODEC_GIF_REQUIRED_OPTION})
+ 
+ if (NOT GIF_FOUND)

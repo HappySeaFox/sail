@@ -46,6 +46,11 @@ jobs:
       run: |
         brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
 
+    - name: Apply GIF patch (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        git apply .github/gif.patch
+
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
       run: |
@@ -82,11 +87,6 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: src/bindings/python
       run: |
-        BREW_PREFIX=$(brew --prefix)
-        # Explicitly set paths to giflib to ensure correct version is found
-        export GIF_INCLUDE=$(find ${BREW_PREFIX}/Cellar/giflib -name gif_lib.h -exec dirname {} \; | head -1)
-        export GIF_LIBRARY=$(find ${BREW_PREFIX}/Cellar/giflib -name "libgif.dylib" | head -1)
-
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
