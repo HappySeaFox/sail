@@ -93,6 +93,8 @@ jobs:
       run: |
         export CMAKE_PREFIX_PATH="$(brew --prefix)"
         export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$(brew --prefix)"
+        export CPATH="$(brew --prefix)/include:$CPATH"
+        export LIBRARY_PATH="$(brew --prefix)/lib:$LIBRARY_PATH"
 
         python -m build --wheel
         mkdir -p wheelhouse
