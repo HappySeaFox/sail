@@ -8,3 +8,4 @@ set_target_properties(sail-munit PROPERTIES
 # Definitions, includes, link
 #
 target_include_directories(sail-munit PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(sail-munit PUBLIC -lc -lg -lm)

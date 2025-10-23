@@ -23,6 +23,11 @@
     SOFTWARE.
 */
 
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+
 #ifdef SAIL_COLORED_OUTPUT
 #ifdef SAIL_WIN32
 #include <windows.h>
@@ -33,14 +38,13 @@
 #else
 #include <unistd.h>
 #define SAIL_ISATTY isatty
+#ifdef PSP
+#define SAIL_FILENO __sfileno
+#else
 #define SAIL_FILENO fileno
 #endif
 #endif
-
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
+#endif
 
 #include "sail-common.h"
 
