@@ -45,7 +45,6 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
-        brew upgrade giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp zlib
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -83,6 +82,9 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: src/bindings/python
       run: |
+        # Force CMake to use Homebrew libraries instead of system ones
+        BREW_PREFIX=$(brew --prefix)
+        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=${BREW_PREFIX};/usr/local"
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
