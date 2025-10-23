@@ -8,8 +8,8 @@ name=HEIF
 description=High Efficiency Image File Format
 # ????ftypheic;????ftypheix;????ftyphevc;????ftyphevx
 magic-numbers=?? ?? ?? ?? 66 74 79 70 68 65 69 63;?? ?? ?? ?? 66 74 79 70 68 65 69 78;?? ?? ?? ?? 66 74 79 70 68 65 76 63;?? ?? ?? ?? 66 74 79 70 68 65 76 78
-extensions=heif;heic;hif
-mime-types=image/heif;image/heic;image/heif-sequence;image/heic-sequence
+extensions=heif;heifs;heic;heics;hif
+mime-types=image/heif;image/heif-sequence;image/heic;image/heic-sequence
 
 [load-features]
 features=STATIC;ANIMATED;META-DATA;ICCP;SOURCE-IMAGE
