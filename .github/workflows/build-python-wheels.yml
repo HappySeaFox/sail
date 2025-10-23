@@ -13,8 +13,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-13, macos-14]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14']
+        exclude:
+          # Python 3.9 doesn't support macOS 14 (ARM64)
+          - os: macos-14
+            python-version: '3.9'
 
     steps:
     - uses: actions/checkout@v4
@@ -115,7 +119,12 @@ jobs:
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
-          delocate-wheel -w wheelhouse/ -v "$wheel"
+          # Determine architecture based on runner
+          if [ "$(uname -m)" = "arm64" ]; then
+            delocate-wheel --require-archs arm64 -w wheelhouse/ "$wheel"
+          else
+            delocate-wheel --require-archs x86_64 -w wheelhouse/ "$wheel"
+          fi
         done
 
     - name: Build wheel (Windows)
