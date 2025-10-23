@@ -86,7 +86,9 @@ jobs:
         BREW_PREFIX=$(brew --prefix)
         echo "Using Homebrew prefix: ${BREW_PREFIX}"
         export CMAKE_PREFIX_PATH="${BREW_PREFIX}"
+        export CMAKE_IGNORE_PATH="/usr/local"
         export PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig"
+        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=${BREW_PREFIX} -DCMAKE_IGNORE_PATH=/usr/local"
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
