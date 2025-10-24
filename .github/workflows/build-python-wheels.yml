@@ -45,9 +45,9 @@ jobs:
 
         # Use Python from brew which is arm64
         #
-        BREW_PREFIX="$(brew --prefix)"
-        ln -s "${BREW_PREFIX}/bin/python3" "${BREW_PREFIX}/bin/python"
-        echo "PATH=${BREW_PREFIX}/bin:$PATH" >> $GITHUB_ENV
+        BREW_PREFIX="$(brew --prefix python)"
+        ln -s "${BREW_PREFIX}/libexec/bin/python3" "${BREW_PREFIX}/libexec/bin/python"
+        echo "PATH=${BREW_PREFIX}/libexec/bin:$PATH" >> $GITHUB_ENV
 
     - name: Set up vcpkg cache
       uses: actions/cache@v4
