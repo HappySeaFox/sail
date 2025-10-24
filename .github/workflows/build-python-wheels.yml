@@ -40,7 +40,14 @@ jobs:
     - name: Install build dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
+        brew install python
         brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
+
+        # Use Python from brew which is arm64
+        #
+        BREW_PREFIX="$(brew --prefix)"
+        ln -s "${BREW_PREFIX}/bin/python3" "${BREW_PREFIX}/bin/python"
+        echo "PATH=${BREW_PREFIX}/bin:$PATH" >> $GITHUB_ENV
 
     - name: Set up vcpkg cache
       uses: actions/cache@v4
