@@ -52,6 +52,10 @@ jobs:
     - name: Install
       run: |
         sudo make -C build install
+
+    - name: ldconfig (Linux)
+      if: runner.os == 'Linux'
+      run: |
         sudo ldconfig
 
     - name: Run tests
