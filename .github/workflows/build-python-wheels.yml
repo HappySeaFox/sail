@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-latest-large]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
@@ -87,12 +87,7 @@ jobs:
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
-          # Determine architecture based on runner
-          if [ "$(uname -m)" = "arm64" ]; then
-            delocate-wheel --require-archs arm64 -w wheelhouse/ "$wheel"
-          else
-            delocate-wheel --require-archs x86_64 -w wheelhouse/ "$wheel"
-          fi
+          delocate-wheel -w wheelhouse/ "$wheel"
         done
 
     - name: Build wheel (Windows)

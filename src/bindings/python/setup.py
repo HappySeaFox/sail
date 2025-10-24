@@ -136,14 +136,6 @@ class CMakeBuild(build_ext):
             env=env
         )
 
-        # Debug: Print CMakeCache.txt to see what CMake found
-        cmake_cache = build_dir / 'CMakeCache.txt'
-        if cmake_cache.exists():
-            print("\n=== CMakeCache.txt ===")
-            with open(cmake_cache, 'r') as f:
-                print(f.read())
-            print("=== End of CMakeCache.txt ===\n")
-
         subprocess.check_call(
             ['cmake', '--build', '.', '--target', '_libsail'] + build_args,
             cwd=build_dir
