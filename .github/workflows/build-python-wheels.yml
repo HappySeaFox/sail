@@ -79,11 +79,6 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: src/bindings/python
       run: |
-        unset CPATH LIBRARY_PATH CMAKE_PREFIX_PATH CMAKE_INCLUDE_PATH CMAKE_LIBRARY_PATH
-        BREW_PREFIX="$(brew --prefix)"
-        export CMAKE_PREFIX_PATH="$BREW_PREFIX"
-        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$BREW_PREFIX -DCMAKE_INCLUDE_PATH=${BREW_PREFIX}/include -DCMAKE_LIBRARY_PATH=${BREW_PREFIX}/lib"
-
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
