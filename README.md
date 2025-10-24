@@ -155,7 +155,7 @@ It's pretty easy, isn't it? :smile: See also [FAQ](FAQ.md).
 ## Programming languages
 
 **Programming language:** C11<br/>
-**Bindings:** C++11, Python 3.9+
+**Bindings:** C++11, Python 3.10+
 
 ## Competitors
 

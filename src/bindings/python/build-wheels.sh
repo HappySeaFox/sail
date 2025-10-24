@@ -8,7 +8,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 # Python versions to build for
-PYTHON_VERSIONS=("3.9" "3.10" "3.11" "3.12" "3.13" "3.14")
+PYTHON_VERSIONS=("3.10" "3.11" "3.12" "3.13" "3.14")
 
 OS_TYPE=$(uname -s)
 
