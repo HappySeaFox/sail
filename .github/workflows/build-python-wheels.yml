@@ -40,8 +40,7 @@ jobs:
     - name: Install build dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install                  giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
-        brew link --overwrite --force giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
+        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -79,7 +78,7 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: src/bindings/python
       env:
-        CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES='x86_64;arm64'
+        CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES=arm64
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
