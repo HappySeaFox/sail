@@ -646,17 +646,17 @@ sail_status_t hdr_private_store_properties(const struct hdr_header* header, stru
     if (header->colorcorr[0] != 1.0f)
     {
         sail_set_variant_float(variant, header->colorcorr[0]);
-        sail_put_hash_map(special_properties, "hdr-colorcorr-1", variant);
+        sail_put_hash_map(special_properties, "hdr-color-correction-1", variant);
     }
     if (header->colorcorr[1] != 1.0f)
     {
         sail_set_variant_float(variant, header->colorcorr[1]);
-        sail_put_hash_map(special_properties, "hdr-colorcorr-2", variant);
+        sail_put_hash_map(special_properties, "hdr-color-correction-2", variant);
     }
     if (header->colorcorr[2] != 1.0f)
     {
         sail_set_variant_float(variant, header->colorcorr[2]);
-        sail_put_hash_map(special_properties, "hdr-colorcorr-3", variant);
+        sail_put_hash_map(special_properties, "hdr-color-correction-3", variant);
     }
 
     sail_destroy_variant(variant);
@@ -712,22 +712,43 @@ sail_status_t hdr_private_fetch_properties(const struct sail_hash_map* special_p
     }
 
     /* Get color correction. */
-    variant = sail_hash_map_value(special_properties, "hdr-colorcorr-1");
-    if (variant != NULL && (variant->type == SAIL_VARIANT_TYPE_FLOAT || variant->type == SAIL_VARIANT_TYPE_DOUBLE))
+    variant = sail_hash_map_value(special_properties, "hdr-color-correction-1");
+    if (variant != NULL)
     {
-        header->colorcorr[0] = sail_variant_to_float(variant);
+        if (variant->type == SAIL_VARIANT_TYPE_FLOAT)
+        {
+            header->colorcorr[0] = sail_variant_to_float(variant);
+        }
+        else if (variant->type == SAIL_VARIANT_TYPE_DOUBLE)
+        {
+            header->colorcorr[0] = sail_variant_to_double(variant);
+        }
     }
 
-    variant = sail_hash_map_value(special_properties, "hdr-colorcorr-2");
-    if (variant != NULL && (variant->type == SAIL_VARIANT_TYPE_FLOAT || variant->type == SAIL_VARIANT_TYPE_DOUBLE))
+    variant = sail_hash_map_value(special_properties, "hdr-color-correction-2");
+    if (variant != NULL)
     {
-        header->colorcorr[1] = sail_variant_to_float(variant);
+        if (variant->type == SAIL_VARIANT_TYPE_FLOAT)
+        {
+            header->colorcorr[1] = sail_variant_to_float(variant);
+        }
+        else if (variant->type == SAIL_VARIANT_TYPE_DOUBLE)
+        {
+            header->colorcorr[1] = sail_variant_to_double(variant);
+        }
     }
 
-    variant = sail_hash_map_value(special_properties, "hdr-colorcorr-3");
-    if (variant != NULL && (variant->type == SAIL_VARIANT_TYPE_FLOAT || variant->type == SAIL_VARIANT_TYPE_DOUBLE))
+    variant = sail_hash_map_value(special_properties, "hdr-color-correction-3");
+    if (variant != NULL)
     {
-        header->colorcorr[2] = sail_variant_to_float(variant);
+        if (variant->type == SAIL_VARIANT_TYPE_FLOAT)
+        {
+            header->colorcorr[2] = sail_variant_to_float(variant);
+        }
+        else if (variant->type == SAIL_VARIANT_TYPE_DOUBLE)
+        {
+            header->colorcorr[2] = sail_variant_to_double(variant);
+        }
     }
 
     return SAIL_OK;

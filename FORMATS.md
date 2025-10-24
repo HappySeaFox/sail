@@ -168,7 +168,7 @@
         Possible values: string.
         Key: <i>"hdr-primaries"</i>. Description: Color primaries.
         Possible values: string.
-        Key: <i>"hdr-colorcorr-1"</i>, <i>"hdr-colorcorr-2"</i>, <i>"hdr-colorcorr-3"</i>. Description: Color correction per channel.
+        Key: <i>"hdr-color-correction-1"</i>, <i>"hdr-color-correction-2"</i>, <i>"hdr-color-correction-3"</i>. Description: Color correction per channel.
         Possible values: float.
     </td>
     <td>-</td>
