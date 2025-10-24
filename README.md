@@ -145,6 +145,7 @@ image = sailpy.Image.from_file(path)
 # python -m sailpy --readme
 
 # Run image viewer example
+# pip install PySide6
 # python -m sailpy.examples.12_image_viewer
 ```
 
