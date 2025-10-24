@@ -58,10 +58,6 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
-    "pytest-cov",
-    "black",
-    "mypy",
-    "pillow",
 ]
 
 [project.urls]
