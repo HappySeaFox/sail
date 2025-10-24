@@ -53,21 +53,20 @@ jobs:
       run: |
         sudo make -C build install
 
-    - name: ldconfig (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        sudo ldconfig
-
-    - name: ldconfig (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        sudo update_dyld_shared_cache
-
     - name: Run tests
       run: ctest --test-dir build --output-on-failure -j$(nproc)
 
-    - name: Test SAIL binary
-      run: /usr/local/bin/sail --version
+    - name: Test SAIL binary (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo ldconfig
+        /usr/local/bin/sail --version
+
+    - name: Test SAIL binary (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        export DYLD_LIBRARY_PATH=/usr/local/lib:$DYLD_LIBRARY_PATH
+        /usr/local/bin/sail --version
 
     - name: Test external C API link
       run: |
