@@ -92,7 +92,7 @@ jobs:
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
-          delocate-wheel -w wheelhouse/ "$wheel"
+          delocate-wheel --require-archs arm64 -w wheelhouse/ "$wheel"
         done
 
     - name: Build wheel (Windows)
