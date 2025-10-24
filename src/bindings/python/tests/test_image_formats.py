@@ -67,8 +67,7 @@ def test_format_roundtrip(extension, pixel_format):
             img.save(output_path)
         except RuntimeError as e:
             if "unsupported" in str(e).lower() or "pixel" in str(e).lower():
-                pytest.skip(f"Codec {extension} doesn't support {
-                            pixel_format}")
+                pytest.skip(f"Codec {extension} doesn't support {pixel_format}")
             raise
 
         # Load
@@ -217,8 +216,7 @@ def test_all_codecs_have_extensions():
     codecs = sailpy.CodecInfo.list()
 
     for codec in codecs:
-        assert len(codec.extensions) > 0, f"Codec {
-            codec.name} has no extensions"
+        assert len(codec.extensions) > 0, f"Codec {codec.name} has no extensions"
 
 
 def test_save_to_different_formats():
