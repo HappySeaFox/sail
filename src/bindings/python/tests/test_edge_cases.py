@@ -142,19 +142,10 @@ def test_edge_reader_invalid_file():
         sailpy.ImageReader("/nonexistent.png")
 
 
-def test_edge_writer_to_readonly_path():
-    """Test ImageWriter with protected path"""
-    import sys
-
-    # Use platform-specific protected path
-    if sys.platform == 'win32':
-        win_dir = os.environ.get('SYSTEMROOT') or os.environ.get('WINDIR') or r'C:\Windows'
-        protected_path = os.path.join(win_dir, 'System32', 'test_sail.png')
-    else:
-        protected_path = "/root/test.png"
-
+def test_edge_writer_to_unavailable_path():
+    """Test ImageWriter with unavailable path"""
     with pytest.raises((RuntimeError, MemoryError, PermissionError, OSError)):
-        sailpy.ImageWriter(protected_path)
+        sailpy.ImageWriter("/unavailable/path/test.png")
 
 
 def test_edge_codec_info_invalid_extension():
