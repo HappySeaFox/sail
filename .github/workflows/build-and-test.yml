@@ -115,9 +115,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/vcpkg
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('.travis.yml') }}
-        restore-keys: |
-          vcpkg-${{ runner.os }}-
+        key: vcpkg-${{ runner.os }}
 
     - name: Set up vcpkg
       run: |
