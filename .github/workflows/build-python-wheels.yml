@@ -50,8 +50,12 @@ jobs:
     - name: Apply CMake patches (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew info libtiff
-        ls -l $(brew --prefix libtiff)/lib
+        brew info giflib
+        echo "BREW GIFLIB"
+        cat /opt/homebrew/opt/giflib/include/giflib.h || true
+        echo "SYS GIFLIB"
+        cat /usr/local/include/giflib.h || true
+
         #git apply .github/gif.patch
         #git apply .github/png.patch
 
