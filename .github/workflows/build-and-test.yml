@@ -1,0 +1,202 @@
+name: Build and Test
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Build and Test on ${{ matrix.os }} - ${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        config:
+          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF" }
+          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON" }
+          - { name: "Static",          build_shared: "OFF", combine_codecs: "OFF" }
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          libavif-dev \
+          libgif-dev \
+          libheif-dev \
+          libheif-plugin-x265 \
+          libjbig-dev \
+          libjpeg-dev \
+          libjxl-dev \
+          libnanosvg-dev \
+          libopenexr-dev \
+          libopenjp2-7-dev \
+          libpng-dev \
+          libsdl2-dev \
+          libtiff-dev \
+          libwebp-dev \
+          zlib1g-dev
+
+    - name: Configure CMake
+      run: |
+        cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_INSTALL_PREFIX=/usr/local \
+          -DBUILD_SHARED_LIBS=${{ matrix.config.build_shared }} \
+          -DSAIL_DEV=ON \
+          -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }}
+
+    - name: Build
+      run: cmake --build build -j$(nproc)
+
+    - name: Install
+      run: |
+        sudo make -C build install
+        sudo ldconfig
+
+    - name: Run tests
+      run: ctest --test-dir build --output-on-failure -j$(nproc)
+
+    - name: Test SAIL binary
+      run: /usr/local/bin/sail --version
+
+    - name: Test external C API link
+      run: |
+        rm -rf tests/external/link/c/build
+        mkdir tests/external/link/c/build
+        cmake -S tests/external/link/c -B tests/external/link/c/build \
+          -DSAIL_DEV=ON \
+          -DCMAKE_BUILD_TYPE=Debug
+        cmake --build tests/external/link/c/build -j$(nproc)
+        tests/external/link/c/build/external-c-api-link
+
+    - name: Test external C++ API link
+      run: |
+        rm -rf tests/external/link/c++/build
+        mkdir tests/external/link/c++/build
+        cmake -S tests/external/link/c++ -B tests/external/link/c++/build \
+          -DSAIL_DEV=ON \
+          -DCMAKE_BUILD_TYPE=Debug
+        cmake --build tests/external/link/c++/build -j$(nproc)
+        tests/external/link/c++/build/external-c++-api-link
+
+    - name: Cleanup
+      if: always()
+      run: |
+        if [ -f build/install_manifest.txt ]; then
+          xargs sudo rm -f < build/install_manifest.txt || true
+        fi
+
+  build-windows:
+    name: Build and Test on Windows - ${{ matrix.config.name }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows" }
+          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON",  static_crt: "OFF", triplet: "x64-windows" }
+          - { name: "Static /MD",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows-static-md" }
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up vcpkg cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/vcpkg
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('.travis.yml') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-
+
+    - name: Set up vcpkg
+      run: |
+        if (!(Test-Path vcpkg/vcpkg.exe)) {
+          if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+        }
+        git -C vcpkg pull
+
+    - name: Install dependencies via vcpkg
+      run: |
+        .\vcpkg\vcpkg install `
+          giflib `
+          jbigkit `
+          libavif[aom] `
+          libjpeg-turbo `
+          libjxl `
+          libpng `
+          libwebp `
+          nanosvg `
+          openjpeg `
+          tiff `
+          zlib `
+          --triplet ${{ matrix.config.triplet }} `
+          --clean-buildtrees-after-build `
+          --clean-downloads-after-build
+
+    - name: Configure CMake
+      run: |
+        cmake -A x64 -S . -B build `
+          -DCMAKE_BUILD_TYPE=Debug `
+          -DCMAKE_INSTALL_PREFIX=C:/SAIL `
+          -DBUILD_SHARED_LIBS=${{ matrix.config.build_shared }} `
+          -DSAIL_DEV=ON `
+          -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }} `
+          -DSAIL_WINDOWS_STATIC_CRT=${{ matrix.config.static_crt }} `
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
+
+    - name: Build
+      run: cmake --build build --config Debug --target install -j$env:NUMBER_OF_PROCESSORS
+
+    - name: Run tests
+      run: ctest --test-dir build/tests -C Debug --output-on-failure -j$env:NUMBER_OF_PROCESSORS
+
+    - name: Test SAIL binary
+      run: C:/SAIL/bin/sail.exe --version
+
+    - name: Test external C API link
+      run: |
+        if (Test-Path tests/external/link/c/build) {
+          Remove-Item -Recurse -Force tests/external/link/c/build
+        }
+        New-Item -ItemType Directory -Path tests/external/link/c/build
+        cmake -A x64 -S tests/external/link/c -B tests/external/link/c/build `
+          -DSAIL_DEV=ON `
+          -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
+        cmake --build tests/external/link/c/build --config Debug -j$env:NUMBER_OF_PROCESSORS
+
+    - name: Test external C++ API link
+      run: |
+        if (Test-Path tests/external/link/c++/build) {
+          Remove-Item -Recurse -Force tests/external/link/c++/build
+        }
+        New-Item -ItemType Directory -Path tests/external/link/c++/build
+        cmake -A x64 -S tests/external/link/c++ -B tests/external/link/c++/build `
+          -DSAIL_DEV=ON `
+          -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
+        cmake --build tests/external/link/c++/build --config Debug -j$env:NUMBER_OF_PROCESSORS
+
+    - name: Cleanup
+      if: always()
+      run: |
+        if (Test-Path C:/SAIL) {
+          Remove-Item -Recurse -Force C:/SAIL -ErrorAction SilentlyContinue
+        }
+
