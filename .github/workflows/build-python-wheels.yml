@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest]
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
@@ -43,12 +43,6 @@ jobs:
         brew install python
         brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
 
-        # Use Python from brew which is arm64
-        #
-        BREW_PREFIX="$(brew --prefix python)"
-        ln -s "${BREW_PREFIX}/libexec/bin/python3" "${BREW_PREFIX}/libexec/bin/python"
-        echo "PATH=${BREW_PREFIX}/libexec/bin:$PATH" >> $GITHUB_ENV
-
     - name: Set up vcpkg cache
       uses: actions/cache@v4
       with:
@@ -69,7 +63,6 @@ jobs:
 
     - name: Install Python build tools
       run: |
-        python -VV
         python -m pip install --upgrade pip
         pip install build twine wheel setuptools pybind11 numpy
 
