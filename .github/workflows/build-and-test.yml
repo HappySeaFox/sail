@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-linux:
+  build-linux-macos:
     name: Build and Test on ${{ matrix.os }} - ${{ matrix.config }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         config:
           - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF" }
           - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON" }
@@ -24,12 +24,18 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install dependencies
+    - name: Install dependencies (Linux)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake libavif-dev libgif-dev libheif-dev libheif-plugin-x265 \
                                 libjbig-dev libjpeg-dev libjxl-dev libnanosvg-dev libopenexr-dev \
                                 libopenjp2-7-dev libpng-dev libsdl2-dev libtiff-dev libwebp-dev zlib1g-dev
+
+    - name: Install dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
 
     - name: Configure CMake
       run: |
@@ -74,13 +80,6 @@ jobs:
         cmake --build tests/external/link/c++/build -j$(nproc)
         tests/external/link/c++/build/external-c++-api-link
 
-    - name: Cleanup
-      if: always()
-      run: |
-        if [ -f build/install_manifest.txt ]; then
-          xargs sudo rm -f < build/install_manifest.txt || true
-        fi
-
   build-windows:
     name: Build and Test on Windows - ${{ matrix.config.name }}
     runs-on: windows-latest
@@ -88,10 +87,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF",                    triplet: "x64-windows" }
-          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON",                     triplet: "x64-windows" }
-          - { name: "Static /MT",      build_shared: "OFF",                        static_crt: "ON",  triplet: "x64-windows-static" }
-          - { name: "Static /MD",      build_shared: "OFF",                        static_crt: "OFF", triplet: "x64-windows-static-md" }
+          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows" }
+          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON",  static_crt: "OFF", triplet: "x64-windows" }
+          - { name: "Static /MT",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "ON",  triplet: "x64-windows-static" }
+          - { name: "Static /MD",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows-static-md" }
 
     steps:
     - uses: actions/checkout@v4
