@@ -42,14 +42,23 @@ jobs:
       run: |
         brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
 
+    - name: Set up vcpkg cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/vcpkg
+        key: vcpkg-${{ runner.os }}
+
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
       run: |
-        git clone https://github.com/Microsoft/vcpkg.git ${{ github.workspace }}/../vcpkg
-        cd ${{ github.workspace }}/../vcpkg
-        ./bootstrap-vcpkg.bat
-        ./vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib `
-                --triplet x64-windows
+        if (!(Test-Path vcpkg/vcpkg.exe)) {
+          if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.bat
+        }
+        git -C vcpkg pull
+        vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib `
+                            --triplet x64-windows
 
     - name: Install Python build tools
       run: |
@@ -90,7 +99,7 @@ jobs:
       if: runner.os == 'Windows'
       working-directory: src/bindings/python
       env:
-        CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/../vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP
+        CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
