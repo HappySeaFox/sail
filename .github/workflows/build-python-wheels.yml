@@ -47,18 +47,6 @@ jobs:
         brew install                  giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
         brew link --overwrite --force giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
 
-    - name: Apply CMake patches (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew info giflib
-        echo "BREW GIFLIB"
-        cat /opt/homebrew/opt/giflib/include/giflib.h || true
-        echo "SYS GIFLIB"
-        cat /usr/local/include/giflib.h || true
-
-        #git apply .github/gif.patch
-        #git apply .github/png.patch
-
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
       run: |
@@ -95,8 +83,10 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: src/bindings/python
       run: |
-        export CMAKE_PREFIX_PATH="$(brew --prefix)"
-        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$(brew --prefix) -DCMAKE_INCLUDE_PATH=$(brew --prefix)/include -DCMAKE_LIBRARY_PATH=$(brew --prefix)/lib"
+        unset CPATH LIBRARY_PATH CMAKE_PREFIX_PATH CMAKE_INCLUDE_PATH CMAKE_LIBRARY_PATH
+        BREW_PREFIX="$(brew --prefix)"
+        export CMAKE_PREFIX_PATH="$BREW_PREFIX"
+        export CMAKE_ARGS="-DCMAKE_PREFIX_PATH=$BREW_PREFIX -DCMAKE_INCLUDE_PATH=${BREW_PREFIX}/include -DCMAKE_LIBRARY_PATH=${BREW_PREFIX}/lib"
 
         python -m build --wheel
         mkdir -p wheelhouse
