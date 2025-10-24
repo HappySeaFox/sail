@@ -111,22 +111,14 @@ def test_edge_save_with_initialized_pixels():
             os.remove(output_path)
 
 
-def test_edge_save_to_readonly_path():
-    """Test saving to read-only location"""
-    import sys
-
+def test_edge_save_to_unavailable_path():
+    """Test saving to unavailable location"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 10, 10)
     img.to_numpy()[:] = 0
 
-    # Use platform-specific protected path
-    if sys.platform == 'win32':
-        win_dir = os.environ.get('SYSTEMROOT') or os.environ.get('WINDIR') or r'C:\Windows'
-        protected_path = os.path.join(win_dir, 'System32', 'test_sail.png')
-    else:
-        protected_path = "/root/test.png"
-
+    # Use platform-specific unavailable path
     with pytest.raises((RuntimeError, MemoryError, PermissionError, OSError)):
-        img.save(protected_path)
+        img.save("/unavailable/path/test.png")
 
 
 def test_edge_save_to_invalid_extension():
