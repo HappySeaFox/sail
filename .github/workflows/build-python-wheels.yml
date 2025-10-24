@@ -78,6 +78,8 @@ jobs:
     - name: Build wheel (macOS)
       if: runner.os == 'macOS'
       working-directory: src/bindings/python
+      env:
+        CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES='x86_64;arm64'
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
