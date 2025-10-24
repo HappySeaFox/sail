@@ -27,23 +27,9 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-          cmake \
-          libavif-dev \
-          libgif-dev \
-          libheif-dev \
-          libheif-plugin-x265 \
-          libjbig-dev \
-          libjpeg-dev \
-          libjxl-dev \
-          libnanosvg-dev \
-          libopenexr-dev \
-          libopenjp2-7-dev \
-          libpng-dev \
-          libsdl2-dev \
-          libtiff-dev \
-          libwebp-dev \
-          zlib1g-dev
+        sudo apt-get install -y cmake libavif-dev libgif-dev libheif-dev libheif-plugin-x265 \
+                                libjbig-dev libjpeg-dev libjxl-dev libnanosvg-dev libopenexr-dev \
+                                libopenjp2-7-dev libpng-dev libsdl2-dev libtiff-dev libwebp-dev zlib1g-dev
 
     - name: Configure CMake
       run: |
@@ -128,21 +114,8 @@ jobs:
 
     - name: Install dependencies via vcpkg
       run: |
-        .\vcpkg\vcpkg install `
-          giflib `
-          jbigkit `
-          libavif[aom] `
-          libjpeg-turbo `
-          libjxl `
-          libpng `
-          libwebp `
-          nanosvg `
-          openjpeg `
-          tiff `
-          zlib `
-          --triplet ${{ matrix.config.triplet }} `
-          --clean-buildtrees-after-build `
-          --clean-downloads-after-build
+        .\vcpkg\vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib `
+          --triplet ${{ matrix.config.triplet }} --clean-buildtrees-after-build --clean-downloads-after-build
 
     - name: Configure CMake
       run: |
@@ -157,10 +130,10 @@ jobs:
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
 
     - name: Build
-      run: cmake --build build --config Debug --target install -j$env:NUMBER_OF_PROCESSORS
+      run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Run tests
-      run: ctest --test-dir build/tests -C Debug --output-on-failure -j$env:NUMBER_OF_PROCESSORS
+      run: ctest --test-dir build/tests -C Debug --output-on-failure "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Test SAIL binary
       run: C:/SAIL/bin/sail.exe --version
@@ -176,7 +149,7 @@ jobs:
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
-        cmake --build tests/external/link/c/build --config Debug -j$env:NUMBER_OF_PROCESSORS
+        cmake --build tests/external/link/c/build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Test external C++ API link
       run: |
@@ -189,7 +162,7 @@ jobs:
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
-        cmake --build tests/external/link/c++/build --config Debug -j$env:NUMBER_OF_PROCESSORS
+        cmake --build tests/external/link/c++/build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Cleanup
       if: always()
