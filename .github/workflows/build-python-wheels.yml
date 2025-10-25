@@ -115,6 +115,7 @@ jobs:
       working-directory: src/bindings/sail-python
       run: |
         pip install wheelhouse/*.whl
+        mv sailpy sail.backup
         python -c "import sailpy; print('sailpy version:', sailpy.__version__)"
 
     - name: Install test dependencies
