@@ -121,5 +121,3 @@ make
 # Install (distro-specific)
 sudo make install
 ```
-
-Debian packaging rules are also provided.
