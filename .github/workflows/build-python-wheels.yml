@@ -131,6 +131,18 @@ jobs:
       run: |
         pytest tests/ -v --tb=short
 
+        python -m sailpy.examples.01_quickstart
+        python -m sailpy.examples.02_memory_io
+        python -m sailpy.examples.03_features_and_options
+        python -m sailpy.examples.04_numpy_integration
+        python -m sailpy.examples.05_multiframe
+        python -m sailpy.examples.06_probe
+        python -m sailpy.examples.07_codec_info
+        python -m sailpy.examples.08_logging
+        python -m sailpy.examples.09_image_transformations
+        python -m sailpy.examples.10_enum_usage
+        python -m sailpy.examples.11_advanced_saving
+
     - name: Upload wheels as artifacts
       uses: actions/upload-artifact@v4
       with:
