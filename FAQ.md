@@ -9,8 +9,8 @@ Table of Contents
   * [What are the competitors of SAIL?](#what-are-the-competitors-of-sail)
   * [Describe the high\-level APIs](#describe-the-high-level-apis)
   * [Does SAIL provide simple one\-line APIs?](#does-sail-provide-simple-one-line-apis)
-  * [In what pixel format SAIL loading functions output images?](#in-what-pixel-format-sail-loading-functions-output-images)
-  * [What pixel formats SAIL is able to write?](#what-pixel-formats-sail-is-able-to-write)
+  * [In what pixel format do SAIL loading functions output images?](#in-what-pixel-format-do-sail-loading-functions-output-images)
+  * [What pixel formats can SAIL write?](#what-pixel-formats-can-sail-write)
   * [Why does a codec support more pixel formats for writing than sail\_convert can convert to?](#why-does-a-codec-support-more-pixel-formats-for-writing-than-sail_convert-can-convert-to)
   * [Does SAIL support animated and multi\-paged images?](#does-sail-support-animated-and-multi-paged-images)
   * [Does SAIL support loading from memory?](#does-sail-support-loading-from-memory)
@@ -46,15 +46,15 @@ Table of Contents
 
 ## How old is SAIL?
 
-SAIL is rebranded ksquirrel-libs rewritten in C, improved and with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
+SAIL is a rebranded ksquirrel-libs rewritten in C, improved, and enhanced with high-level APIs. Ksquirrel-libs was a set of C++ image codecs
 for the KSquirrel image viewer. See [http://ksquirrel.sourceforge.net](http://ksquirrel.sourceforge.net).
 
-Technically, SAIL (ksquirrel-libs) was founded in 2003 making it one of the oldest image decoding libraries.
+Technically, SAIL (ksquirrel-libs) was founded in 2003, making it one of the oldest image decoding libraries.
 
 ## Is SAIL cross-platform?
 
-Yes. It's written in pure C11 and is highly portable. However, only the Windows, macOS, and Linux platforms
-are officially supported. SAIL may or may not compile on other platforms. Pull requests to support more platforms are highly welcomed.
+Yes. It's written in pure C11 and is highly portable. However, only Windows, macOS, and Linux platforms
+are officially supported. SAIL may or may not compile on other platforms. Pull requests to support additional platforms are highly welcomed.
 
 ## What's the preferred way of installation?
 
@@ -84,29 +84,28 @@ Yes. Compile with `-DBUILD_SHARED_LIBS=OFF`. This automatically enables `SAIL_CO
 
 SAIL provides four levels of high-level APIs:
 
-- `Junior`: I just want to load this JPEG from a file or memory
-- `Advanced`: I want to load this animated GIF from a file or memory
-- `Deep diver`: I want to load this animated GIF from a file or memory and have control over selected codecs and meta data
-- `Technical diver`: I want everything above and my custom I/O source
+- `Junior`: Simple one-line image loading from file or memory
+- `Advanced`: Loading animated/multi-paged images from file or memory
+- `Deep diver`: Full control over codec selection, meta data, and loading options
+- `Technical diver`: Everything above plus custom I/O sources
 
 ## Does SAIL provide simple one-line APIs?
 
-Yes. SAIL provides four levels of APIs, depending on your needs: `junior`, `advanced`, `deep diver`, and `technical diver`.
-`junior` is your choice.
+Yes. Use the `junior` API level for simple one-line image loading.
 
-## In what pixel format SAIL loading functions output images?
+## In what pixel format do SAIL loading functions output images?
 
-SAIL always tries to output pixel format close to the source pixel format as much as possible.
-Ideally (but not always), it outputs the same pixel format as stored in the image.
+SAIL attempts to output a pixel format as close to the source format as possible.
+Ideally, it outputs the same pixel format as stored in the image.
 
 For example, SAIL outputs BPP24-BGR images from full-color BMP files without transparency.
 
-You can also consider conversion functions from `libsail-manip`.
+Consider using conversion functions from `libsail-manip` for format conversion.
 
-## What pixel formats SAIL is able to write?
+## What pixel formats can SAIL write?
 
-SAIL codecs always try to support as much output pixel formats as possible. SAIL doesn't convert
-one pixel format to another in saving operations. Images are always written as is.
+SAIL codecs support as many output pixel formats as possible. SAIL does not convert
+pixel formats during save operations. Images are always written as-is.
 
 The list of pixel formats that can be written by SAIL is codec-specific and is publicly available in every
 .codec.info file. It can be accessed through `sail_codec_info_from_extension() -> codec_info -> save_features ->
@@ -155,47 +154,47 @@ the most common use cases.
 
 ## Does SAIL support animated and multi-paged images?
 
-Yes. Just continue loading the image file until the loading functions return `SAIL_OK`.
-If no more frames are available, the loading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
+Yes. Continue loading the image file until the loading functions return `SAIL_OK`.
+When no more frames are available, the loading functions return `SAIL_ERROR_NO_MORE_FRAMES`.
 
 ## Does SAIL support loading from memory?
 
-Yes. SAIL supports loading/saving from/to files and memory. For technical divers,
-it's also possible to use custom I/O sources.
+Yes. SAIL supports loading and saving from files and memory. For technical divers,
+custom I/O sources are also supported.
 
 See `sail_start_loading_from_file()`, `sail_start_loading_mem()`, and `sail_start_loading_from_io()`.
 
 ## How does SAIL support image formats?
 
-SAIL supports image formats through dynamically loaded SAIL codecs. End-users never work
-with the codecs directly. They always work with the abstract high-level APIs.
+SAIL supports image formats through dynamically loaded codecs. End users never work
+with codecs directly; they interact exclusively with the high-level APIs.
 
 ## Does SAIL preload codecs in the initialization routine?
 
 ### `SAIL_COMBINE_CODECS` is `OFF`
 
-SAIL doesn't preload codecs in the initialization routine (`sail_init()`). It loads them on demand.
+SAIL does not preload codecs in the initialization routine (`sail_init()`). It loads them on demand.
 However, you can preload them explicitly with `sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS)`.
 
 ### `SAIL_COMBINE_CODECS` is `ON`
 
-All codecs get loaded on application startup.
+All codecs are loaded on application startup.
 
 ## How does SAIL look for codecs?
 
-Codecs path search algorithm (first found path wins):
+Codec path search algorithm (first found path wins):
 
 ### Conan recipe on any platform
 
-Codecs are combined into a dynamically linked library, so no need to search them.
+Codecs are combined into a dynamically linked library, so no search is required.
 
 ### VCPKG port on any platform
 
-Codecs are combined into a dynamically linked library, so no need to search them.
+Codecs are combined into a dynamically linked library, so no search is required.
 
 ### Manually compiled on any platform with SAIL_COMBINE_CODECS=ON
 
-Codecs are combined into a dynamically linked library, so no need to search them.
+Codecs are combined into a dynamically linked library, so no search is required.
 
 ### Manually compiled on Windows with SAIL_COMBINE_CODECS=OFF (the default)
 1. `SAIL_CODECS_PATH` environment variable
@@ -209,25 +208,24 @@ Codecs are combined into a dynamically linked library, so no need to search them
 
 `<FOUND PATH>/lib` is added to `LD_LIBRARY_PATH`.
 
-Additionally, `SAIL_THIRD_PARTY_CODECS_PATH` environment variable with a list of ';'-separated paths
-is searched if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default) so you can load your own codecs
-from there.
+Additionally, if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), the `SAIL_THIRD_PARTY_CODECS_PATH`
+environment variable is searched for a list of ';'-separated paths containing third-party codecs.
 
 ## How can I point SAIL to my custom codecs?
 
-If `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), you can set the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable
+If `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), set the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable
 to a list of ';'-separated paths containing your custom SAIL codecs.
 
-On Windows, `sail.dll location` and `SAIL_THIRD_PARTY_CODECS_PATH/lib` are the only places where codecs DLL dependencies are searched.
-No other paths are searched. Use WIN32 API `AddDllDirectory` to add your own DLL dependencies search path.
+On Windows, only the `sail.dll` location and `SAIL_THIRD_PARTY_CODECS_PATH/lib` are searched for codec DLL dependencies.
+Use the WIN32 API `AddDllDirectory()` to add custom DLL dependency search paths.
 On other platforms, `SAIL_THIRD_PARTY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
 
-If `SAIL_THIRD_PARTY_CODECS_PATH` is `OFF`, loading custom codecs is disabled.
+If `SAIL_THIRD_PARTY_CODECS_PATH` is `OFF`, custom codec loading is disabled.
 
 ## I'd like to reorganize the standard SAIL folder layout on Windows
 
-You can surely do that. However, with the standard layout SAIL detects the codecs' location automatically.
-If you reorganize the standard SAIL folder layout, you'll need to specify the new codecs' location by
+This is supported. However, with the standard layout, SAIL automatically detects the codec location.
+If you reorganize the folder layout, you must specify the new codec location by
 setting the `SAIL_CODECS_PATH` environment variable.
 
 ## Describe the memory management techniques implemented in SAIL
@@ -236,18 +234,16 @@ setting the `SAIL_CODECS_PATH` environment variable.
 
 Internally, SAIL always cleans up on errors. If you encounter a memory leak on error, please report it.
 
-**C only:** However, if an engineer encounters an error in the middle of loading or saving an image with the `advanced`
-or a deeper API, it's always a responsibility of the engineer to stop loading or saving with
-`sail_stop_loading()` or `sail_stop_saving()`. These functions execute a proper cleanup in the underlying codec.
-If you don't call `sail_stop_loading()` or `sail_stop_saving()` in this situation, be prepared for memory leaks.
+**C only:** If an error occurs during loading or saving with the `advanced` or deeper API,
+the developer must call `sail_stop_loading()` or `sail_stop_saving()` to perform proper cleanup
+in the underlying codec. Failure to call these functions will result in memory leaks.
 
-**C++ only:** C++ engineers are more lucky. The C++ binding executes the necessary cleanup automatically in this
-situation in `~image_input()` or `~image_output()`.
+**C++ only:** The C++ binding automatically performs cleanup in `~image_input()` or `~image_output()` destructors.
 
 ### Convention to call SAIL functions
 
-It's always recommended (but not required) to use the `SAIL_TRY()` macro to call SAIL functions. It's also always recommended
-to clean up in your code with the `SAIL_TRY_OR_CLEANUP()` macro if you need to.
+Use the `SAIL_TRY()` macro when calling SAIL functions. For cleanup on error,
+use the `SAIL_TRY_OR_CLEANUP()` macro.
 
 ### External pointers stay untouched on error
 
@@ -285,7 +281,7 @@ SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
 
 ### Always set a pointer to state to NULL (C only)
 
-C loading and saving functions require a local void pointer to state. Always set it to NULL before
+C loading and saving functions require a local void pointer to state. Always initialize it to NULL before
 loading or saving. For example:
 
 ```C
@@ -299,8 +295,8 @@ SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, ...),
 
 ## Can I implement an image codec in C++?
 
-Yes. Your codec just needs to export a set of public functions so SAIL can recognize and use it.
-Theoretically, you can implement your codec in any programming language.
+Yes. A codec must export a set of public functions for SAIL to recognize and use it.
+Theoretically, codecs can be implemented in any programming language that supports C-compatible exports.
 
 ## Describe codec info file format
 
@@ -311,8 +307,8 @@ Let's take a hypothetical codec info:
 #
 [codec]
 
-# Codec layout is a set of functions the codec exports. Different layouts generations are not compatible.
-# libsail supports just a single (current) layout. Cannot be empty.
+# Codec layout is a set of functions the codec exports. Different layout versions are not compatible.
+# libsail supports a single (current) layout version. Cannot be empty.
 #
 layout=8
 
@@ -320,14 +316,14 @@ layout=8
 #
 version=1.0.0
 
-# Codec priority. SAIL uses this property to sort the enumerated codecs by priority
-# to speed up search of popular image formats by functions like sail_codec_info_from_path().
+# Codec priority. SAIL uses this property to sort enumerated codecs by priority
+# to speed up searches for popular image formats in functions like sail_codec_info_from_path().
 #
-# HIGHEST = one of the most popular image formats like JPEG
-# HIGH    = pretty popular and common image format like SVG
-# MEDIUM  = moderate popularity
-# LOW     = pretty rare image format
-# LOWEST  = very rare and/or too specific and/or ancient image format
+# HIGHEST = Most popular image formats (e.g., JPEG)
+# HIGH    = Popular and common image formats (e.g., SVG)
+# MEDIUM  = Moderately popular formats
+# LOW     = Rare image formats
+# LOWEST  = Very rare, highly specific, or ancient image formats
 #
 priority=MEDIUM
 
@@ -357,120 +353,119 @@ mime-types=image/abc
 #
 [load-features]
 
-# ';'-separated list of what the image codec can actually read.
-# Can be empty if the image codec cannot load images.
+# ';'-separated list of features the codec supports for reading.
+# Can be empty if the codec cannot load images.
 #
 # Possible values:
 #    STATIC       - Can load static images.
 #    ANIMATED     - Can load animated images.
 #    MULTI-PAGED  - Can load multi-paged (but not animated) images.
-#    META-DATA    - Can load image meta data like JPEG comments or EXIF.
+#    META-DATA    - Can load image metadata (e.g., JPEG comments, EXIF).
 #    ICCP         - Can load embedded ICC profiles.
 #    SOURCE-IMAGE - Can populate source image information in sail_image.source_image.
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
 
-# ';'-separated list of codec-specific tuning options. For example, it's possible
-# to disable ABC codec filtering with setting abc-filtering to 0 in load options.
-# Tuning options' names must start with the codec name to avoid confusion.
+# ';'-separated list of codec-specific tuning options. For example,
+# disable ABC codec filtering by setting abc-filtering to 0 in load options.
+# Tuning option names must start with the codec name to avoid conflicts.
 #
-# The list of possible values for every tuning option is not currently available
-# programmatically. Every codec must document them in the codec info file.
+# The list of possible values for each tuning option is not available programmatically.
+# Each codec must document them in the codec info file.
 #
 # For example:
 #   - abc-filtering: Tune filtering. Possible values: 0 (disable), 1 (light), 2 (hard).
 #
 tuning=abc-filtering
 
-# Section of various features describing what the image codec can actually save.
+# Section describing features the codec supports for saving.
 #
 [save-features]
 
-# ';'-separated list of what the image codec can actually write.
-# Can be empty if the image codec cannot save images.
+# ';'-separated list of features the codec supports for writing.
+# Can be empty if the codec cannot save images.
 #
 # Possible values:
 #    STATIC      - Can save static images.
 #    ANIMATED    - Can save animated images.
 #    MULTI-PAGED - Can save multi-paged (but not animated) images.
-#    META-DATA   - Can save image meta data like JPEG comments or EXIF.
+#    META-DATA   - Can save image metadata (e.g., JPEG comments, EXIF).
 #    INTERLACED  - Can save interlaced images.
 #    ICCP        - Can save embedded ICC profiles.
 #
 features=STATIC;META-DATA;INTERLACED;ICCP
 
-# ';'-separated list of codec-specific tuning options. For example, it's possible
-# to disable ABC codec filtering with setting abc-filtering to 0 in save options.
-# Tuning options' names must start with the codec name to avoid confusion.
+# ';'-separated list of codec-specific tuning options. For example,
+# disable ABC codec filtering by setting abc-filtering to 0 in save options.
+# Tuning option names must start with the codec name to avoid conflicts.
 #
-# The list of possible values for every tuning option is not currently available
-# programmatically. Every codec must document them in the codec info file.
+# The list of possible values for each tuning option is not available programmatically.
+# Each codec must document them in the codec info file.
 #
 # For example:
 #   - abc-filtering: Tune filtering. Possible values: 0 (disable), 1 (light), 2 (hard).
 #
 tuning=abc-filtering
 
-# ';'-separated list of pixel formats the image codec can write.
-# Can be empty if the image codec cannot save images.
+# ';'-separated list of pixel formats the codec can write.
+# Can be empty if the codec cannot save images.
 #
-# Note: SAIL doesn't convert images while saving. It writes them 1:1. The image codec
-# can take as input and save 8-bit indexed, 24-bit RGB, and 32-bit RGBA images.
+# Note: SAIL does not convert images during saving. Images are written as-is.
+# This example codec accepts and saves 8-bit indexed, 24-bit RGB, and 32-bit RGBA images.
 #
 pixel-formats=BPP8-INDEXED;BPP24-RGB;BPP32-BGRA
 
-# ';'-separated list of compressions the image codec can write. Cannot be empty if the image codec
-# can save images. If the image codec cannot select compressions, specify UNSUPPORTED.
+# ';'-separated list of compressions the codec can write. Cannot be empty if the codec
+# can save images. If the codec cannot select compressions, specify UNSUPPORTED.
 #
 compression-types=DEFLATE;RLE
 
-# Default compression from the list above to use when no explicit compression was selected
-# by a client application. Can be empty if the image codec cannot save images.
+# Default compression to use when no explicit compression is specified
+# by the client application. Can be empty if the codec cannot save images.
 #
 default-compression=DEFLATE
 
-# Minimum compression level. This parameter is not used and must be 0 if the list
-# of supported compressions has more than one compression or if the list is empty.
+# Minimum compression level. Not used and must be 0 if multiple compressions are supported
+# or if the list is empty.
 #
-# The data type is double. C function atof() is used to convert the value to double.
+# Data type: double. Converted using C function atof().
 # Decimal-point character is determined by the current C locale.
 #
 compression-level-min=1
 
-# Maximum compression level. This parameter is not used and must be 0 if the list
-# of supported compressions has more than one compression or if the list is empty.
+# Maximum compression level. Not used and must be 0 if multiple compressions are supported
+# or if the list is empty.
 #
-# The data type is double. C function atof() is used to convert the value to double.
+# Data type: double. Converted using C function atof().
 # Decimal-point character is determined by the current C locale.
 #
 compression-level-max=9
 
-# Default compression level to use when no explicit compression level was selected
-# by a client application. This parameter is not used and must be 0 if the list
-# of supported compressions has more than one compression or if the list is empty.
-# Must be in the range of the min/max limits above.
+# Default compression level to use when no explicit level is specified.
+# Not used and must be 0 if multiple compressions are supported or if the list is empty.
+# Must be within the min/max range above.
 #
-# The data type is double. C function atof() is used to convert the value to double.
+# Data type: double. Converted using C function atof().
 # Decimal-point character is determined by the current C locale.
 #
 compression-level-default=6
 
-# Step to increment or decrement compression level. This parameter is not used
-# and must be 0 if the list of supported compressions has more than one compression
-# or if the list is empty.
+# Increment/decrement step for compression level. Not used and must be 0 if
+# multiple compressions are supported or if the list is empty.
 #
-# The data type is double. C function atof() is used to convert the value to double.
+# Data type: double. Converted using C function atof().
 # Decimal-point character is determined by the current C locale.
 #
 compression-level-step=1
 ```
 
-## Can I compile codecs dependencies (like libjpeg) directly into SAIL?</h5>
-Unlike FreeImage, SAIL doesn't allow compiling external dependencies into a single library and I have no plans to allow that.
+## Can I compile codec dependencies (like libjpeg) directly into SAIL?
 
-You can still achieve that using external build systems like `vcpkg`.
+Unlike FreeImage, SAIL does not support compiling external dependencies into a single library, and there are no plans to add this feature.
 
-If you prefer compiling SAIL manually as a shared library, you can compile it against the static vcpkg triplet like `x64-windows-static`.
+You can achieve this using external build systems like `vcpkg`.
+
+If you prefer compiling SAIL manually as a shared library, compile it against a static vcpkg triplet such as `x64-windows-static`.
 For example:
 
 ```
@@ -500,17 +495,17 @@ Yes. See the `examples` directory in the source tree.
 
 ## Are there any bindings to other programming languages?
 
-Yes. Currently SAIL supports the following bindings:
+Yes. SAIL currently supports the following language bindings:
 
 1. C++
 2. Python
 
-Pull requests to support more programming languages are highly welcomed.
+Pull requests to support additional programming languages are highly welcomed.
 
 ## How many image formats are you going to implement?
 
-Ksquirrel-libs supported around 60 image formats. I don't plan to port all of them. However,
-the most popular image formats will be definitely ported from ksquirrel-libs.
+Ksquirrel-libs supported around 60 image formats. Not all of them will be ported. However,
+the most popular image formats will be ported from ksquirrel-libs.
 
 ## I have problems with include paths with vcpkg without CMake
 
@@ -519,16 +514,16 @@ See https://learn.microsoft.com/en-us/vcpkg/users/buildsystems/msbuild-integrati
 
 ## How to embed SAIL as a subproject?
 
-Embedding SAIL is not fully supported. SAIL alters global CMake variables like `CMAKE_C_FLAGS`,
-so embedding it is not recommended. One of the possible options is to build SAIL separately.
+Embedding SAIL is not fully supported. SAIL modifies global CMake variables like `CMAKE_C_FLAGS`,
+making embedding not recommended. The recommended approach is to build SAIL separately.
 
 ## Does SAIL support big-endian platforms?
 
-No. Currently SAIL supports little-endian platforms only.
+No. SAIL currently supports little-endian platforms only.
 
 ## I have questions, issues, or proposals
 
-Opening a GitHub [issue](https://github.com/HappySeaFox/sail/issues) is the preferred way
-of communicating and solving problems.
+Opening a GitHub [issue](https://github.com/HappySeaFox/sail/issues) is the preferred method
+for communication and problem resolution.
 
-Pull requests are always welcomed.
+Pull requests are always welcome.
