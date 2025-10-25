@@ -76,7 +76,7 @@ jobs:
 
     - name: Build wheel (Linux)
       if: runner.os == 'Linux'
-      working-directory: src/bindings/python
+      working-directory: src/bindings/sail-python
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
@@ -86,7 +86,7 @@ jobs:
 
     - name: Build wheel (macOS)
       if: runner.os == 'macOS'
-      working-directory: src/bindings/python
+      working-directory: src/bindings/sail-python
       env:
         CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES=arm64
       run: |
@@ -98,7 +98,7 @@ jobs:
 
     - name: Build wheel (Windows)
       if: runner.os == 'Windows'
-      working-directory: src/bindings/python
+      working-directory: src/bindings/sail-python
       env:
         CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP
       run: |
@@ -107,12 +107,12 @@ jobs:
         Copy-Item dist/*.whl wheelhouse/
 
     - name: Check wheels
-      working-directory: src/bindings/python
+      working-directory: src/bindings/sail-python
       run: |
         twine check --strict wheelhouse/*.whl
 
     - name: Test wheel installation
-      working-directory: src/bindings/python
+      working-directory: src/bindings/sail-python
       run: |
         pip install wheelhouse/*.whl
         python -c "import sailpy; print('sailpy version:', sailpy.__version__)"
@@ -122,7 +122,7 @@ jobs:
         pip install pytest
 
     - name: Run tests
-      working-directory: src/bindings/python
+      working-directory: src/bindings/sail-python
       run: |
         pytest tests/ -v --tb=short
 
@@ -130,7 +130,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
-        path: src/bindings/python/wheelhouse/*.whl
+        path: src/bindings/sail-python/wheelhouse/*.whl
         retention-days: 30
 
   upload_pypi:
