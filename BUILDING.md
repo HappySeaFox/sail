@@ -14,34 +14,40 @@ vcpkg install sail
 
 ### CMake options overview
 
+- `BUILD_SHARED_LIBS=ON|OFF` - Build shared libraries. When disabled, automatically sets `SAIL_COMBINE_CODECS` to `ON`. Default: `ON`
 - `SAIL_BUILD_APPS=ON|OFF` - Build client applications. Default: `ON`
+- `SAIL_BUILD_BINDINGS=ON|OFF` - Build C++ and Python bindings. Default: `ON`
 - `SAIL_BUILD_EXAMPLES=ON|OFF` - Build examples. Default: `ON`
-- `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows >= 10 and Unix platforms. Default: `ON`
-- `SAIL_COMBINE_CODECS=ON|OFF` - Combine all codecs into a single library. Static build always sets this option to ON. Default: `OFF`
-- `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and possible `ASAN` enabled for examples. Default: `OFF`
-- `SAIL_DISABLE_CODECS="a;b;c"` - Disable the codecs specified in this ';'-separated list. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Default: empty list
-- `SAIL_ENABLE_CODECS="a;b;c"` - Forcefully enable the codecs specified in this ';'-separated list. If an enabled codec fails to find its dependencies, the configuration process fails. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Other codecs may or may not be enabled depending on found dependencies. When SAIL_ENABLE_CODECS is enabled, SAIL_ONLY_CODECS gets ignored. Default: empty list
-- `SAIL_ENABLE_OPENMP=ON|OFF` - Enable OpenMP support if it's available in the compiler. Default: ON
-- `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from the ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
-- `SAIL_THREAD_SAFE=ON|OFF` - Enable working in multi-threaded environments by locking the internal context with a mutex. Default: `ON`
-- `SAIL_ONLY_CODECS="a;b;c"` - Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. If an enabled codec fails to find its dependencies, the configuration process fails. One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. Default: empty list
-- `SAIL_OPENMP_SCHEDULE="dynamic"` - OpenMP scheduling algorithm. Default: dynamic
+- `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows 10+ and Unix platforms. Default: `ON`
+- `SAIL_COMBINE_CODECS=ON|OFF` - Combine all codecs into a single library. Static builds automatically set this to `ON`. Default: `OFF`
+- `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and optional `ASAN` for examples. Default: `OFF`
+- `SAIL_DISABLE_CODECS="a;b;c"` - Disable the codecs specified in this ';'-separated list. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Default: empty list
+- `SAIL_ENABLE_CODECS="a;b;c"` - Force-enable the codecs specified in this ';'-separated list. Configuration fails if an enabled codec cannot find its dependencies. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Other codecs may be enabled based on available dependencies. When set, `SAIL_ONLY_CODECS` is ignored. Default: empty list
+- `SAIL_ENABLE_OPENMP=ON|OFF` - Enable OpenMP support if available in the compiler. Default: `ON`
+- `SAIL_ONLY_CODECS="a;b;c"` - Force-enable only the codecs specified in this ';'-separated list and disable all others. Configuration fails if an enabled codec cannot find its dependencies. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Default: empty list
+- `SAIL_OPENMP_SCHEDULE="dynamic"` - OpenMP scheduling algorithm. Default: `dynamic`
+- `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
+- `SAIL_THREAD_SAFE=ON|OFF` - Enable thread-safe operation by locking the internal context with a mutex. Default: `ON`
+- `SAIL_WINDOWS_INSTALL_PDB=ON|OFF` - Install PDB debug files along with libraries (MSVC only). Default: `ON`
+- `SAIL_WINDOWS_STATIC_CRT=ON|OFF` - Use static CRT (`/MT`) instead of dynamic CRT (`/MD`) for static builds (MSVC only). Default: `ON`
+- `SAIL_WINDOWS_UTF8_PATHS=ON|OFF` - Convert file paths to UTF-8 on Windows. Default: `ON`
 
 ### Windows
 
 #### Tested environments
 
-- Windows 7 x64
+- Windows 10 x64
+- Windows 11 x64
 
 #### Build requirements
 
-- git
-- cmake 3.12 or later
+- Git
+- CMake 3.18 or later
 - MSVC 2019 or later
 
 #### Build steps
 
-Open `Git Bash` (installed along with `git`) and execute the following commands:
+Open `Git Bash` (installed with Git) and execute the following commands:
 
 ```
 git clone --recursive https://github.com/HappySeaFox/sail.git
@@ -91,11 +97,11 @@ brew upgrade sail
 
 #### Build requirements
 
-- git
-- cmake 3.12 or later
+- Git
+- CMake 3.18 or later
 - GCC and G++ 7.5 or later
-- standard C/C++ development files installed (usually installed by metapackages like `build-essential`)
-- codec-specific development libraries installed. You can grab the list from `debian/control`
+- Standard C/C++ development files (usually installed by metapackages like `build-essential`)
+- Codec-specific development libraries. See `debian/control` for the complete list
 
 #### Build steps
 
@@ -103,7 +109,7 @@ brew upgrade sail
 git clone --recursive https://github.com/HappySeaFox/sail.git
 cd sail
 
-# Install the required dependencies grabbed from debian/control
+# Install the required dependencies from debian/control
 sudo apt install ...
 
 # Compile SAIL
@@ -112,8 +118,8 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 
-# Install
-... distro-specific installation
+# Install (distro-specific)
+sudo make install
 ```
 
-Debian rules are provided as well.
+Debian packaging rules are also provided.
