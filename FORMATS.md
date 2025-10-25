@@ -675,7 +675,7 @@
     </td>
     <td>Tiled TIFFs, Planar configuration (PLANARCONFIG_SEPARATE), EXIF</td>
     <td>
-        <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
+        <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 32-bit (float), 32-bit (uint).
         <br/>
         <b>Grayscale+Alpha:</b> 8-bit (4+4), 16-bit (8+8), 32-bit (16+16).
         <br/>

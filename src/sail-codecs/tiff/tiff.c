@@ -396,6 +396,15 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, c
     TIFFSetField(tiff_state->tiff, TIFFTAG_COMPRESSION, tiff_state->save_compression);
     TIFFSetField(tiff_state->tiff, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize(tiff_state->tiff, (uint32_t)-1));
 
+    if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT)
+    {
+        TIFFSetField(tiff_state->tiff, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP);
+    }
+    else if (image->pixel_format == SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT)
+    {
+        TIFFSetField(tiff_state->tiff, TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_UINT);
+    }
+
     /* Handle tuning options. */
     if (tiff_state->save_options->tuning != NULL)
     {

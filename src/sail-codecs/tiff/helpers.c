@@ -362,6 +362,21 @@ sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF* tiff, enum SailPixe
             case 4: *result = SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE; return SAIL_OK;
             case 8: *result = SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE; return SAIL_OK;
             case 16: *result = SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE; return SAIL_OK;
+            case 32:
+            {
+                uint16_t sample_format = SAMPLEFORMAT_UINT;
+                TIFFGetField(tiff, TIFFTAG_SAMPLEFORMAT, &sample_format);
+
+                if (sample_format == SAMPLEFORMAT_IEEEFP)
+                {
+                    *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT;
+                }
+                else
+                {
+                    *result = SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT;
+                }
+                return SAIL_OK;
+            }
             }
             break;
         }
@@ -536,6 +551,14 @@ sail_status_t tiff_private_sail_pixel_format_to_tiff(enum SailPixelFormat pixel_
     {
         *photometric       = PHOTOMETRIC_MINISBLACK;
         *bits_per_sample   = 16;
+        *samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT:
+    {
+        *photometric       = PHOTOMETRIC_MINISBLACK;
+        *bits_per_sample   = 32;
         *samples_per_pixel = 1;
         break;
     }
