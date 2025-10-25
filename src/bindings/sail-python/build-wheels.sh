@@ -149,18 +149,18 @@ mkdir -p wheelhouse
 
 for version in "${PYTHON_VERSIONS[@]}"; do
     if ! pyenv versions | grep -q "$version"; then
-        echo
-        echo "============================"
-        echo "  Building for Python $version"
-        echo "============================"
-        echo
-
         echo "Installing Python $version with pyenv..."
         pyenv install --skip-existing "$version" || {
             echo "Error: Failed to install Python $version" >&2
             exit 1
         }
     fi
+
+    echo
+    echo "============================"
+    echo "  Building for Python $version"
+    echo "============================"
+    echo
 
     pyenv local "$version"
 
