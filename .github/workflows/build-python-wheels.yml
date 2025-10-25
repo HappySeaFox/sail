@@ -50,13 +50,14 @@ jobs:
         key: vcpkg-${{ runner.os }}
 
     - name: Set up vcpkg (Windows)
+      shell: bash
       if: runner.os == 'Windows'
       run: |
-        if (!(Test-Path vcpkg/vcpkg.exe)) {
-          if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
+        if [ ! -f vcpkg/vcpkg.exe ]; then
+          rm -rf vcpkg
           git clone https://github.com/microsoft/vcpkg.git
-          ./vcpkg/bootstrap-vcpkg.bat
-        }
+          vcpkg/bootstrap-vcpkg.bat
+        fi
         git -C vcpkg pull
         vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib `
                             --triplet x64-windows
