@@ -22,8 +22,8 @@
 #
 
 SAIL is a high-quality cross-platform image decoding library providing rich APIs, from one-liners
-to complex use cases with custom I/O sources. It enables a client to load and save static,
-animated, multi-paged images along with their meta data and ICC profiles. :sailboat:
+to complex use cases with custom I/O sources. It supports loading and saving static,
+animated, and multi-paged images along with metadata and ICC profiles. :sailboat:
 
 <p align="center">
   <a href=".github/qt-demo.gif"><img src=".github/qt-demo.gif?raw=true" alt="GIF Demo Screenshot"/></a>
@@ -38,17 +38,16 @@ animated, multi-paged images along with their meta data and ICC profiles. :sailb
 
 ## Features overview
 
-- [x] Easy-to-use thread-safe C, C++, and Python interfaces
+- [x] Thread-safe C, C++, and Python interfaces
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams (see [custom-io.c](https://github.com/HappySeaFox/sail/blob/607de77843614e2ba873961d36a91256d6f9bf68/tests/sail/custom-io.c))
-- [x] Load by file suffixes, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Format-specific tuning options like <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>. See [FORMATS](FORMATS.md)
-- [x] Meta data support: text comments, EXIF, ICC profiles
-- [x] Access to the image properties w/o decoding pixels (probing)
-- [x] Access to the source image properties (source encoding etc.)
-- [x] Save pixels as close as possible to the source
-- [x] Adding or updating image codecs with ease demonstrated by Intel \[[*](#intel)\]
-- [x] The best MIME icons in the computer industry :smile:
+- [x] Load by file extensions, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
+- [x] Format-specific tuning options (e.g., <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>). See [FORMATS](FORMATS.md)
+- [x] Metadata support: text comments, EXIF, ICC profiles
+- [x] Access to image properties without decoding pixels (probing)
+- [x] Access to source image properties (source encoding, etc.)
+- [x] Preserve original pixel formats when saving
+- [x] Extensible codec architecture demonstrated by Intel \[[*](#intel)\]
 
 <a id="intel"></a>
 
@@ -149,7 +148,7 @@ image = sailpy.Image.from_file(path)
 # python -m sailpy.examples.12_image_viewer
 ```
 
-It's pretty easy, isn't it? :smile: See also [FAQ](FAQ.md).
+See also [FAQ](FAQ.md) for more information.
 
 ## Programming languages
 
@@ -171,31 +170,31 @@ It's pretty easy, isn't it? :smile: See also [FAQ](FAQ.md).
 ## Differences from other image decoding libraries
 
 - Easily extensible with new image format plugins
-- Easy-to-use API providing expected business entities - images, palettes, pixels etc.
+- Intuitive API with well-defined abstractions: images, palettes, pixels, etc.
 - Access to source pixel data (supported by most codecs)
-- Access to the image properties w/o decoding pixel data (probing)
+- Access to image properties without decoding pixel data (probing)
 
 ## Have questions or issues?
 
-Opening a GitHub [issue](https://github.com/HappySeaFox/sail/issues) is the preferred way
-of communicating and solving problems.
+Opening a GitHub [issue](https://github.com/HappySeaFox/sail/issues) is the preferred method
+for communication and problem resolution.
 
-See [FAQ](FAQ.md) for more.
+See [FAQ](FAQ.md) for more information.
 
 ## Architecture overview
 
-SAIL is written in pure C11 w/o using any third-party libraries (except for codecs). It also provides
-bindings to C++.
+SAIL is written in pure C11 without using any third-party libraries (except for codecs). It also provides
+bindings to C++ and Python.
 
 ### SAIL codecs
 
-SAIL codecs is the deepest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
-and DLL on Windows). They implement actual decoding and encoding capabilities. End-users never work with
-codecs directly. They always use abstract, high-level APIs in `libsail` for that.
+SAIL codecs represent the lowest level. This is a set of standalone, dynamically loaded codecs (SO on Linux
+and DLL on Windows). They implement the actual decoding and encoding capabilities. End users never work with
+codecs directly; they always use the abstract, high-level APIs in `libsail`.
 
-Every codec is accompanied with a so called codec info (description) file which is just a plain text file.
-It describes what the codec can actually do: what pixel formats it can load and output, what compression types
-it supports, and more.
+Every codec is accompanied by a codec info (description) file, which is a plain text file.
+It describes the codec's capabilities: supported pixel formats for loading and output, compression types,
+and more.
 
 By default, SAIL loads codecs on demand. To preload them, use `sail_init_with_flags(SAIL_FLAG_PRELOAD_CODECS)`.
 
@@ -206,19 +205,18 @@ of functions shared between SAIL codecs and the high-level APIs in `libsail`.
 
 ### libsail
 
-libsail is a feature-rich, high-level API. It provides comprehensive and lightweight interfaces to decode
-and encode images. End-users implementing C applications always work with libsail.
+libsail is a feature-rich, high-level API. It provides comprehensive and lightweight interfaces for decoding
+and encoding images. End users implementing C applications work with libsail.
 
 ### libsail-manip
 
-libsail-manip is a collection of image manipulation functions. For example, conversion functions from one pixel
-format to another.
+libsail-manip is a collection of image manipulation functions, such as pixel format conversion.
 
 ### libsail-c++
 
-libsail-c++ is a C++ binding to libsail. End-users implementing C++ applications may choose
-between libsail and libsail-c++. Using libsail-c++ is always recommended, as it's much more simple
-to use in C++ applications.
+libsail-c++ is a C++ binding to libsail. End users implementing C++ applications may choose
+between libsail and libsail-c++. Using libsail-c++ is recommended for C++ applications due to its
+simplified interface.
 
 ## Building
 
@@ -226,11 +224,11 @@ See [BUILDING](BUILDING.md).
 
 ## Philosophy
 
-Philosophy of SAIL is modularization and simplicity.
+SAIL's philosophy is modularization and simplicity.
 
-Image codecs are architectured to be standalone dynamically loaded files. Any future hypothetical improvements
-will be implemented as separate client libraries. So a user is always able to choose what to use (i.e. to link against)
-and what not to use.
+Image codecs are designed as standalone dynamically loaded files. Future improvements
+will be implemented as separate libraries, allowing users to choose which components to use (i.e., link against)
+and which to exclude.
 
 ## Support
 
