@@ -13,6 +13,11 @@ Supports single and multi-frame images with animation playback.
 Requirements:
     pip install PySide6
 
+Usage:
+    python 12_image_viewer.py [file]
+
+    file - Optional path to image file to open on startup
+
 Keyboard Shortcuts:
     Ctrl+O          - Open image
     Ctrl+S          - Save image
@@ -25,6 +30,7 @@ Keyboard Shortcuts:
 """
 
 import sys
+import argparse
 from pathlib import Path
 
 from PySide6.QtWidgets import (
@@ -159,33 +165,16 @@ class ImageViewer(QMainWindow):
         super().resizeEvent(event)
         self.update_info_position()
 
-    def open_image(self):
-        """Open image using Qt file dialog."""
-        # Build filters: All files first, then each codec
-        filters = ["All Files (*.*)"]
-
-        for codec in sailpy.CodecInfo.list():
-            ext_patterns = [f"*.{ext}" for ext in codec.extensions]
-            filter_name = f"{codec.description} ({' '.join(ext_patterns)})"
-            filters.append(filter_name)
-
-        filter_str = ";;".join(filters)
-
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open Image", self.last_directory, filter_str
-        )
-
-        if not path:
-            return
-
+    def load_image_file(self, path):
+        """Load image from the specified path."""
         try:
             codec = sailpy.CodecInfo.from_path(path)
             if not codec.can_load:
                 QMessageBox.critical(self, "Error", "SAIL doesn't support loading the selected image format")
-                return
+                return False
         except ValueError:
             QMessageBox.critical(self, "Error", "SAIL doesn't support loading the selected image format")
-            return
+            return False
 
         self.last_directory = str(Path(path).parent)
 
@@ -207,13 +196,39 @@ class ImageViewer(QMainWindow):
 
                 self.fit_to_window()
                 self.display_current_frame()
+                return True
             else:
                 QMessageBox.critical(self, "Error", "Failed to load the image")
+                return False
 
         except FileNotFoundError:
             QMessageBox.critical(self, "Error", f"File not found: {path}")
+            return False
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to load image: {e}")
+            return False
+
+    def open_image(self):
+        """Open image using Qt file dialog."""
+        # Build filters: All files first, then each codec
+        filters = []
+
+        for codec in sailpy.CodecInfo.list():
+            ext_patterns = [f"*.{ext}" for ext in codec.extensions]
+            filter_name = f"{codec.description} ({' '.join(ext_patterns)})"
+            filters.append(filter_name)
+
+        filters.sort()
+        filters.insert(0, "All Files (*.*)")
+
+        filter_str = ";;".join(filters)
+
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Open Image", self.last_directory, filter_str
+        )
+
+        if path:
+            self.load_image_file(path)
 
     def save_image(self):
         """Save current frame."""
@@ -373,11 +388,25 @@ class ImageViewer(QMainWindow):
 
 def main():
     """Entry point."""
+    parser = argparse.ArgumentParser(
+        description="SAIL Image Viewer - Simple Qt-based image viewer"
+    )
+    parser.add_argument(
+        "file",
+        nargs="?",
+        help="Path to image file to open on startup"
+    )
+    args = parser.parse_args()
+
     sailpy.set_log_barrier(sailpy.LogLevel.DEBUG)
 
     app = QApplication(sys.argv)
     viewer = ImageViewer()
     viewer.show()
+
+    if args.file:
+        viewer.load_image_file(args.file)
+
     sys.exit(app.exec())
 
 
