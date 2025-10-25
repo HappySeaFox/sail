@@ -101,7 +101,7 @@ brew upgrade sail
 - CMake 3.18 or later
 - GCC and G++ 7.5 or later
 - Standard C/C++ development files (usually installed by metapackages like `build-essential`)
-- Codec-specific development libraries. See `debian/control` for the complete list
+- Codec-specific development libraries. See `.github/workflows/build-and-test.yml` for the complete list
 
 #### Build steps
 
@@ -109,7 +109,7 @@ brew upgrade sail
 git clone --recursive https://github.com/HappySeaFox/sail.git
 cd sail
 
-# Install the required dependencies from debian/control
+# Install the required dependencies from .github/workflows/build-and-test.yml
 sudo apt install ...
 
 # Compile SAIL
