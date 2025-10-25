@@ -33,7 +33,7 @@ from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 
-def get_version():
+def sail_version():
     """Get version from root CMakeLists.txt."""
     cmake = Path(__file__).resolve(
     ).parent.parent.parent.parent / "CMakeLists.txt"
@@ -54,6 +54,25 @@ class CMakeExtension(Extension):
 
 
 class CMakeBuild(build_ext):
+    def _generate_version_file(self, target_dir):
+        """Generate _version.py from template in the target directory."""
+        sailpy_dir = Path(__file__).parent / 'sailpy'
+        template_file = sailpy_dir / '_version.py.in'
+        version_file = target_dir / '_version.py'
+
+        version = sail_version()
+        content = template_file.read_text()
+        content = content.replace('@SAIL_VERSION@', version)
+        version_file.write_text(content)
+        print(f"Generated _version.py with version {version} in {target_dir}")
+
+    def run(self):
+        super().run()
+
+        # Generate _version.py
+        build_sailpy_dir = Path(self.build_lib) / 'sailpy'
+        self._generate_version_file(build_sailpy_dir)
+
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(
             self.get_ext_fullpath(ext.name)))
@@ -189,7 +208,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='sailpy',
-    version=get_version(),
+    version=sail_version(),
     long_description=Path('README.md').read_text(encoding='utf-8'),
     long_description_content_type='text/markdown',
     packages=find_packages(),

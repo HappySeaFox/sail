@@ -26,8 +26,6 @@ echo "Python Manager: pyenv"
 echo "Target versions: ${PYTHON_VERSIONS[*]}"
 echo
 
-echo "[1/4] Preparing environment..."
-
 if [[ "$OS_TYPE" == "Linux" ]]; then
     if [ -d "$HOME/.pyenv" ]; then
         export PYENV_ROOT="$HOME/.pyenv"
@@ -124,7 +122,10 @@ build_wheel_for_version()
     if [[ "$OS_TYPE" == "Linux" ]]; then
         for wheel in dist/*.whl; do
             echo "Processing: $wheel"
-            auditwheel repair "$wheel" -w wheelhouse/
+            auditwheel repair "$wheel" -w wheelhouse/tmp/
+            echo "Checking: $wheel"
+            twine check --strict wheelhouse/tmp/*.whl
+            mv wheelhouse/tmp/*.whl wheelhouse/
         done
     else
         mkdir -p wheelhouse
@@ -143,13 +144,8 @@ build_wheel_for_version()
     echo
 }
 
-# Clean previous builds
-echo "[2/4] Cleaning previous builds..."
-
 rm -rf wheelhouse
 mkdir -p wheelhouse
-
-echo "[3/4] Building wheels..."
 
 for version in "${PYTHON_VERSIONS[@]}"; do
     if ! pyenv versions | grep -q "$version"; then
@@ -171,22 +167,6 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     python_executable="$(pyenv which python)"
     build_wheel_for_version "$version" "$python_executable"
 done
-
-echo "[4/4] Checking all wheels..."
-
-echo "Creating temporary venv for checking..."
-pyenv local
-python -m venv "venv-check"
-source_venv "venv-check"
-pip install --upgrade pip twine > /dev/null
-
-for wheel in wheelhouse/*.whl; do
-    echo "Checking: $wheel"
-    twine check --strict "$wheel"
-done
-
-deactivate
-rm -rf "venv-check"
 
 echo
 echo "====================================="

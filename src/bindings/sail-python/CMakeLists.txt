@@ -65,13 +65,6 @@ endif()
 get_directory_property(SAIL_VERSION DIRECTORY ${SAIL_SOURCE_DIR} DEFINITION PROJECT_VERSION)
 message(STATUS "SAIL version: ${SAIL_VERSION}")
 
-# Generate version file for Python
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/sailpy/_version.py.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/sailpy/_version.py
-    @ONLY
-)
-
 # Generate pyproject.toml with version
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in
