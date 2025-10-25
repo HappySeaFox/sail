@@ -218,15 +218,14 @@ def example_codec_specific_compression():
             continue
 
         print(f"\n{codec.name} codec:")
-        print(f"  Supported compressions: {
-              [c.name for c in codec.save_features.compressions]}")
+        print(f"  Supported compressions: {[c.name for c in codec.save_features.compressions]}")
         print(f"  Default: {codec.save_features.default_compression.name}")
 
         # Use each supported compression
         # Test first 2
         for compression in codec.save_features.compressions[:2]:
-            output_path = os.path.join(tempfile.gettempdir(), f"test_{codec_name}_{
-                                       compression.name}.{codec_name}")
+            output_path = os.path.join(tempfile.gettempdir(),
+                                       f"test_{codec_name}_{compression.name}.{codec_name}")
 
             try:
                 # Get defaults

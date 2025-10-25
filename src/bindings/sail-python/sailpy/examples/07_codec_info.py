@@ -35,8 +35,7 @@ def main():
         exts = ', '.join(codec.extensions[:3])
         if len(codec.extensions) > 3:
             exts += "..."
-        print(f"{codec.name:12} v{codec.version:8}  Load:{
-              load}  Save:{save}  [{exts}]")
+        print(f"{codec.name:12} v{codec.version:8}  Load:{load}  Save:{save}  [{exts}]")
 
     print()
 

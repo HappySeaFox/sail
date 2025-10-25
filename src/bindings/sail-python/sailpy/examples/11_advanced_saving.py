@@ -77,8 +77,7 @@ def main():
         file_size = os.path.getsize(output_path)
         results.append((filter_name, description, file_size, output_path))
 
-        print(f"  Filter '{filter_name:6s}': {
-              file_size:,} bytes - {description}")
+        print(f"  Filter '{filter_name:6s}': {file_size:,} bytes - {description}")
 
     print()
 
@@ -91,8 +90,8 @@ def main():
 
     print(f"  Smallest: '{smallest[0]}' = {smallest[2]:,} bytes")
     print(f"  Largest:  '{largest[0]}' = {largest[2]:,} bytes")
-    print(f"  Difference: {
-          largest[2] - smallest[2]:,} bytes ({(largest[2] / smallest[2] - 1) * 100:.1f}% larger)")
+    print(f"  Difference: {largest[2] - smallest[2]:,} bytes "
+          f"({(largest[2] / smallest[2] - 1) * 100:.1f}% larger)")
     print()
 
     # Demonstrate tuning as dict

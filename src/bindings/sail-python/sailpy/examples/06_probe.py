@@ -56,8 +56,7 @@ def main():
         if 'source_pixel_format' in metadata:
             print(f"  Source format: {metadata['source_pixel_format'].name}")
         if 'source_compression' in metadata:
-            print(f"  Source compression: {
-                  metadata['source_compression'].name}")
+            print(f"  Source compression: {metadata['source_compression'].name}")
 
         pixels_size_mb = metadata['width'] * metadata['height'] * \
             (metadata['bits_per_pixel'] // 8) / 1024 / 1024
