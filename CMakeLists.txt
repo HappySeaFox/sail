@@ -76,32 +76,32 @@ endif()
 
 # Options
 #
-option(SAIL_BUILD_APPS "Build applications." ON)
-option(SAIL_BUILD_BINDINGS "Build the C++ and other bindings." ON)
+option(SAIL_BUILD_APPS "Build client applications." ON)
+option(SAIL_BUILD_BINDINGS "Build C++ and other bindings." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
-option(SAIL_DEV "Enable developer mode. Be more strict when compiling source code, for example." OFF)
-option(SAIL_ENABLE_OPENMP "Enable OpenMP support if it's available in the compiler. See also SAIL_OPENMP_SCHEDULE." ON)
-set(SAIL_ENABLE_CODECS "" CACHE STRING "Forcefully enable the codecs specified in this ';'-separated list. \
-If an enabled codec fails to find its dependencies, the configuration process fails. \
-One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm. \
-Other codecs may or may not be enabled depending on found dependencies. \
-When SAIL_ENABLE_CODECS is enabled, SAIL_ONLY_CODECS gets ignored.")
+option(SAIL_DEV "Enable developer mode with pedantic warnings and optional ASAN for examples." OFF)
+option(SAIL_ENABLE_OPENMP "Enable OpenMP support if available in the compiler. See also SAIL_OPENMP_SCHEDULE." ON)
+set(SAIL_ENABLE_CODECS "" CACHE STRING "Force-enable the codecs specified in this ';'-separated list. \
+Configuration fails if an enabled codec cannot find its dependencies. \
+Supports individual codecs and codec groups by priority (e.g., highest-priority;xbm). \
+Other codecs may be enabled or disabled based on available dependencies. \
+When set, SAIL_ONLY_CODECS is ignored.")
 set(SAIL_DISABLE_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
-One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
-set(SAIL_ONLY_CODECS "" CACHE STRING "Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. \
-If an enabled codec fails to find its dependencies, the configuration process fails. \
-One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
+Supports individual codecs and codec groups by priority (e.g., highest-priority;xbm).")
+set(SAIL_ONLY_CODECS "" CACHE STRING "Force-enable only the codecs specified in this ';'-separated list and disable all others. \
+Configuration fails if an enabled codec cannot find its dependencies. \
+Supports individual codecs and codec groups by priority (e.g., highest-priority;xbm).")
 set(SAIL_OPENMP_SCHEDULE "dynamic" CACHE STRING "OpenMP scheduling algorithm.")
-option(BUILD_SHARED_LIBS "Build shared libs. When disabled, sets SAIL_COMBINE_CODECS to ON automatically." ON)
+option(BUILD_SHARED_LIBS "Build shared libraries. When disabled, automatically sets SAIL_COMBINE_CODECS to ON." ON)
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library. When disabled, all codecs are implemented as \
 dynamically loaded plugins." OFF "BUILD_SHARED_LIBS" ON)
-option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading third-party codecs from the ';'-separated paths specified in \
+option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading custom codecs from ';'-separated paths specified in \
 the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)
-option(SAIL_THREAD_SAFE "Enable working in multi-threaded environments by locking the internal context with a mutex." ON)
+option(SAIL_THREAD_SAFE "Enable thread-safe operations by locking the internal context with a mutex." ON)
 if (WIN32)
     option(SAIL_WINDOWS_UTF8_PATHS "Convert file paths to UTF-8 on Windows." ON)
     if (MSVC)
-        option(SAIL_WINDOWS_INSTALL_PDB "Install PDB files along with libraries (MSVC only)." ON)
+        option(SAIL_WINDOWS_INSTALL_PDB "Install PDB debug files along with libraries." ON)
         option(SAIL_WINDOWS_STATIC_CRT "Use static CRT (/MT) instead of dynamic CRT (/MD) for static builds." ON)
     endif()
 endif()
