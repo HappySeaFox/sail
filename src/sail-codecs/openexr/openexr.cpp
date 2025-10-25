@@ -202,18 +202,28 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_openexr(void* stat
         const Header& header            = openexr_state->input_file->header();
         const Imath::Box2i& data_window = header.dataWindow();
 
-        FrameBuffer frameBuffer;
-        sail::openexr::setup_framebuffer_read(frameBuffer, openexr_state->channel_info, image->pixels,
-                                              static_cast<int>(openexr_state->width),
-                                              static_cast<int>(openexr_state->height), data_window);
+        // Special handling for YCbCr
+        if (openexr_state->channel_info.has_y && openexr_state->channel_info.has_ry
+            && openexr_state->channel_info.has_by)
+        {
+            sail::openexr::read_ycbcr_and_convert(*openexr_state->input_file, openexr_state->channel_info,
+                                                  image->pixels, openexr_state->width, openexr_state->height,
+                                                  data_window);
+        }
+        else
+        {
+            FrameBuffer frameBuffer;
+            sail::openexr::setup_framebuffer_read(frameBuffer, openexr_state->channel_info, image->pixels,
+                                                  openexr_state->width, openexr_state->height, data_window);
 
-        openexr_state->input_file->setFrameBuffer(frameBuffer);
-        openexr_state->input_file->readPixels(data_window.min.y, data_window.max.y);
+            openexr_state->input_file->setFrameBuffer(frameBuffer);
+            openexr_state->input_file->readPixels(data_window.min.y, data_window.max.y);
+        }
     }
     catch (const std::exception& e)
     {
         SAIL_LOG_ERROR("OpenEXR: Failed to read pixels: %s", e.what());
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
     openexr_state->frame_processed = true;
@@ -324,8 +334,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_openexr(void* stat
             Imath::V2i(0, 0), Imath::V2i(static_cast<int>(image->width) - 1, static_cast<int>(image->height) - 1));
 
         sail::openexr::setup_framebuffer_read(frameBuffer, openexr_state->channel_info, image->pixels,
-                                              static_cast<int>(image->width), static_cast<int>(image->height),
-                                              data_window);
+                                              image->width, image->height, data_window);
 
         openexr_state->output_file->setFrameBuffer(frameBuffer);
         openexr_state->output_file->writePixels(static_cast<int>(image->height));

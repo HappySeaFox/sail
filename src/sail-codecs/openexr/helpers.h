@@ -47,11 +47,14 @@ namespace sail::openexr
  */
 struct ChannelInfo
 {
-    bool has_y;                                     // Grayscale (Y channel)
+    bool has_y;                                     // Grayscale (Y channel) or Luminance
     bool has_r, has_g, has_b;                       // RGB channels
+    bool has_ry, has_by;                            // Chroma channels (YCbCr format)
     bool has_a;                                     // Alpha channel
     OPENEXR_IMF_INTERNAL_NAMESPACE::PixelType type; // HALF, FLOAT, or UINT
     int num_channels;                               // Total number of channels
+    int ry_xsampling, ry_ysampling;                 // RY channel subsampling
+    int by_xsampling, by_ysampling;                 // BY channel subsampling
 };
 
 SailPixelFormat pixel_type_to_sail(int pixel_type, int channel_count);
@@ -73,9 +76,16 @@ SailPixelFormat determine_pixel_format(const ChannelInfo& info);
 void setup_framebuffer_read(OPENEXR_IMF_INTERNAL_NAMESPACE::FrameBuffer& fb,
                             const ChannelInfo& info,
                             void* pixels,
-                            int width,
-                            int height,
+                            unsigned width,
+                            unsigned height,
                             const Imath::Box2i& data_window);
+
+void read_ycbcr_and_convert(OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile& file,
+                             const ChannelInfo& info,
+                             void* pixels,
+                             unsigned width,
+                             unsigned height,
+                             const IMATH_INTERNAL_NAMESPACE::Box2i& data_window);
 
 void setup_header_write(OPENEXR_IMF_INTERNAL_NAMESPACE::Header& header,
                         SailPixelFormat pixel_format,

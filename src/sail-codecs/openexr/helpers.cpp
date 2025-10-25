@@ -23,11 +23,13 @@
     SOFTWARE.
 */
 
+#include <algorithm>
 #include <array>
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <fcntl.h>
 
@@ -40,10 +42,12 @@
 #endif
 
 #include <Imath/ImathBox.h>
+#include <Imath/half.h>
 #include <OpenEXR/ImfChannelList.h>
 #include <OpenEXR/ImfCompression.h>
 #include <OpenEXR/ImfFrameBuffer.h>
 #include <OpenEXR/ImfHeader.h>
+#include <OpenEXR/ImfInputFile.h>
 #include <OpenEXR/ImfPixelType.h>
 
 #include <sail-common/sail-common.h>
@@ -262,21 +266,54 @@ ChannelInfo analyze_channels(const ChannelList& channels)
     info.num_channels = 0;
 
     // Check for standard channels
-    const Channel* y_channel = channels.findChannel("Y");
-    const Channel* r_channel = channels.findChannel("R");
-    const Channel* g_channel = channels.findChannel("G");
-    const Channel* b_channel = channels.findChannel("B");
-    const Channel* a_channel = channels.findChannel("A");
+    auto* y_channel  = channels.findChannel("Y");
+    auto* r_channel  = channels.findChannel("R");
+    auto* g_channel  = channels.findChannel("G");
+    auto* b_channel  = channels.findChannel("B");
+    auto* ry_channel = channels.findChannel("RY");
+    auto* by_channel = channels.findChannel("BY");
+    auto* a_channel  = channels.findChannel("A");
 
-    info.has_y = (y_channel != nullptr);
-    info.has_r = (r_channel != nullptr);
-    info.has_g = (g_channel != nullptr);
-    info.has_b = (b_channel != nullptr);
-    info.has_a = (a_channel != nullptr);
+    info.has_y  = (y_channel != nullptr);
+    info.has_r  = (r_channel != nullptr);
+    info.has_g  = (g_channel != nullptr);
+    info.has_b  = (b_channel != nullptr);
+    info.has_ry = (ry_channel != nullptr);
+    info.has_by = (by_channel != nullptr);
+    info.has_a  = (a_channel != nullptr);
+
+    // Store subsampling factors for chroma channels
+    if (info.has_ry)
+    {
+        info.ry_xsampling = ry_channel->xSampling;
+        info.ry_ysampling = ry_channel->ySampling;
+    }
+    else
+    {
+        info.ry_xsampling = 1;
+        info.ry_ysampling = 1;
+    }
+
+    if (info.has_by)
+    {
+        info.by_xsampling = by_channel->xSampling;
+        info.by_ysampling = by_channel->ySampling;
+    }
+    else
+    {
+        info.by_xsampling = 1;
+        info.by_ysampling = 1;
+    }
 
     // Determine pixel type (use first available channel)
     const Channel* first_channel = nullptr;
-    if (info.has_y)
+
+    if (info.has_y && info.has_ry && info.has_by)
+    {
+        first_channel     = y_channel;
+        info.num_channels = 3; // Will be converted to RGB
+    }
+    else if (info.has_y && !info.has_ry && !info.has_by)
     {
         first_channel     = y_channel;
         info.num_channels = 1;
@@ -339,7 +376,7 @@ size_t bytes_per_pixel(const ChannelInfo& info)
 }
 
 void setup_framebuffer_read(
-    FrameBuffer& fb, const ChannelInfo& info, void* pixels, int width, int height, const Imath::Box2i& data_window)
+    FrameBuffer& fb, const ChannelInfo& info, void* pixels, unsigned width, unsigned height, const Imath::Box2i& data_window)
 {
     (void)height; // May be unused
 
@@ -351,21 +388,22 @@ void setup_framebuffer_read(
     // Adjust base pointer for data window
     base = base - data_window.min.x * x_stride - data_window.min.y * y_stride;
 
-    if (info.has_y)
+    if (info.has_y && info.has_ry && info.has_by)
     {
-        // Grayscale
+        throw std::runtime_error("YCbCr should be handled via read_ycbcr_and_convert()");
+    }
+    else if (info.has_y && !info.has_ry && !info.has_by)
+    {
         fb.insert("Y", Slice(info.type, base, x_stride, y_stride));
 
         if (info.has_a)
         {
-            // Grayscale + Alpha
             const size_t bytes_per_channel = (info.type == HALF) ? 2 : 4;
             fb.insert("A", Slice(info.type, base + bytes_per_channel, x_stride, y_stride));
         }
     }
     else if (info.has_r && info.has_g && info.has_b)
     {
-        // RGB
         const size_t bytes_per_channel = (info.type == HALF) ? 2 : 4;
         fb.insert("R", Slice(info.type, base + 0 * bytes_per_channel, x_stride, y_stride));
         fb.insert("G", Slice(info.type, base + 1 * bytes_per_channel, x_stride, y_stride));
@@ -373,7 +411,6 @@ void setup_framebuffer_read(
 
         if (info.has_a)
         {
-            // RGBA
             fb.insert("A", Slice(info.type, base + 3 * bytes_per_channel, x_stride, y_stride));
         }
     }
@@ -382,6 +419,113 @@ void setup_framebuffer_read(
         throw std::runtime_error("Unsupported channel configuration in OpenEXR file");
     }
 }
+
+void read_ycbcr_and_convert(InputFile& file,
+                             const ChannelInfo& info,
+                             void* pixels,
+                             unsigned width,
+                             unsigned height,
+                             const Imath::Box2i& data_window)
+{
+    if (info.type != HALF)
+    {
+        throw std::runtime_error("Only HALF YCbCr is currently supported");
+    }
+
+    // Calculate subsampled dimensions
+    const auto chroma_width = (width + info.ry_xsampling - 1) / info.ry_xsampling;
+    const auto chroma_height = (height + info.ry_ysampling - 1) / info.ry_ysampling;
+
+    // Allocate temporary buffers for Y, RY, BY channels
+    std::vector<Imath::half> y_buffer(width * height);
+    std::vector<Imath::half> ry_buffer(chroma_width * chroma_height);
+    std::vector<Imath::half> by_buffer(chroma_width * chroma_height);
+
+    auto* y_base = reinterpret_cast<char*>(y_buffer.data());
+    auto* ry_base = reinterpret_cast<char*>(ry_buffer.data());
+    auto* by_base = reinterpret_cast<char*>(by_buffer.data());
+
+    y_base = y_base - data_window.min.x * sizeof(Imath::half) - data_window.min.y * width * sizeof(Imath::half);
+    ry_base = ry_base - (data_window.min.x / info.ry_xsampling) * sizeof(Imath::half)
+            - (data_window.min.y / info.ry_ysampling) * chroma_width * sizeof(Imath::half);
+    by_base = by_base - (data_window.min.x / info.by_xsampling) * sizeof(Imath::half)
+            - (data_window.min.y / info.by_ysampling) * chroma_width * sizeof(Imath::half);
+
+    FrameBuffer fb;
+    fb.insert("Y", Slice(HALF, y_base, sizeof(Imath::half), width * sizeof(Imath::half), 1, 1));
+    fb.insert("RY", Slice(HALF, ry_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
+                         info.ry_xsampling, info.ry_ysampling));
+    fb.insert("BY", Slice(HALF, by_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
+                         info.by_xsampling, info.by_ysampling));
+
+    file.setFrameBuffer(fb);
+    file.readPixels(data_window.min.y, data_window.max.y);
+
+    // Luminance weights
+    const auto yw_r = 0.2126f;
+    const auto yw_g = 0.7152f;
+    const auto yw_b = 0.0722f;
+
+    // Convert YCA to RGB with bilinear upsampling for chroma
+    Imath::half* dest = static_cast<Imath::half*>(pixels);
+
+    for (unsigned y = 0; y < height; y++)
+    {
+        for (unsigned x = 0; x < width; x++)
+        {
+            // Get Y value (full resolution)
+            auto Y = static_cast<float>(y_buffer[y * width + x]);
+
+            // Get RY and BY with bilinear upsampling
+            const auto cx = x / info.ry_xsampling;
+            const auto cy = y / info.ry_ysampling;
+            const auto cx_next = std::min(cx + 1u, chroma_width - 1);
+            const auto cy_next = std::min(cy + 1u, chroma_height - 1);
+
+            // Bilinear interpolation weights
+            const auto fx = (x % info.ry_xsampling) / static_cast<float>(info.ry_xsampling);
+            const auto fy = (y % info.ry_ysampling) / static_cast<float>(info.ry_ysampling);
+
+            // Interpolate RY
+            auto ry00 = static_cast<float>(ry_buffer[cy * chroma_width + cx]);
+            auto ry10 = static_cast<float>(ry_buffer[cy * chroma_width + cx_next]);
+            auto ry01 = static_cast<float>(ry_buffer[cy_next * chroma_width + cx]);
+            auto ry11 = static_cast<float>(ry_buffer[cy_next * chroma_width + cx_next]);
+            auto RY = ry00 * (1 - fx) * (1 - fy) + ry10 * fx * (1 - fy) +
+                       ry01 * (1 - fx) * fy + ry11 * fx * fy;
+
+            // Interpolate BY
+            auto by00 = static_cast<float>(by_buffer[cy * chroma_width + cx]);
+            auto by10 = static_cast<float>(by_buffer[cy * chroma_width + cx_next]);
+            auto by01 = static_cast<float>(by_buffer[cy_next * chroma_width + cx]);
+            auto by11 = static_cast<float>(by_buffer[cy_next * chroma_width + cx_next]);
+            auto BY = by00 * (1 - fx) * (1 - fy) + by10 * fx * (1 - fy) +
+                       by01 * (1 - fx) * fy + by11 * fx * fy;
+
+            float r, g, b;
+            if (RY == 0.0f && BY == 0.0f)
+            {
+                r = g = b = Y;
+            }
+            else
+            {
+                r = (RY + 1.0f) * Y;
+                b = (BY + 1.0f) * Y;
+                g = (Y - r * yw_r - b * yw_b) / yw_g;
+            }
+
+            *dest++ = Imath::half(r);
+            *dest++ = Imath::half(g);
+            *dest++ = Imath::half(b);
+
+            if (info.has_a)
+            {
+                *dest++ = Imath::half(1.0f);
+            }
+        }
+    }
+}
+
 
 void setup_header_write(
     Header& header, SailPixelFormat pixel_format, int width, int height, SailCompression compression)

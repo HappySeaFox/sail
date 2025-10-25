@@ -133,7 +133,23 @@ static inline float float16_to_float32(uint16_t value)
 static inline uint16_t half_to_uint16(uint16_t half_value)
 {
     float f = float16_to_float32(half_value);
-    return float_to_uint16(f);
+
+    if (f != f) /* NaN. */
+    {
+        return 0;
+    }
+    else if (f <= 0.0f)
+    {
+        return 0;
+    }
+    else if (f >= 1.0f)
+    {
+        return 65535;
+    }
+    else
+    {
+        return (uint16_t)(f * 65535.0f + 0.5f);
+    }
 }
 
 static inline uint16_t uint16_to_half(uint16_t value)
