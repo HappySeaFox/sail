@@ -98,24 +98,32 @@ jobs:
 
     - name: Build wheel (Windows)
       if: runner.os == 'Windows'
+      shell: bash
       working-directory: src/bindings/sail-python
       env:
         CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
-        Copy-Item dist/*.whl wheelhouse/
+        mv dist/*.whl wheelhouse/
 
     - name: Check wheels
+      shell: bash
       working-directory: src/bindings/sail-python
       run: |
         twine check --strict wheelhouse/*.whl
 
+    - name: List wheelhouse contents
+      shell: bash
+      working-directory: src/bindings/sail-python
+      run: ls -la wheelhouse/
+
     - name: Test wheel installation
+      shell: bash
       working-directory: src/bindings/sail-python
       run: |
         pip install wheelhouse/*.whl
-        mv sailpy sail.backup
+        mv sailpy sailpy.backup
         python -c "import sailpy; print('sailpy version:', sailpy.__version__)"
 
     - name: Install test dependencies
