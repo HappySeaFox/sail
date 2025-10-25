@@ -113,11 +113,6 @@ jobs:
       run: |
         twine check --strict wheelhouse/*.whl
 
-    - name: List wheelhouse contents
-      shell: bash
-      working-directory: src/bindings/sail-python
-      run: ls -la wheelhouse/
-
     - name: Test wheel installation
       shell: bash
       working-directory: src/bindings/sail-python
