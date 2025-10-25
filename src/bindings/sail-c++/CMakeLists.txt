@@ -107,8 +107,8 @@ sail_enable_asan(TARGET sail-c++)
 
 sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 
-if (SAIL_INSTALL_PDB)
-    sail_install_pdb(TARGET sail-c++)
+if (SAIL_WINDOWS_INSTALL_PDB)
+    sail_windows_install_pdb(TARGET sail-c++)
 endif()
 
 # Definitions, includes, link

@@ -16,8 +16,8 @@ sail_enable_asan(TARGET sail-app)
 
 # Install PDB
 #
-if (SAIL_INSTALL_PDB)
-    sail_install_pdb(TARGET sail-app RENAME sail.app.pdb)
+if (SAIL_WINDOWS_INSTALL_PDB)
+    sail_windows_install_pdb(TARGET sail-app RENAME sail.app.pdb)
 endif()
 
 # Installation

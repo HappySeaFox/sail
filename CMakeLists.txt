@@ -28,8 +28,8 @@ include(sail_enable_posix_source)
 include(sail_enable_xopen_source)
 include(sail_enable_warnings)
 include(sail_install_cmake_config)
-include(sail_install_pdb)
 include(sail_test)
+include(sail_windows_install_pdb)
 
 include(JoinPaths)
 
@@ -88,7 +88,6 @@ Other codecs may or may not be enabled depending on found dependencies. \
 When SAIL_ENABLE_CODECS is enabled, SAIL_ONLY_CODECS gets ignored.")
 set(SAIL_DISABLE_CODECS "" CACHE STRING "Disable the codecs specified in this ';'-separated list. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
-option(SAIL_INSTALL_PDB "Install PDB files along with libraries." ON)
 set(SAIL_ONLY_CODECS "" CACHE STRING "Forcefully enable only the codecs specified in this ';'-separated list and disable the rest. \
 If an enabled codec fails to find its dependencies, the configuration process fails. \
 One can also specify not just individual codecs but codec groups by their priority like that: highest-priority;xbm.")
@@ -102,6 +101,7 @@ option(SAIL_THREAD_SAFE "Enable working in multi-threaded environments by lockin
 if (WIN32)
     option(SAIL_WINDOWS_UTF8_PATHS "Convert file paths to UTF-8 on Windows." ON)
     if (MSVC)
+        option(SAIL_WINDOWS_INSTALL_PDB "Install PDB files along with libraries (MSVC only)." ON)
         option(SAIL_WINDOWS_STATIC_CRT "Use static CRT (/MT) instead of dynamic CRT (/MD) for static builds." ON)
     endif()
 endif()
@@ -334,7 +334,9 @@ message("* Build examples:               ${SAIL_BUILD_EXAMPLES}")
 message("* Build SDL example:            ${SAIL_SDL_EXAMPLE}")
 message("* Build bindings:               ${SAIL_BUILD_BINDINGS}")
 message("* Build tests:                  ${BUILD_TESTING}")
-message("* Install PDB files:            ${SAIL_INSTALL_PDB}")
+if (MSVC)
+    message("* Install PDB files:            ${SAIL_WINDOWS_INSTALL_PDB}")
+endif()
 message("*")
 message("* SAIL_HAVE_BUILTIN_BSWAP16:    ${SAIL_HAVE_BUILTIN_BSWAP16_DISPLAY}")
 message("* SAIL_HAVE_BUILTIN_BSWAP32:    ${SAIL_HAVE_BUILTIN_BSWAP32_DISPLAY}")

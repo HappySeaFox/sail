@@ -1,6 +1,6 @@
 # Intended to be included by SAIL libraries to install their debug PDB files
 #
-macro(sail_install_pdb)
+macro(sail_windows_install_pdb)
     cmake_parse_arguments(SAIL_INSTALL_PDB "" "TARGET;RENAME" "" ${ARGN})
 
     if (MSVC AND BUILD_SHARED_LIBS)

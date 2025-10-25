@@ -102,8 +102,8 @@ sail_enable_posix_source(TARGET sail-common VERSION 200809L)
 
 sail_enable_pch(TARGET sail-common HEADER sail-common.h)
 
-if (SAIL_INSTALL_PDB)
-    sail_install_pdb(TARGET sail-common)
+if (SAIL_WINDOWS_INSTALL_PDB)
+    sail_windows_install_pdb(TARGET sail-common)
 endif()
 
 # Definitions, includes, link
