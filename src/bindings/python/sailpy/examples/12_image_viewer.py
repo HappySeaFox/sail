@@ -222,7 +222,7 @@ class ImageViewer(QMainWindow):
             return
 
         # Build file types: All files first, then codecs with save support
-        filetypes = ["All Files (*.*)"]
+        filetypes = []
 
         for codec in sailpy.CodecInfo.list():
             # Check if codec supports saving
@@ -231,6 +231,9 @@ class ImageViewer(QMainWindow):
                 ext_patterns = [f"*.{ext}" for ext in codec.extensions]
                 filter_name = f"{codec.description} ({' '.join(ext_patterns)})"
                 filetypes.append(filter_name)
+
+        filetypes.sort()
+        filetypes.insert(0, "All Files (*.*)")
 
         # Default filename with last directory
         default_name = "saved_image.png"
