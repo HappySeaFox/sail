@@ -30,14 +30,14 @@ def main():
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 256, 256)
     arr = img.to_numpy()  # Zero-copy!
 
-    print(f"\n✓ Zero-copy array:")
+    print(f"\nY Zero-copy array:")
     print(f"  Shape: {arr.shape}")
     print(f"  Dtype: {arr.dtype}")
     print(f"  Flags: C_CONTIGUOUS={arr.flags['C_CONTIGUOUS']}")
 
     # Modify in-place (affects original image)
     arr[:] = [100, 150, 200]
-    print(f"✓ Modified in-place (no copy!)\n")
+    print(f"Y Modified in-place (no copy!)\n")
 
     # Example 2: uint16 support
     print("=" * 70)
@@ -47,12 +47,12 @@ def main():
     img16 = sailpy.Image(sailpy.PixelFormat.BPP48_RGB, 128, 128)
     arr16 = img16.to_numpy()
 
-    print(f"\n✓ 16-bit array:")
+    print(f"\nY 16-bit array:")
     print(f"  Shape: {arr16.shape}")
     print(f"  Dtype: {arr16.dtype}")  # uint16!
 
     arr16[:] = [10000, 30000, 50000]  # Full 16-bit range
-    print(f"✓ Set 16-bit values\n")
+    print(f"Y Set 16-bit values\n")
 
     # Example 3: Image processing
     print("=" * 70)
@@ -68,15 +68,15 @@ def main():
         arr[y, :, 1] = 255 - y  # Green
         arr[y, :, 2] = 128  # Blue
 
-    print("✓ Created gradient with NumPy")
+    print("Y Created gradient with NumPy")
 
     # Brighten
     arr[:] = np.clip(arr * 1.5, 0, 255).astype(np.uint8)
-    print("✓ Brightened image")
+    print("Y Brightened image")
 
     # Invert
     arr[:] = 255 - arr
-    print("✓ Inverted colors\n")
+    print("Y Inverted colors\n")
 
     # Example 4: From NumPy array
     print("=" * 70)
@@ -91,7 +91,7 @@ def main():
     # Create SAIL image from array
     img = sailpy.Image.from_numpy(arr, sailpy.PixelFormat.BPP24_RGB)
 
-    print(f"✓ Created from NumPy: {img.width}x{img.height}")
+    print(f"Y Created from NumPy: {img.width}x{img.height}")
     print(f"  Valid: {img.is_valid}\n")
 
     # Example 5: Slicing and operations
@@ -107,15 +107,15 @@ def main():
     arr[100:, :, :3] = [0, 0, 255]  # Bottom half blue
     arr[:, :, 3] = 255  # Full opacity
 
-    print("✓ Sliced and modified regions")
+    print("Y Sliced and modified regions")
 
     # Channel operations
     red_channel = arr[:, :, 0]
     avg_red = red_channel.mean()
-    print(f"✓ Average red value: {avg_red:.1f}\n")
+    print(f"Y Average red value: {avg_red:.1f}\n")
 
     print("=" * 70)
-    print("✓ All examples completed!")
+    print("Y All examples completed!")
     print()
 
 

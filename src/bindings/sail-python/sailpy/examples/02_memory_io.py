@@ -64,7 +64,7 @@ def example_image_to_bytes():
 
 
 def example_bytes_roundtrip():
-    """Full roundtrip: Image → bytes → Image"""
+    """Full roundtrip: Image -> bytes -> Image"""
     print("=" * 70)
     print("EXAMPLE 2: Bytes Roundtrip")
     print("=" * 70)
@@ -79,15 +79,15 @@ def example_bytes_roundtrip():
 
     # To bytes
     png_data = original.to_bytes("png")
-    print(f"\n✓ Encoded to PNG: {len(png_data):,} bytes")
+    print(f"\nY Encoded to PNG: {len(png_data):,} bytes")
 
     # From bytes
     loaded = sailpy.Image.from_bytes(png_data)
-    print(f"✓ Decoded from PNG: {loaded.width}x{loaded.height}")
+    print(f"Y Decoded from PNG: {loaded.width}x{loaded.height}")
 
     # Verify integrity (PNG is lossless)
     diff = np.abs(original.to_numpy().astype(int) - loaded.to_numpy().astype(int)).max()
-    print(f"✓ Max pixel difference: {diff} (lossless)")
+    print(f"Y Max pixel difference: {diff} (lossless)")
 
     print("\nUse case: Microservices, image processing pipelines")
     print()
@@ -106,7 +106,7 @@ def example_load_from_api_response():
 
     # This would be bytes from API response
     api_response_bytes = source_img.to_bytes("png")
-    print(f"   ✓ Got {len(api_response_bytes):,} bytes from 'API'")
+    print(f"   Y Got {len(api_response_bytes):,} bytes from 'API'")
 
     # Process the image
     print("\n2. Processing image from bytes...")
@@ -118,7 +118,7 @@ def example_load_from_api_response():
 
     # Convert back to bytes for response
     response_bytes = img.to_bytes("webp")
-    print(f"   ✓ Processed and encoded to WebP: {len(response_bytes):,} bytes")
+    print(f"   Y Processed and encoded to WebP: {len(response_bytes):,} bytes")
     print(f"   Size reduction: {(1 - len(response_bytes)/len(api_response_bytes))*100:.1f}%")
 
     print("\nUse case: Image proxy services, CDN transformations")
@@ -203,7 +203,7 @@ def example_batch_processing():
         img.to_numpy()[:] = [i * 50, i * 70, i * 90]
         images_data.append(img.to_bytes("png"))
 
-    print(f"\n✓ Created batch of {len(images_data)} images")
+    print(f"\nY Created batch of {len(images_data)} images")
     total_size = sum(len(d) for d in images_data)
     print(f"  Total size: {total_size:,} bytes")
 
@@ -218,7 +218,7 @@ def example_batch_processing():
         processed_data = img.to_bytes("png")
         processed.append(processed_data)
 
-    print(f"✓ Processed {len(processed)} images")
+    print(f"Y Processed {len(processed)} images")
     print(f"  Output size: {sum(len(d) for d in processed):,} bytes")
 
     print("\nUse case: Batch image processor, photo filters")
@@ -241,7 +241,7 @@ def main():
         example_batch_processing()
 
         print("=" * 70)
-        print("✓ All examples completed!")
+        print("Y All examples completed!")
         print()
 
     finally:

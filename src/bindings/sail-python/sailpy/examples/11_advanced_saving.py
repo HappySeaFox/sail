@@ -127,7 +127,7 @@ def main():
         os.remove(path)
 
     print("=" * 70)
-    print("✓ PNG filters affect file size!")
+    print("Y PNG filters affect file size!")
     print("  Use 'paeth' for best compression, 'none' for speed")
     print("=" * 70)
     print()

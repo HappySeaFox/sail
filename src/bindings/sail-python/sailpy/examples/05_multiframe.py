@@ -58,7 +58,7 @@ def main():
         supports_animated = (codec.save_features.features & sailpy.CodecFeature.ANIMATED) != 0
 
         print(f"Using codec: {codec.name}")
-        print(f"  Animated support: {'✓' if supports_animated else '✗'}")
+        print(f"  Animated support: {'Y' if supports_animated else 'N'}")
         print(f"  Supported formats: {', '.join([pf.name for pf in codec.save_features.pixel_formats][:4])}")
         print()
 
@@ -89,7 +89,7 @@ def main():
             writer.write(img2)
             writer.write(img3)
 
-        print(f"✓ Written 3 frames to animated {codec.name}")
+        print(f"Y Written 3 frames to animated {codec.name}")
         print(f"  File: {output_path}")
         print(f"  Total delay: 300ms")
 
@@ -99,7 +99,7 @@ def main():
 
     print()
     print("=" * 70)
-    print("✓ All examples completed!")
+    print("Y All examples completed!")
     print("=" * 70)
     print()
 

@@ -30,8 +30,8 @@ def main():
     print(f"Total codecs: {len(codecs)}\n")
 
     for codec in codecs:
-        load = "✓" if codec.can_load else "✗"
-        save = "✓" if codec.can_save else "✗"
+        load = "Y" if codec.can_load else "N"
+        save = "Y" if codec.can_save else "N"
         exts = ', '.join(codec.extensions[:3])
         if len(codec.extensions) > 3:
             exts += "..."
@@ -78,8 +78,8 @@ def main():
         try:
             codec = sailpy.CodecInfo.from_name(codec_name)
             print(f"{codec.name}:")
-            print(f"  Load: {'✓' if codec.can_load else '✗'}")
-            print(f"  Save: {'✓' if codec.can_save else '✗'}")
+            print(f"  Load: {'Y' if codec.can_load else 'N'}")
+            print(f"  Save: {'Y' if codec.can_save else 'N'}")
             print(f"  MIME types: {', '.join(codec.mime_types)}")
             print(f"  Magic numbers: {codec.magic_numbers[0] if codec.magic_numbers else 'none'}")
             print(f"  Extensions: {', '.join(codec.extensions)}")
@@ -94,7 +94,7 @@ def main():
             print(f"{codec_name}: codec not available\n")
 
     print("=" * 70)
-    print("✓ All examples completed!")
+    print("Y All examples completed!")
     print()
 
 

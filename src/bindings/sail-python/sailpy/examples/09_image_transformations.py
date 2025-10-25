@@ -58,7 +58,7 @@ def main():
     rotated = img.rotate_to(sailpy.Orientation.ROTATED_90)
     output = tmp_dir / f"{base_name}_rotated_90.png"
     rotated.save(str(output))
-    print(f"      {img.width}x{img.height} → {rotated.width}x{rotated.height}")
+    print(f"      {img.width}x{img.height} -> {rotated.width}x{rotated.height}")
     print(f"      Saved: {output}")
     print()
 
@@ -76,12 +76,12 @@ def main():
         gray = img.convert_to(sailpy.PixelFormat.BPP8_GRAYSCALE)
         output = tmp_dir / f"{base_name}_grayscale.png"
         gray.save(str(output))
-        print(f"      {img.pixel_format.name} → {gray.pixel_format.name}")
+        print(f"      {img.pixel_format.name} -> {gray.pixel_format.name}")
         print(f"      Saved: {output}")
     print()
 
     print("=" * 70)
-    print("✓ All transformations completed!")
+    print("Y All transformations completed!")
     print("=" * 70)
 
 

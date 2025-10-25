@@ -43,7 +43,7 @@ def main():
     print("  More examples:")
     for sail_str in ["BPP32-RGBA", "BPP8-GRAYSCALE", "BPP4-INDEXED"]:
         fmt = sailpy.PixelFormat.from_string(sail_str)
-        print(f"    '{sail_str}' → {fmt.name}")
+        print(f"    '{sail_str}' -> {fmt.name}")
     print()
 
     # Compression enum
@@ -58,7 +58,7 @@ def main():
     print("  Parse from SAIL strings:")
     for sail_str in ["JPEG", "DEFLATE", "RLE", "LZW"]:
         c = sailpy.Compression.from_string(sail_str)
-        print(f"    '{sail_str}' → {c.name}")
+        print(f"    '{sail_str}' -> {c.name}")
     print()
 
     # Orientation enum
@@ -73,7 +73,7 @@ def main():
     print("  Parse from SAIL strings (with dashes):")
     for sail_str in ["NORMAL", "ROTATED-90", "ROTATED-180", "MIRRORED-HORIZONTALLY"]:
         o = sailpy.Orientation.from_string(sail_str)
-        print(f"    '{sail_str:25s}' → {o.name}")
+        print(f"    '{sail_str:25s}' -> {o.name}")
     print()
 
     # ChromaSubsampling enum
@@ -87,7 +87,7 @@ def main():
     print("  Parse from SAIL strings (numeric format):")
     for sail_str in ["420", "422", "444"]:
         chroma = sailpy.ChromaSubsampling.from_string(sail_str)
-        print(f"    '{sail_str}' → {chroma.name}")
+        print(f"    '{sail_str}' -> {chroma.name}")
     print()
 
     # Practical usage
@@ -113,7 +113,7 @@ def main():
     print()
 
     print("=" * 70)
-    print("✓ Summary:")
+    print("Y Summary:")
     print("=" * 70)
     print()
     print("  Use .name for:")

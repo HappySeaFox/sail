@@ -36,7 +36,7 @@ def main():
     # No logs will be shown
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 16, 16)
 
-    print("✓ Silent mode active (no logs printed)")
+    print("Y Silent mode active (no logs printed)")
 
     # Restore
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
@@ -68,7 +68,7 @@ def main():
     codec = sailpy.CodecInfo.from_name("JPEG")
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
 
-    print(f"✓ Captured {len(log_messages)} log messages")
+    print(f"Y Captured {len(log_messages)} log messages")
     if log_messages:
         print(f"  First message: {log_messages[0][:60]}...")
         if len(log_messages) > 1:
@@ -108,12 +108,12 @@ def main():
 
         sailpy.set_logger(None)
 
-    print("\n✓ Use set_log_barrier() to control verbosity")
+    print("\nY Use set_log_barrier() to control verbosity")
 
     print()
 
     print("=" * 70)
-    print("✓ All examples completed!")
+    print("Y All examples completed!")
     print()
 
 

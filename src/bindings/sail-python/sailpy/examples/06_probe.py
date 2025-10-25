@@ -60,7 +60,7 @@ def main():
 
         pixels_size_mb = metadata['width'] * metadata['height'] * \
             (metadata['bits_per_pixel'] // 8) / 1024 / 1024
-        print(f"\n✓ Probed without loading {pixels_size_mb:.1f}MB of pixels!")
+        print(f"\nY Probed without loading {pixels_size_mb:.1f}MB of pixels!")
 
         # Compare with full load
         start = time.time()
@@ -78,7 +78,7 @@ def main():
 
     print()
     print("=" * 70)
-    print("✓ Use probe when you only need metadata!")
+    print("Y Use probe when you only need metadata!")
     print("=" * 70)
     print()
 

@@ -397,7 +397,7 @@ width = metadata['width']
 
 ## Common Patterns
 
-### Pattern 1: Simple Load → Process → Save
+### Pattern 1: Simple Load -> Process -> Save
 ```python
 img = sailpy.Image.from_file("input.jpg")
 arr = img.to_numpy()

@@ -50,9 +50,9 @@ def example_get_codec_features():
     lf = codec.load_features
     print(f"\nLoad features: {lf.features}")
     if lf.features & sailpy.CodecFeature.META_DATA:
-        print("  ✓ Can load metadata (EXIF, comments)")
+        print("  Y Can load metadata (EXIF, comments)")
     if lf.features & sailpy.CodecFeature.ICCP:
-        print("  ✓ Can load ICC profiles")
+        print("  Y Can load ICC profiles")
 
     # Save features
     sf = codec.save_features
@@ -85,7 +85,7 @@ def example_use_default_options():
     # Get codec
     codec = sailpy.CodecInfo.from_name("PNG")
 
-    # ✓ CORRECT WAY: Get defaults from features
+    # Y CORRECT WAY: Get defaults from features
     options = codec.save_features.to_options()
 
     print(f"\nDefault options from PNG codec:")
@@ -101,7 +101,7 @@ def example_use_default_options():
         writer.write(img)
         writer.finish()
 
-        print(f"\n✓ Saved with codec defaults: {output_path}")
+        print(f"\nY Saved with codec defaults: {output_path}")
         print(f"  File size: {os.path.getsize(output_path)} bytes")
     finally:
         if os.path.exists(output_path):
@@ -183,7 +183,7 @@ def example_option_flags():
 
     # Check if flag is set
     if options.options & sailpy.Option.META_DATA:
-        print("  ✓ META_DATA flag is set")
+        print("  Y META_DATA flag is set")
 
     output_path = os.path.join(tempfile.gettempdir(), "with_options.png")
     try:
@@ -192,7 +192,7 @@ def example_option_flags():
         writer.write(img)
         writer.finish()
 
-        print(f"\n✓ Saved with custom options")
+        print(f"\nY Saved with custom options")
     finally:
         if os.path.exists(output_path):
             os.remove(output_path)
@@ -267,7 +267,7 @@ def example_check_format_support():
 
     for pf in test_formats:
         supported = pf in codec.save_features.pixel_formats
-        status = "✓" if supported else "✗"
+        status = "Y" if supported else "N"
         print(f"  {status} {pf.name}")
 
     print()
@@ -322,7 +322,7 @@ def main():
         example_source_image_info()
 
         print("=" * 70)
-        print("✓ All examples completed!")
+        print("Y All examples completed!")
         print()
 
     finally:

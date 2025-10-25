@@ -49,22 +49,22 @@ def main():
     # Save
     output_path = os.path.join(tempfile.gettempdir(), "simple_output.png")
     img.save(output_path)
-    print(f"✓ Saved: {output_path}")
+    print(f"Y Saved: {output_path}")
 
     # Load
     loaded = sailpy.Image.from_file(output_path)
-    print(f"✓ Loaded: {loaded.width}x{loaded.height} pixels")
+    print(f"Y Loaded: {loaded.width}x{loaded.height} pixels")
     print(f"  Pixel format: {loaded.pixel_format.name}")
     print(f"  Bits per pixel: {loaded.bits_per_pixel}")
 
     # Quick transformation example
     rotated = loaded.rotate_to(sailpy.Orientation.ROTATED_90)
-    print(f"✓ Rotated 90°: {rotated.width}x{rotated.height} pixels")
+    print(f"Y Rotated 90°: {rotated.width}x{rotated.height} pixels")
 
     # Cleanup
     os.remove(output_path)
 
-    print("\n✓ Complete!")
+    print("\nY Complete!")
 
 
 if __name__ == "__main__":
