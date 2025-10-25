@@ -108,7 +108,7 @@ jobs:
     - name: Set up vcpkg cache
       uses: actions/cache@v4
       with:
-        path: ${{ github.workspace }}/vcpkg
+        path: vcpkg
         key: vcpkg-${{ runner.os }}
 
     - name: Set up vcpkg
