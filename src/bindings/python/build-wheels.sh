@@ -8,10 +8,15 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 # Python versions to build for
-PYTHON_VERSIONS=("3.10" "3.11" "3.12" "3.13" "3.14")
+if [ $# -gt 0 ]; then
+    PYTHON_VERSIONS=("$@")
+else
+    PYTHON_VERSIONS=("3.10" "3.11" "3.12" "3.13" "3.14")
+fi
 
 OS_TYPE=$(uname -s)
 
+echo
 echo "====================================="
 echo "=  Building Python Wheels for PyPI  ="
 echo "====================================="
