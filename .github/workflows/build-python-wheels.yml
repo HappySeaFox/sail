@@ -53,13 +53,13 @@ jobs:
       shell: bash
       if: runner.os == 'Windows'
       run: |
-        if [ ! -f vcpkg/vcpkg.exe ]; then
+        if [ ! -f "vcpkg/vcpkg.exe" ]; then
           rm -rf vcpkg
           git clone https://github.com/microsoft/vcpkg.git
           vcpkg/bootstrap-vcpkg.bat
         fi
         git -C vcpkg pull
-        vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib `
+        vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
                             --triplet x64-windows --clean-buildtrees-after-build --clean-downloads-after-build
 
     - name: Install Python build tools
