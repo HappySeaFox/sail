@@ -201,7 +201,6 @@ std::string create_temp_file_from_io(sail_io* io)
     int fd;
     if (_sopen_s(&fd, path.c_str(), _O_RDWR | _O_CREAT | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE) != 0)
     {
-        SAIL_LOG_ERROR("OpenEXR: Failed to open temporary file");
         throw std::runtime_error("Failed to open temporary file");
     }
 #else
@@ -209,7 +208,6 @@ std::string create_temp_file_from_io(sail_io* io)
 
     if (fd < 0)
     {
-        SAIL_LOG_ERROR("OpenEXR: Failed to open temporary file");
         throw std::runtime_error("Failed to open temporary file");
     }
 #endif
@@ -245,7 +243,6 @@ std::string create_temp_file_from_io(sail_io* io)
             close(fd);
 #endif
             remove(path.c_str());
-            SAIL_LOG_ERROR("OpenEXR: Failed to write to temporary file");
             throw std::runtime_error("Failed to write to temporary file");
         }
     }

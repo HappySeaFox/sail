@@ -128,7 +128,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_init_v8_openexr(struct sail
     catch (const std::exception& e)
     {
         SAIL_LOG_ERROR("OpenEXR: Failed to open input file: %s", e.what());
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
     return SAIL_OK;
