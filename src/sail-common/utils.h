@@ -216,6 +216,9 @@ SAIL_EXPORT bool sail_is_file(const char* path);
  * for deleting the file and the path when it's no longer needed. The prefix can be
  * empty or NULL, in which case a default prefix will be used.
  *
+ * Note: The returned path is guaranteed to be unique, but the file may not exist yet.
+ *       The caller must create the file (e.g., with O_CREAT flag on POSIX or _O_CREAT on Windows).
+ *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_temp_file_path(const char* prefix, char** path);

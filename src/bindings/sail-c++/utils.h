@@ -67,6 +67,9 @@ SAIL_EXPORT bool is_file(const std::string& path);
  * Returns a temporary file path with the specified prefix. The caller is responsible
  * for deleting the file when it's no longer needed.
  *
+ * Note: The returned path is guaranteed to be unique, but the file may not exist yet.
+ *       The caller must create the file before using it.
+ *
  * Throws std::runtime_error on error.
  */
 SAIL_EXPORT std::string temp_file_path(const std::string& prefix = {});
