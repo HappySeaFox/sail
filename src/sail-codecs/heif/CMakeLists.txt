@@ -31,7 +31,7 @@ cmake_push_check_state(RESET)
             set(TEST_CHROMA "heif_chroma_444")
         endif()
 
-        check_c_source_runs(
+        check_c_source_compiles(
             "
             #include <libheif/heif.h>
             int main() {
