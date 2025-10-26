@@ -119,7 +119,6 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git
           vcpkg/bootstrap-vcpkg.bat
         fi
-        git -C vcpkg pull
         vcpkg/vcpkg install --triplet ${{ matrix.config.triplet }} --clean-buildtrees-after-build
 
     - name: Configure CMake

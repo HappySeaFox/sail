@@ -58,7 +58,6 @@ jobs:
           git clone https://github.com/microsoft/vcpkg.git
           vcpkg/bootstrap-vcpkg.bat
         fi
-        git -C vcpkg pull
         vcpkg/vcpkg install --triplet x64-windows --clean-buildtrees-after-build
 
     - name: Install Python build tools
