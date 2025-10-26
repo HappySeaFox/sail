@@ -122,7 +122,7 @@ jobs:
 
     - name: Install dependencies via vcpkg
       run: |
-        vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib `
+        vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib `
                             --triplet ${{ matrix.config.triplet }} --clean-buildtrees-after-build
 
     - name: Configure CMake

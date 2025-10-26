@@ -23,6 +23,12 @@
     SOFTWARE.
 */
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#endif
+
 #include <algorithm>
 #include <array>
 #include <cstdio>
@@ -63,7 +69,7 @@ SailPixelFormat pixel_type_to_sail(int pixel_type, int channel_count)
 {
     switch (pixel_type)
     {
-    case HALF:
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::HALF:
         switch (channel_count)
         {
         case 1: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF;
@@ -73,7 +79,7 @@ SailPixelFormat pixel_type_to_sail(int pixel_type, int channel_count)
         }
         break;
 
-    case FLOAT:
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::FLOAT:
         switch (channel_count)
         {
         case 1: return SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT;
@@ -83,7 +89,7 @@ SailPixelFormat pixel_type_to_sail(int pixel_type, int channel_count)
         }
         break;
 
-    case UINT:
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::UINT:
         switch (channel_count)
         {
         case 1: return SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT;
@@ -102,22 +108,22 @@ std::tuple<int, int> sail_to_pixel_type(SailPixelFormat pixel_format)
     switch (pixel_format)
     {
     // HALF formats
-    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF: return {HALF, 1};
-    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF: return {HALF, 2};
-    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF: return {HALF, 3};
-    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF: return {HALF, 4};
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF:       return {OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, 1};
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF: return {OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, 2};
+    case SAIL_PIXEL_FORMAT_BPP48_RGB_HALF:             return {OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, 3};
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF:            return {OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, 4};
 
     // FLOAT formats
-    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT: return {FLOAT, 1};
-    case SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT: return {FLOAT, 2};
-    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT: return {FLOAT, 3};
-    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT: return {FLOAT, 4};
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_FLOAT:       return {OPENEXR_IMF_INTERNAL_NAMESPACE::FLOAT, 1};
+    case SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT: return {OPENEXR_IMF_INTERNAL_NAMESPACE::FLOAT, 2};
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT:             return {OPENEXR_IMF_INTERNAL_NAMESPACE::FLOAT, 3};
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT:           return {OPENEXR_IMF_INTERNAL_NAMESPACE::FLOAT, 4};
 
     // UINT formats
-    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT: return {UINT, 1};
-    case SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT: return {UINT, 2};
-    case SAIL_PIXEL_FORMAT_BPP96_RGB_UINT: return {UINT, 3};
-    case SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT: return {UINT, 4};
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_UINT:       return {OPENEXR_IMF_INTERNAL_NAMESPACE::UINT, 1};
+    case SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT: return {OPENEXR_IMF_INTERNAL_NAMESPACE::UINT, 2};
+    case SAIL_PIXEL_FORMAT_BPP96_RGB_UINT:             return {OPENEXR_IMF_INTERNAL_NAMESPACE::UINT, 3};
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT:           return {OPENEXR_IMF_INTERNAL_NAMESPACE::UINT, 4};
 
     default: throw std::runtime_error("Unsupported pixel format");
     }
@@ -127,16 +133,16 @@ SailCompression compression_to_sail(int compression)
 {
     switch (compression)
     {
-    case NO_COMPRESSION: return SAIL_COMPRESSION_NONE;
-    case RLE_COMPRESSION: return SAIL_COMPRESSION_RLE;
-    case ZIPS_COMPRESSION: return SAIL_COMPRESSION_ZIPS;
-    case ZIP_COMPRESSION: return SAIL_COMPRESSION_ZIP;
-    case PIZ_COMPRESSION: return SAIL_COMPRESSION_PIZ;
+    case NO_COMPRESSION:    return SAIL_COMPRESSION_NONE;
+    case RLE_COMPRESSION:   return SAIL_COMPRESSION_RLE;
+    case ZIPS_COMPRESSION:  return SAIL_COMPRESSION_ZIPS;
+    case ZIP_COMPRESSION:   return SAIL_COMPRESSION_ZIP;
+    case PIZ_COMPRESSION:   return SAIL_COMPRESSION_PIZ;
     case PXR24_COMPRESSION: return SAIL_COMPRESSION_PXR24;
-    case B44_COMPRESSION: return SAIL_COMPRESSION_B44;
-    case B44A_COMPRESSION: return SAIL_COMPRESSION_B44A;
-    case DWAA_COMPRESSION: return SAIL_COMPRESSION_DWAA;
-    case DWAB_COMPRESSION: return SAIL_COMPRESSION_DWAB;
+    case B44_COMPRESSION:   return SAIL_COMPRESSION_B44;
+    case B44A_COMPRESSION:  return SAIL_COMPRESSION_B44A;
+    case DWAA_COMPRESSION:  return SAIL_COMPRESSION_DWAA;
+    case DWAB_COMPRESSION:  return SAIL_COMPRESSION_DWAB;
     default: return SAIL_COMPRESSION_UNKNOWN;
     }
 }
@@ -366,9 +372,9 @@ size_t bytes_per_pixel(const ChannelInfo& info)
 
     switch (info.type)
     {
-    case HALF: bytes_per_channel = 2; break;
-    case FLOAT: bytes_per_channel = 4; break;
-    case UINT: bytes_per_channel = 4; break;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::HALF:  bytes_per_channel = 2; break;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::FLOAT: bytes_per_channel = 4; break;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::UINT:  bytes_per_channel = 4; break;
     default: bytes_per_channel = 2; break;
     }
 

@@ -59,7 +59,7 @@ jobs:
           vcpkg/bootstrap-vcpkg.bat
         fi
         git -C vcpkg pull
-        vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openjpeg tiff zlib \
+        vcpkg/vcpkg install giflib jbigkit libavif libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib \
                             --triplet x64-windows --clean-buildtrees-after-build
 
     - name: Install Python build tools
