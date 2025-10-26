@@ -109,7 +109,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vcpkg
-        key: vcpkg-${{ runner.os }}
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Set up vcpkg
       shell: bash
@@ -120,8 +120,7 @@ jobs:
           vcpkg/bootstrap-vcpkg.bat
         fi
         git -C vcpkg pull
-        vcpkg/vcpkg install giflib jbigkit libavif[aom] libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib \
-                            --triplet ${{ matrix.config.triplet }} --clean-buildtrees-after-build
+        vcpkg/vcpkg install --triplet ${{ matrix.config.triplet }} --clean-buildtrees-after-build
 
     - name: Configure CMake
       run: |
