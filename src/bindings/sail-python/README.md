@@ -528,8 +528,9 @@ options = SaveOptions()
 options.compression = Compression.DEFLATE
 options.compression_level = 6
 
-# Codec-specific tuning (dict)
-options.tuning["png-filter"] = "paeth"  # PNG: none, sub, up, avg, paeth
+# Codec-specific tuning (dict[str, Variant])
+# IMPORTANT: Set the whole dict, not individual keys
+options.tuning = {"png-filter": Variant("paeth")}  # PNG: none, sub, up, avg, paeth
 
 # Use with ImageOutput
 output = ImageOutput("output.png").with_options(options)
