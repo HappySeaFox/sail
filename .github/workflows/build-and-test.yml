@@ -110,16 +110,9 @@ jobs:
       with:
         vcpkgJsonGlob: 'vcpkg.json'
 
-    - name: Install vcpkg dependencies
-      shell: bash
-      run: |
-        echo "Installing packages for triplet: ${{ matrix.config.triplet }}"
-        "${VCPKG_ROOT}/vcpkg.exe" install --triplet=${{ matrix.config.triplet }}
-        echo "Installed packages:"
-        "${VCPKG_ROOT}/vcpkg.exe" list
-
     - name: Configure CMake
       run: |
+        $toolchainFile = "$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
         cmake -S . -B build `
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_INSTALL_PREFIX=C:/SAIL `
@@ -127,8 +120,9 @@ jobs:
           -DSAIL_DEV=ON `
           -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }} `
           -DSAIL_WINDOWS_STATIC_CRT=${{ matrix.config.static_crt }} `
-          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake `
-          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
+          -DCMAKE_TOOLCHAIN_FILE="$toolchainFile" `
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
+          -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
 
     - name: Build
       run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"

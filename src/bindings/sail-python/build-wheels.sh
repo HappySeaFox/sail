@@ -26,6 +26,11 @@ echo "Python Manager: pyenv"
 echo "Target versions: ${PYTHON_VERSIONS[*]}"
 echo
 
+mingw_path_to_windows()
+{
+    echo "$1" | sed 's|^/c/|C:/|' | sed 's|/|\\|g'
+}
+
 if [[ "$OS_TYPE" == "Linux" ]]; then
     if [ -d "$HOME/.pyenv" ]; then
         export PYENV_ROOT="$HOME/.pyenv"
@@ -43,20 +48,18 @@ else
         exit 1
     fi
 
-    VCPKG_ROOT="$PWD/../../../../vcpkg"
-    CMAKE_TOOLCHAIN_FILE="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-    CMAKE_TOOLCHAIN_FILE=$(echo "$CMAKE_TOOLCHAIN_FILE" | sed 's|^/c/|C:/|' | sed 's|/|\\|g')
+
+    PROJECT_ROOT="$PWD/../../.."
+    VCPKG_ROOT="$PROJECT_ROOT/../vcpkg"
     VCPKG_TARGET_TRIPLET="x64-windows"
 
-    git -C "$VCPKG_ROOT" pull
-
-    "$VCPKG_ROOT/vcpkg" install giflib jbigkit libavif[aom] libheif libjpeg-turbo \
-                                libjxl libpng libwebp nanosvg openjpeg tiff zlib  \
-                                --triplet x64-windows --clean-buildtrees-after-build --clean-downloads-after-build
-    "$VCPKG_ROOT/vcpkg" remove openexr # compilation errors
-
     # Used by setup.py
-    export CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=$CMAKE_TOOLCHAIN_FILE -DVCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP"
+    export CMAKE_ARGS="\
+-DCMAKE_TOOLCHAIN_FILE=$(mingw_path_to_windows "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake") \
+-DVCPKG_TARGET_TRIPLET=$VCPKG_TARGET_TRIPLET \
+-DVCPKG_MANIFEST_DIR=$(mingw_path_to_windows "$PROJECT_ROOT") \
+-DCMAKE_C_FLAGS=-MP \
+-DCMAKE_CXX_FLAGS=-MP"
 fi
 
 source_venv()
