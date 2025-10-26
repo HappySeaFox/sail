@@ -168,19 +168,68 @@ static MunitResult test_io_memory_read_write(const MunitParameter params[], void
     return MUNIT_OK;
 }
 
+/* Test loading from empty bytes */
+static MunitResult test_io_memory_image_input_null_bytes(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    auto* empty_data = "";
+    sail::image_input input(empty_data, 0);
+
+    sail::image img = input.next_frame();
+    munit_assert_false(img.is_valid());
+
+    return MUNIT_OK;
+}
+
+/* Test loading from invalid image data */
+static MunitResult test_io_memory_image_input_invalid_bytes(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    std::string invalid_data = "not an image";
+    sail::image_input input(invalid_data.c_str(), invalid_data.length());
+
+    sail::image img = input.next_frame();
+    munit_assert_false(img.is_valid());
+
+    return MUNIT_OK;
+}
+
+/* Test loading truncated image data */
+static MunitResult test_io_memory_image_input_truncated_data(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    // Valid PNG header but truncated
+    std::string png_header = "\x89PNG\r\n\x1a\n";
+    sail::image_input input(png_header.c_str(), png_header.length());
+
+    sail::image img = input.next_frame();
+    munit_assert_false(img.is_valid());
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/read",       test_io_memory_read,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/write",      test_io_memory_write,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/seek-tell",  test_io_memory_seek_tell,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/eof",        test_io_memory_eof,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/read-write", test_io_memory_read_write, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/read",                       test_io_memory_read,                       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/write",                      test_io_memory_write,                      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/seek-tell",                  test_io_memory_seek_tell,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/eof",                        test_io_memory_eof,                        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/read-write",                 test_io_memory_read_write,                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-input-null-bytes",     test_io_memory_image_input_null_bytes,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-input-invalid-bytes",  test_io_memory_image_input_invalid_bytes,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-input-truncated-data", test_io_memory_image_input_truncated_data, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/io-memory", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/io-memory", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
 // clang-format on
 

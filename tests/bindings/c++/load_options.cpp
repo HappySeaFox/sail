@@ -126,15 +126,15 @@ static MunitResult test_load_options_move(const MunitParameter params[], void* u
 
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/load-options/construct", test_load_options_construct, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/load-options/copy",      test_load_options_copy,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/load-options/move",      test_load_options_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/construct", test_load_options_construct, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",      test_load_options_copy,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",      test_load_options_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/load-options", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
 // clang-format on
 

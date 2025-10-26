@@ -243,12 +243,29 @@ static MunitResult test_clear(const MunitParameter params[], void* user_data)
     return MUNIT_OK;
 }
 
+/* Test variant value retrieval with wrong type */
+static MunitResult test_type_mismatch(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::variant var(42);
+
+    munit_assert_false(var.has_value<std::string>());
+    munit_assert(var.has_value<int>());
+
+    munit_assert(var.is_valid());
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/set-value", test_set_value, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/move",      test_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/compare",   test_compare,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/clear",     test_clear,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/set-value",     test_set_value,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",          test_move,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/compare",       test_compare,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/clear",         test_clear,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/type-mismatch", test_type_mismatch, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

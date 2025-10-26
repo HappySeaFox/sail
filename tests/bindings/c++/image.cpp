@@ -26,6 +26,7 @@
 #include <utility> /* move */
 
 #include <sail-c++/sail-c++.h>
+#include <sail/sail.h>
 
 #include "munit.h"
 
@@ -190,12 +191,142 @@ static MunitResult test_image_special_properties(const MunitParameter params[], 
     return MUNIT_OK;
 }
 
+/* Test creating image with zero dimensions */
+static MunitResult test_image_zero_dimensions(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 0, 0);
+    munit_assert_false(img.is_valid());
+
+    return MUNIT_OK;
+}
+
+/* Test creating image with zero width */
+static MunitResult test_image_zero_width(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 0, 10);
+    munit_assert_false(img.is_valid());
+
+    return MUNIT_OK;
+}
+
+/* Test creating image with zero height */
+static MunitResult test_image_zero_height(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 10, 0);
+    munit_assert_false(img.is_valid());
+
+    return MUNIT_OK;
+}
+
+/* Test creating image with unreasonably large dimensions */
+static MunitResult test_image_huge_dimensions(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+// ASAN immediately crashes the whole process due to actual OOM
+#ifndef SAIL_ASAN_ENABLED
+    bool exception_thrown = false;
+    try
+    {
+        sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 1000000, 1000000);
+    }
+    catch (...)
+    {
+        exception_thrown = true;
+    }
+
+    munit_assert(exception_thrown);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
+/* Test creating image with invalid pixel format */
+static MunitResult test_image_invalid_pixel_format(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::image img(SAIL_PIXEL_FORMAT_UNKNOWN, 10, 10);
+    munit_assert_false(img.is_valid());
+
+    return MUNIT_OK;
+}
+
+/* Test saving image with initialized pixels */
+static MunitResult test_image_save_with_initialized_pixels(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_PNG
+    char* temp_path = nullptr;
+    munit_assert(sail_temp_file_path("sail_test_valid", &temp_path) == SAIL_OK);
+
+    std::string output_path = std::string(temp_path) + ".png";
+    sail_free(temp_path);
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 10, 10);
+    munit_assert(img.is_valid());
+
+    auto* pixels = static_cast<unsigned char*>(img.pixels());
+    munit_assert(pixels != nullptr);
+    memset(pixels, 128, img.bytes_per_line() * img.height());
+
+    auto status = img.save(output_path);
+    munit_assert(status == SAIL_OK);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
+/* Test conversion to same format */
+static MunitResult test_image_conversion_to_same_format(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 10, 10);
+    munit_assert(img.is_valid());
+
+    auto* pixels = static_cast<unsigned char*>(img.pixels());
+    munit_assert(pixels != nullptr);
+    memset(pixels, 100, img.bytes_per_line() * img.height());
+
+    sail::image converted = img.convert_to(SAIL_PIXEL_FORMAT_BPP24_RGB);
+    munit_assert(converted.is_valid());
+    munit_assert(converted.pixel_format() == SAIL_PIXEL_FORMAT_BPP24_RGB);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/create",             test_image_create,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/copy",               test_image_copy,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/move",               test_image_move,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/special-properties", test_image_special_properties, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/create",                       test_image_create,                       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",                         test_image_copy,                         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",                         test_image_move,                         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/special-properties",           test_image_special_properties,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/zero-dimensions",              test_image_zero_dimensions,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/zero-width",                   test_image_zero_width,                   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/zero-height",                  test_image_zero_height,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/huge-dimensions",              test_image_huge_dimensions,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-pixel-format",         test_image_invalid_pixel_format,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-with-initialized-pixels", test_image_save_with_initialized_pixels, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/conversion-to-same-format",    test_image_conversion_to_same_format,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

@@ -98,11 +98,25 @@ static MunitResult test_meta_data_move(const MunitParameter params[], void* user
     return MUNIT_OK;
 }
 
+/* Test creating metadata with valid key (edge case) */
+static MunitResult test_meta_data_valid_key(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::variant var(std::string("value"));
+    sail::meta_data md("Author", var);
+    munit_assert(var.is_valid());
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/create", test_meta_data_create, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/copy",   test_meta_data_copy,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/move",   test_meta_data_move,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/create",    test_meta_data_create,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",      test_meta_data_copy,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",      test_meta_data_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/valid-key", test_meta_data_valid_key, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

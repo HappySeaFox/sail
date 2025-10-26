@@ -28,6 +28,7 @@
 #include <string>
 
 #include <sail-c++/sail-c++.h>
+#include <sail/sail.h>
 
 #include "munit.h"
 
@@ -173,18 +174,170 @@ static MunitResult test_io_file_eof(const MunitParameter params[], void* user_da
     return MUNIT_OK;
 }
 
+/* Test loading from nonexistent file */
+static MunitResult test_io_file_image_input_nonexistent_file(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    bool exception_thrown = false;
+    try
+    {
+        sail::image_input input("/nonexistent/path/image.png");
+    }
+    catch (...)
+    {
+        exception_thrown = true;
+    }
+
+    munit_assert(exception_thrown);
+
+    return MUNIT_OK;
+}
+
+/* Test loading from invalid path */
+static MunitResult test_io_file_image_input_invalid_path(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    bool exception_thrown = false;
+    try
+    {
+        sail::image_input input("");
+    }
+    catch (...)
+    {
+        exception_thrown = true;
+    }
+
+    munit_assert(exception_thrown);
+
+    return MUNIT_OK;
+}
+
+/* Test saving to unavailable path */
+static MunitResult test_io_file_image_output_unavailable_path(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 10, 10);
+    munit_assert(img.is_valid());
+
+    bool exception_thrown = false;
+    try
+    {
+        sail::image_output output("/unavailable/path/test.png");
+        output.next_frame(img);
+        output.finish();
+    }
+    catch (...)
+    {
+        exception_thrown = true;
+    }
+
+    munit_assert(exception_thrown);
+
+    return MUNIT_OK;
+}
+
+/* Test saving to invalid extension */
+static MunitResult test_io_file_image_output_invalid_extension(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    char* temp_path = nullptr;
+    munit_assert(sail_temp_file_path("sail_test_invalid", &temp_path) == SAIL_OK);
+
+    std::string output_path = std::string(temp_path) + ".unknownext";
+    sail_free(temp_path);
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 10, 10);
+    munit_assert(img.is_valid());
+
+    sail::image_output output(output_path);
+    auto status = output.next_frame(img);
+
+    munit_assert(status != SAIL_OK);
+
+    return MUNIT_OK;
+}
+
+/* Test calling finish() twice on reader */
+static MunitResult test_io_file_image_input_double_finish(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_PNG
+    char* temp_path = nullptr;
+    munit_assert(sail_temp_file_path("sail_test_double", &temp_path) == SAIL_OK);
+
+    std::string output_path = std::string(temp_path) + ".png";
+    sail_free(temp_path);
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 10, 10);
+    munit_assert(img.is_valid());
+    munit_assert(img.save(output_path) == SAIL_OK);
+
+    sail::image_input input(output_path);
+    munit_assert(input.finish() == SAIL_OK);
+    munit_assert(input.finish() == SAIL_OK);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
+/* Test that reading after finish() raises error */
+static MunitResult test_io_file_image_input_finish_then_read_fails(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_PNG
+    char* temp_path = nullptr;
+    munit_assert(sail_temp_file_path("sail_test_after_finish", &temp_path) == SAIL_OK);
+
+    std::string output_path = std::string(temp_path) + ".png";
+    sail_free(temp_path);
+
+    sail::image img(SAIL_PIXEL_FORMAT_BPP24_RGB, 10, 10);
+    munit_assert(img.is_valid());
+    munit_assert(img.save(output_path) == SAIL_OK);
+
+    sail::image_input input(output_path);
+    munit_assert(input.next_frame().is_valid());
+    munit_assert(input.finish() == SAIL_OK);
+    munit_assert(input.next_frame().is_valid() == false);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/read",      test_io_file_read,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/write",     test_io_file_write,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/seek-tell", test_io_file_seek_tell, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/eof",       test_io_file_eof,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/read",                               test_io_file_read,                               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/write",                              test_io_file_write,                              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/seek-tell",                          test_io_file_seek_tell,                          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/eof",                                test_io_file_eof,                                NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-input-nonexistent-file",       test_io_file_image_input_nonexistent_file,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-input-invalid-path",           test_io_file_image_input_invalid_path,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-output-unavailable-path",      test_io_file_image_output_unavailable_path,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-output-invalid-extension",     test_io_file_image_output_invalid_extension,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-input-double-finish",          test_io_file_image_input_double_finish,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/image-input-finish-then-read-fails", test_io_file_image_input_finish_then_read_fails, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/io-file", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/io-file", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
 // clang-format on
 

@@ -95,13 +95,13 @@ static MunitResult test_save_features(const MunitParameter params[], void* user_
 
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/save-features", test_save_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/core", test_save_features, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/bindings/c++", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/save-features", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
 // clang-format on
 

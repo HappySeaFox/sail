@@ -66,11 +66,37 @@ static MunitResult test_reverse_uint64(const MunitParameter params[], void* user
     return MUNIT_OK;
 }
 
+/* Test getting codec info for invalid extension */
+static MunitResult test_codec_info_invalid_extension(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::codec_info codec = sail::codec_info::from_extension("unknownext");
+    munit_assert_false(codec.is_valid());
+
+    return MUNIT_OK;
+}
+
+/* Test getting codec info for empty extension */
+static MunitResult test_codec_info_empty_extension(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::codec_info codec = sail::codec_info::from_extension("");
+    munit_assert_false(codec.is_valid());
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/reverse-uint16", test_reverse_uint16, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/reverse-uint32", test_reverse_uint32, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/reverse-uint64", test_reverse_uint64, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint16",               test_reverse_uint16,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint32",               test_reverse_uint32,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint64",               test_reverse_uint64,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/codec-info-invalid-extension", test_codec_info_invalid_extension, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/codec-info-empty-extension",   test_codec_info_empty_extension,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

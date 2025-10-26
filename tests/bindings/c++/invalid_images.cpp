@@ -81,6 +81,19 @@ static MunitResult test_invalid_image_scan_line(const MunitParameter params[], v
     return MUNIT_OK;
 }
 
+/* Test invalid image with null pixels */
+static MunitResult test_invalid_image_null_pixels(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    sail::image invalid_img;
+    munit_assert_false(invalid_img.is_valid());
+    munit_assert(invalid_img.pixels() == nullptr);
+
+    return MUNIT_OK;
+}
+
 /* Test invalid image comparison */
 static MunitResult test_invalid_image_comparison(const MunitParameter params[], void* user_data)
 {
@@ -361,6 +374,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/invalid-image-attributes",        test_invalid_image_attributes,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-image-conversion",        test_invalid_image_conversion,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-image-scan-line",         test_invalid_image_scan_line,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-image-null-pixels",       test_invalid_image_null_pixels,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-image-comparison",        test_invalid_image_comparison,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-image-save",              test_invalid_image_save,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-codec-info",              test_invalid_codec_info,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -376,7 +390,7 @@ static MunitTest test_suite_tests[] = {
 };
 
 static const MunitSuite test_suite = {
-    (char *)"/invalid-images", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
+    (char *)"/bindings/c++/invalid-images", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
 // clang-format on
 
