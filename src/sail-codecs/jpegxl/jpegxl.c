@@ -68,7 +68,7 @@ struct jpegxl_state
     /* For progressive reading. */
     unsigned char* buffer;
     size_t buffer_size;
-    bool frame_saved;
+    bool frame_processed;
     unsigned current_frame;
     bool is_animation;
     unsigned first_frame_width;
@@ -110,19 +110,19 @@ static sail_status_t alloc_jpegxl_state(struct sail_io* io,
 
         .source_image = NULL,
 
-        .libjxl_success    = false,
-        .frame_header_seen = false,
-        .basic_info        = NULL,
-        .memory_manager    = memory_manager,
-        .runner            = NULL,
-        .decoder           = NULL,
-        .encoder           = NULL,
-        .frame_settings    = NULL,
-        .buffer            = buffer,
-        .buffer_size       = buffer_size,
-        .frame_saved       = false,
-        .current_frame     = 0,
-        .is_animation      = false,
+        .libjxl_success     = false,
+        .frame_header_seen  = false,
+        .basic_info         = NULL,
+        .memory_manager     = memory_manager,
+        .runner             = NULL,
+        .decoder            = NULL,
+        .encoder            = NULL,
+        .frame_settings     = NULL,
+        .buffer             = buffer,
+        .buffer_size        = buffer_size,
+        .frame_processed    = false,
+        .current_frame      = 0,
+        .is_animation       = false,
         .first_frame_width  = 0,
         .first_frame_height = 0,
     };
@@ -659,7 +659,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpegxl(void* state, const str
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    jpegxl_state->frame_saved = true;
+    jpegxl_state->frame_processed = true;
 
     return SAIL_OK;
 }
@@ -673,7 +673,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpegxl(void** state)
 
     sail_status_t status = SAIL_OK;
 
-    if (jpegxl_state->frame_saved && jpegxl_state->encoder != NULL)
+    if (jpegxl_state->frame_processed && jpegxl_state->encoder != NULL)
     {
         /* Close input. */
         JxlEncoderCloseInput(jpegxl_state->encoder);
