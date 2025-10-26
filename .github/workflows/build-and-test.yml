@@ -112,17 +112,15 @@ jobs:
         key: vcpkg-${{ runner.os }}
 
     - name: Set up vcpkg
+      shell: bash
       run: |
-        if (!(Test-Path vcpkg/vcpkg.exe)) {
-          if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
+        if [ ! -f "vcpkg/vcpkg.exe" ]; then
+          rm -rf vcpkg
           git clone https://github.com/microsoft/vcpkg.git
           vcpkg/bootstrap-vcpkg.bat
-        }
+        fi
         git -C vcpkg pull
-
-    - name: Install dependencies via vcpkg
-      run: |
-        vcpkg/vcpkg install giflib jbigkit libavif[aom] libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib `
+        vcpkg/vcpkg install giflib jbigkit libavif[aom] libheif libjpeg-turbo libjxl libpng libwebp nanosvg openexr openjpeg tiff zlib `
                             --triplet ${{ matrix.config.triplet }} --clean-buildtrees-after-build
 
     - name: Configure CMake
