@@ -131,7 +131,7 @@ def test_rotate_90_pixel_data():
     arr[1, 1] = [0, 255, 255]  # Cyan
     arr[1, 2] = [255, 0, 255]  # Magenta
 
-    # Rotate 90° clockwise (width 3, height 2 → width 2, height 3)
+    # Rotate 90 degrees clockwise (width 3, height 2 -> width 2, height 3)
     rotated = img.rotate_to(sailpy.Orientation.ROTATED_90)
     r_arr = rotated.to_numpy()
 

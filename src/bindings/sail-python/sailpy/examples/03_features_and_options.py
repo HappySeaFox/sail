@@ -36,9 +36,9 @@ import tempfile
 
 def example_get_codec_features():
     """Discover what a codec can do"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 1: Discovering Codec Features")
-    print("=" * 70)
+    print("=" * 50)
 
     # Get codec info
     codec = sailpy.CodecInfo.from_name("PNG")
@@ -75,9 +75,9 @@ def example_get_codec_features():
 
 def example_use_default_options():
     """Get correct default options from codec features"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 2: Using Default Options from Features")
-    print("=" * 70)
+    print("=" * 50)
 
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 64, 64)
     img.to_numpy()[:] = [100, 150, 200]
@@ -101,7 +101,7 @@ def example_use_default_options():
         output.save(img)
         output.finish()
 
-        print(f"\nY Saved with codec defaults: {output_path}")
+        print(f"\n+ Saved with codec defaults: {output_path}")
         print(f"  File size: {os.path.getsize(output_path)} bytes")
     finally:
         if os.path.exists(output_path):
@@ -112,9 +112,9 @@ def example_use_default_options():
 
 def example_custom_compression():
     """Customize compression within valid range"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 3: Custom Compression Settings")
-    print("=" * 70)
+    print("=" * 50)
 
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 128, 128)
     img.to_numpy()[:] = [80, 120, 160]
@@ -159,9 +159,9 @@ def example_custom_compression():
 
 def example_option_flags():
     """Use Option flags to control save behavior"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 4: Using Option Flags")
-    print("=" * 70)
+    print("=" * 50)
 
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
     img.to_numpy()[:] = [200, 100, 50]
@@ -192,7 +192,7 @@ def example_option_flags():
         output.save(img)
         output.finish()
 
-        print(f"\nY Saved with custom options")
+        print(f"\n+ Saved with custom options")
     finally:
         if os.path.exists(output_path):
             os.remove(output_path)
@@ -202,9 +202,9 @@ def example_option_flags():
 
 def example_codec_specific_compression():
     """Use codec-specific compression types"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 5: Codec-Specific Compression Types")
-    print("=" * 70)
+    print("=" * 50)
 
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 64, 64)
     img.to_numpy()[:] = [150, 100, 200]
@@ -251,9 +251,9 @@ def example_codec_specific_compression():
 
 def example_check_format_support():
     """Check if a pixel format is supported by codec"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 6: Checking Pixel Format Support")
-    print("=" * 70)
+    print("=" * 50)
 
     codec = sailpy.CodecInfo.from_name("PNG")
     test_formats = [
@@ -275,9 +275,9 @@ def example_check_format_support():
 
 def example_source_image_info():
     """Access original image properties"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 7: Source Image Properties")
-    print("=" * 70)
+    print("=" * 50)
 
     # Create test image
     test_path = os.path.join(tempfile.gettempdir(), "test_source.png")
@@ -310,7 +310,7 @@ def main():
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
 
     print("\nSAIL Features & Options Examples")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     try:
         example_get_codec_features()
@@ -321,8 +321,8 @@ def main():
         example_check_format_support()
         example_source_image_info()
 
-        print("=" * 70)
-        print("Y All examples completed!")
+        print("=" * 50)
+        print("+ All examples completed!")
         print()
 
     finally:

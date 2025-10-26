@@ -20,11 +20,11 @@ def main():
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
 
     print("\nSAIL Multi-frame Images")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     # Loading frames with iterator
     print("EXAMPLE 1: Loading Frames with Iterator")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     test_path = os.path.join(tempfile.gettempdir(), "test_multiframe.png")
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
@@ -47,7 +47,7 @@ def main():
 
     # Writing multiple frames
     print("EXAMPLE 2: Writing Multiple Frames")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     # Use GIF for animation support
     output_path = os.path.join(tempfile.gettempdir(), "multi_output.gif")
@@ -89,7 +89,7 @@ def main():
             output.save(img2)
             output.save(img3)
 
-        print(f"Y Written 3 frames to animated {codec.name}")
+        print(f"+ Written 3 frames to animated {codec.name}")
         print(f"  File: {output_path}")
         print(f"  Total delay: 300ms")
 
@@ -98,9 +98,9 @@ def main():
             os.remove(output_path)
 
     print()
-    print("=" * 70)
-    print("Y All examples completed!")
-    print("=" * 70)
+    print("=" * 50)
+    print("+ All examples completed!")
+    print("=" * 50)
     print()
 
 

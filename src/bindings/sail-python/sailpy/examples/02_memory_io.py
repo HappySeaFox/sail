@@ -35,9 +35,9 @@ import numpy as np
 
 def example_image_to_bytes():
     """Convert image to bytes (useful for network transfer, API responses)"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 1: Image to Bytes (Network/API)")
-    print("=" * 70)
+    print("=" * 50)
 
     # Create image
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 256, 256)
@@ -65,9 +65,9 @@ def example_image_to_bytes():
 
 def example_bytes_roundtrip():
     """Full roundtrip: Image -> bytes -> Image"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 2: Bytes Roundtrip")
-    print("=" * 70)
+    print("=" * 50)
 
     # Create original
     original = sailpy.Image(sailpy.PixelFormat.BPP32_RGBA, 128, 128)
@@ -79,15 +79,15 @@ def example_bytes_roundtrip():
 
     # To bytes
     png_data = original.to_bytes("png")
-    print(f"\nY Encoded to PNG: {len(png_data):,} bytes")
+    print(f"\n+ Encoded to PNG: {len(png_data):,} bytes")
 
     # From bytes
     loaded = sailpy.Image.from_bytes(png_data)
-    print(f"Y Decoded from PNG: {loaded.width}x{loaded.height}")
+    print(f"+ Decoded from PNG: {loaded.width}x{loaded.height}")
 
     # Verify integrity (PNG is lossless)
     diff = np.abs(original.to_numpy().astype(int) - loaded.to_numpy().astype(int)).max()
-    print(f"Y Max pixel difference: {diff} (lossless)")
+    print(f"+ Max pixel difference: {diff} (lossless)")
 
     print("\nUse case: Microservices, image processing pipelines")
     print()
@@ -95,9 +95,9 @@ def example_bytes_roundtrip():
 
 def example_load_from_api_response():
     """Simulate loading image from API response"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 3: Loading from API Response (Simulated)")
-    print("=" * 70)
+    print("=" * 50)
 
     # Simulate getting image bytes from API
     print("\n1. Creating 'API response' (simulated)...")
@@ -127,9 +127,9 @@ def example_load_from_api_response():
 
 def example_format_conversion_in_memory():
     """Convert between formats without saving to disk"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 4: Format Conversion in Memory")
-    print("=" * 70)
+    print("=" * 50)
 
     # Create JPEG image (lossy)
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 100, 100)
@@ -155,9 +155,9 @@ def example_format_conversion_in_memory():
 
 def example_thumbnail_generation():
     """Generate thumbnail and return as bytes"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 5: Thumbnail Generation")
-    print("=" * 70)
+    print("=" * 50)
 
     # Create "large" image
     large = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 512, 512)
@@ -192,18 +192,18 @@ def example_thumbnail_generation():
 
 def example_batch_processing():
     """Process multiple images in memory"""
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 6: Batch Processing in Memory")
-    print("=" * 70)
+    print("=" * 50)
 
     # Simulate batch of images
     images_data = []
     for i in range(3):
         img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
-        img.to_numpy()[:] = [i * 50, i * 70, i * 90]
+        img.to_numpy()[:] = [i * 50, i * 50, i * 90]
         images_data.append(img.to_bytes("png"))
 
-    print(f"\nY Created batch of {len(images_data)} images")
+    print(f"\n+ Created batch of {len(images_data)} images")
     total_size = sum(len(d) for d in images_data)
     print(f"  Total size: {total_size:,} bytes")
 
@@ -218,7 +218,7 @@ def example_batch_processing():
         processed_data = img.to_bytes("png")
         processed.append(processed_data)
 
-    print(f"Y Processed {len(processed)} images")
+    print(f"+ Processed {len(processed)} images")
     print(f"  Output size: {sum(len(d) for d in processed):,} bytes")
 
     print("\nUse case: Batch image processor, photo filters")
@@ -230,7 +230,7 @@ def main():
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
 
     print("\nSAIL Memory I/O Examples")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     try:
         example_image_to_bytes()
@@ -240,8 +240,8 @@ def main():
         example_thumbnail_generation()
         example_batch_processing()
 
-        print("=" * 70)
-        print("Y All examples completed!")
+        print("=" * 50)
+        print("+ All examples completed!")
         print()
 
     finally:

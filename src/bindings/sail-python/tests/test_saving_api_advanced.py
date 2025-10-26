@@ -52,7 +52,7 @@ def test_output_finish_idempotent():
 
 
 def test_output_write_then_finish(test_jpeg):
-    """Test write → finish workflow"""
+    """Test write -> finish workflow"""
     source = sailpy.Image.from_file(str(test_jpeg))
     output_path = os.path.join(tempfile.gettempdir(), "test_workflow.png")
 

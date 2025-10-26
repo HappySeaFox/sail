@@ -19,12 +19,12 @@ def main():
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
 
     print("\nSAIL Codec Discovery")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     # Example 1: List all codecs
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 1: List All Available Codecs")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     codecs = sailpy.CodecInfo.list()
     print(f"Total codecs: {len(codecs)}\n")
@@ -40,9 +40,9 @@ def main():
     print()
 
     # Example 2: Get codec by extension
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 2: Find Codec by Extension")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     jpeg_codec = sailpy.CodecInfo.from_name("JPEG") # case insensitive
     print(f"JPEG codec (by name 'JPEG'):")
@@ -55,9 +55,9 @@ def main():
     print()
 
     # Example 3: Get codec by MIME type
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 3: Find Codec by MIME Type")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     png_codec = sailpy.CodecInfo.from_mime_type("image/png")
     print(f"PNG codec (by MIME 'image/png'):")
@@ -68,9 +68,9 @@ def main():
     print()
 
     # Example 4: Check codec capabilities
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 4: Check Codec Capabilities")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     test_codecs = ["PNG", "JPEG", "WEBP"]
 
@@ -93,8 +93,8 @@ def main():
         except ValueError:
             print(f"{codec_name}: codec not available\n")
 
-    print("=" * 70)
-    print("Y All examples completed!")
+    print("=" * 50)
+    print("+ All examples completed!")
     print()
 
 

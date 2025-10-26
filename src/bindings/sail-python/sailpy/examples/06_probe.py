@@ -22,11 +22,11 @@ def main():
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
 
     print("\nSAIL Efficient Metadata Probing")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     # Probe metadata without loading pixels
     print("EXAMPLE: Probe Metadata (No Pixel Loading)")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     # Use provided image or create test image
     if len(sys.argv) > 1 and Path(sys.argv[1]).exists():
@@ -60,7 +60,7 @@ def main():
 
         pixels_size_mb = metadata['width'] * metadata['height'] * \
             (metadata['bits_per_pixel'] // 8) / 1024 / 1024
-        print(f"\nY Probed without loading {pixels_size_mb:.1f}MB of pixels!")
+        print(f"\n+ Probed without loading {pixels_size_mb:.1f}MB of pixels!")
 
         # Compare with full load
         start = time.time()
@@ -77,9 +77,9 @@ def main():
             os.remove(probe_path)
 
     print()
-    print("=" * 70)
-    print("Y Use probe when you only need metadata!")
-    print("=" * 70)
+    print("=" * 50)
+    print("+ Use probe when you only need metadata")
+    print("=" * 50)
     print()
 
 

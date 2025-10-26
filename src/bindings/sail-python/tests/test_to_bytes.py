@@ -86,15 +86,13 @@ def test_to_bytes_default_format():
 
 
 def test_to_bytes_roundtrip():
-    """Test to_bytes → from_bytes roundtrip"""
+    """Test to_bytes -> from_bytes roundtrip"""
     original = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 48, 48)
     arr = original.to_numpy()
     arr[:] = [50, 100, 150]
 
-    # to_bytes
     data = original.to_bytes("png")
 
-    # from_bytes
     loaded = sailpy.Image.from_bytes(data)
 
     assert loaded.is_valid

@@ -14,9 +14,9 @@ import sailpy
 
 
 def main():
-    print("=" * 70)
+    print("=" * 50)
     print(" SAIL Python - Enum Usage (Python Way)")
-    print("=" * 70)
+    print("=" * 50)
     print()
 
     sailpy.set_log_barrier(sailpy.LogLevel.SILENCE)
@@ -91,9 +91,9 @@ def main():
     print()
 
     # Practical usage
-    print("=" * 70)
+    print("=" * 50)
     print("PRACTICAL USAGE")
-    print("=" * 70)
+    print("=" * 50)
     print()
 
     print("1. Create image from parsed format:")
@@ -112,21 +112,21 @@ def main():
     print(f"   JPEG == JPEG: {sailpy.Compression.JPEG == sailpy.Compression.JPEG}")
     print()
 
-    print("=" * 70)
-    print("Y Summary:")
-    print("=" * 70)
+    print("=" * 50)
+    print("+ Summary:")
+    print("=" * 50)
     print()
     print("  Use .name for:")
-    print("    • Logging and debug output")
-    print("    • Python code comparisons")
-    print("    • Display in UI")
+    print("    - Logging and debug output")
+    print("    - Python code comparisons")
+    print("    - Display in UI")
     print()
     print("  Use .from_string() for:")
-    print("    • Parsing from config files")
-    print("    • Parsing from API responses")
-    print("    • Converting SAIL format strings")
+    print("    - Parsing from config files")
+    print("    - Parsing from API responses")
+    print("    - Converting SAIL format strings")
     print()
-    print("=" * 70)
+    print("=" * 50)
 
 
 if __name__ == "__main__":

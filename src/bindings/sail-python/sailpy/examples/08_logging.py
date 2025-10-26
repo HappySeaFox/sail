@@ -17,18 +17,18 @@ import sailpy
 def main():
     """Logging examples"""
     print("\nSAIL Logging Examples")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     # Example 1: Log level control
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 1: Log Level Control")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     print("Available log levels:")
     for level in [sailpy.LogLevel.SILENCE, sailpy.LogLevel.ERROR,
                   sailpy.LogLevel.WARNING, sailpy.LogLevel.INFO,
                   sailpy.LogLevel.DEBUG]:
-        print(f"  • {level.name}")
+        print(f"  - {level.name}")
 
     print("\nSetting to SILENCE (no logs)...")
     sailpy.set_log_barrier(sailpy.LogLevel.SILENCE)
@@ -36,7 +36,7 @@ def main():
     # No logs will be shown
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 16, 16)
 
-    print("Y Silent mode active (no logs printed)")
+    print("+ Silent mode active (no logs printed)")
 
     # Restore
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
@@ -44,9 +44,9 @@ def main():
     print()
 
     # Example 2: Custom logger
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 2: Custom Logger")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     log_messages = []
 
@@ -68,7 +68,7 @@ def main():
     codec = sailpy.CodecInfo.from_name("JPEG")
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
 
-    print(f"Y Captured {len(log_messages)} log messages")
+    print(f"+ Captured {len(log_messages)} log messages")
     if log_messages:
         print(f"  First message: {log_messages[0][:60]}...")
         if len(log_messages) > 1:
@@ -81,9 +81,9 @@ def main():
     print()
 
     # Example 3: Filtering by level
-    print("=" * 70)
+    print("=" * 50)
     print("EXAMPLE 3: Filtering by Log Level")
-    print("=" * 70 + "\n")
+    print("=" * 50 + "\n")
 
     levels_to_test = [
         (sailpy.LogLevel.ERROR, "ERROR only"),
@@ -108,12 +108,12 @@ def main():
 
         sailpy.set_logger(None)
 
-    print("\nY Use set_log_barrier() to control verbosity")
+    print("\n+ Use set_log_barrier() to control verbosity")
 
     print()
 
-    print("=" * 70)
-    print("Y All examples completed!")
+    print("=" * 50)
+    print("+ All examples completed!")
     print()
 
 

@@ -13,9 +13,9 @@ from pathlib import Path
 
 
 def main():
-    print("=" * 70)
+    print("=" * 50)
     print(" SAIL Python - Image Transformations")
-    print("=" * 70)
+    print("=" * 50)
     print()
 
     sailpy.set_log_barrier(sailpy.LogLevel.SILENCE)
@@ -80,9 +80,9 @@ def main():
         print(f"      Saved: {output}")
     print()
 
-    print("=" * 70)
-    print("Y All transformations completed!")
-    print("=" * 70)
+    print("=" * 50)
+    print("+ All transformations completed!")
+    print("=" * 50)
 
 
 if __name__ == "__main__":

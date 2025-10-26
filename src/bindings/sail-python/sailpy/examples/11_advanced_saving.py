@@ -20,9 +20,9 @@ import tempfile
 
 
 def main():
-    print("=" * 70)
+    print("=" * 50)
     print(" SAIL Python - Advanced Saving with PNG Filters")
-    print("=" * 70)
+    print("=" * 50)
     print()
 
     sailpy.set_log_barrier(sailpy.LogLevel.ERROR)
@@ -164,12 +164,12 @@ def main():
     for _, _, _, path in results:
         os.remove(path)
 
-    print("=" * 70)
-    print("✓ PNG filters affect file size")
+    print("=" * 50)
+    print("+ PNG filters affect file size")
     print("  - Different filters work better for different image types")
     print("  - Combining filters (e.g., 'sub;paeth') lets libpng choose best")
     print("  - Use 'none' for fastest encoding (but largest files)")
-    print("=" * 70)
+    print("=" * 50)
     print()
 
 

@@ -23,7 +23,7 @@
 #  SOFTWARE.
 
 """
-Roundtrip tests: Load → Save → Load and verify data integrity
+Roundtrip tests: Load -> Save -> Load and verify data integrity
 Based on tests/sail/io-produce-same-images.c
 """
 
@@ -233,7 +233,7 @@ def test_roundtrip_gamma_reading():
 
 
 def test_roundtrip_create_save_load():
-    """Test complete cycle: create → save → load"""
+    """Test complete cycle: create -> save -> load"""
     # Create from scratch
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 48, 48)
     arr = img.to_numpy()
