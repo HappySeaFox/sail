@@ -253,7 +253,7 @@ def test_metadata_static_methods():
 # ============================================================================
 
 def test_source_image_from_probe(test_jpeg):
-    """Test SourceImage info from probe - source_image() not exported to Python yet"""
+    """Test SourceImage info from probe"""
     metadata = sailpy.ImageReader.probe(str(test_jpeg))
 
     # Probe should return source format info
@@ -311,8 +311,7 @@ def test_palette_in_image():
 def test_resolution_construct_empty():
     """Test Resolution default constructor"""
     res = sailpy.Resolution()
-    # Resolution doesn't have is_valid in Python yet
-    assert res.x == 0.0 or res.x is not None
+    assert res.x == 0.0
 
 
 def test_resolution_construct_with_values():

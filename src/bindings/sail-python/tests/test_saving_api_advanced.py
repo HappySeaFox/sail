@@ -47,7 +47,6 @@ def test_writer_finish_idempotent():
 
         assert os.path.exists(output_path)
     finally:
-        del writer  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 
@@ -61,7 +60,6 @@ def test_writer_write_then_finish(test_jpeg):
         writer = sailpy.ImageWriter(output_path)
         writer.write(source)
         writer.finish()
-        del writer  # Explicitly destroy to close file on Windows
 
         loaded = sailpy.Image.from_file(output_path)
         assert loaded.is_valid
@@ -129,7 +127,6 @@ def test_writer_early_stop():
         writer = sailpy.ImageWriter(output_path)
         writer.finish()  # Should not crash
     finally:
-        del writer  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 
@@ -219,7 +216,6 @@ def test_writer_write_multiple_sequential():
 
         assert os.path.exists(output_path)
     finally:
-        del writer  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 
@@ -271,8 +267,6 @@ def test_image_writer_with_options():
 
         writer.write(img)
         writer.finish()
-        del writer  # Explicitly destroy to close file
-        del writer_with_options  # Explicitly destroy to close file
 
         # Verify file exists
         assert os.path.exists(output_path)
@@ -305,8 +299,6 @@ def test_image_writer_with_codec():
 
         writer.write(img)
         writer.finish()
-        del writer  # Explicitly destroy to close file
-        del writer_with_codec  # Explicitly destroy to close file
 
         # Verify
         assert os.path.exists(output_path)
@@ -336,7 +328,6 @@ def test_image_writer_chaining():
         writer = sailpy.ImageWriter(output_path)
         writer.with_options(options).with_codec(codec).write(img)
         writer.finish()
-        del writer  # Explicitly destroy to close file
 
         # Verify
         assert os.path.exists(output_path)
@@ -373,7 +364,6 @@ def test_image_writer_with_supported_compressions():
             writer.with_options(options)
             writer.write(img)
             writer.finish()
-            del writer  # Explicitly destroy to close file
 
             assert os.path.exists(output_path)
 
@@ -412,7 +402,6 @@ def test_save_with_png_filter_tuning(tmp_path):
         writer.with_options(options)
         writer.write(img)
         writer.finish()
-        del writer  # Explicitly destroy to close file
 
         # Verify file was created and can be loaded
         assert os.path.exists(output_path)

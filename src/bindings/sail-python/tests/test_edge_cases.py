@@ -173,7 +173,6 @@ def test_edge_double_finish():
         reader.finish()
         reader.finish()  # Second finish should not crash
     finally:
-        del reader  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 
@@ -197,7 +196,6 @@ def test_edge_finish_then_read_fails():
         with pytest.raises(RuntimeError):
             reader.read()
     finally:
-        del reader  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 

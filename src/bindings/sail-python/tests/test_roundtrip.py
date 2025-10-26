@@ -278,13 +278,11 @@ def test_roundtrip_reader_writer():
         reader = sailpy.ImageReader(path1)
         frame = reader.read()
         reader.finish()
-        del reader  # Explicitly destroy to close file on Windows
 
         # Write with ImageWriter
         writer = sailpy.ImageWriter(path2)
         writer.write(frame)
         writer.finish()
-        del writer  # Explicitly destroy to close file on Windows
 
         # Verify
         final = sailpy.Image.from_file(path2)

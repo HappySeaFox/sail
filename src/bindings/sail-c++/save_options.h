@@ -26,7 +26,6 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 
 #include <sail-common/common.h>
 #include <sail-common/export.h>

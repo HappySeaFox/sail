@@ -38,8 +38,10 @@ public:
     pimpl(sail::abstract_io* abstract_io_ext, const sail::codec_info& other_codec_info)
         : abstract_io(abstract_io_ext)
         , abstract_io_ref(*abstract_io)
+        , our_io(true)
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
         , state(nullptr)
+        , finished(false)
         , codec_info(other_codec_info)
         , override_save_options(false)
     {
@@ -48,8 +50,10 @@ public:
     pimpl(sail::abstract_io& abstract_io_ext, const sail::codec_info& other_codec_info)
         : abstract_io()
         , abstract_io_ref(abstract_io_ext)
+        , our_io(false)
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
         , state(nullptr)
+        , finished(false)
         , codec_info(other_codec_info)
         , override_save_options(false)
     {
@@ -60,16 +64,26 @@ public:
 private:
     std::unique_ptr<sail::abstract_io> abstract_io;
     sail::abstract_io& abstract_io_ref;
+    bool our_io;
 
 public:
-    void flush()
+    void finish()
     {
-        abstract_io_ref.flush();
+        if (our_io)
+        {
+            abstract_io.reset();
+        }
+        else
+        {
+            abstract_io_ref.flush();
+        }
+        finished = true;
     }
 
     const std::unique_ptr<sail::abstract_io_adapter> abstract_io_adapter;
     void* state;
 
+    bool finished;
     sail::codec_info codec_info;
     bool override_save_options;
     sail::save_options save_options;
@@ -81,7 +95,9 @@ sail_status_t image_output::pimpl::start()
 
     sail_save_options* sail_save_options = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(sail_destroy_save_options(sail_save_options););
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_save_options(sail_save_options);
+    );
 
     if (override_save_options)
     {
@@ -152,7 +168,11 @@ image_output& image_output::with(const sail::save_options& save_options)
 
 sail_status_t image_output::next_frame(const sail::image& image)
 {
-    if (d->state == nullptr)
+    if (d->finished)
+    {
+        return SAIL_ERROR_CONFLICTING_OPERATION;
+    }
+    else if (d->state == nullptr)
     {
         SAIL_TRY(d->start());
     }
@@ -160,7 +180,10 @@ sail_status_t image_output::next_frame(const sail::image& image)
     sail_image* sail_image = nullptr;
     SAIL_TRY(image.to_sail_image(&sail_image));
 
-    SAIL_AT_SCOPE_EXIT(sail_image->pixels = nullptr; sail_destroy_image(sail_image););
+    SAIL_AT_SCOPE_EXIT(
+        sail_image->pixels = nullptr;
+        sail_destroy_image(sail_image);
+    );
 
     SAIL_TRY(sail_write_next_frame(d->state, sail_image));
 
@@ -177,9 +200,9 @@ sail_status_t image_output::finish()
                             /* on error */ saved_status = __sail_status);
 
         d->state = nullptr;
-
-        d->flush();
     }
+
+    d->finish();
 
     return saved_status;
 }

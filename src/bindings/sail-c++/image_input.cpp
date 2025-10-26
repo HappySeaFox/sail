@@ -38,8 +38,10 @@ public:
     pimpl(sail::abstract_io* abstract_io_ext)
         : abstract_io(abstract_io_ext)
         , abstract_io_ref(*abstract_io)
+        , our_io(true)
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
         , state(nullptr)
+        , finished(false)
         , override_codec_info(false)
         , override_load_options(false)
     {
@@ -48,8 +50,10 @@ public:
     pimpl(sail::abstract_io& abstract_io_ext)
         : abstract_io()
         , abstract_io_ref(abstract_io_ext)
+        , our_io(false)
         , abstract_io_adapter(new sail::abstract_io_adapter(abstract_io_ref))
         , state(nullptr)
+        , finished(false)
         , override_codec_info(false)
         , override_load_options(false)
     {
@@ -58,20 +62,31 @@ public:
     sail_status_t start();
 
 private:
-    const std::unique_ptr<sail::abstract_io> abstract_io;
+    std::unique_ptr<sail::abstract_io> abstract_io;
     sail::abstract_io& abstract_io_ref;
+    bool our_io;
 
 public:
-    void flush()
+    void finish()
     {
-        abstract_io_ref.flush();
+        if (our_io)
+        {
+            abstract_io.reset();
+        }
+        else
+        {
+            abstract_io_ref.flush();
+        }
+        finished = true;
     }
 
     const std::unique_ptr<sail::abstract_io_adapter> abstract_io_adapter;
     void* state;
 
+    bool finished;
     bool override_codec_info;
     sail::codec_info codec_info;
+
     bool override_load_options;
     sail::load_options load_options;
 };
@@ -87,7 +102,9 @@ sail_status_t image_input::pimpl::start()
 
     sail_load_options* sail_load_options = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(sail_destroy_load_options(sail_load_options););
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_load_options(sail_load_options);
+    );
 
     if (override_load_options)
     {
@@ -159,14 +176,20 @@ image_input& image_input::with(const sail::load_options& load_options)
 
 sail_status_t image_input::next_frame(sail::image* image)
 {
-    if (d->state == nullptr)
+    if (d->finished)
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CONFLICTING_OPERATION);
+    }
+    else if (d->state == nullptr)
     {
         SAIL_TRY(d->start());
     }
 
     sail_image* sail_image = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(sail_destroy_image(sail_image););
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_image(sail_image);
+    );
 
     SAIL_TRY(sail_load_next_frame(d->state, &sail_image));
 
@@ -196,9 +219,9 @@ sail_status_t image_input::finish()
                             /* on error */ saved_status = __sail_status);
 
         d->state = nullptr;
-
-        d->flush();
     }
+
+    d->finish();
 
     return saved_status;
 }
@@ -208,7 +231,10 @@ std::tuple<image, codec_info> image_input::probe()
     const sail_codec_info* sail_codec_info;
     sail_image* sail_image = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(sail_destroy_image(sail_image););
+
+    SAIL_AT_SCOPE_EXIT(
+        sail_destroy_image(sail_image);
+    );
 
     SAIL_TRY_OR_EXECUTE(sail_probe_io(&d->abstract_io_adapter->sail_io_c(), &sail_image, &sail_codec_info),
                         /* on error */ return {});

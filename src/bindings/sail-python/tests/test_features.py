@@ -243,7 +243,6 @@ def test_save_with_features_derived_options():
         writer.with_options(options)
         writer.write(img)
         writer.finish()
-        del writer  # Explicitly destroy to close file
 
         # Verify
         assert os.path.exists(output_path)

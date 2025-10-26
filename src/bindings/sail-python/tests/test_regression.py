@@ -99,8 +99,8 @@ def test_regression_reader_after_error():
         reader = sailpy.ImageReader(output_path)
         loaded = reader.read()
         assert loaded.is_valid
+        reader.finish()
     finally:
-        del reader  # Explicitly destroy to close file
         if os.path.exists(output_path):
             os.remove(output_path)
 

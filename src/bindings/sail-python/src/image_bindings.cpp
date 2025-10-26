@@ -718,7 +718,7 @@ void init_image(py::module_& m)
                     throw std::runtime_error("Failed to finish reading");
                 }
             },
-            "Finish reading (file is closed in destructor)")
+            "Finish reading")
 
         // Options and codec override
         .def(
@@ -800,7 +800,7 @@ void init_image(py::module_& m)
                     throw std::runtime_error("Failed to finish writing");
                 }
             },
-            "Finish writing (file is closed in destructor)")
+            "Finish writing")
 
         // Options and codec override
         .def(

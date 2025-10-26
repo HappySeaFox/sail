@@ -51,7 +51,6 @@ def test_image_writer_single_frame():
         writer = sailpy.ImageWriter(output_path)
         writer.write(img)
         writer.finish()
-        del writer  # Trigger destructor to close file
 
         # Verify file was created and can be loaded
         assert os.path.exists(output_path)
@@ -107,7 +106,6 @@ def test_image_writer_repr():
         writer = sailpy.ImageWriter(output_path)
         assert "ImageWriter" in repr(writer)
         writer.finish()
-        del writer  # Trigger destructor
     finally:
         # Cleanup
         if os.path.exists(output_path):

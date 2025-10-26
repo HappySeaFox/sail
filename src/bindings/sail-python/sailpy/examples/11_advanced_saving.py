@@ -114,7 +114,6 @@ def main():
     writer.with_options(options)
     writer.write(img)
     writer.finish()
-    del writer  # Explicitly destroy to close file
 
     combined_size = os.path.getsize(combined_path)
     print(f"  Combined filters 'avg;paeth': {combined_size:,} bytes")
