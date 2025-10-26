@@ -60,7 +60,7 @@ struct png_state
     struct sail_image* first_image;
     int interlaced_passes;
     bool libpng_error;
-    bool frame_saved;
+    bool frame_processed;
     int frames;
     int current_frame;
 
@@ -117,7 +117,7 @@ static sail_status_t alloc_png_state(const struct sail_load_options* load_option
         .first_image       = NULL,
         .interlaced_passes = 0,
         .libpng_error      = false,
-        .frame_saved       = false,
+        .frame_processed   = false,
         .frames            = 0,
         .current_frame     = 0,
 
@@ -626,12 +626,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 #else
-    if (png_state->frame_saved)
+    if (png_state->frame_processed)
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    png_state->frame_saved = true;
+    png_state->frame_processed = true;
 #endif
 
     /* Error handling setup. */
@@ -877,7 +877,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_png(void** state)
         }
     }
 
-    if (png_state->png_ptr != NULL && !png_state->libpng_error)
+    if (png_state->png_ptr != NULL && !png_state->libpng_error && png_state->frame_processed)
     {
         png_write_end(png_state->png_ptr, png_state->info_ptr);
     }
