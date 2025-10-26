@@ -80,26 +80,26 @@ def test_regression_numpy_memory_leak():
         # Let Python GC handle cleanup
 
 
-def test_regression_reader_after_error():
-    """Test that reader can be created after error"""
+def test_regression_input_after_error():
+    """Test that input can be created after error"""
     import tempfile
     import os
 
     # First, try invalid file (should fail)
     with pytest.raises((RuntimeError, MemoryError)):
-        sailpy.ImageReader("/nonexistent.png")
+        sailpy.ImageInput("/nonexistent.png")
 
-    # Then, create valid reader (should work)
+    # Then, create valid input (should work)
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 10, 10)
     img.to_numpy()[:] = 0
 
     output_path = os.path.join(tempfile.gettempdir(), "test_valid.png")
     try:
         img.save(output_path)
-        reader = sailpy.ImageReader(output_path)
-        loaded = reader.read()
+        input = sailpy.ImageInput(output_path)
+        loaded = input.load()
         assert loaded.is_valid
-        reader.finish()
+        input.finish()
     finally:
         if os.path.exists(output_path):
             os.remove(output_path)

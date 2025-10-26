@@ -22,8 +22,8 @@ def main():
     print("\nSAIL Multi-frame Images")
     print("=" * 70 + "\n")
 
-    # Reading frames with iterato
-    print("EXAMPLE 1: Reading Frames with Iterator")
+    # Loading frames with iterator
+    print("EXAMPLE 1: Loading Frames with Iterator")
     print("=" * 70 + "\n")
 
     test_path = os.path.join(tempfile.gettempdir(), "test_multiframe.png")
@@ -32,11 +32,11 @@ def main():
     img.save(test_path)
 
     try:
-        # Method: read_all()
-        print("  Using read_all():")
-        reader = sailpy.ImageReader(test_path)
-        frames = reader.read_all()
-        print(f"    Read {len(frames)} frame(s)")
+        # Method: load_all()
+        print("  Using load_all():")
+        input = sailpy.ImageInput(test_path)
+        frames = input.load_all()
+        print(f"    Loaded {len(frames)} frame(s)")
         for i, frame in enumerate(frames):
             print(f"    Frame {i}: {frame.width}x{frame.height}")
 
@@ -83,11 +83,11 @@ def main():
         print(f"  Converted to: {img1.pixel_format.name}")
         print()
 
-        # Write animation
-        with sailpy.ImageWriter(output_path) as writer:
-            writer.write(img1)
-            writer.write(img2)
-            writer.write(img3)
+        # Save animation
+        with sailpy.ImageOutput(output_path) as output:
+            output.save(img1)
+            output.save(img2)
+            output.save(img3)
 
         print(f"Y Written 3 frames to animated {codec.name}")
         print(f"  File: {output_path}")

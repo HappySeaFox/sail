@@ -43,7 +43,7 @@ def main():
 
         # Probe metadata WITHOUT loading pixels (instant!)
         start = time.time()
-        metadata = sailpy.ImageReader.probe(probe_path)
+        metadata = sailpy.ImageInput.probe(probe_path)
         probe_time = time.time() - start
 
         print(f"Image: {Path(probe_path).name}")

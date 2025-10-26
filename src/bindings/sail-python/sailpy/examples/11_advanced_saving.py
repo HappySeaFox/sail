@@ -68,10 +68,10 @@ def main():
         output_path = os.path.join(
             tempfile.gettempdir(), f"test_filter_{filter_name}.png")
 
-        writer = sailpy.ImageWriter(output_path)
-        writer.with_options(options)
-        writer.write(img)
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.with_options(options)
+        output.save(img)
+        output.finish()
 
         # Get file size
         file_size = os.path.getsize(output_path)
@@ -110,10 +110,10 @@ def main():
     # Save with combined filters
     combined_path = os.path.join(
         tempfile.gettempdir(), "test_filter_combined.png")
-    writer = sailpy.ImageWriter(combined_path)
-    writer.with_options(options)
-    writer.write(img)
-    writer.finish()
+    output = sailpy.ImageOutput(combined_path)
+    output.with_options(options)
+    output.save(img)
+    output.finish()
 
     combined_size = os.path.getsize(combined_path)
     print(f"  Combined filters 'avg;paeth': {combined_size:,} bytes")

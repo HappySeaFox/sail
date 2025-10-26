@@ -53,27 +53,27 @@ def test_image_from_bytes(test_jpeg):
     assert img.height == 32
 
 
-def test_image_reader_single_frame(test_jpeg):
-    """Test ImageReader for single frame image"""
-    reader = sailpy.ImageReader(str(test_jpeg))
+def test_image_input_single_frame(test_jpeg):
+    """Test ImageInput for single frame image"""
+    input = sailpy.ImageInput(str(test_jpeg))
 
     # Read first frame
-    img = reader.read()
+    img = input.load()
     assert img.is_valid
     assert img.width == 32
     assert img.height == 32
 
     # Try to read second frame (should fail for single frame)
     with pytest.raises(RuntimeError, match="No more frames"):
-        reader.read()
+        input.load()
 
 
-def test_image_reader_iterator(test_png):
-    """Test ImageReader as iterator"""
+def test_image_input_iterator(test_png):
+    """Test ImageInput as iterator"""
     frames = []
 
     # This PNG is animated
-    for frame in sailpy.ImageReader(str(test_png)):
+    for frame in sailpy.ImageInput(str(test_png)):
         frames.append(frame)
         if len(frames) >= 10:  # Safety limit
             break
@@ -83,10 +83,10 @@ def test_image_reader_iterator(test_png):
     assert all(f.is_valid for f in frames)
 
 
-def test_image_reader_read_all(test_png):
-    """Test ImageReader.read_all()"""
-    reader = sailpy.ImageReader(str(test_png))
-    frames = reader.read_all()
+def test_image_input_load_all(test_png):
+    """Test ImageInput.load_all()"""
+    input = sailpy.ImageInput(str(test_png))
+    frames = input.load_all()
 
     assert len(frames) >= 1
     assert all(f.is_valid for f in frames)
@@ -94,19 +94,19 @@ def test_image_reader_read_all(test_png):
     assert all(f.height == 16 for f in frames)
 
 
-def test_image_reader_context_manager(test_jpeg):
-    """Test ImageReader as context manager"""
-    with sailpy.ImageReader(str(test_jpeg)) as reader:
-        img = reader.read()
+def test_image_input_context_manager(test_jpeg):
+    """Test ImageInput as context manager"""
+    with sailpy.ImageInput(str(test_jpeg)) as input:
+        img = input.load()
         assert img.is_valid
 
-    # After context manager, reader should be finished
+    # After context manager, input should be finished
     # (no way to test this directly, but it shouldn't crash)
 
 
-def test_image_reader_probe(test_png):
-    """Test ImageReader.probe() for metadata"""
-    metadata = sailpy.ImageReader.probe(str(test_png))
+def test_image_input_probe(test_png):
+    """Test ImageInput.probe() for metadata"""
+    metadata = sailpy.ImageInput.probe(str(test_png))
 
     assert "width" in metadata
     assert "height" in metadata
@@ -119,19 +119,19 @@ def test_image_reader_probe(test_png):
     assert metadata["codec_name"] == "PNG"
 
 
-def test_image_reader_repr(test_png):
-    """Test ImageReader string representation"""
-    reader = sailpy.ImageReader(str(test_png))
-    assert "ImageReader" in repr(reader)
+def test_image_input_repr(test_png):
+    """Test ImageInput string representation"""
+    input = sailpy.ImageInput(str(test_png))
+    assert "ImageInput" in repr(input)
 
 
-def test_multiple_readers(test_png, test_jpeg):
-    """Test using multiple readers simultaneously"""
-    reader1 = sailpy.ImageReader(str(test_png))
-    reader2 = sailpy.ImageReader(str(test_jpeg))
+def test_multiple_inputs(test_png, test_jpeg):
+    """Test using multiple inputs simultaneously"""
+    input1 = sailpy.ImageInput(str(test_png))
+    input2 = sailpy.ImageInput(str(test_jpeg))
 
-    img1 = reader1.read()
-    img2 = reader2.read()
+    img1 = input1.load()
+    img2 = input2.load()
 
     assert img1.is_valid
     assert img2.is_valid

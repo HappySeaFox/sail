@@ -62,8 +62,8 @@ from ._libsail import (
     SourceImage,
 
     # Loading and Saving Classes
-    ImageReader,
-    ImageWriter,
+    ImageInput,
+    ImageOutput,
 
     # Options and Configuration Classes
     LoadOptions,
@@ -112,8 +112,8 @@ __all__ = [
     "SourceImage",
 
     # Loading and Saving Classes
-    "ImageReader",
-    "ImageWriter",
+    "ImageInput",
+    "ImageOutput",
 
     # Options and Configuration Classes
     "LoadOptions",

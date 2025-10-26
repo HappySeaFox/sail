@@ -32,25 +32,25 @@ import os
 import tempfile
 
 
-def test_image_writer_single_frame():
-    """Test ImageWriter for single frame"""
+def test_image_output_single_frame():
+    """Test ImageOutput for single frame"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
     arr = img.to_numpy()
     arr[:] = [0, 255, 0]  # Green
 
     # Use temp directory
     output_path = os.path.join(
-        tempfile.gettempdir(), "sail_test_writer_single.png")
+        tempfile.gettempdir(), "sail_test_output_single.png")
 
     try:
         # Remove if exists
         if os.path.exists(output_path):
             os.remove(output_path)
 
-        # Write using ImageWriter
-        writer = sailpy.ImageWriter(output_path)
-        writer.write(img)
-        writer.finish()
+        # Write using ImageOutput
+        output = sailpy.ImageOutput(output_path)
+        output.save(img)
+        output.finish()
 
         # Verify file was created and can be loaded
         assert os.path.exists(output_path)
@@ -93,19 +93,19 @@ def test_image_save_method():
             os.remove(output_path)
 
 
-def test_image_writer_repr():
-    """Test ImageWriter string representation"""
+def test_image_output_repr():
+    """Test ImageOutput string representation"""
     output_path = os.path.join(
-        tempfile.gettempdir(), "sail_test_writer_repr.png")
+        tempfile.gettempdir(), "sail_test_output_repr.png")
 
     try:
         # Remove if exists
         if os.path.exists(output_path):
             os.remove(output_path)
 
-        writer = sailpy.ImageWriter(output_path)
-        assert "ImageWriter" in repr(writer)
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        assert "ImageOutput" in repr(output)
+        output.finish()
     finally:
         # Cleanup
         if os.path.exists(output_path):

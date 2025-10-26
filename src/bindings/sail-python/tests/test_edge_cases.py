@@ -136,16 +136,16 @@ def test_edge_save_to_invalid_extension():
         os.remove(output_path)
 
 
-def test_edge_reader_invalid_file():
-    """Test ImageReader with invalid file"""
+def test_edge_input_invalid_file():
+    """Test ImageInput with invalid file"""
     with pytest.raises((RuntimeError, MemoryError)):
-        sailpy.ImageReader("/nonexistent.png")
+        sailpy.ImageInput("/nonexistent.png")
 
 
-def test_edge_writer_to_unavailable_path():
-    """Test ImageWriter with unavailable path"""
+def test_edge_output_to_unavailable_path():
+    """Test ImageOutput with unavailable path"""
     with pytest.raises((RuntimeError, MemoryError, PermissionError, OSError)):
-        sailpy.ImageWriter("/unavailable/path/test.png")
+        sailpy.ImageOutput("/unavailable/path/test.png")
 
 
 def test_edge_codec_info_invalid_extension():
@@ -161,7 +161,7 @@ def test_edge_codec_info_empty_extension():
 
 
 def test_edge_double_finish():
-    """Test calling finish() twice on reader"""
+    """Test calling finish() twice on input"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 10, 10)
     img.to_numpy()[:] = 0
 
@@ -169,9 +169,9 @@ def test_edge_double_finish():
 
     try:
         img.save(output_path)
-        reader = sailpy.ImageReader(output_path)
-        reader.finish()
-        reader.finish()  # Second finish should not crash
+        input = sailpy.ImageInput(output_path)
+        input.finish()
+        input.finish()  # Second finish should not crash
     finally:
         if os.path.exists(output_path):
             os.remove(output_path)
@@ -186,15 +186,15 @@ def test_edge_finish_then_read_fails():
     try:
         img.save(output_path)
 
-        reader = sailpy.ImageReader(output_path)
-        frame = reader.read()
+        input = sailpy.ImageInput(output_path)
+        frame = input.load()
         assert frame.is_valid
 
-        reader.finish()
+        input.finish()
 
         # Reading after finish should fail
         with pytest.raises(RuntimeError):
-            reader.read()
+            input.load()
     finally:
         if os.path.exists(output_path):
             os.remove(output_path)

@@ -33,8 +33,8 @@ import sailpy
 
 def test_multiframe_read_all_frames(test_png):
     """Test reading all frames from animated image"""
-    reader = sailpy.ImageReader(str(test_png))
-    frames = reader.read_all()
+    input = sailpy.ImageInput(str(test_png))
+    frames = input.load_all()
 
     assert len(frames) >= 1
     assert all(f.is_valid for f in frames)
@@ -44,7 +44,7 @@ def test_multiframe_read_all_frames(test_png):
 
 def test_multiframe_iterator_count(test_png):
     """Test that iterator returns correct number of frames"""
-    frames = list(sailpy.ImageReader(str(test_png)))
+    frames = list(sailpy.ImageInput(str(test_png)))
 
     assert len(frames) >= 1
     assert all(f.is_valid for f in frames)
@@ -52,8 +52,8 @@ def test_multiframe_iterator_count(test_png):
 
 def test_multiframe_delay_consistency(test_png):
     """Test that frame delays are consistent"""
-    reader = sailpy.ImageReader(str(test_png))
-    frames = reader.read_all()
+    input = sailpy.ImageInput(str(test_png))
+    frames = input.load_all()
 
     for i, frame in enumerate(frames):
         # Delay should be >= -1 (-1 means no delay info)
@@ -69,8 +69,8 @@ def test_multiframe_delay_consistency(test_png):
 
 def test_multiframe_dimensions_consistency(test_png):
     """Test that all frames have consistent dimensions"""
-    reader = sailpy.ImageReader(str(test_png))
-    frames = reader.read_all()
+    input = sailpy.ImageInput(str(test_png))
+    frames = input.load_all()
 
     if len(frames) > 1:
         first_width = frames[0].width
@@ -84,8 +84,8 @@ def test_multiframe_dimensions_consistency(test_png):
 
 def test_multiframe_pixel_format_consistency(test_png):
     """Test that all frames have consistent pixel format"""
-    reader = sailpy.ImageReader(str(test_png))
-    frames = reader.read_all()
+    input = sailpy.ImageInput(str(test_png))
+    frames = input.load_all()
 
     # All frames should have valid pixel format
     for frame in frames:
@@ -94,12 +94,12 @@ def test_multiframe_pixel_format_consistency(test_png):
 
 def test_multiframe_read_one_by_one(test_png):
     """Test reading frames one by one"""
-    reader = sailpy.ImageReader(str(test_png))
+    input = sailpy.ImageInput(str(test_png))
 
     frames_count = 0
     for _ in range(100):  # Safety limit
         try:
-            frame = reader.read()
+            frame = input.load()
             assert frame.is_valid
             frames_count += 1
         except RuntimeError:
@@ -110,15 +110,15 @@ def test_multiframe_read_one_by_one(test_png):
 
 def test_multiframe_no_more_frames_error(test_jpeg):
     """Test that reading past last frame raises error"""
-    reader = sailpy.ImageReader(str(test_jpeg))
+    input = sailpy.ImageInput(str(test_jpeg))
 
     # Read first frame
-    frame1 = reader.read()
+    frame1 = input.load()
     assert frame1.is_valid
 
     # Try to read second frame from single-frame image
     with pytest.raises(RuntimeError, match="No more frames"):
-        reader.read()
+        input.load()
 
 
 def test_multiframe_iterator_then_read():
@@ -132,14 +132,14 @@ def test_multiframe_iterator_then_read():
     output_path = os.path.join(tempfile.gettempdir(), "test_mixed.png")
     try:
         img.save(output_path)
-        reader = sailpy.ImageReader(output_path)
-        frames = list(reader)
+        input = sailpy.ImageInput(output_path)
+        frames = list(input)
 
         assert len(frames) == 1
 
         with pytest.raises(RuntimeError):
-            reader.read()
-        reader.finish()
+            input.load()
+        input.finish()
     finally:
         if os.path.exists(output_path):
             os.remove(output_path)
@@ -158,14 +158,14 @@ def test_multiframe_write_multiple():
 
     output_path = os.path.join(tempfile.gettempdir(), "test_multi.png")
     try:
-        writer = sailpy.ImageWriter(output_path)
+        output = sailpy.ImageOutput(output_path)
 
         # PNG may not support multi-frame, so just write first frame
         # Or use write() in loop
         for frame in frames[:1]:  # Write only first frame for PNG
-            writer.write(frame)
+            output.save(frame)
 
-        writer.finish()
+        output.finish()
 
         # Verify file was created
         assert os.path.exists(output_path)
@@ -199,9 +199,9 @@ def test_multiframe_write_all_single():
 
     output_path = os.path.join(tempfile.gettempdir(), "test_single_list.png")
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.write_all([img])
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.save_all([img])
+        output.finish()
 
         assert os.path.exists(output_path)
     finally:
@@ -209,7 +209,7 @@ def test_multiframe_write_all_single():
             os.remove(output_path)
 
 
-def test_multiframe_single_frame_write_all():
+def test_multiframe_single_frame_save_all():
     """Test write_all with single frame"""
     import tempfile
     import os
@@ -219,9 +219,9 @@ def test_multiframe_single_frame_write_all():
 
     output_path = os.path.join(tempfile.gettempdir(), "test_single.png")
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.write_all([img])
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.save_all([img])
+        output.finish()
 
         # Load and verify
         loaded = sailpy.Image.from_file(output_path)
@@ -235,7 +235,7 @@ def test_multiframe_single_frame_write_all():
 
 def test_multiframe_probe_animated(test_png):
     """Test probing animated image"""
-    metadata = sailpy.ImageReader.probe(str(test_png))
+    metadata = sailpy.ImageInput.probe(str(test_png))
 
     assert "width" in metadata
     assert "height" in metadata

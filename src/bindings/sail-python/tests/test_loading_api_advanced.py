@@ -33,44 +33,44 @@ import sailpy
 
 def test_early_stop_loading(test_jpeg):
     """Test stopping loading before reading any frames"""
-    reader = sailpy.ImageReader(str(test_jpeg))
+    input = sailpy.ImageInput(str(test_jpeg))
     # Finish without reading
-    reader.finish()
+    input.finish()
     # Should not crash
 
 
 def test_no_more_frames_after_iteration(test_png):
     """Test that iteration properly handles end of frames"""
     # Iterate through all frames
-    frames = list(sailpy.ImageReader(str(test_png)))
+    frames = list(sailpy.ImageInput(str(test_png)))
     assert len(frames) >= 1
 
     # Create new reader and exhaust it
-    reader = sailpy.ImageReader(str(test_png))
+    input = sailpy.ImageInput(str(test_png))
     for _ in range(len(frames)):
-        reader.read()
+        input.load()
 
     # Next read should fail
     with pytest.raises(RuntimeError, match="No more frames"):
-        reader.read()
+        input.load()
 
 
 def test_reader_with_load_options(test_jpeg):
-    """Test ImageReader with LoadOptions - CRITICAL TEST"""
+    """Test ImageInput with LoadOptions - CRITICAL TEST"""
     options = sailpy.LoadOptions()
     options.options = 1  # Set some option
 
     # MUST pass options using with_options()
-    reader = sailpy.ImageReader(str(test_jpeg))
-    reader.with_options(options)
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
 
-    img = reader.read()
+    img = input.load()
     assert img.is_valid
 
 
 def test_probe_returns_all_metadata(test_jpeg):
     """Test that probe returns comprehensive metadata"""
-    metadata = sailpy.ImageReader.probe(str(test_jpeg))
+    metadata = sailpy.ImageInput.probe(str(test_jpeg))
 
     # Required fields
     required = ["width", "height", "pixel_format", "codec_name"]
@@ -85,14 +85,14 @@ def test_probe_returns_all_metadata(test_jpeg):
 
 def test_reader_finish_idempotent(test_jpeg):
     """Test that calling finish() multiple times is safe"""
-    reader = sailpy.ImageReader(str(test_jpeg))
-    img = reader.read()
+    input = sailpy.ImageInput(str(test_jpeg))
+    img = input.load()
     assert img.is_valid
 
     # Call finish multiple times
-    reader.finish()
-    reader.finish()
-    reader.finish()
+    input.finish()
+    input.finish()
+    input.finish()
     # Should not crash
 
 
@@ -111,7 +111,7 @@ def test_load_with_explicit_codec(test_jpeg):
 def test_reader_iteration_safety(test_png):
     """Test that reader iteration is safe"""
     count = 0
-    for frame in sailpy.ImageReader(str(test_png)):
+    for frame in sailpy.ImageInput(str(test_png)):
         assert frame.is_valid
         count += 1
         # Safety limit
@@ -137,7 +137,7 @@ def test_load_from_bytes_complete(test_jpeg):
 def test_probe_vs_load_consistency(test_jpeg):
     """Test that probe and load return consistent metadata"""
     # Probe
-    metadata = sailpy.ImageReader.probe(str(test_jpeg))
+    metadata = sailpy.ImageInput.probe(str(test_jpeg))
 
     # Load
     img = sailpy.Image.from_file(str(test_jpeg))
@@ -149,15 +149,15 @@ def test_probe_vs_load_consistency(test_jpeg):
 
 def test_reader_multiple_read_calls(test_jpeg):
     """Test calling read() multiple times"""
-    reader = sailpy.ImageReader(str(test_jpeg))
+    input = sailpy.ImageInput(str(test_jpeg))
 
     # First read should succeed
-    img1 = reader.read()
+    img1 = input.load()
     assert img1.is_valid
 
     # Second read should fail (single-frame image)
     with pytest.raises(RuntimeError, match="No more frames"):
-        reader.read()
+        input.load()
 
 
 # ============================================================================
@@ -171,8 +171,8 @@ def test_load_with_tuning_options(test_png):
     options.tuning = {"custom-param": sailpy.Variant("test-value")}
 
     # Load with tuning (tuning may be ignored if codec doesn't use it)
-    reader = sailpy.ImageReader(str(test_png))
-    reader.with_options(options)
+    input = sailpy.ImageInput(str(test_png))
+    input.with_options(options)
 
-    img = reader.read()
+    img = input.load()
     assert img.is_valid

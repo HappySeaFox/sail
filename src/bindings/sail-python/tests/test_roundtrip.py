@@ -261,8 +261,8 @@ def test_roundtrip_create_save_load():
             os.remove(output_path)
 
 
-def test_roundtrip_reader_writer():
-    """Test roundtrip using ImageReader and ImageWriter"""
+def test_roundtrip_input_output():
+    """Test roundtrip using ImageInput and ImageOutput"""
     # Create original
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
     img.to_numpy()[:] = [70, 140, 210]
@@ -274,15 +274,15 @@ def test_roundtrip_reader_writer():
         # Save first
         img.save(path1)
 
-        # Read with ImageReader
-        reader = sailpy.ImageReader(path1)
-        frame = reader.read()
-        reader.finish()
+        # Read with ImageInput
+        input = sailpy.ImageInput(path1)
+        frame = input.load()
+        input.finish()
 
-        # Write with ImageWriter
-        writer = sailpy.ImageWriter(path2)
-        writer.write(frame)
-        writer.finish()
+        # Write with ImageOutput
+        output = sailpy.ImageOutput(path2)
+        output.save(frame)
+        output.finish()
 
         # Verify
         final = sailpy.Image.from_file(path2)

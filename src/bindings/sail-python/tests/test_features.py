@@ -239,10 +239,10 @@ def test_save_with_features_derived_options():
             options.compression_level = cl.max_level  # Max compression
 
         # Save with these options
-        writer = sailpy.ImageWriter(output_path)
-        writer.with_options(options)
-        writer.write(img)
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.with_options(options)
+        output.save(img)
+        output.finish()
 
         # Verify
         assert os.path.exists(output_path)
@@ -263,9 +263,9 @@ def test_load_with_features_derived_options(test_jpeg):
     options = codec.load_features.to_options()
 
     # Load with these options
-    reader = sailpy.ImageReader(str(test_jpeg))
-    reader.with_options(options)
-    img = reader.read()
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
+    img = input.load()
 
     assert img.is_valid
 

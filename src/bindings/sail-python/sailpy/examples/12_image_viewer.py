@@ -179,8 +179,8 @@ class ImageViewer(QMainWindow):
         self.last_directory = str(Path(path).parent)
 
         try:
-            reader = sailpy.ImageReader(path)
-            self.frames = reader.read_all()
+            input = sailpy.ImageInput(path)
+            self.frames = input.load_all()
             self.current_frame = 0
             self.current_path = path
             self.zoom_level = 1.0

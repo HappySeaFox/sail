@@ -32,18 +32,18 @@ import tempfile
 import os
 
 
-def test_writer_finish_idempotent():
+def test_output_finish_idempotent():
     """Test calling finish() multiple times"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 16, 16)
     img.to_numpy()[:] = 100
 
     output_path = os.path.join(tempfile.gettempdir(), "test_finish_multi.png")
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.write(img)
-        writer.finish()
-        writer.finish()  # Should not crash
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.save(img)
+        output.finish()
+        output.finish()  # Should not crash
+        output.finish()
 
         assert os.path.exists(output_path)
     finally:
@@ -51,15 +51,15 @@ def test_writer_finish_idempotent():
             os.remove(output_path)
 
 
-def test_writer_write_then_finish(test_jpeg):
+def test_output_write_then_finish(test_jpeg):
     """Test write → finish workflow"""
     source = sailpy.Image.from_file(str(test_jpeg))
     output_path = os.path.join(tempfile.gettempdir(), "test_workflow.png")
 
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.write(source)
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.save(source)
+        output.finish()
 
         loaded = sailpy.Image.from_file(output_path)
         assert loaded.is_valid
@@ -119,13 +119,13 @@ def test_save_different_extensions():
                 os.remove(path)
 
 
-def test_writer_early_stop():
+def test_output_early_stop():
     """Test finish() without writing frames"""
     output_path = os.path.join(tempfile.gettempdir(), "test_early_stop.png")
 
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.finish()  # Should not crash
+        output = sailpy.ImageOutput(output_path)
+        output.finish()  # Should not crash
     finally:
         if os.path.exists(output_path):
             os.remove(output_path)
@@ -197,7 +197,7 @@ def test_save_overwrite_existing():
             os.remove(output_path)
 
 
-def test_writer_write_multiple_sequential():
+def test_output_write_multiple_sequential():
     """Test writing frames sequentially"""
     img1 = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 16, 16)
     img1.to_numpy()[:] = 50
@@ -208,11 +208,11 @@ def test_writer_write_multiple_sequential():
     output_path = os.path.join(tempfile.gettempdir(), "test_sequential.png")
 
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.write(img1)
+        output = sailpy.ImageOutput(output_path)
+        output.save(img1)
         # PNG doesn't support multi-frame usually, so this may fail
         # Just write first frame
-        writer.finish()
+        output.finish()
 
         assert os.path.exists(output_path)
     finally:
@@ -237,11 +237,11 @@ def test_save_uninitialized_pixels():
 
 
 # ============================================================================
-# ImageWriter with options and codec - Critical tests
+# ImageOutput with options and codec - Critical tests
 # ============================================================================
 
-def test_image_writer_with_options():
-    """Test ImageWriter.with_options() - CRITICAL TEST"""
+def test_image_output_with_options():
+    """Test ImageOutput.with_options() - CRITICAL TEST"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
     img.to_numpy()[:] = 128
 
@@ -259,14 +259,14 @@ def test_image_writer_with_options():
 
         options.options = options.options | sailpy.Option.META_DATA
 
-        writer = sailpy.ImageWriter(output_path)
-        writer_with_options = writer.with_options(options)
+        output = sailpy.ImageOutput(output_path)
+        output_with_options = output.with_options(options)
 
         # Should return self for chaining
-        assert writer_with_options is writer
+        assert output_with_options is output
 
-        writer.write(img)
-        writer.finish()
+        output.save(img)
+        output.finish()
 
         # Verify file exists
         assert os.path.exists(output_path)
@@ -280,8 +280,8 @@ def test_image_writer_with_options():
             os.remove(output_path)
 
 
-def test_image_writer_with_codec():
-    """Test ImageWriter.with_codec() - CRITICAL TEST"""
+def test_image_output_with_codec():
+    """Test ImageOutput.with_codec() - CRITICAL TEST"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
     img.to_numpy()[:] = [100, 150, 200]
 
@@ -291,14 +291,14 @@ def test_image_writer_with_codec():
         codec = sailpy.CodecInfo.from_name("PNG")
         assert codec.is_valid
 
-        writer = sailpy.ImageWriter(output_path)
-        writer_with_codec = writer.with_codec(codec)
+        output = sailpy.ImageOutput(output_path)
+        output_with_codec = output.with_codec(codec)
 
         # Should return self for chaining
-        assert writer_with_codec is writer
+        assert output_with_codec is output
 
-        writer.write(img)
-        writer.finish()
+        output.save(img)
+        output.finish()
 
         # Verify
         assert os.path.exists(output_path)
@@ -310,8 +310,8 @@ def test_image_writer_with_codec():
             os.remove(output_path)
 
 
-def test_image_writer_chaining():
-    """Test ImageWriter method chaining"""
+def test_image_output_chaining():
+    """Test ImageOutput method chaining"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 16, 16)
     img.to_numpy()[:] = 255
 
@@ -324,10 +324,10 @@ def test_image_writer_chaining():
         options = codec.save_features.to_options()
         options.compression_level = codec.save_features.compression_level.max_level
 
-        # Test chaining: with_options().with_codec().write()
-        writer = sailpy.ImageWriter(output_path)
-        writer.with_options(options).with_codec(codec).write(img)
-        writer.finish()
+        # Test chaining: with_options().with_codec().save()
+        output = sailpy.ImageOutput(output_path)
+        output.with_options(options).with_codec(codec).save(img)
+        output.finish()
 
         # Verify
         assert os.path.exists(output_path)
@@ -339,8 +339,8 @@ def test_image_writer_chaining():
             os.remove(output_path)
 
 
-def test_image_writer_with_supported_compressions():
-    """Test ImageWriter with supported compression types from features - CRITICAL"""
+def test_image_output_with_supported_compressions():
+    """Test ImageOutput with supported compression types from features - CRITICAL"""
     img = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 32, 32)
     img.to_numpy()[:] = [50, 100, 150]
 
@@ -360,10 +360,10 @@ def test_image_writer_with_supported_compressions():
             # Override compression with supported value
             options.compression = comp
 
-            writer = sailpy.ImageWriter(output_path)
-            writer.with_options(options)
-            writer.write(img)
-            writer.finish()
+            output = sailpy.ImageOutput(output_path)
+            output.with_options(options)
+            output.save(img)
+            output.finish()
 
             assert os.path.exists(output_path)
 
@@ -398,10 +398,10 @@ def test_save_with_png_filter_tuning(tmp_path):
         options.tuning = {"png-filter": sailpy.Variant("paeth")}
 
         # Save with tuning
-        writer = sailpy.ImageWriter(output_path)
-        writer.with_options(options)
-        writer.write(img)
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.with_options(options)
+        output.save(img)
+        output.finish()
 
         # Verify file was created and can be loaded
         assert os.path.exists(output_path)
@@ -428,10 +428,10 @@ def test_save_with_multiple_tuning_options(tmp_path):
     options.compression_level = 9.0
 
     output_path = tmp_path / "test_multi_tuning.png"
-    writer = sailpy.ImageWriter(str(output_path))
-    writer.with_options(options)
-    writer.write(img)
-    writer.finish()
+    output = sailpy.ImageOutput(str(output_path))
+    output.with_options(options)
+    output.save(img)
+    output.finish()
 
     assert output_path.exists()
 
@@ -465,10 +465,10 @@ def test_tuning_compare_filter_sizes(tmp_path):
             options.tuning = {"png-filter": sailpy.Variant(filter_name)}
 
             output_path = tmp_path / f"filter_{filter_name}.png"
-            writer = sailpy.ImageWriter(str(output_path))
-            writer.with_options(options)
-            writer.write(img)
-            writer.finish()
+            output = sailpy.ImageOutput(str(output_path))
+            output.with_options(options)
+            output.save(img)
+            output.finish()
 
             sizes[filter_name] = output_path.stat().st_size
 

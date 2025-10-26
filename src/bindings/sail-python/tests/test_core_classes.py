@@ -254,7 +254,7 @@ def test_metadata_static_methods():
 
 def test_source_image_from_probe(test_jpeg):
     """Test SourceImage info from probe"""
-    metadata = sailpy.ImageReader.probe(str(test_jpeg))
+    metadata = sailpy.ImageInput.probe(str(test_jpeg))
 
     # Probe should return source format info
     assert "source_pixel_format" in metadata or "pixel_format" in metadata

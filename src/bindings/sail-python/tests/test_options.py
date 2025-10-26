@@ -48,7 +48,7 @@ def test_load_options_construct_with_value():
 
 
 def test_load_options_copy_semantics():
-    """Test LoadOptions copy behavior - CRITICAL for C++ API"""
+    """Test LoadOptions copy behavior"""
     opt1 = sailpy.LoadOptions()
     opt1.options = sailpy.Option.META_DATA
 
@@ -95,15 +95,15 @@ def test_load_options_modify_after_creation():
     assert options.options == 0
 
 
-def test_load_options_with_image_reader(test_jpeg):
-    """Test LoadOptions with actual ImageReader - CRITICAL TEST"""
+def test_load_options_with_image_input(test_jpeg):
+    """Test LoadOptions with actual ImageInput"""
     options = sailpy.LoadOptions()
     options.options = sailpy.Option.META_DATA
 
-    reader = sailpy.ImageReader(str(test_jpeg))
-    reader.with_options(options)
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
 
-    img = reader.read()
+    img = input.load()
     assert img.is_valid
 
 
@@ -126,7 +126,7 @@ def test_save_options_construct_with_value():
 
 
 def test_save_options_copy_semantics():
-    """Test SaveOptions copy behavior - CRITICAL for C++ API"""
+    """Test SaveOptions copy behavior"""
     opt1 = sailpy.SaveOptions()
     opt1.options = sailpy.Option.META_DATA
     opt1.compression = sailpy.Compression.DEFLATE
@@ -165,15 +165,15 @@ def test_save_options_independence():
 
 
 def test_save_options_all_properties_accessible():
-    """Test all SaveOptions properties are accessible - CRITICAL"""
+    """Test all SaveOptions properties are accessible"""
     options = sailpy.SaveOptions()
 
-    # Read all
+    # Load all
     _ = options.options
     _ = options.compression
     _ = options.compression_level
 
-    # Write all
+    # Save all
     options.options = sailpy.Option.META_DATA
     options.compression = sailpy.Compression.DEFLATE
     options.compression_level = 0.8

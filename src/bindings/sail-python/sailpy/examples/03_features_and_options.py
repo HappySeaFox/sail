@@ -96,10 +96,10 @@ def example_use_default_options():
     # Save with defaults
     output_path = os.path.join(tempfile.gettempdir(), "default_options.png")
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.with_options(options)
-        writer.write(img)
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.with_options(options)
+        output.save(img)
+        output.finish()
 
         print(f"\nY Saved with codec defaults: {output_path}")
         print(f"  File size: {os.path.getsize(output_path)} bytes")
@@ -142,10 +142,10 @@ def example_custom_compression():
             # Customize compression level
             options.compression_level = level
 
-            writer = sailpy.ImageWriter(output_path)
-            writer.with_options(options)
-            writer.write(img)
-            writer.finish()
+            output = sailpy.ImageOutput(output_path)
+            output.with_options(options)
+            output.save(img)
+            output.finish()
 
             size = os.path.getsize(output_path)
             print(f"  {name:8} (level {level}): {size:,} bytes")
@@ -187,10 +187,10 @@ def example_option_flags():
 
     output_path = os.path.join(tempfile.gettempdir(), "with_options.png")
     try:
-        writer = sailpy.ImageWriter(output_path)
-        writer.with_options(options)
-        writer.write(img)
-        writer.finish()
+        output = sailpy.ImageOutput(output_path)
+        output.with_options(options)
+        output.save(img)
+        output.finish()
 
         print(f"\nY Saved with custom options")
     finally:
@@ -234,10 +234,10 @@ def example_codec_specific_compression():
                 # Override compression
                 options.compression = compression
 
-                writer = sailpy.ImageWriter(output_path)
-                writer.with_options(options)
-                writer.write(img)
-                writer.finish()
+                output = sailpy.ImageOutput(output_path)
+                output.with_options(options)
+                output.save(img)
+                output.finish()
 
                 size = os.path.getsize(output_path)
                 print(f"    {compression.name}: {size:,} bytes")

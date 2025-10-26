@@ -603,10 +603,10 @@ void init_image(py::module_& m)
             py::arg("data"), "Load image from bytes (convenience method)");
 
     // ============================================================================
-    // ImageReader - Pythonic wrapper over sail::image_input
+    // ImageInput - Pythonic wrapper over sail::image_input
     // ============================================================================
 
-    py::class_<sail::image_input>(m, "ImageReader", "Read images with support for animations and multi-page formats")
+    py::class_<sail::image_input>(m, "ImageInput", "Load images with support for animations and multi-page formats")
         .def(py::init([](const std::string& path) {
                  try
                  {
@@ -614,10 +614,10 @@ void init_image(py::module_& m)
                  }
                  catch (const std::exception& e)
                  {
-                     throw std::runtime_error("Failed to open image file '" + path + "' for reading: " + e.what());
+                     throw std::runtime_error("Failed to open image file '" + path + "' for loading: " + e.what());
                  }
              }),
-             py::arg("path"), "Open image file for reading")
+             py::arg("path"), "Open image file for loading")
         .def(py::init([](py::bytes data) {
                  char* buf_ptr;
                  Py_ssize_t buf_size;
@@ -627,7 +627,7 @@ void init_image(py::module_& m)
                  }
                  return new sail::image_input(buf_ptr, static_cast<std::size_t>(buf_size));
              }),
-             py::arg("data"), "Open image from bytes for reading")
+             py::arg("data"), "Open image from bytes for loading")
 
         // Iterator protocol
         .def("__iter__", [](sail::image_input& input) -> sail::image_input& { return input; })
@@ -647,7 +647,7 @@ void init_image(py::module_& m)
 
         // Direct methods
         .def(
-            "read",
+            "load",
             [](sail::image_input& input) {
                 sail::image img = input.next_frame();
                 if (!img.is_valid())
@@ -656,10 +656,10 @@ void init_image(py::module_& m)
                 }
                 return img;
             },
-            "Read next frame/image")
+            "Load next frame/image")
 
         .def(
-            "read_all",
+            "load_all",
             [](sail::image_input& input) {
                 std::vector<sail::image> images;
                 while (true)
@@ -673,7 +673,7 @@ void init_image(py::module_& m)
                 }
                 return images;
             },
-            "Read all frames/images")
+            "Load all frames/images")
 
         .def_static(
             "probe",
@@ -715,10 +715,10 @@ void init_image(py::module_& m)
                 auto status = input.finish();
                 if (status != SAIL_OK)
                 {
-                    throw std::runtime_error("Failed to finish reading");
+                    throw std::runtime_error("Failed to finish loading");
                 }
             },
-            "Finish reading")
+            "Finish loading")
 
         // Options and codec override
         .def(
@@ -736,13 +736,13 @@ void init_image(py::module_& m)
             },
             py::arg("codec"), py::return_value_policy::reference_internal, "Override codec (returns self for chaining)")
 
-        .def("__repr__", [](const sail::image_input&) { return "ImageReader()"; });
+        .def("__repr__", [](const sail::image_input&) { return "ImageInput()"; });
 
     // ============================================================================
-    // ImageWriter - Pythonic wrapper over sail::image_output
+    // ImageOutput - Pythonic wrapper over sail::image_output
     // ============================================================================
 
-    py::class_<sail::image_output>(m, "ImageWriter", "Write images with support for animations and multi-page formats")
+    py::class_<sail::image_output>(m, "ImageOutput", "Save images with support for animations and multi-page formats")
         .def(py::init([](const std::string& path) {
                  try
                  {
@@ -767,29 +767,29 @@ void init_image(py::module_& m)
 
         // Direct methods
         .def(
-            "write",
+            "save",
             [](sail::image_output& output, const sail::image& img) {
                 auto status = output.next_frame(img);
                 if (status != SAIL_OK)
                 {
-                    throw std::runtime_error("Failed to write image frame");
+                    throw std::runtime_error("Failed to save image frame");
                 }
             },
-            py::arg("image"), "Write single frame/image")
+            py::arg("image"), "Save single frame/image")
 
         .def(
-            "write_all",
+            "save_all",
             [](sail::image_output& output, const std::vector<sail::image>& images) {
                 for (const auto& img : images)
                 {
                     auto status = output.next_frame(img);
                     if (status != SAIL_OK)
                     {
-                        throw std::runtime_error("Failed to write image frame");
+                        throw std::runtime_error("Failed to save image frame");
                     }
                 }
             },
-            py::arg("images"), "Write multiple frames/images")
+            py::arg("images"), "Save multiple frames/images")
 
         .def(
             "finish",
@@ -797,10 +797,10 @@ void init_image(py::module_& m)
                 auto status = output.finish();
                 if (status != SAIL_OK)
                 {
-                    throw std::runtime_error("Failed to finish writing");
+                    throw std::runtime_error("Failed to finish saving");
                 }
             },
-            "Finish writing")
+            "Finish saving")
 
         // Options and codec override
         .def(
@@ -818,5 +818,5 @@ void init_image(py::module_& m)
             },
             py::arg("codec"), py::return_value_policy::reference_internal, "Override codec (returns self for chaining)")
 
-        .def("__repr__", [](const sail::image_output&) { return "ImageWriter()"; });
+        .def("__repr__", [](const sail::image_output&) { return "ImageOutput()"; });
 }

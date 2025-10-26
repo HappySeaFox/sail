@@ -102,7 +102,7 @@ new_image.save("output.png")
 
 ## Supported Formats
 
-| Format | Read | Write | Features |
+| Format | Load | Save | Features |
 |--------|------|-------|----------|
 | AVIF | ✅ | ✅ | Modern efficient format |
 | BMP | ✅ | ✅ | Windows Bitmap |
@@ -281,8 +281,8 @@ except FileNotFoundError:
 import sailpy
 
 # Load animated GIF or multi-page TIFF
-reader = sailpy.ImageReader("animation.gif")
-frames = reader.read_all()
+input = sailpy.ImageInput("animation.gif")
+frames = input.load_all()
 
 print(f"Total frames: {len(frames)}")
 
@@ -293,15 +293,15 @@ for i, frame in enumerate(frames):
     frame.save(f"frame_{i:03d}.png")
 
 # Or iterate frame by frame (memory efficient)
-reader = sailpy.ImageReader("animation.gif")
-for i, frame in enumerate(reader):
+input = sailpy.ImageInput("animation.gif")
+for i, frame in enumerate(input):
     print(f"Processing frame {i}")
     # Process frame...
 
 # Load with custom options
 options = sailpy.LoadOptions()
-reader = sailpy.ImageReader("image.tiff").with_options(options)
-frames = reader.read_all()
+input = sailpy.ImageInput("image.tiff").with_options(options)
+frames = input.load_all()
 ```
 
 ### Working with Memory (Bytes)
@@ -351,24 +351,24 @@ if image.source_image and image.source_image.orientation:
 ```python
 import sailpy
 
-# Write multi-page TIFF (memory efficient for large datasets)
-writer = sailpy.ImageWriter("document.tiff")
+# Save multi-page TIFF (memory efficient for large datasets)
+output = sailpy.ImageOutput("document.tiff")
 
 # Optional: Set save options
 options = sailpy.SaveOptions()
 options.compression = sailpy.Compression.DEFLATE
 options.compression_level = 6
-writer = writer.with_options(options)
+output = output.with_options(options)
 
-# Write pages one by one
+# Save pages one by one
 for page_num in range(10):
     # Create or load page
     page = sailpy.Image(sailpy.PixelFormat.BPP24_RGB, 1024, 768)
     # ... fill page data ...
 
-    writer.write(page)
+    output.save(page)
 
-writer.finish()
+output.finish()
 print("Multi-page document created")
 ```
 
@@ -420,47 +420,47 @@ Image(pixel_format: PixelFormat, width: int, height: int)  # Create empty
 - `to_numpy() -> np.ndarray` - Get NumPy array view (zero-copy when possible)
 - `from_numpy(array: np.ndarray, pixel_format: PixelFormat) -> Image` - Create from NumPy array (static)
 
-#### `ImageReader`
+#### `ImageInput`
 
-Low-level interface for reading images with more control.
+Low-level interface for loading images with more control.
 
 ```python
 # Basic usage
-reader = ImageReader(path: str)
-frames = reader.read_all()  # Read all frames
-frame = reader.next_frame()  # Read next frame
-reader.stop()  # Stop reading
+input = ImageInput(path: str)
+frames = input.load_all()  # Load all frames
+frame = input.next_frame()  # Load next frame
+input.stop()  # Stop loading
 
 # With custom options (builder pattern)
 options = LoadOptions()
-reader = ImageReader("image.tiff").with_options(options)
-frames = reader.read_all()
+input = ImageInput("image.tiff").with_options(options)
+frames = input.load_all()
 
 # Force specific codec (for files with wrong/missing extension)
 codec = CodecInfo.from_name("png")
-reader = ImageReader("image.dat").with_codec(codec)
+input = ImageInput("image.dat").with_codec(codec)
 ```
 
-#### `ImageWriter`
+#### `ImageOutput`
 
-Low-level interface for writing images with more control.
+Low-level interface for saving images with more control.
 
 ```python
 # Basic usage
-writer = ImageWriter(path: str)
-writer.write(image: Image)
-writer.finish()
+output = ImageOutput(path: str)
+output.save(image: Image)
+output.finish()
 
 # With save options (builder pattern)
 options = SaveOptions()
 options.compression = Compression.JPEG
-writer = ImageWriter("output.tiff").with_options(options)
-writer.write(image)
-writer.finish()
+output = ImageOutput("output.tiff").with_options(options)
+output.save(image)
+output.finish()
 
 # Force specific codec (for files with custom extension)
 codec = CodecInfo.from_name("tiff")
-writer = ImageWriter("output.dat").with_codec(codec)
+output = ImageOutput("output.dat").with_codec(codec)
 ```
 
 #### `CodecInfo`
@@ -480,8 +480,8 @@ Information about image format codecs.
 - `extensions: List[str]` - Supported file extensions
 - `mime_types: List[str]` - Supported MIME types
 - `magic_numbers: List[bytes]` - Magic number patterns
-- `can_load: bool` - Can read images
-- `can_save: bool` - Can write images
+- `can_load: bool` - Can load images
+- `can_save: bool` - Can save images
 - `is_valid: bool` - Check if codec info is valid
 - `load_features: LoadFeatures` - Supported load features
 - `save_features: SaveFeatures` - Supported save features
@@ -531,10 +531,10 @@ options.compression_level = 6
 # Codec-specific tuning (dict)
 options.tuning["png-filter"] = "paeth"  # PNG: none, sub, up, avg, paeth
 
-# Use with ImageWriter
-writer = ImageWriter("output.png").with_options(options)
-writer.write(image)
-writer.finish()
+# Use with ImageOutput
+output = ImageOutput("output.png").with_options(options)
+output.save(image)
+output.finish()
 ```
 
 #### `LoadOptions`
@@ -546,9 +546,9 @@ options = LoadOptions()
 # Most codecs don't require load options
 # LoadOptions.tuning is available for codec-specific settings if needed
 
-# Use with ImageReader
-reader = ImageReader("image.tiff").with_options(options)
-frames = reader.read_all()
+# Use with ImageInput
+input = ImageInput("image.tiff").with_options(options)
+frames = input.load_all()
 ```
 
 #### `Resolution`
@@ -574,7 +574,7 @@ print(f"DPI: {image.resolution.x}x{image.resolution.y} {image.resolution.unit}")
 Image metadata container.
 
 ```python
-# Read metadata from loaded image
+# Load metadata from loaded image
 image = Image.from_file("photo.jpg")
 meta = image.meta_data
 if meta:
