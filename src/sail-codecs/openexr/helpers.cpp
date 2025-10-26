@@ -199,13 +199,13 @@ std::string create_temp_file_from_io(sail_io* io)
     /* Open the file */
 #ifdef _WIN32
     int fd;
-    if (_sopen_s(&fd, path.c_str(), _O_RDWR | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE) != 0)
+    if (_sopen_s(&fd, path.c_str(), _O_RDWR | _O_CREAT | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE) != 0)
     {
         SAIL_LOG_ERROR("OpenEXR: Failed to open temporary file");
         throw std::runtime_error("Failed to open temporary file");
     }
 #else
-    const int fd = open(path.c_str(), O_RDWR);
+    const int fd = open(path.c_str(), O_RDWR | O_CREAT, 0600);
 
     if (fd < 0)
     {
