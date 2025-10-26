@@ -55,6 +55,8 @@ jobs:
       run: |
         echo "Installing packages for triplet: x64-windows"
         "${VCPKG_ROOT}/vcpkg.exe" install --triplet=x64-windows
+        echo "Installed packages:"
+        "${VCPKG_ROOT}/vcpkg.exe" list
 
     - name: Install Python build tools
       run: |
@@ -97,6 +99,9 @@ jobs:
       working-directory: src/bindings/sail-python
       run: |
         export CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP"
+        echo "CMAKE_ARGS: ${CMAKE_ARGS}"
+        echo "VCPKG_ROOT: ${VCPKG_ROOT}"
+        ls -la "${VCPKG_ROOT}/installed/x64-windows/" || echo "No installed packages directory"
         python -m build --wheel
         mkdir -p wheelhouse
         mv dist/*.whl wheelhouse/

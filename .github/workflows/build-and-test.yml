@@ -115,6 +115,8 @@ jobs:
       run: |
         echo "Installing packages for triplet: ${{ matrix.config.triplet }}"
         "${VCPKG_ROOT}/vcpkg.exe" install --triplet=${{ matrix.config.triplet }}
+        echo "Installed packages:"
+        "${VCPKG_ROOT}/vcpkg.exe" list
 
     - name: Configure CMake
       run: |
