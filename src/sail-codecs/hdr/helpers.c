@@ -721,7 +721,7 @@ sail_status_t hdr_private_fetch_properties(const struct sail_hash_map* special_p
         }
         else if (variant->type == SAIL_VARIANT_TYPE_DOUBLE)
         {
-            header->colorcorr[0] = sail_variant_to_double(variant);
+            header->colorcorr[0] = (float)sail_variant_to_double(variant);
         }
     }
 
@@ -734,7 +734,7 @@ sail_status_t hdr_private_fetch_properties(const struct sail_hash_map* special_p
         }
         else if (variant->type == SAIL_VARIANT_TYPE_DOUBLE)
         {
-            header->colorcorr[1] = sail_variant_to_double(variant);
+            header->colorcorr[1] = (float)sail_variant_to_double(variant);
         }
     }
 
@@ -747,7 +747,7 @@ sail_status_t hdr_private_fetch_properties(const struct sail_hash_map* special_p
         }
         else if (variant->type == SAIL_VARIANT_TYPE_DOUBLE)
         {
-            header->colorcorr[2] = sail_variant_to_double(variant);
+            header->colorcorr[2] = (float)sail_variant_to_double(variant);
         }
     }
 
