@@ -54,3 +54,12 @@
 #else
 #define SAIL_DEPRECATED
 #endif
+
+/* AddressSanitizer detection. */
+#if defined(__SANITIZE_ADDRESS__)
+    #define SAIL_ASAN_ENABLED
+#elif defined(__has_feature)
+    #if __has_feature(address_sanitizer)
+        #define SAIL_ASAN_ENABLED
+    #endif
+#endif
