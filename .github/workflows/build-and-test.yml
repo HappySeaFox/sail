@@ -105,21 +105,10 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Set up vcpkg cache
-      uses: actions/cache@v4
-      with:
-        path: vcpkg
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
-
     - name: Set up vcpkg
-      shell: bash
-      run: |
-        if [ ! -f "vcpkg/vcpkg.exe" ]; then
-          rm -rf vcpkg
-          git clone https://github.com/microsoft/vcpkg.git
-          vcpkg/bootstrap-vcpkg.bat
-        fi
-        vcpkg/vcpkg install --triplet ${{ matrix.config.triplet }} --clean-buildtrees-after-build
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgJsonGlob: 'vcpkg.json'
 
     - name: Configure CMake
       run: |
@@ -130,7 +119,7 @@ jobs:
           -DSAIL_DEV=ON `
           -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }} `
           -DSAIL_WINDOWS_STATIC_CRT=${{ matrix.config.static_crt }} `
-          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
 
     - name: Build
@@ -150,7 +139,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
           -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
-          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DSAIL_DEV=ON
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
@@ -163,7 +152,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
           -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
-          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DSAIL_DEV=ON
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"

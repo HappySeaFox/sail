@@ -43,22 +43,11 @@ jobs:
         brew install python
         brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
 
-    - name: Set up vcpkg cache
-      uses: actions/cache@v4
-      with:
-        path: vcpkg
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
-
     - name: Set up vcpkg (Windows)
-      shell: bash
       if: runner.os == 'Windows'
-      run: |
-        if [ ! -f "vcpkg/vcpkg.exe" ]; then
-          rm -rf vcpkg
-          git clone https://github.com/microsoft/vcpkg.git
-          vcpkg/bootstrap-vcpkg.bat
-        fi
-        vcpkg/vcpkg install --triplet x64-windows --clean-buildtrees-after-build
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgJsonGlob: 'vcpkg.json'
 
     - name: Install Python build tools
       run: |
@@ -100,7 +89,7 @@ jobs:
       shell: bash
       working-directory: src/bindings/sail-python
       env:
-        CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP
+        CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
