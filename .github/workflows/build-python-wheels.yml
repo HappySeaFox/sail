@@ -129,7 +129,7 @@ jobs:
     - name: Run tests
       working-directory: src/bindings/sail-python
       run: |
-        pytest tests/ -v --tb=short
+        pytest tests/
 
         python -m sailpy.examples.01_quickstart
         python -m sailpy.examples.02_memory_io
