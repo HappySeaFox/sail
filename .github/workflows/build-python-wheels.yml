@@ -49,6 +49,13 @@ jobs:
       with:
         vcpkgJsonGlob: 'vcpkg.json'
 
+    - name: Install vcpkg dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        echo "Installing packages for triplet: x64-windows"
+        "${VCPKG_ROOT}/vcpkg.exe" install --triplet=x64-windows
+
     - name: Install Python build tools
       run: |
         python -m pip install --upgrade pip
