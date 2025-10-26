@@ -269,12 +269,10 @@ if (SAIL_VCPKG AND WIN32)
         message(FATAL_ERROR "CMAKE_BUILD_TYPE is required for VCPKG build")
     endif()
 
-    # ../../vcpkg/scripts/buildsystems/vcpkg.cmake -> C:/projects/vcpkg/installed/x64-windows/bin
-    #
     if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/bin")
+        set(SAIL_VCPKG_BIN_PATH "${PROJECT_SOURCE_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/bin")
     else()
-        set(SAIL_VCPKG_BIN_PATH "${CMAKE_TOOLCHAIN_FILE}/../../../installed/${VCPKG_TARGET_TRIPLET}/debug/bin")
+        set(SAIL_VCPKG_BIN_PATH "${PROJECT_SOURCE_DIR}/vcpkg_installed/${VCPKG_TARGET_TRIPLET}/debug/bin")
     endif()
     get_filename_component(SAIL_VCPKG_BIN_PATH "${SAIL_VCPKG_BIN_PATH}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
     install(DIRECTORY "${SAIL_VCPKG_BIN_PATH}/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH} OPTIONAL)
