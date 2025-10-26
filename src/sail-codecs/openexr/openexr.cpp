@@ -38,8 +38,6 @@
 
 #include "helpers.h"
 
-using namespace OPENEXR_IMF_INTERNAL_NAMESPACE;
-
 /*
  * Codec-specific state.
  */
@@ -49,8 +47,8 @@ struct openexr_state
     const struct sail_save_options* save_options;
     struct sail_io* io;
 
-    std::unique_ptr<InputFile> input_file;
-    std::unique_ptr<OutputFile> output_file;
+    std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile> input_file;
+    std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::OutputFile> output_file;
 
     std::string temp_path_read;
     std::string temp_path_write;
@@ -72,8 +70,8 @@ static sail_status_t alloc_openexr_state(struct sail_io* io,
         load_options,                  // load_options
         save_options,                  // save_options
         io,                            // io
-        std::unique_ptr<InputFile>(),  // input_file
-        std::unique_ptr<OutputFile>(), // output_file
+        std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile>(),  // input_file
+        std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::OutputFile>(), // output_file
         {},                            // temp_path_read
         {},                            // temp_path_write
         false,                         // frame_processed
@@ -123,7 +121,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_init_v8_openexr(struct sail
     try
     {
         openexr_state->temp_path_read = sail::openexr::create_temp_file_from_io(io);
-        openexr_state->input_file.reset(new InputFile(openexr_state->temp_path_read.c_str()));
+        openexr_state->input_file.reset(new OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile(openexr_state->temp_path_read.c_str()));
     }
     catch (const std::exception& e)
     {
@@ -144,7 +142,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_openexr(
     }
 
     /* Get image dimensions and channels from the file. */
-    const Header& header            = openexr_state->input_file->header();
+    const OPENEXR_IMF_INTERNAL_NAMESPACE::Header& header = openexr_state->input_file->header();
     const Imath::Box2i& data_window = header.dataWindow();
     openexr_state->width            = static_cast<unsigned>(data_window.max.x - data_window.min.x + 1);
     openexr_state->height           = static_cast<unsigned>(data_window.max.y - data_window.min.y + 1);
@@ -199,7 +197,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_openexr(void* stat
     /* Setup FrameBuffer and read pixels. */
     try
     {
-        const Header& header            = openexr_state->input_file->header();
+        const OPENEXR_IMF_INTERNAL_NAMESPACE::Header& header = openexr_state->input_file->header();
         const Imath::Box2i& data_window = header.dataWindow();
 
         // Special handling for YCbCr
@@ -212,7 +210,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_openexr(void* stat
         }
         else
         {
-            FrameBuffer frameBuffer;
+            OPENEXR_IMF_INTERNAL_NAMESPACE::FrameBuffer frameBuffer;
             sail::openexr::setup_framebuffer_read(frameBuffer, openexr_state->channel_info, image->pixels,
                                                   openexr_state->width, openexr_state->height, data_window);
 
@@ -303,12 +301,12 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_openexr(
     /* Create OpenEXR file for writing using General API. */
     try
     {
-        Header header(static_cast<int>(image->width), static_cast<int>(image->height));
+        OPENEXR_IMF_INTERNAL_NAMESPACE::Header header(static_cast<int>(image->width), static_cast<int>(image->height));
 
         sail::openexr::setup_header_write(header, image->pixel_format, static_cast<int>(image->width),
                                           static_cast<int>(image->height), openexr_state->save_options->compression);
 
-        openexr_state->output_file.reset(new OutputFile(openexr_state->temp_path_write.c_str(), header));
+        openexr_state->output_file.reset(new OPENEXR_IMF_INTERNAL_NAMESPACE::OutputFile(openexr_state->temp_path_write.c_str(), header));
 
         /* Analyze the format we're writing. */
         openexr_state->channel_info = sail::openexr::analyze_channels(header.channels());
@@ -329,7 +327,7 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_openexr(void* stat
     /* Setup FrameBuffer and write pixels. */
     try
     {
-        FrameBuffer frameBuffer;
+        OPENEXR_IMF_INTERNAL_NAMESPACE::FrameBuffer frameBuffer;
         const Imath::Box2i data_window(
             Imath::V2i(0, 0), Imath::V2i(static_cast<int>(image->width) - 1, static_cast<int>(image->height) - 1));
 

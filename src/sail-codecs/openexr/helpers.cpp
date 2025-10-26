@@ -60,8 +60,6 @@
 
 #include "helpers.h"
 
-using namespace OPENEXR_IMF_INTERNAL_NAMESPACE;
-
 namespace sail::openexr
 {
 
@@ -133,16 +131,16 @@ SailCompression compression_to_sail(int compression)
 {
     switch (compression)
     {
-    case NO_COMPRESSION:    return SAIL_COMPRESSION_NONE;
-    case RLE_COMPRESSION:   return SAIL_COMPRESSION_RLE;
-    case ZIPS_COMPRESSION:  return SAIL_COMPRESSION_ZIPS;
-    case ZIP_COMPRESSION:   return SAIL_COMPRESSION_ZIP;
-    case PIZ_COMPRESSION:   return SAIL_COMPRESSION_PIZ;
-    case PXR24_COMPRESSION: return SAIL_COMPRESSION_PXR24;
-    case B44_COMPRESSION:   return SAIL_COMPRESSION_B44;
-    case B44A_COMPRESSION:  return SAIL_COMPRESSION_B44A;
-    case DWAA_COMPRESSION:  return SAIL_COMPRESSION_DWAA;
-    case DWAB_COMPRESSION:  return SAIL_COMPRESSION_DWAB;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::NO_COMPRESSION:    return SAIL_COMPRESSION_NONE;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::RLE_COMPRESSION:   return SAIL_COMPRESSION_RLE;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::ZIPS_COMPRESSION:  return SAIL_COMPRESSION_ZIPS;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::ZIP_COMPRESSION:   return SAIL_COMPRESSION_ZIP;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::PIZ_COMPRESSION:   return SAIL_COMPRESSION_PIZ;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::PXR24_COMPRESSION: return SAIL_COMPRESSION_PXR24;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::B44_COMPRESSION:   return SAIL_COMPRESSION_B44;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::B44A_COMPRESSION:  return SAIL_COMPRESSION_B44A;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::DWAA_COMPRESSION:  return SAIL_COMPRESSION_DWAA;
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::DWAB_COMPRESSION:  return SAIL_COMPRESSION_DWAB;
     default: return SAIL_COMPRESSION_UNKNOWN;
     }
 }
@@ -151,17 +149,17 @@ int sail_compression_to_exr(SailCompression compression)
 {
     switch (compression)
     {
-    case SAIL_COMPRESSION_NONE: return NO_COMPRESSION;
-    case SAIL_COMPRESSION_RLE: return RLE_COMPRESSION;
-    case SAIL_COMPRESSION_ZIPS: return ZIPS_COMPRESSION;
-    case SAIL_COMPRESSION_ZIP: return ZIP_COMPRESSION;
-    case SAIL_COMPRESSION_PIZ: return PIZ_COMPRESSION;
-    case SAIL_COMPRESSION_PXR24: return PXR24_COMPRESSION;
-    case SAIL_COMPRESSION_B44: return B44_COMPRESSION;
-    case SAIL_COMPRESSION_B44A: return B44A_COMPRESSION;
-    case SAIL_COMPRESSION_DWAA: return DWAA_COMPRESSION;
-    case SAIL_COMPRESSION_DWAB: return DWAB_COMPRESSION;
-    default: return ZIP_COMPRESSION;
+    case SAIL_COMPRESSION_NONE:  return OPENEXR_IMF_INTERNAL_NAMESPACE::NO_COMPRESSION;
+    case SAIL_COMPRESSION_RLE:   return OPENEXR_IMF_INTERNAL_NAMESPACE::RLE_COMPRESSION;
+    case SAIL_COMPRESSION_ZIPS:  return OPENEXR_IMF_INTERNAL_NAMESPACE::ZIPS_COMPRESSION;
+    case SAIL_COMPRESSION_ZIP:   return OPENEXR_IMF_INTERNAL_NAMESPACE::ZIP_COMPRESSION;
+    case SAIL_COMPRESSION_PIZ:   return OPENEXR_IMF_INTERNAL_NAMESPACE::PIZ_COMPRESSION;
+    case SAIL_COMPRESSION_PXR24: return OPENEXR_IMF_INTERNAL_NAMESPACE::PXR24_COMPRESSION;
+    case SAIL_COMPRESSION_B44:   return OPENEXR_IMF_INTERNAL_NAMESPACE::B44_COMPRESSION;
+    case SAIL_COMPRESSION_B44A:  return OPENEXR_IMF_INTERNAL_NAMESPACE::B44A_COMPRESSION;
+    case SAIL_COMPRESSION_DWAA:  return OPENEXR_IMF_INTERNAL_NAMESPACE::DWAA_COMPRESSION;
+    case SAIL_COMPRESSION_DWAB:  return OPENEXR_IMF_INTERNAL_NAMESPACE::DWAB_COMPRESSION;
+    default: return OPENEXR_IMF_INTERNAL_NAMESPACE::ZIP_COMPRESSION;
     }
 }
 
@@ -169,16 +167,16 @@ const char* compression_to_string(int compression)
 {
     switch (compression)
     {
-    case NO_COMPRESSION: return "NONE";
-    case RLE_COMPRESSION: return "RLE";
-    case ZIPS_COMPRESSION: return "ZIPS";
-    case ZIP_COMPRESSION: return "ZIP";
-    case PIZ_COMPRESSION: return "PIZ";
-    case PXR24_COMPRESSION: return "PXR24";
-    case B44_COMPRESSION: return "B44";
-    case B44A_COMPRESSION: return "B44A";
-    case DWAA_COMPRESSION: return "DWAA";
-    case DWAB_COMPRESSION: return "DWAB";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::NO_COMPRESSION: return "NONE";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::RLE_COMPRESSION: return "RLE";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::ZIPS_COMPRESSION: return "ZIPS";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::ZIP_COMPRESSION: return "ZIP";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::PIZ_COMPRESSION: return "PIZ";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::PXR24_COMPRESSION: return "PXR24";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::B44_COMPRESSION: return "B44";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::B44A_COMPRESSION: return "B44A";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::DWAA_COMPRESSION: return "DWAA";
+    case OPENEXR_IMF_INTERNAL_NAMESPACE::DWAB_COMPRESSION: return "DWAB";
     default: return "UNKNOWN";
     }
 }
@@ -263,7 +261,7 @@ std::string create_temp_file_from_io(sail_io* io)
     return path;
 }
 
-ChannelInfo analyze_channels(const ChannelList& channels)
+ChannelInfo analyze_channels(const OPENEXR_IMF_INTERNAL_NAMESPACE::ChannelList& channels)
 {
     ChannelInfo info{};
     info.num_channels = 0;
@@ -309,7 +307,7 @@ ChannelInfo analyze_channels(const ChannelList& channels)
     }
 
     // Determine pixel type (use first available channel)
-    const Channel* first_channel = nullptr;
+    const OPENEXR_IMF_INTERNAL_NAMESPACE::Channel* first_channel = nullptr;
 
     if (info.has_y && info.has_ry && info.has_by)
     {
@@ -379,7 +377,7 @@ size_t bytes_per_pixel(const ChannelInfo& info)
 }
 
 void setup_framebuffer_read(
-    FrameBuffer& fb, const ChannelInfo& info, void* pixels, unsigned width, unsigned height, const Imath::Box2i& data_window)
+    OPENEXR_IMF_INTERNAL_NAMESPACE::FrameBuffer& fb, const ChannelInfo& info, void* pixels, unsigned width, unsigned height, const Imath::Box2i& data_window)
 {
     (void)height; // May be unused
 
@@ -397,24 +395,24 @@ void setup_framebuffer_read(
     }
     else if (info.has_y && !info.has_ry && !info.has_by)
     {
-        fb.insert("Y", Slice(info.type, base, x_stride, y_stride));
+        fb.insert("Y", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(info.type, base, x_stride, y_stride));
 
         if (info.has_a)
         {
-            const size_t bytes_per_channel = (info.type == HALF) ? 2 : 4;
-            fb.insert("A", Slice(info.type, base + bytes_per_channel, x_stride, y_stride));
+            const size_t bytes_per_channel = (info.type == OPENEXR_IMF_INTERNAL_NAMESPACE::HALF) ? 2 : 4;
+            fb.insert("A", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(info.type, base + bytes_per_channel, x_stride, y_stride));
         }
     }
     else if (info.has_r && info.has_g && info.has_b)
     {
-        const size_t bytes_per_channel = (info.type == HALF) ? 2 : 4;
-        fb.insert("R", Slice(info.type, base + 0 * bytes_per_channel, x_stride, y_stride));
-        fb.insert("G", Slice(info.type, base + 1 * bytes_per_channel, x_stride, y_stride));
-        fb.insert("B", Slice(info.type, base + 2 * bytes_per_channel, x_stride, y_stride));
+        const size_t bytes_per_channel = (info.type == OPENEXR_IMF_INTERNAL_NAMESPACE::HALF) ? 2 : 4;
+        fb.insert("R", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(info.type, base + 0 * bytes_per_channel, x_stride, y_stride));
+        fb.insert("G", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(info.type, base + 1 * bytes_per_channel, x_stride, y_stride));
+        fb.insert("B", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(info.type, base + 2 * bytes_per_channel, x_stride, y_stride));
 
         if (info.has_a)
         {
-            fb.insert("A", Slice(info.type, base + 3 * bytes_per_channel, x_stride, y_stride));
+            fb.insert("A", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(info.type, base + 3 * bytes_per_channel, x_stride, y_stride));
         }
     }
     else
@@ -423,14 +421,14 @@ void setup_framebuffer_read(
     }
 }
 
-void read_ycbcr_and_convert(InputFile& file,
+void read_ycbcr_and_convert(OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile& file,
                              const ChannelInfo& info,
                              void* pixels,
                              unsigned width,
                              unsigned height,
                              const Imath::Box2i& data_window)
 {
-    if (info.type != HALF)
+    if (info.type != OPENEXR_IMF_INTERNAL_NAMESPACE::HALF)
     {
         throw std::runtime_error("Only HALF YCbCr is currently supported");
     }
@@ -454,11 +452,11 @@ void read_ycbcr_and_convert(InputFile& file,
     by_base = by_base - (data_window.min.x / info.by_xsampling) * sizeof(Imath::half)
             - (data_window.min.y / info.by_ysampling) * chroma_width * sizeof(Imath::half);
 
-    FrameBuffer fb;
-    fb.insert("Y", Slice(HALF, y_base, sizeof(Imath::half), width * sizeof(Imath::half), 1, 1));
-    fb.insert("RY", Slice(HALF, ry_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
+    OPENEXR_IMF_INTERNAL_NAMESPACE::FrameBuffer fb;
+    fb.insert("Y", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, y_base, sizeof(Imath::half), width * sizeof(Imath::half), 1, 1));
+    fb.insert("RY", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, ry_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
                          info.ry_xsampling, info.ry_ysampling));
-    fb.insert("BY", Slice(HALF, by_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
+    fb.insert("BY", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, by_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
                          info.by_xsampling, info.by_ysampling));
 
     file.setFrameBuffer(fb);
@@ -531,13 +529,13 @@ void read_ycbcr_and_convert(InputFile& file,
 
 
 void setup_header_write(
-    Header& header, SailPixelFormat pixel_format, int width, int height, SailCompression compression)
+    OPENEXR_IMF_INTERNAL_NAMESPACE::Header& header, SailPixelFormat pixel_format, int width, int height, SailCompression compression)
 {
     (void)width;
     (void)height;
 
     const auto [pixel_type, channel_count] = sail_to_pixel_type(pixel_format);
-    const auto exr_pixel_type              = static_cast<PixelType>(pixel_type);
+    const auto exr_pixel_type = static_cast<OPENEXR_IMF_INTERNAL_NAMESPACE::PixelType>(pixel_type);
 
     // Add channels based on format
     if (pixel_format == SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF
@@ -548,28 +546,28 @@ void setup_header_write(
         || pixel_format == SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT)
     {
         // Grayscale or Grayscale+Alpha
-        header.channels().insert("Y", Channel(exr_pixel_type));
+        header.channels().insert("Y", OPENEXR_IMF_INTERNAL_NAMESPACE::Channel(exr_pixel_type));
 
         if (channel_count == 2)
         {
-            header.channels().insert("A", Channel(exr_pixel_type));
+            header.channels().insert("A", OPENEXR_IMF_INTERNAL_NAMESPACE::Channel(exr_pixel_type));
         }
     }
     else
     {
         // RGB or RGBA
-        header.channels().insert("R", Channel(exr_pixel_type));
-        header.channels().insert("G", Channel(exr_pixel_type));
-        header.channels().insert("B", Channel(exr_pixel_type));
+        header.channels().insert("R", OPENEXR_IMF_INTERNAL_NAMESPACE::Channel(exr_pixel_type));
+        header.channels().insert("G", OPENEXR_IMF_INTERNAL_NAMESPACE::Channel(exr_pixel_type));
+        header.channels().insert("B", OPENEXR_IMF_INTERNAL_NAMESPACE::Channel(exr_pixel_type));
 
         if (channel_count == 4)
         {
-            header.channels().insert("A", Channel(exr_pixel_type));
+            header.channels().insert("A", OPENEXR_IMF_INTERNAL_NAMESPACE::Channel(exr_pixel_type));
         }
     }
 
     // Set compression
-    header.compression() = static_cast<Compression>(sail_compression_to_exr(compression));
+    header.compression() = static_cast<OPENEXR_IMF_INTERNAL_NAMESPACE::Compression>(sail_compression_to_exr(compression));
 }
 
 } // namespace sail::openexr
