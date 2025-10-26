@@ -168,12 +168,16 @@ void init_image(py::module_& m)
     // ============================================================================
 
     py::class_<sail::resolution>(m, "Resolution", "Image resolution (DPI)")
-        .def(py::init<>())
-        .def(py::init<SailResolutionUnit, double, double>(), py::arg("unit"), py::arg("x"), py::arg("y"))
+        .def(py::init<>(), "Create resolution with default values")
+        .def(py::init<SailResolutionUnit, double, double>(), py::arg("unit"), py::arg("x"), py::arg("y"),
+             "Create resolution with unit, x and y values")
         .def_property("unit", &sail::resolution::unit,
-                      [](sail::resolution& r, SailResolutionUnit unit) { r.set_unit(unit); })
-        .def_property("x", &sail::resolution::x, [](sail::resolution& r, double x) { r.set_x(x); })
-        .def_property("y", &sail::resolution::y, [](sail::resolution& r, double y) { r.set_y(y); })
+                      [](sail::resolution& r, SailResolutionUnit unit) { r.set_unit(unit); },
+                      "Resolution unit (unknown, micrometer, centimeter, inch)")
+        .def_property("x", &sail::resolution::x, [](sail::resolution& r, double x) { r.set_x(x); },
+                      "Horizontal resolution value")
+        .def_property("y", &sail::resolution::y, [](sail::resolution& r, double y) { r.set_y(y); },
+                      "Vertical resolution value")
         .def("__repr__", [](const sail::resolution& r) {
             return "Resolution(unit=" + std::to_string(static_cast<int>(r.unit())) + ", x=" + std::to_string(r.x())
                    + ", y=" + std::to_string(r.y()) + ")";
@@ -184,7 +188,7 @@ void init_image(py::module_& m)
     // ============================================================================
 
     py::class_<sail::conversion_options>(m, "ConversionOptions", "Options for pixel format conversion")
-        .def(py::init<>())
+        .def(py::init<>(), "Create default conversion options")
         .def_property(
             "blend_alpha",
             [](const sail::conversion_options& opts) { return opts.options() & SAIL_CONVERSION_OPTION_BLEND_ALPHA; },
