@@ -99,15 +99,17 @@ jobs:
     - name: Build wheel (Windows)
       if: runner.os == 'Windows'
       working-directory: src/bindings/sail-python
-      run: |
+      env:
         # When we build Python wheels, CMAKE_SOURCE_DIR is src/bindings/sail-python.
         # VCPKG will try to search for vcpkg.json there. Redirect vcpkg to the project root.
         #
-        export CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
-                            -DVCPKG_TARGET_TRIPLET=x64-windows `
-                            -DVCPKG_MANIFEST_DIR=${{ github.workspace }} `
-                            -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed `
-                            -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP"
+        CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+                        -DVCPKG_TARGET_TRIPLET=x64-windows `
+                        -DVCPKG_MANIFEST_DIR=${{ github.workspace }} `
+                        -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed `
+                        -DCMAKE_C_FLAGS=-MP `
+                        -DCMAKE_CXX_FLAGS=-MP
+      run: |
         python -m build --wheel
         mkdir -p wheelhouse
         mv dist/*.whl wheelhouse/
