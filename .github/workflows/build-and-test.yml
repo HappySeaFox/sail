@@ -122,7 +122,8 @@ jobs:
           -DSAIL_WINDOWS_STATIC_CRT=${{ matrix.config.static_crt }} `
           -DCMAKE_TOOLCHAIN_FILE="$toolchainFile" `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
-          -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
+          -DVCPKG_MANIFEST_DIR=${{ github.workspace }} `
+          -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed
 
     - name: Build
       run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"
