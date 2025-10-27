@@ -105,25 +105,34 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Set up vcpkg
-      uses: lukka/run-vcpkg@v11
+    - name: Cache vcpkg
+      uses: actions/cache@v4
       with:
-        vcpkgJsonGlob: 'vcpkg.json'
+        path: vcpkg
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+
+    - name: Set up vcpkg
+      shell: bash
+      run: |
+        if [ ! -f "vcpkg/vcpkg.exe" ]; then
+          rm -rf vcpkg
+          git clone https://github.com/microsoft/vcpkg.git
+          cd vcpkg
+          ./bootstrap-vcpkg.bat
+        fi
 
     - name: Configure CMake
+      shell: bash
       run: |
-        $toolchainFile = "$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
-        cmake -S . -B build `
-          -DCMAKE_BUILD_TYPE=Debug `
-          -DCMAKE_INSTALL_PREFIX=C:/SAIL `
-          -DBUILD_SHARED_LIBS=${{ matrix.config.build_shared }} `
-          -DSAIL_DEV=ON `
-          -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }} `
-          -DSAIL_WINDOWS_STATIC_CRT=${{ matrix.config.static_crt }} `
-          -DCMAKE_TOOLCHAIN_FILE="$toolchainFile" `
-          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
-          -DVCPKG_MANIFEST_DIR=${{ github.workspace }} `
-          -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed
+        cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_INSTALL_PREFIX=C:/SAIL \
+          -DBUILD_SHARED_LIBS=${{ matrix.config.build_shared }} \
+          -DSAIL_DEV=ON \
+          -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }} \
+          -DSAIL_WINDOWS_STATIC_CRT=${{ matrix.config.static_crt }} \
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake \
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
 
     - name: Build
       run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"
@@ -135,27 +144,31 @@ jobs:
       run: C:/SAIL/bin/sail.exe --version
 
     - name: Test external C API link
+      shell: bash
       working-directory: tests/external/link/c
       run: |
         mkdir build
-        cmake -S . -B build `
-          -DCMAKE_BUILD_TYPE=Debug `
-          -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
-          -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
-          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake `
-          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
+        cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake \
+          -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} \
+          -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} \
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake \
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} \
           -DSAIL_DEV=ON
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Test external C++ API link
+      shell: bash
       working-directory: tests/external/link/c++
       run: |
         mkdir build
-        cmake -S . -B build `
-          -DCMAKE_BUILD_TYPE=Debug `
-          -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
-          -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
-          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake `
-          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
+        cmake -S . -B build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake \
+          -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} \
+          -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} \
+          -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake \
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} \
           -DSAIL_DEV=ON
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
