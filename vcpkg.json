@@ -5,7 +5,12 @@
     "dependencies": [
         "giflib",
         "jbigkit",
-        "libavif[aom]",
+        {
+          "name": "libavif",
+            "features": [
+              "aom"
+            ]
+        },
         "libheif",
         "libjpeg-turbo",
         "libjxl",
