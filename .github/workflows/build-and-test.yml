@@ -154,7 +154,9 @@ jobs:
           -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
-          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
+          -DVCPKG_MANIFEST_DIR=${{ github.workspace }} `
+          -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Test external C++ API link
@@ -167,5 +169,7 @@ jobs:
           -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
-          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }}
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
+          -DVCPKG_MANIFEST_DIR=${{ github.workspace }} `
+          -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
