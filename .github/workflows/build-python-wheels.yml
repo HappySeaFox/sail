@@ -66,11 +66,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install build twine wheel setuptools pybind11 numpy
 
-    - name: Install auditwheel (Linux only)
+    - name: Install auditwheel (Linux)
       if: runner.os == 'Linux'
       run: pip install auditwheel patchelf
 
-    - name: Install delocate (macOS only)
+    - name: Install delocate (macOS)
       if: runner.os == 'macOS'
       run: pip install delocate
 
@@ -98,16 +98,15 @@ jobs:
 
     - name: Build wheel (Windows)
       if: runner.os == 'Windows'
-      shell: bash
       working-directory: src/bindings/sail-python
       run: |
         # When we build Python wheels, CMAKE_SOURCE_DIR is src/bindings/sail-python.
         # VCPKG will try to search for vcpkg.json there. Redirect vcpkg to the project root.
         #
-        export CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-                            -DVCPKG_TARGET_TRIPLET=x64-windows \
-                            -DVCPKG_MANIFEST_DIR=${{ github.workspace }} \
-                            -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed \
+        export CMAKE_ARGS="-DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
+                            -DVCPKG_TARGET_TRIPLET=x64-windows `
+                            -DVCPKG_MANIFEST_DIR=${{ github.workspace }} `
+                            -DVCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed `
                             -DCMAKE_C_FLAGS=-MP -DCMAKE_CXX_FLAGS=-MP"
         python -m build --wheel
         mkdir -p wheelhouse
@@ -164,17 +163,15 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
     - name: Install build dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake libavif-dev libgif-dev libheif-dev libjbig-dev libjpeg-dev libjxl-dev \
                                 libnanosvg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libtiff-dev       \
                                 libwebp-dev zlib1g-dev
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
 
     - name: Install Python build tools
       run: |
