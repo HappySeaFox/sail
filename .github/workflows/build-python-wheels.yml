@@ -41,7 +41,7 @@ jobs:
       if: runner.os == 'macOS'
       run: |
         brew install python
-        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
+        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg resvg webp
 
     - name: Cache vcpkg (Windows)
       if: runner.os == 'Windows'

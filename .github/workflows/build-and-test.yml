@@ -35,7 +35,7 @@ jobs:
     - name: Install dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg webp
+        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg resvg webp
 
     - name: Configure CMake
       run: |
