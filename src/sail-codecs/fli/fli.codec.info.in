@@ -1,0 +1,27 @@
+# FLI codec information
+#
+[codec]
+layout=8
+version=0.3.2
+priority=LOWEST
+name=FLI
+description=Autodesk Animator FLIC Animation
+magic-numbers=11 AF;12 AF
+extensions=fli;flc
+mime-types=image/x-fli;video/x-fli;video/fli
+
+[load-features]
+features=STATIC;ANIMATED;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=STATIC;ANIMATED
+pixel-formats=BPP8-INDEXED
+compressions=RLE
+default-compression=RLE
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=
+

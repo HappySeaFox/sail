@@ -31,6 +31,13 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/bmp/bpp32-bgra.not4.bmp",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_FLI
+    "@SAIL_TEST_IMAGES_PATH@/fli/bpp8-indexed.fli",
+    "@SAIL_TEST_IMAGES_PATH@/fli/bpp8-indexed.flc",
+    "@SAIL_TEST_IMAGES_PATH@/fli/bpp8-indexed-animated.fli",
+    "@SAIL_TEST_IMAGES_PATH@/fli/bpp8-indexed-animated.flc",
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_GIF
     "@SAIL_TEST_IMAGES_PATH@/gif/bpp8-indexed.comment.gif",
     "@SAIL_TEST_IMAGES_PATH@/gif/bpp8-indexed.interlaced.gif",

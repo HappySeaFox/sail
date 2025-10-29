@@ -8,7 +8,7 @@ set(HIGHEST_PRIORITY_CODECS gif jpeg png svg webp)
 set(HIGH_PRIORITY_CODECS    avif ico)
 set(MEDIUM_PRIORITY_CODECS  heif openexr psd tiff)
 set(LOW_PRIORITY_CODECS     bmp hdr jpeg2000 jpegxl pnm qoi tga)
-set(LOWEST_PRIORITY_CODECS  jbig pcx wal xbm xpm xwd)
+set(LOWEST_PRIORITY_CODECS  fli jbig pcx wal xbm xpm xwd)
 
 set(CODECS ${HIGHEST_PRIORITY_CODECS}
            ${HIGH_PRIORITY_CODECS}
