@@ -48,7 +48,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vcpkg
-        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+        key: vcpkg-${{ runner.os }}-Python-${{ hashFiles('vcpkg.json') }}
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
