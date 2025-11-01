@@ -236,7 +236,7 @@ If you like the project, please consider starring the repository.
 
 ## Author
 
-Dmitry Baryshev
+Dzmitry Baryshau
 
 ## License
 
