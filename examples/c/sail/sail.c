@@ -1092,8 +1092,6 @@ static void print_aligned_image_info(const struct sail_image* image)
 
     if (image->meta_data_node != NULL)
     {
-        printf("  Meta data   :\n");
-
         for (const struct sail_meta_data_node* meta_data_node = image->meta_data_node; meta_data_node != NULL;
              meta_data_node                                   = meta_data_node->next)
         {
