@@ -147,6 +147,9 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/pnm/bpp32-rgba.pam",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_RAW
+#endif
+
 #ifdef SAIL_HAVE_BUILTIN_PSD
     "@SAIL_TEST_IMAGES_PATH@/psd/bpp8-grayscale.psd",
     "@SAIL_TEST_IMAGES_PATH@/psd/bpp8-indexed.psd",

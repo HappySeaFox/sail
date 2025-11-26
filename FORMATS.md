@@ -638,6 +638,60 @@
 </tr>
 <tr>
     <td>19</td>
+    <td><a href="https://wikipedia.org/wiki/Raw_image_format">RAW</a></td>
+    <td>
+        <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>RGB:</b> 24-bit, 48-bit.
+        <b>RGBA:</b> 32-bit, 64-bit.
+        <br/><br/>
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Supported formats:</b> 3FR, ARW, BAY, CR2, CR3, CRW, DCR, DNG, ERF, FFF, GPR, IIQ, K25, KDC, MEF, MOS, MRW, NEF, NRW, ORF, PEF, RAF, RAW, RW2, RWL, RWZ, SR2, SRF, SRW, X3F.
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"raw-iso"</i>. Description: ISO speed. Possible values: float.
+        Key: <i>"raw-shutter"</i>. Description: Shutter speed. Possible values: float.
+        Key: <i>"raw-aperture"</i>. Description: Aperture value. Possible values: float.
+        Key: <i>"raw-focal-length"</i>. Description: Focal length. Possible values: float.
+        Key: <i>"raw-lens-id"</i>. Description: Lens ID. Possible values: unsigned long long.
+        Key: <i>"raw-lens"</i>. Description: Lens name. Possible values: string.
+        Key: <i>"raw-min-focal-length"</i>. Description: Minimum focal length. Possible values: float.
+        Key: <i>"raw-max-focal-length"</i>. Description: Maximum focal length. Possible values: float.
+        Key: <i>"raw-max-aperture-min-focal"</i>. Description: Maximum aperture at minimum focal length. Possible values: float.
+        Key: <i>"raw-max-aperture-max-focal"</i>. Description: Maximum aperture at maximum focal length. Possible values: float.
+        Key: <i>"raw-focal-length-in-35mm-format"</i>. Description: Focal length in 35mm format. Possible values: unsigned short.
+        Key: <i>"raw-filters"</i>. Description: Bayer filter pattern. Possible values: unsigned int.
+        Key: <i>"raw-colors"</i>. Description: Number of color channels. Possible values: int.
+        Key: <i>"raw-width"</i>. Description: Raw image width. Possible values: unsigned short.
+        Key: <i>"raw-height"</i>. Description: Raw image height. Possible values: unsigned short.
+        Key: <i>"raw-top-margin"</i>. Description: Top margin. Possible values: unsigned short.
+        Key: <i>"raw-left-margin"</i>. Description: Left margin. Possible values: unsigned short.
+        Key: <i>"raw-is-foveon"</i>. Description: Is Foveon sensor. Possible values: bool.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"raw-brightness"</i>. Description: Brightness adjustment. Possible values: float/double.
+        <br/>Key: <i>"raw-gamma"</i>. Description: Gamma curve. Possible values: "power", "bt709".
+        <br/>Key: <i>"raw-highlight"</i>. Description: Highlight mode (0-9). Possible values: int/unsigned int 0-9.
+        <br/>Key: <i>"raw-output-color"</i>. Description: Output color space. Possible values: string ("srgb", "adobe-rgb", "wide-gamut-rgb", "prophoto-rgb", "xyz", "aces", "rec2020").
+        <br/>Key: <i>"raw-output-bits-per-sample"</i>. Description: Output bit depth. Possible values: int/unsigned int 8 or 16.
+        <br/>Key: <i>"raw-demosaic"</i>. Description: Demosaicing algorithm. Possible values: string ("linear", "vng", "ppg", "ahd", "dcb", "dht", "aahd").
+        <br/>Key: <i>"raw-four-color-rgb"</i>. Description: Use four-color RGB interpolation. Possible values: bool.
+        <br/>Key: <i>"raw-dcb-iterations"</i>. Description: DCB iterations (0-100). Possible values: int/unsigned int 0-100.
+        <br/>Key: <i>"raw-dcb-enhance-focal-length"</i>. Description: DCB enhance focal length (0-100). Possible values: int/unsigned int 0-100.
+        <br/>Key: <i>"raw-use-camera-white-balance"</i>. Description: Use camera white balance. Possible values: bool.
+        <br/>Key: <i>"raw-use-auto-white-balance"</i>. Description: Use auto white balance. Possible values: bool.
+        <br/>Key: <i>"raw-user-multiplier"</i>. Description: User white balance multipliers. Possible values: string ("r g1 b g2").
+        <br/>Key: <i>"raw-auto-brightness"</i>. Description: Auto brightness adjustment. Possible values: bool.
+        <br/>Key: <i>"raw-half-size"</i>. Description: Output half-size image. Possible values: bool.
+        <br/>Key: <i>"raw-use-fuji-rotate"</i>. Description: Use Fuji rotation. Possible values: bool.
+        <br/>Key: <i>"raw-no-interpolation"</i>. Description: Disable interpolation. Possible values: bool.
+        <br/>Key: <i>"raw-median-passes"</i>. Description: Median filter passes (0-100). Possible values: int/unsigned int 0-100.
+    </td>
+    <td><b>Content:</b> Multi-paged.</td>
+    <td>Unsupported</td>
+    <td>-</td>
+    <td>libraw</td>
+</tr>
+<tr>
+    <td>20</td>
     <td><a href="https://wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td>
     <td>
         <b>Bit depth:</b> 32-bit.
@@ -656,7 +710,7 @@
     <td>resvg or nanosvg</td>
 </tr>
 <tr>
-    <td>20</td>
+    <td>21</td>
     <td><a href="https://wikipedia.org/wiki/Truevision_TGA">TGA</a></td>
     <td>
         <b>Grayscale:</b> 8-bit.
@@ -687,7 +741,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>21</td>
+    <td>22</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 40-bit, 48-bit, 64-bit, 80-bit.
@@ -731,7 +785,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>22</td>
+    <td>23</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -750,7 +804,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>23</td>
+    <td>24</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>RGBA:</b> 32-bit.
@@ -825,7 +879,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>24</td>
+    <td>25</td>
     <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -854,7 +908,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>25</td>
+    <td>26</td>
     <td><a href="https://en.wikipedia.org/wiki/X_PixMap">XPM</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
@@ -881,7 +935,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>26</td>
+    <td>27</td>
     <td><a href="https://en.wikipedia.org/wiki/Xwd">XWD</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.

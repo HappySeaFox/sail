@@ -1,0 +1,26 @@
+# RAW codec information
+#
+[codec]
+layout=8
+version=0.8.77
+priority=MEDIUM
+name=RAW
+description=RAW Image Format
+magic-numbers=
+extensions=3fr;arw;bay;cr2;cr3;crw;dcr;dng;erf;fff;gpr;iiq;k25;kdc;mef;mos;mrw;nef;nrw;orf;pef;raf;raw;rw2;rwl;rwz;sr2;srf;srw;x3f
+mime-types=image/x-canon-cr2;image/x-canon-crw;image/x-fuji-raf;image/x-nikon-nef;image/x-olympus-orf;image/x-panasonic-raw;image/x-pentax-pef;image/x-sony-arw
+
+[load-features]
+features=STATIC;META-DATA;SOURCE-IMAGE
+tuning=raw-brightness;raw-gamma;raw-highlight;raw-output-color;raw-output-bits-per-sample;raw-demosaic;raw-four-color-rgb;raw-dcb-iterations;raw-dcb-enhance-focal-length;raw-use-camera-white-balance;raw-use-auto-white-balance;raw-user-multiplier;raw-auto-brightness;raw-half-size;raw-use-fuji-rotate;raw-no-interpolation;raw-median-passes
+
+[save-features]
+features=
+pixel-formats=
+compressions=
+default-compression=
+compression-level-min=0
+compression-level-max=0
+compression-level-default=0
+compression-level-step=0
+tuning=
