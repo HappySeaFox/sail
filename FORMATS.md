@@ -177,7 +177,7 @@
 </tr>
 <tr>
     <td>6</td>
-    <td><a href="https://en.wikipedia.org/wiki/RGBE_image_format">HDR</a></td>
+    <td><a href="https://wikipedia.org/wiki/RGBE_image_format">HDR</a></td>
     <td>
         <b>RGB:</b> 96-bit (32-bit float per channel).
         <br/><br/>
@@ -216,7 +216,7 @@
 </tr>
 <tr>
     <td>7</td>
-    <td><a href="https://en.wikipedia.org/wiki/High_Efficiency_Image_File_Format">HEIF/HEIC</a></td>
+    <td><a href="https://wikipedia.org/wiki/High_Efficiency_Image_File_Format">HEIF/HEIC</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit<sup><a href="#star-underlying">[1]</a></sup>.
         <b>RGB:</b> 24-bit, 48-bit<sup><a href="#star-underlying">[1]</a></sup>.
@@ -257,7 +257,7 @@
 </tr>
 <tr>
     <td>8</td>
-    <td><a href="https://en.wikipedia.org/wiki/ICO_(file_format)">ICO and CUR</a></td>
+    <td><a href="https://wikipedia.org/wiki/ICO_(file_format)">ICO and CUR</a></td>
     <td>
         <b>Bit depth:</b> Same to BMP.
         <br/><br/>
@@ -290,7 +290,7 @@
 </tr>
 <tr>
     <td>9</td>
-    <td><a href="https://en.wikipedia.org/wiki/JBIG">JBIG</a></td>
+    <td><a href="https://wikipedia.org/wiki/JBIG">JBIG</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
         <br/><br/>
@@ -473,7 +473,7 @@
 </tr>
 <tr>
     <td>13</td>
-    <td><a href="https://en.wikipedia.org/wiki/OpenEXR">OpenEXR</a></td>
+    <td><a href="https://wikipedia.org/wiki/OpenEXR">OpenEXR</a></td>
     <td>
         <b>Grayscale:</b> 16-bit (half), 32-bit (float), 32-bit (uint).
         <b>Grayscale+Alpha:</b> 32-bit (half), 64-bit (float), 64-bit (uint).
@@ -586,7 +586,7 @@
 </tr>
 <tr>
     <td>17</td>
-    <td><a href="https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
+    <td><a href="https://wikipedia.org/wiki/Adobe_Photoshop#File_format">PSD</a></td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit.
         <b>Grayscale+Alpha:</b> 16-bit, 32-bit.
@@ -880,7 +880,7 @@
 </tr>
 <tr>
     <td>25</td>
-    <td><a href="https://en.wikipedia.org/wiki/X_BitMap">XBM</a></td>
+    <td><a href="https://wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
         <br/><br/>
@@ -909,7 +909,7 @@
 </tr>
 <tr>
     <td>26</td>
-    <td><a href="https://en.wikipedia.org/wiki/X_PixMap">XPM</a></td>
+    <td><a href="https://wikipedia.org/wiki/X_PixMap">XPM</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
         <b>RGBA:</b> 32-bit.
@@ -936,7 +936,7 @@
 </tr>
 <tr>
     <td>27</td>
-    <td><a href="https://en.wikipedia.org/wiki/Xwd">XWD</a></td>
+    <td><a href="https://wikipedia.org/wiki/Xwd">XWD</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
         <b>RGB:</b> 16-bit (555, 565), 24-bit.
