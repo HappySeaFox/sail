@@ -270,14 +270,7 @@ class CustomSDist(sdist):
             # Copy all SAIL source files from git archive
             sail_items = [
                 (archive_dir / 'cmake', 'cmake'),
-                (archive_dir / 'src' / 'sail', 'src/sail'),
-                (archive_dir / 'src' / 'sail-common', 'src/sail-common'),
-                (archive_dir / 'src' / 'sail-manip', 'src/sail-manip'),
-                (archive_dir / 'src' / 'sail-codecs', 'src/sail-codecs'),
-                (archive_dir / 'src' / 'sail-codecs-archive', 'src/sail-codecs-archive'),
-                (archive_dir / 'src' / 'bindings' / 'sail-c++', 'src/bindings/sail-c++'),
-                (archive_dir / 'src' / 'bindings' / 'sail-python', 'src/bindings/sail-python'),
-                (archive_dir / 'src' / 'config.h.in', 'src/config.h.in'),
+                (archive_dir / 'src', 'src'),
                 (archive_dir / 'tests', 'tests'),
                 (archive_dir / 'LICENSE.txt', 'LICENSE.txt'),
                 (archive_dir / 'LICENSE.INIH.txt', 'LICENSE.INIH.txt'),
