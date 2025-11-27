@@ -12,6 +12,14 @@ SAIL is available in VCPKG on Windows, Linux, and macOS:
 vcpkg install sail
 ```
 
+### HomeBrew
+
+SAIL is available in `brew`:
+
+```
+brew install libsail
+```
+
 ### CMake options overview
 
 - `BUILD_SHARED_LIBS=ON|OFF` - Build shared libraries. When disabled, automatically sets `SAIL_COMBINE_CODECS` to `ON`. Default: `ON`
@@ -50,50 +58,37 @@ vcpkg install sail
 Open `Git Bash` (installed with Git) and execute the following commands:
 
 ```
-git clone --recursive https://github.com/HappySeaFox/sail.git
+# Install vcpkg or use your copy
+#
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.bat
+export VCPKG_ROOT="$PWD"
+cd -
+
+# Clone SAIL
+#
+git clone https://github.com/HappySeaFox/sail.git
 cd sail
 
-# Compile third-party dependencies
-cd extra
-./build
-cd ..
-
-# Compile SAIL
+# Compile SAIL against vcpkg
+#
 mkdir build
 cd build
-cmake -A x64 -DCMAKE_INSTALL_PREFIX="C:\SAIL" ..
+cmake -DCMAKE_INSTALL_PREFIX="C:/SAIL" -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake ..
 cmake --build . --config Release
 
 # Install
+#
 cmake --build . --config Release --target install
-```
-
-### macOS
-
-#### Tested environments
-
-- macOS 10.14 Mojave
-- macOS 10.15 Catalina
-- macOS 11.3 Big Sur
-
-#### Installation steps
-
-```
-brew install HappySeaFox/sail/sail
-```
-
-Or
-
-```
-brew upgrade sail
 ```
 
 ### Linux
 
 #### Tested environments
 
-- LUbuntu 18.04 64-bit
-- LUbuntu 20.04 64-bit
+- LUbuntu 24.04 64-bit
+- LUbuntu 25.04 64-bit
 
 #### Build requirements
 
@@ -106,10 +101,13 @@ brew upgrade sail
 #### Build steps
 
 ```
+# Clone SAIL
+#
 git clone --recursive https://github.com/HappySeaFox/sail.git
 cd sail
 
 # Install the required dependencies from .github/workflows/build-and-test.yml
+#
 sudo apt install ...
 
 # Compile SAIL
