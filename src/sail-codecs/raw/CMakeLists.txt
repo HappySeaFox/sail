@@ -25,3 +25,6 @@ set_target_properties(sail-codec-raw PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO)
+
+# getc_unlocked
+sail_enable_posix_source(TARGET sail-codec-raw VERSION 200112L)
