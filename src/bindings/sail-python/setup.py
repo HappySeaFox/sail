@@ -26,37 +26,62 @@ import os
 import sys
 import subprocess
 import multiprocessing
+import tempfile
+import fnmatch
 from pathlib import Path
 import re
 
 from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
+from setuptools.command.sdist import sdist
+import shutil
 
+def find_sail_root(start_dir=None):
+    """Find SAIL root directory and version by looking for CMakeLists.txt with SAIL project.
+    Returns tuple (root_path, version).
+    Raises FileNotFoundError if not found.
+    """
+    if start_dir is None:
+        start_dir = Path(__file__).parent.resolve()
+    else:
+        start_dir = Path(start_dir).resolve()
+
+    current = start_dir
+    for _ in range(5):
+        cmake_path = current / "CMakeLists.txt"
+        if cmake_path.exists():
+            try:
+                content = cmake_path.read_text()
+                match = re.search(r'project\s*\(\s*SAIL\s+VERSION\s+([\d.]+)', content, re.I)
+                if match:
+                    return current.resolve(), match.group(1)
+            except Exception:
+                pass
+        current = current.parent
+        if current == current.parent:  # Reached filesystem root
+            break
+
+    raise FileNotFoundError("Cannot find SAIL CMakeLists.txt with version")
 
 def sail_version():
     """Get version from root CMakeLists.txt."""
-    cmake = Path(__file__).resolve(
-    ).parent.parent.parent.parent / "CMakeLists.txt"
-    if not cmake.exists():
-        raise FileNotFoundError(f"Cannot find SAIL CMakeLists.txt: {cmake}")
-
-    match = re.search(
-        r'project\s*\(\s*SAIL\s+VERSION\s+([\d.]+)', cmake.read_text(), re.I)
-    if match:
-        return match.group(1)
-    else:
-        raise ValueError(f"Cannot find SAIL version in {cmake}")
+    _, version = find_sail_root()
+    return version
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
         self.sourcedir = os.path.abspath(sourcedir)
 
-
 class CMakeBuild(build_ext):
     def _generate_version_file(self, target_dir):
         """Generate _version.py from template in the target directory."""
-        sailpy_dir = Path(__file__).parent / 'sailpy'
+        setup_dir = Path(__file__).parent.resolve()
+        if (setup_dir / 'src' / 'bindings' / 'sail-python' / 'sailpy').exists():
+            sailpy_dir = setup_dir / 'src' / 'bindings' / 'sail-python' / 'sailpy'
+        else:
+            sailpy_dir = setup_dir / 'sailpy'
+
         template_file = sailpy_dir / '_version.py.in'
         version_file = target_dir / '_version.py'
 
@@ -69,7 +94,6 @@ class CMakeBuild(build_ext):
     def run(self):
         super().run()
 
-        # Generate _version.py
         build_sailpy_dir = Path(self.build_lib) / 'sailpy'
         self._generate_version_file(build_sailpy_dir)
 
@@ -77,50 +101,36 @@ class CMakeBuild(build_ext):
         extdir = os.path.abspath(os.path.dirname(
             self.get_ext_fullpath(ext.name)))
 
-        # Determine build configuration
         cfg = 'Debug' if self.debug else 'Release'
 
-        # Find SAIL root directory FIRST (before cmake_args)
-        # When building from repo: src/bindings/python/setup.py -> ../../../../
-        # When building from sdist: we need to check if CMakeLists.txt exists
-        sail_root = Path(__file__).parent.parent.parent.parent.resolve()
+        setup_dir = Path(__file__).parent.resolve()
+        sail_root, _ = find_sail_root(setup_dir)
 
-        # Check if this is a valid SAIL root
-        if not (sail_root / 'CMakeLists.txt').exists():
-            # Try alternative paths or raise error
-            alt_sail_root = Path(__file__).parent.resolve()
-            if not (alt_sail_root / 'CMakeLists.txt').exists():
-                raise RuntimeError(
-                    "Cannot find SAIL root directory with CMakeLists.txt.\n"
-                    "Please ensure you're building from the SAIL repository, not from PyPI sdist.\n"
-                    "To build from source:\n"
-                    "  git clone https://github.com/HappySeaFox/sail\n"
-                    "  cd sail/src/bindings/python\n"
-                    "  pip install -e .\n"
-                    "\n"
-                    "Or install pre-built wheels from PyPI:\n"
-                    "  pip install sailpy"
-                )
-            sail_root = alt_sail_root
+        if not (sail_root / 'src' / 'sail').exists():
+            raise RuntimeError(
+                f"SAIL root directory found at {sail_root} but src/sail directory is missing.\n"
+                "Please ensure you're building from the SAIL repository or from a complete sdist.\n"
+            )
 
         print(f"Building SAIL Python bindings from: {sail_root}")
 
-        # Use fixed build directory instead of temporary one
-        python_bindings_dir = Path(__file__).parent.resolve()
+        if (setup_dir / 'src' / 'bindings' / 'sail-python').exists():
+            python_bindings_dir = setup_dir / 'src' / 'bindings' / 'sail-python'
+        else:
+            python_bindings_dir = setup_dir
         build_dir = python_bindings_dir / 'build-python'
 
         cmake_args = [
             f'-DPYTHON_EXECUTABLE={sys.executable}',
             f'-DCMAKE_BUILD_TYPE={cfg}',
             f'-DSAIL_ROOT_DIR={sail_root}',
-            '-DSAIL_BUILD_TESTS=OFF',
+            '-DBUILD_TESTING=OFF',
             '-DSAIL_BUILD_EXAMPLES=OFF',
             '-DSAIL_BUILD_APPS=OFF',
             '-DSAIL_COMBINE_CODECS=ON',
             '-DSAIL_THIRD_PARTY_CODECS_PATH=OFF',
         ]
 
-        # On Windows, force output to build_dir root (MSVC creates Debug/Release subdirs anyway)
         is_windows = sys.platform.startswith('win')
         if is_windows:
             cmake_args.extend([
@@ -148,9 +158,10 @@ class CMakeBuild(build_ext):
 
         print(f"CMake arguments: {cmake_args}")
 
-        # Configure with CMake - pass the Python bindings directory
+        cmake_source_dir = python_bindings_dir
+
         subprocess.check_call(
-            ['cmake', str(python_bindings_dir)] + cmake_args,
+            ['cmake', str(cmake_source_dir)] + cmake_args,
             cwd=build_dir,
             env=env
         )
@@ -161,8 +172,6 @@ class CMakeBuild(build_ext):
         )
 
         # Copy Python extension module and SAIL libraries to sailpy directory
-        import shutil
-        import glob
         sailpy_dir = python_bindings_dir / 'sailpy'
         os.makedirs(extdir, exist_ok=True)
 
@@ -206,6 +215,93 @@ class CMakeBuild(build_ext):
         print(f"Copied {copied_count} library files to {sailpy_dir} and {extdir}")
 
 
+class CustomSDist(sdist):
+    """Custom sdist command that includes SAIL source files from parent directories."""
+
+    def make_release_tree(self, base_dir, files):
+        """Override to add SAIL source files to the release tree."""
+        super().make_release_tree(base_dir, files)
+
+        sail_root = Path(__file__).parent.parent.parent.parent.resolve()
+        python_bindings_dir = Path(__file__).parent.resolve()
+        release_dir = Path(base_dir).resolve()
+
+        print("Including SAIL source files in sdist...")
+
+        # Use git archive to get clean source tree without build artifacts
+        with tempfile.TemporaryDirectory() as tmpdir:
+            archive_dir = Path(tmpdir) / 'sail-archive'
+            archive_dir.mkdir()
+
+            # Create clean archive using git archive
+            subprocess.check_call(
+                ['git', 'archive', '--format=tar', 'HEAD'],
+                cwd=sail_root,
+                stdout=open(archive_dir / 'archive.tar', 'wb')
+            )
+            subprocess.check_call(
+                ['tar', '-xf', 'archive.tar'],
+                cwd=archive_dir
+            )
+            (archive_dir / 'archive.tar').unlink()
+
+            # Ignore patterns for copying (shell patterns)
+            def ignore_patterns(src, names):
+                patterns = ['*.so*', 'sailpy.egg-info']
+                ignored = set()
+                for name in names:
+                    for pattern in patterns:
+                        if fnmatch.fnmatch(name, pattern):
+                            ignored.add(name)
+                            break
+                return ignored
+
+            # Copy setup.py to root (overwrite if exists)
+            setup_py_src = python_bindings_dir / 'setup.py'
+            setup_py_dest = release_dir / 'setup.py'
+            if setup_py_src.exists():
+                shutil.copy2(setup_py_src, setup_py_dest)
+
+            # Copy SAIL root CMakeLists.txt (overwrite Python bindings one if exists)
+            sail_cmake = archive_dir / 'CMakeLists.txt'
+            if sail_cmake.exists():
+                shutil.copy2(sail_cmake, release_dir / 'CMakeLists.txt')
+
+            # Copy all SAIL source files from git archive
+            sail_items = [
+                (archive_dir / 'cmake', 'cmake'),
+                (archive_dir / 'src' / 'sail', 'src/sail'),
+                (archive_dir / 'src' / 'sail-common', 'src/sail-common'),
+                (archive_dir / 'src' / 'sail-manip', 'src/sail-manip'),
+                (archive_dir / 'src' / 'sail-codecs', 'src/sail-codecs'),
+                (archive_dir / 'src' / 'sail-codecs-archive', 'src/sail-codecs-archive'),
+                (archive_dir / 'src' / 'bindings' / 'sail-c++', 'src/bindings/sail-c++'),
+                (archive_dir / 'src' / 'bindings' / 'sail-python', 'src/bindings/sail-python'),
+                (archive_dir / 'src' / 'config.h.in', 'src/config.h.in'),
+                (archive_dir / 'tests', 'tests'),
+                (archive_dir / 'LICENSE.txt', 'LICENSE.txt'),
+                (archive_dir / 'LICENSE.INIH.txt', 'LICENSE.INIH.txt'),
+                (archive_dir / 'LICENSE.MUNIT.txt', 'LICENSE.MUNIT.txt'),
+                (archive_dir / 'vcpkg.json', 'vcpkg.json'),
+            ]
+
+            for src_path, dest_rel in sail_items:
+                if src_path.exists():
+                    dest_path = release_dir / dest_rel
+                    if dest_path.exists():
+                        if dest_path.is_dir():
+                            shutil.rmtree(dest_path)
+                        else:
+                            dest_path.unlink()
+                    if src_path.is_file():
+                        dest_path.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(src_path, dest_path)
+                    else:
+                        shutil.copytree(src_path, dest_path, ignore=ignore_patterns)
+
+        print("Added SAIL source files to sdist")
+
+
 setup(
     name='sailpy',
     version=sail_version(),
@@ -214,6 +310,6 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     ext_modules=[CMakeExtension('sailpy._libsail')],
-    cmdclass={'build_ext': CMakeBuild},
+    cmdclass={'build_ext': CMakeBuild, 'sdist': CustomSDist},
     zip_safe=False,
 )

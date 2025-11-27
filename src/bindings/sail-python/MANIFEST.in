@@ -10,16 +10,11 @@ include pyproject.toml
 include setup.py
 include CMakeLists.txt
 
-# Include all C++ source files for building from source
-recursive-include src *.cpp *.h *.hpp
+# Include all C++ source files for building from source (Python bindings)
+recursive-include src *.cpp
+
+# Note: SAIL source files (CMakeLists.txt, cmake/, src/sail/, etc.) are added
+# automatically by CustomSDist.make_release_tree() during sdist creation.
 
 # Exclude build artifacts and cache
-global-exclude *.pyc
-global-exclude *.pyo
-global-exclude __pycache__
-prune build
-prune dist
-prune wheelhouse
-prune venv
-prune .pytest_cache
-prune *.egg-info
+global-exclude *.so.*

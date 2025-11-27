@@ -163,7 +163,6 @@ for version in "${PYTHON_VERSIONS[@]}"; do
     echo "============================"
     echo "  Building for Python $version"
     echo "============================"
-    echo
 
     pyenv local "$version"
 
