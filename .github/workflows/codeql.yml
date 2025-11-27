@@ -32,7 +32,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libavif-dev libgif-dev libheif-dev libjbig-dev libjpeg-dev libjxl-dev \
-                                  libnanosvg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libtiff-dev libwebp-dev zlib1g-dev
+                                  libnanosvg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libraw-dev libtiff-dev libwebp-dev zlib1g-dev
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2

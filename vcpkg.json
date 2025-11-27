@@ -15,6 +15,7 @@
         "libjpeg-turbo",
         "libjxl",
         "libpng",
+        "libraw",
         "libwebp",
         "nanosvg",
         "openexr",

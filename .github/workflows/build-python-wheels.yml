@@ -34,14 +34,14 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake libavif-dev libgif-dev libheif-dev libjbig-dev libjpeg-dev libjxl-dev \
-                                libnanosvg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libtiff-dev       \
+                                libnanosvg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libraw-dev libtiff-dev \
                                 libwebp-dev zlib1g-dev
 
     - name: Install build dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
         brew install python
-        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libtiff openexr openjpeg resvg webp
+        brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libraw libtiff openexr openjpeg resvg webp
 
     - name: Cache vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -168,7 +168,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y cmake libavif-dev libgif-dev libheif-dev libjbig-dev libjpeg-dev libjxl-dev \
-                                libnanosvg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libtiff-dev       \
+                                libnanosvg-dev libopenexr-dev libopenjp2-7-dev libpng-dev libraw-dev libtiff-dev \
                                 libwebp-dev zlib1g-dev
 
     - name: Set up Python
