@@ -326,7 +326,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                         /* Skip remaining bytes if we had to truncate. */
                         if (actual_count < c)
                         {
-                            SAIL_TRY(psd_state->io->seek(psd_state->io->stream, (c - actual_count) * bytes_per_sample,
+                            SAIL_TRY(psd_state->io->seek(psd_state->io->stream, (long)((unsigned)c - actual_count) * bytes_per_sample,
                                                          SEEK_CUR));
                         }
 
