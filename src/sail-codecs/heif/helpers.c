@@ -234,11 +234,9 @@ sail_status_t heif_private_fetch_meta_data(struct heif_image_handle* handle,
 
                 SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_EXIF,
                                                                                   &meta_data_node_local->meta_data),
-                                    /* cleanup */ sail_free(metadata),
-                                    sail_destroy_meta_data_node(meta_data_node_local));
+                                    /* cleanup */ sail_free(metadata), sail_destroy_meta_data_node(meta_data_node_local));
 
-                SAIL_TRY_OR_CLEANUP(
-                    sail_set_variant_data(meta_data_node_local->meta_data->value, metadata, metadata_size),
+                SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node_local->meta_data->value, metadata, metadata_size),
                     /* cleanup */ sail_free(metadata), sail_destroy_meta_data_node(meta_data_node_local));
 
                 *last_meta_data_node = meta_data_node_local;
@@ -280,11 +278,9 @@ sail_status_t heif_private_fetch_meta_data(struct heif_image_handle* handle,
 
                     SAIL_TRY_OR_CLEANUP(sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_XMP,
                                                                                       &meta_data_node_local->meta_data),
-                                        /* cleanup */ sail_free(metadata),
-                                        sail_destroy_meta_data_node(meta_data_node_local));
+                                        /* cleanup */ sail_free(metadata), sail_destroy_meta_data_node(meta_data_node_local));
 
-                    SAIL_TRY_OR_CLEANUP(
-                        sail_set_variant_data(meta_data_node_local->meta_data->value, metadata, metadata_size),
+                    SAIL_TRY_OR_CLEANUP(sail_set_variant_data(meta_data_node_local->meta_data->value, metadata, metadata_size),
                         /* cleanup */ sail_free(metadata), sail_destroy_meta_data_node(meta_data_node_local));
 
                     *last_meta_data_node = meta_data_node_local;
