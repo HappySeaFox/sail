@@ -96,15 +96,25 @@ static sail_status_t add_time_meta_data(time_t timestamp, struct sail_meta_data_
         return SAIL_OK;
     }
 
-    struct tm* time_info = gmtime(&timestamp);
+    std::tm time_info;
+    std::tm* time_info_ptr = nullptr;
 
-    if (time_info == NULL)
+#ifdef _MSC_VER
+    if (gmtime_s(&time_info, &timestamp) == 0)
+    {
+        time_info_ptr = &time_info;
+    }
+#else
+    time_info_ptr = gmtime_r(&timestamp, &time_info);
+#endif
+
+    if (time_info_ptr == nullptr)
     {
         return SAIL_OK;
     }
 
     char time_string[32];
-    strftime(time_string, sizeof(time_string), "%Y:%m:%d %H:%M:%S", time_info);
+    std::strftime(time_string, sizeof(time_string), "%Y:%m:%d %H:%M:%S", time_info_ptr);
 
     return add_string_meta_data(SAIL_META_DATA_CREATION_TIME, time_string, last_meta_data_node);
 }
