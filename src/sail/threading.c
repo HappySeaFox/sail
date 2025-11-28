@@ -69,7 +69,7 @@ sail_status_t threading_call_once(sail_once_flag_t* once_flag, void (*callback)(
     }
     else
     {
-        sail_print_errno("Failed to execute call_once: %s");
+        SAIL_LOG_ERROR("Failed to execute call_once: %s", sail_strerror());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
@@ -98,20 +98,20 @@ sail_status_t threading_init_mutex(sail_mutex_t* mutex)
             }
             else
             {
-                sail_print_errno("Failed to initialize mutex: %s");
+                SAIL_LOG_ERROR("Failed to initialize mutex: %s", sail_strerror());
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
             }
         }
         else
         {
             pthread_mutexattr_destroy(&attr);
-            sail_print_errno("Failed to set mutex attributes: %s");
+            SAIL_LOG_ERROR("Failed to set mutex attributes: %s", sail_strerror());
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
         }
     }
     else
     {
-        sail_print_errno("Failed to initialize mutex attributes: %s");
+        SAIL_LOG_ERROR("Failed to initialize mutex attributes: %s", sail_strerror());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
@@ -131,7 +131,7 @@ sail_status_t threading_lock_mutex(sail_mutex_t* mutex)
     }
     else
     {
-        sail_print_errno("Failed to lock mutex: %s");
+        SAIL_LOG_ERROR("Failed to lock mutex: %s", sail_strerror());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
@@ -151,7 +151,7 @@ sail_status_t threading_unlock_mutex(sail_mutex_t* mutex)
     }
     else
     {
-        sail_print_errno("Failed to unlock mutex: %s");
+        SAIL_LOG_ERROR("Failed to unlock mutex: %s", sail_strerror());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif
@@ -171,7 +171,7 @@ sail_status_t threading_destroy_mutex(sail_mutex_t* mutex)
     }
     else
     {
-        sail_print_errno("Failed to initialize mutex: %s");
+        SAIL_LOG_ERROR("Failed to initialize mutex: %s", sail_strerror());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 #endif

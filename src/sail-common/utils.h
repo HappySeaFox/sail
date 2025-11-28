@@ -187,9 +187,10 @@ SAIL_EXPORT bool sail_is_ycbcr(enum SailPixelFormat pixel_format);
 SAIL_EXPORT bool sail_is_ycck(enum SailPixelFormat pixel_format);
 
 /*
- * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
+ * Returns a pointer to a thread-local buffer containing the error message for the current errno value.
+ * The buffer is valid until the next call to sail_strerror() in the same thread.
  */
-SAIL_EXPORT void sail_print_errno(const char* format);
+SAIL_EXPORT const char* sail_strerror(void);
 
 /*
  * Returns the current number of milliseconds since Epoch or 0 on error.

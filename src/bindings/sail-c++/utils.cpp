@@ -28,9 +28,9 @@
 namespace sail
 {
 
-void print_errno(const char* format)
+const char* strerror()
 {
-    sail_print_errno(format);
+    return sail_strerror();
 }
 
 std::uint64_t now()

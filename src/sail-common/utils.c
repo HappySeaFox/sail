@@ -776,21 +776,25 @@ bool sail_is_floating_point(enum SailPixelFormat pixel_format)
     }
 }
 
-void sail_print_errno(const char* format)
+const char* sail_strerror(void)
 {
-    if (strstr(format, "%s") == NULL)
-    {
-        SAIL_LOG_ERROR("Format argument must contain %%s");
-        return;
-    }
+    static SAIL_THREAD_LOCAL char buffer[256];
 
 #ifdef _MSC_VER
-    char buffer[80];
-    strerror_s(buffer, sizeof(buffer), errno);
-    SAIL_LOG_ERROR(format, buffer);
+    if (strerror_s(buffer, sizeof(buffer), errno) != 0)
+    {
+        SAIL_LOG_ERROR("Failed to get the error message for the current errno value");
+        return NULL;
+    }
 #else
-    SAIL_LOG_ERROR(format, strerror(errno));
+    if (snprintf(buffer, sizeof(buffer), "%s", strerror(errno)) < 0)
+    {
+        SAIL_LOG_ERROR("Failed to get the error message for the current errno value");
+        return NULL;
+    }
 #endif
+
+    return buffer;
 }
 
 uint64_t sail_now(void)
@@ -827,7 +831,7 @@ uint64_t sail_now(void)
 
     if (gettimeofday(&tv, NULL) != 0)
     {
-        sail_print_errno("Failed to get the current time: %s");
+        SAIL_LOG_ERROR("Failed to get the current time: %s", sail_strerror());
         return 0;
     }
 
@@ -997,7 +1001,7 @@ sail_status_t sail_temp_file_path(const char* prefix, char** path)
 
     if (fd < 0)
     {
-        sail_print_errno("Failed to create temporary file: %s");
+        SAIL_LOG_ERROR("Failed to create temporary file: %s", sail_strerror());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 

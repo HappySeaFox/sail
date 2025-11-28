@@ -39,9 +39,10 @@ namespace sail
 class abstract_io;
 
 /*
- * Prints the recent errno value with SAIL_LOG_ERROR(). The specified format must include '%s'.
+ * Returns a pointer to a thread-local buffer containing the error message for the current errno value.
+ * The buffer is valid until the next call to strerror() in the same thread.
  */
-SAIL_EXPORT void print_errno(const char* format);
+SAIL_EXPORT const char* strerror();
 
 /*
  * Returns the current number of milliseconds since Epoch or 0 on error.
