@@ -11,7 +11,7 @@
 <p align="center">
   <a href="#target-audience">Target Audience</a> •
   <a href="#features-overview">Features</a> •
-  <a href="#supported-image-formats">Image Formats</a> •
+  <a href="#20-image-formats">Image Formats</a> •
   <a href="#apis-overview">Getting Started</a> •
   <a href="FAQ.md">FAQ</a>
 </p>
