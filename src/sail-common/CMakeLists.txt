@@ -114,6 +114,7 @@ endif()
 
 target_include_directories(sail-common
                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+                                   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
                                    $<INSTALL_INTERFACE:include/sail>)
 
 # pkg-config integration

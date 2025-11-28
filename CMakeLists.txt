@@ -208,10 +208,6 @@ if (WIN32)
     string(REPLACE "/" "\\\\" SAIL_CODECS_PATH "${SAIL_CODECS_PATH}")
 endif()
 
-# Global include directory with generated configs
-#
-include_directories("${PROJECT_BINARY_DIR}/include")
-
 # Configure subdirs
 #
 add_subdirectory(src/sail-common)
