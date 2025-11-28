@@ -7,9 +7,6 @@
   <a href="https://github.com/HappySeaFox/sail/releases">
     <img alt="Latest release" src="https://img.shields.io/github/v/release/HappySeaFox/sail?include_prereleases"/>
   </a>
-  <a href="https://www.buymeacoffee.com/dima8w">
-    <img alt="Buy me a coffee" src="https://img.shields.io/badge/buy_me-a_coffee-ffdd00"/>
-  </a>
 </p>
 <p align="center">
   <a href="#target-audience">Target Audience</a> •
