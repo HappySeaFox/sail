@@ -139,6 +139,13 @@ public:
      */
     sail_status_t eof(bool* result) override;
 
+    /*
+     * Assigns the size of the underlying I/O object to the 'size' argument.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t size(std::size_t* size) override;
+
 protected:
     class pimpl;
     const std::unique_ptr<pimpl> d;

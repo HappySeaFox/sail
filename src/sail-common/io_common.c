@@ -47,6 +47,7 @@ sail_status_t sail_alloc_io(struct sail_io** io)
     (*io)->flush          = NULL;
     (*io)->close          = NULL;
     (*io)->eof            = NULL;
+    (*io)->size           = NULL;
 
     return SAIL_OK;
 }
@@ -71,8 +72,16 @@ sail_status_t sail_check_io_valid(const struct sail_io* io)
 {
     SAIL_CHECK_PTR(io);
 
-    if (io->tolerant_read == NULL || io->strict_read == NULL || io->tolerant_write == NULL || io->strict_write == NULL
-        || io->seek == NULL || io->tell == NULL || io->flush == NULL || io->close == NULL || io->eof == NULL)
+    if (io->tolerant_read == NULL  ||
+        io->strict_read == NULL    ||
+        io->tolerant_write == NULL ||
+        io->strict_write == NULL   ||
+        io->seek == NULL  ||
+        io->tell == NULL  ||
+        io->flush == NULL ||
+        io->close == NULL ||
+        io->eof == NULL   ||
+        io->size == NULL)
     {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);
     }
@@ -85,16 +94,9 @@ sail_status_t sail_io_size(struct sail_io* io, size_t* size)
     SAIL_TRY(sail_check_io_valid(io));
     SAIL_CHECK_PTR(size);
 
-    /* Save the current position. */
-    size_t saved_position;
-    SAIL_TRY(io->tell(io->stream, &saved_position));
-
     size_t size_local;
-    SAIL_TRY(io->seek(io->stream, 0, SEEK_END));
-    SAIL_TRY(io->tell(io->stream, &size_local));
-    SAIL_TRY(io->seek(io->stream, (long)saved_position, SEEK_SET));
-
-    *size = size_local - saved_position;
+    SAIL_TRY(io->size(io->stream, &size_local));
+    *size = size_local;
 
     return SAIL_OK;
 }

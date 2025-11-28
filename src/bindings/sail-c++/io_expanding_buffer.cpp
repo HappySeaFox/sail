@@ -24,7 +24,6 @@
 */
 
 #include <cstring>
-#include <stdexcept>
 
 #include <sail/sail.h>
 
@@ -46,16 +45,6 @@ io_expanding_buffer::io_expanding_buffer(std::size_t initial_capacity)
 
 io_expanding_buffer::~io_expanding_buffer()
 {
-}
-
-std::size_t io_expanding_buffer::size() const
-{
-    std::size_t result_size;
-
-    SAIL_TRY_OR_EXECUTE(sail_io_expanding_buffer_size(d->sail_io_wrapper.get(), &result_size),
-                        /* on error */ throw std::runtime_error("Failed to get expanding buffer size"));
-
-    return result_size;
 }
 
 codec_info io_expanding_buffer::codec_info()

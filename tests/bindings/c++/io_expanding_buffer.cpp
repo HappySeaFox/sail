@@ -46,7 +46,9 @@ static MunitResult test_expanding_buffer_write(const MunitParameter params[], vo
     munit_assert(written_size == test_data.size());
 
     /* Check size. */
-    munit_assert(io.size() == test_data.size());
+    std::size_t size;
+    munit_assert(io.size(&size) == SAIL_OK);
+    munit_assert(size == test_data.size());
 
     /* Verify data by reading back. */
     munit_assert(io.seek(0, SEEK_SET) == SAIL_OK);
@@ -79,7 +81,9 @@ static MunitResult test_expanding_buffer_multiple_writes(const MunitParameter pa
 
     /* Check size. */
     const std::size_t expected_size = chunk1.size() + chunk2.size() + chunk3.size();
-    munit_assert(io.size() == expected_size);
+    std::size_t size;
+    munit_assert(io.size(&size) == SAIL_OK);
+    munit_assert(size == expected_size);
 
     /* Verify data by reading back. */
     const std::string expected = chunk1 + chunk2 + chunk3;
@@ -111,7 +115,9 @@ static MunitResult test_expanding_buffer_expansion(const MunitParameter params[]
     munit_assert(written_size == large_size);
 
     /* Check size. */
-    munit_assert(io.size() == large_size);
+    std::size_t size;
+    munit_assert(io.size(&size) == SAIL_OK);
+    munit_assert(size == large_size);
 
     /* Verify data by reading back. */
     munit_assert(io.seek(0, SEEK_SET) == SAIL_OK);
@@ -142,7 +148,9 @@ static MunitResult test_expanding_buffer_flush(const MunitParameter params[], vo
     munit_assert(io.flush() == SAIL_OK);
 
     /* Verify data is still there. */
-    munit_assert(io.size() == test_data.size());
+    std::size_t size;
+    munit_assert(io.size(&size) == SAIL_OK);
+    munit_assert(size == test_data.size());
 
     return MUNIT_OK;
 }

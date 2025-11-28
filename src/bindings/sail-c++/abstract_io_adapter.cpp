@@ -36,7 +36,6 @@ namespace sail
 
 static sail_status_t wrapped_tolerant_read(void* stream, void* buf, size_t size_to_read, size_t* read_size)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.tolerant_read(buf, size_to_read, read_size));
@@ -46,7 +45,6 @@ static sail_status_t wrapped_tolerant_read(void* stream, void* buf, size_t size_
 
 static sail_status_t wrapped_strict_read(void* stream, void* buf, size_t size_to_read)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.strict_read(buf, size_to_read));
@@ -56,7 +54,6 @@ static sail_status_t wrapped_strict_read(void* stream, void* buf, size_t size_to
 
 static sail_status_t wrapped_tolerant_write(void* stream, const void* buf, size_t size_to_write, size_t* written_size)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.tolerant_write(buf, size_to_write, written_size));
@@ -66,7 +63,6 @@ static sail_status_t wrapped_tolerant_write(void* stream, const void* buf, size_
 
 static sail_status_t wrapped_strict_write(void* stream, const void* buf, size_t size_to_write)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.strict_write(buf, size_to_write));
@@ -76,7 +72,6 @@ static sail_status_t wrapped_strict_write(void* stream, const void* buf, size_t 
 
 static sail_status_t wrapped_seek(void* stream, long offset, int whence)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.seek(offset, whence));
@@ -86,7 +81,6 @@ static sail_status_t wrapped_seek(void* stream, long offset, int whence)
 
 static sail_status_t wrapped_tell(void* stream, size_t* offset)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.tell(offset));
@@ -96,7 +90,6 @@ static sail_status_t wrapped_tell(void* stream, size_t* offset)
 
 static sail_status_t wrapped_flush(void* stream)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.flush());
@@ -106,7 +99,6 @@ static sail_status_t wrapped_flush(void* stream)
 
 static sail_status_t wrapped_close(void* stream)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.close());
@@ -116,10 +108,20 @@ static sail_status_t wrapped_close(void* stream)
 
 static sail_status_t wrapped_eof(void* stream, bool* result)
 {
-
     sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
 
     SAIL_TRY(abstract_io.eof(result));
+
+    return SAIL_OK;
+}
+
+static sail_status_t wrapped_size(void* stream, size_t* size)
+{
+    sail::abstract_io& abstract_io = *reinterpret_cast<sail::abstract_io*&>(stream);
+
+    std::size_t size_local;
+    SAIL_TRY(abstract_io.size(&size_local));
+    *size = size_local;
 
     return SAIL_OK;
 }
@@ -141,6 +143,7 @@ public:
         sail_io.flush          = wrapped_flush;
         sail_io.close          = wrapped_close;
         sail_io.eof            = wrapped_eof;
+        sail_io.size           = wrapped_size;
     }
 
     sail::abstract_io& abstract_io;

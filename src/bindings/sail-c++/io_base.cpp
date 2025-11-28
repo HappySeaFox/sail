@@ -109,4 +109,13 @@ sail_status_t io_base::eof(bool* result)
     return SAIL_OK;
 }
 
+sail_status_t io_base::size(std::size_t* size)
+{
+    size_t size_local;
+    SAIL_TRY(d->sail_io_wrapper->size(d->sail_io_wrapper->stream, &size_local));
+    *size = size_local;
+
+    return SAIL_OK;
+}
+
 } // namespace sail

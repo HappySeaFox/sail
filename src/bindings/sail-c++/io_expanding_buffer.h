@@ -52,12 +52,6 @@ public:
     ~io_expanding_buffer() override;
 
     /*
-     * Returns the current size of data written to the buffer.
-     * This is different from the buffer capacity.
-     */
-    std::size_t size() const;
-
-    /*
      * Finds and returns the first codec info object that supports the magic number read
      * from the memory buffer. The comparison algorithm is case insensitive. After reading
      * the magic number, rewinds the I/O cursor position back to the previous position.

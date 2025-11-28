@@ -126,6 +126,15 @@ public:
     virtual sail_status_t eof(bool* result) = 0;
 
     /*
+     * Assigns the size of the underlying I/O object to the 'size' argument.
+     * For real streams (not files or memory buffers), this method should return
+     * SAIL_ERROR_NOT_IMPLEMENTED.
+     *
+     * Returns SAIL_OK on success.
+     */
+    virtual sail_status_t size(std::size_t* size) = 0;
+
+    /*
      * Finds and returns a first codec info object that can theoretically read the underlying
      * I/O stream into a valid image.
      *

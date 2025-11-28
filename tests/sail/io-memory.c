@@ -190,6 +190,54 @@ static MunitResult test_io_memory_read_write(const MunitParameter params[], void
     return MUNIT_OK;
 }
 
+static MunitResult test_io_memory_size(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    const char* test_data       = "Test data for size";
+    const size_t test_data_size = strlen(test_data);
+
+    /* Open for reading */
+    struct sail_io* io = NULL;
+    munit_assert(sail_alloc_io_read_memory(test_data, test_data_size, &io) == SAIL_OK);
+
+    /* Check size callback is set */
+    munit_assert(io->size != NULL);
+
+    /* Get size using sail_io_size */
+    size_t size;
+    munit_assert(sail_io_size(io, &size) == SAIL_OK);
+    munit_assert(size == test_data_size);
+
+    /* Get size using callback directly */
+    size_t size_direct;
+    munit_assert(io->size(io->stream, &size_direct) == SAIL_OK);
+    munit_assert(size_direct == test_data_size);
+
+    /* Size should remain the same after seeking */
+    munit_assert(io->seek(io->stream, 5, SEEK_SET) == SAIL_OK);
+    size_t size_after_seek;
+    munit_assert(sail_io_size(io, &size_after_seek) == SAIL_OK);
+    munit_assert(size_after_seek == test_data_size);
+
+    sail_destroy_io(io);
+
+    /* Test read-write memory buffer */
+    char buffer[256] = {0};
+    const size_t buffer_size = sizeof(buffer);
+    munit_assert(sail_alloc_io_read_write_memory(buffer, buffer_size, &io) == SAIL_OK);
+
+    /* Size should be buffer size, not written data size */
+    size_t buffer_size_result;
+    munit_assert(sail_io_size(io, &buffer_size_result) == SAIL_OK);
+    munit_assert(buffer_size_result == buffer_size);
+
+    sail_destroy_io(io);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/read",       test_io_memory_read,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -197,6 +245,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/seek-tell",  test_io_memory_seek_tell,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/eof",        test_io_memory_eof,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/read-write", test_io_memory_read_write, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/size",       test_io_memory_size,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

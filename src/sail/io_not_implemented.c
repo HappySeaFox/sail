@@ -101,3 +101,11 @@ sail_status_t sail_io_not_implemented_eof(void* stream, bool* result)
 
     SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
 }
+
+sail_status_t sail_io_not_implemented_size(void* stream, size_t* size)
+{
+    (void)stream;
+    (void)size;
+
+    SAIL_LOG_AND_RETURN(SAIL_ERROR_NOT_IMPLEMENTED);
+}

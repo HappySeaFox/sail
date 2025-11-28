@@ -164,7 +164,7 @@ static sail_status_t io_memory_seek(void* stream, long offset, int whence)
 {
     SAIL_CHECK_PTR(stream);
 
-    struct mem_io_buffer_info* mem_io_buffer_info = (struct mem_io_buffer_info*)stream;
+    struct mem_io_buffer_info* mem_io_buffer_info = stream;
 
     size_t new_pos;
 
@@ -215,7 +215,7 @@ static sail_status_t io_memory_tell(void* stream, size_t* offset)
     SAIL_CHECK_PTR(stream);
     SAIL_CHECK_PTR(offset);
 
-    struct mem_io_buffer_info* mem_io_buffer_info = (struct mem_io_buffer_info*)stream;
+    struct mem_io_buffer_info* mem_io_buffer_info = stream;
 
     *offset = mem_io_buffer_info->pos;
 
@@ -243,9 +243,21 @@ static sail_status_t io_memory_eof(void* stream, bool* result)
     SAIL_CHECK_PTR(stream);
     SAIL_CHECK_PTR(result);
 
-    struct mem_io_buffer_info* mem_io_buffer_info = (struct mem_io_buffer_info*)stream;
+    struct mem_io_buffer_info* mem_io_buffer_info = stream;
 
     *result = mem_io_buffer_info->pos >= mem_io_buffer_info->accessible_length;
+
+    return SAIL_OK;
+}
+
+static sail_status_t io_memory_size(void* stream, size_t* size)
+{
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(size);
+
+    struct mem_io_buffer_info* mem_io_buffer_info = stream;
+
+    *size = mem_io_buffer_info->length;
 
     return SAIL_OK;
 }
@@ -285,6 +297,7 @@ sail_status_t sail_alloc_io_read_memory(const void* buffer, size_t length, struc
     io_local->flush          = sail_io_noop_flush;
     io_local->close          = io_memory_close;
     io_local->eof            = io_memory_eof;
+    io_local->size           = io_memory_size;
 
     *io = io_local;
 
@@ -322,6 +335,7 @@ sail_status_t sail_alloc_io_read_write_memory(void* buffer, size_t length, struc
     io_local->flush          = io_memory_flush;
     io_local->close          = io_memory_close;
     io_local->eof            = io_memory_eof;
+    io_local->size           = io_memory_size;
 
     *io = io_local;
 

@@ -90,6 +90,11 @@ SAIL_EXPORT sail_status_t sail_io_not_implemented_close(void* stream);
  */
 SAIL_EXPORT sail_status_t sail_io_not_implemented_eof(void* stream, bool* result);
 
+/*
+ * No-op callback that just returns SAIL_ERROR_NOT_IMPLEMENTED.
+ */
+SAIL_EXPORT sail_status_t sail_io_not_implemented_size(void* stream, size_t* size);
+
 /* extern "C" */
 #ifdef __cplusplus
 }

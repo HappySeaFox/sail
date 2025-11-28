@@ -32,6 +32,11 @@
 #ifdef _MSC_VER
 /* _SH_DENYWR */
 #include <share.h>
+#include <sys/stat.h>
+#include <io.h>
+#else
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 
 #include <sail/sail.h>
@@ -189,6 +194,52 @@ static sail_status_t io_file_eof(void* stream, bool* result)
     return SAIL_OK;
 }
 
+static sail_status_t io_file_size(void* stream, size_t* size)
+{
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(size);
+
+    struct io_file_state* io_file_state = stream;
+
+    /* Try to get size efficiently using stat. */
+#ifdef _MSC_VER
+    int fd = _fileno(io_file_state->fptr);
+    if (fd >= 0)
+    {
+        struct _stat attrs;
+        if (_fstat(fd, &attrs) == 0)
+        {
+            *size = attrs.st_size;
+            return SAIL_OK;
+        }
+    }
+#else
+    int fd = fileno(io_file_state->fptr);
+    if (fd >= 0)
+    {
+        struct stat attrs;
+        if (fstat(fd, &attrs) == 0)
+        {
+            *size = attrs.st_size;
+            return SAIL_OK;
+        }
+    }
+#endif
+
+    /* Fallback to seek/tell method. */
+    size_t saved_position;
+    SAIL_TRY(io_file_tell(stream, &saved_position));
+
+    size_t size_local;
+    SAIL_TRY(io_file_seek(stream, 0, SEEK_END));
+    SAIL_TRY(io_file_tell(stream, &size_local));
+    SAIL_TRY(io_file_seek(stream, (long)saved_position, SEEK_SET));
+
+    *size = size_local;
+
+    return SAIL_OK;
+}
+
 static sail_status_t alloc_io_file(const char* path, const char* mode, struct sail_io** io)
 {
     SAIL_CHECK_PTR(path);
@@ -259,6 +310,7 @@ sail_status_t sail_alloc_io_read_file(const char* path, struct sail_io** io)
     (*io)->flush          = sail_io_noop_flush;
     (*io)->close          = io_file_close;
     (*io)->eof            = io_file_eof;
+    (*io)->size           = io_file_size;
 
     return SAIL_OK;
 }
@@ -277,6 +329,7 @@ sail_status_t sail_alloc_io_read_write_file(const char* path, struct sail_io** i
     (*io)->flush          = io_file_flush;
     (*io)->close          = io_file_close;
     (*io)->eof            = io_file_eof;
+    (*io)->size           = io_file_size;
 
     return SAIL_OK;
 }

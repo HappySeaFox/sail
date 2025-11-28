@@ -115,6 +115,15 @@ typedef sail_status_t (*sail_io_close_t)(void* stream);
  */
 typedef sail_status_t (*sail_io_eof_t)(void* stream, bool* result);
 
+/*
+ * Assigns the size of the underlying I/O object to the 'size' argument.
+ * For real streams (not files or memory buffers), this callback should return
+ * SAIL_ERROR_NOT_IMPLEMENTED.
+ *
+ * Returns SAIL_OK on success.
+ */
+typedef sail_status_t (*sail_io_size_t)(void* stream, size_t* size);
+
 /* I/O features. */
 enum SailIoFeature
 {
@@ -185,6 +194,11 @@ struct sail_io
      * EOF callback.
      */
     sail_io_eof_t eof;
+
+    /*
+     * Size callback.
+     */
+    sail_io_size_t size;
 };
 
 typedef struct sail_io sail_io_t;
@@ -215,7 +229,7 @@ SAIL_EXPORT void sail_destroy_io(struct sail_io* io);
 SAIL_EXPORT sail_status_t sail_check_io_valid(const struct sail_io* io);
 
 /*
- * Retrieves the I/O stream size. The stream must be seekable.
+ * Retrieves the I/O stream size using the 'size' callback.
  *
  * Returns SAIL_OK on success.
  */

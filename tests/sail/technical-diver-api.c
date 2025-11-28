@@ -353,6 +353,7 @@ static MunitResult test_technical_diver_io_callbacks(const MunitParameter params
     munit_assert(io->tell != NULL);
     munit_assert(io->close != NULL);
     munit_assert(io->eof != NULL);
+    munit_assert(io->size != NULL);
 
     size_t offset = 0;
     munit_assert(io->tell(io->stream, &offset) == SAIL_OK);
@@ -378,6 +379,11 @@ static MunitResult test_technical_diver_io_callbacks(const MunitParameter params
     munit_assert(io->seek(io->stream, 0, SEEK_SET) == SAIL_OK);
     munit_assert(io->tolerant_read(io->stream, buffer, sizeof(buffer), &read_size) == SAIL_OK);
     munit_assert(read_size > 0);
+
+    /* Test size callback */
+    size_t size;
+    munit_assert(sail_io_size(io, &size) == SAIL_OK);
+    munit_assert(size > 0);
 
     sail_destroy_io(io);
 

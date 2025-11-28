@@ -278,6 +278,56 @@ static MunitResult test_expanding_buffer_eof(const MunitParameter params[], void
     return MUNIT_OK;
 }
 
+static MunitResult test_expanding_buffer_size(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    const size_t initial_capacity = 1024;
+    const char* test_data         = "Size test";
+    const size_t test_data_size   = strlen(test_data);
+
+    struct sail_io* io = NULL;
+    munit_assert(sail_alloc_io_write_expanding_buffer(initial_capacity, &io) == SAIL_OK);
+
+    /* Check size callback is set */
+    munit_assert(io->size != NULL);
+
+    /* Initially size should be 0 */
+    size_t size;
+    munit_assert(sail_io_size(io, &size) == SAIL_OK);
+    munit_assert(size == 0);
+
+    /* Write test data. */
+    size_t written_size;
+    munit_assert(io->tolerant_write(io->stream, test_data, test_data_size, &written_size) == SAIL_OK);
+
+    /* Size should now be test_data_size */
+    munit_assert(sail_io_size(io, &size) == SAIL_OK);
+    munit_assert(size == test_data_size);
+
+    /* Get size using callback directly */
+    size_t size_direct;
+    munit_assert(io->size(io->stream, &size_direct) == SAIL_OK);
+    munit_assert(size_direct == test_data_size);
+
+    /* Size should match sail_io_expanding_buffer_size */
+    size_t buffer_size;
+    munit_assert(sail_io_expanding_buffer_size(io, &buffer_size) == SAIL_OK);
+    munit_assert(buffer_size == test_data_size);
+    munit_assert(buffer_size == size);
+
+    /* Size should remain the same after seeking */
+    munit_assert(io->seek(io->stream, 5, SEEK_SET) == SAIL_OK);
+    size_t size_after_seek;
+    munit_assert(sail_io_size(io, &size_after_seek) == SAIL_OK);
+    munit_assert(size_after_seek == test_data_size);
+
+    sail_destroy_io(io);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/write",           test_expanding_buffer_write,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -287,6 +337,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/read",            test_expanding_buffer_read,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/seek-tell",       test_expanding_buffer_seek_tell,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/eof",             test_expanding_buffer_eof,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/size",            test_expanding_buffer_size,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

@@ -49,7 +49,7 @@ static sail_status_t io_expanding_buffer_tolerant_read(void* stream, void* buf, 
     SAIL_CHECK_PTR(buf);
     SAIL_CHECK_PTR(read_size);
 
-    struct expanding_buffer_stream* expanding_buffer_stream = (struct expanding_buffer_stream*)stream;
+    struct expanding_buffer_stream* expanding_buffer_stream = stream;
 
     *read_size = 0;
 
@@ -90,7 +90,7 @@ static sail_status_t io_expanding_buffer_tolerant_write(void* stream, const void
     SAIL_CHECK_PTR(buf);
     SAIL_CHECK_PTR(written_size);
 
-    struct expanding_buffer_stream* expanding_buffer_stream = (struct expanding_buffer_stream*)stream;
+    struct expanding_buffer_stream* expanding_buffer_stream = stream;
 
     *written_size = 0;
 
@@ -153,7 +153,7 @@ static sail_status_t io_expanding_buffer_seek(void* stream, long offset, int whe
 {
     SAIL_CHECK_PTR(stream);
 
-    struct expanding_buffer_stream* expanding_buffer_stream = (struct expanding_buffer_stream*)stream;
+    struct expanding_buffer_stream* expanding_buffer_stream = stream;
 
     size_t new_pos;
 
@@ -194,7 +194,7 @@ static sail_status_t io_expanding_buffer_tell(void* stream, size_t* offset)
     SAIL_CHECK_PTR(stream);
     SAIL_CHECK_PTR(offset);
 
-    struct expanding_buffer_stream* expanding_buffer_stream = (struct expanding_buffer_stream*)stream;
+    struct expanding_buffer_stream* expanding_buffer_stream = stream;
 
     *offset = expanding_buffer_stream->pos;
 
@@ -213,7 +213,7 @@ static sail_status_t io_expanding_buffer_close(void* stream)
 {
     SAIL_CHECK_PTR(stream);
 
-    struct expanding_buffer_stream* expanding_buffer_stream = (struct expanding_buffer_stream*)stream;
+    struct expanding_buffer_stream* expanding_buffer_stream = stream;
 
     sail_free(expanding_buffer_stream->buffer);
     sail_free(expanding_buffer_stream);
@@ -226,9 +226,21 @@ static sail_status_t io_expanding_buffer_eof(void* stream, bool* result)
     SAIL_CHECK_PTR(stream);
     SAIL_CHECK_PTR(result);
 
-    struct expanding_buffer_stream* expanding_buffer_stream = (struct expanding_buffer_stream*)stream;
+    struct expanding_buffer_stream* expanding_buffer_stream = stream;
 
     *result = expanding_buffer_stream->pos >= expanding_buffer_stream->size;
+
+    return SAIL_OK;
+}
+
+static sail_status_t io_expanding_buffer_size(void* stream, size_t* size)
+{
+    SAIL_CHECK_PTR(stream);
+    SAIL_CHECK_PTR(size);
+
+    struct expanding_buffer_stream* expanding_buffer_stream = stream;
+
+    *size = expanding_buffer_stream->size;
 
     return SAIL_OK;
 }
@@ -277,6 +289,7 @@ sail_status_t sail_alloc_io_write_expanding_buffer(size_t initial_capacity, stru
     io_local->flush          = io_expanding_buffer_flush;
     io_local->close          = io_expanding_buffer_close;
     io_local->eof            = io_expanding_buffer_eof;
+    io_local->size           = io_expanding_buffer_size;
 
     *io = io_local;
 
@@ -289,7 +302,7 @@ sail_status_t sail_io_expanding_buffer_size(struct sail_io* io, size_t* size)
     SAIL_CHECK_PTR(io->stream);
     SAIL_CHECK_PTR(size);
 
-    struct expanding_buffer_stream* expanding_buffer_stream = (struct expanding_buffer_stream*)io->stream;
+    struct expanding_buffer_stream* expanding_buffer_stream = io->stream;
 
     *size = expanding_buffer_stream->size;
 
