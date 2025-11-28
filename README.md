@@ -1,5 +1,5 @@
 <h1 align="center">Squirrel Abstract Imaging Library</h1>
-<h3 align="center">The missing fast and easy-to-use image decoding library for humans (not for machines).</h3>
+<h3 align="center">The missing fast imaging library for humans (not for machines).</h3>
 <p align="center">
   <a href="https://github.com/HappySeaFox/sail/actions">
     <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/HappySeaFox/sail/build-and-test.yml"/>
