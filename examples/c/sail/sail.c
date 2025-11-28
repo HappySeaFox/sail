@@ -226,11 +226,8 @@ static sail_status_t convert_impl(const char** inputs,
                     {
                         r = g = b = 0;
                     }
-                    else if (background[0] == '#' && strlen(background) == 7)
-                    {
-                        sail_sscanf(background + 1, "%02x%02x%02x", &r, &g, &b);
-                    }
-                    else
+                    else if (background[0] != '#' || strlen(background) != 7
+                             || sail_sscanf(background + 1, "%02x%02x%02x", &r, &g, &b) != 3)
                     {
                         SAIL_LOG_ERROR("Invalid background color: %s", background);
                         sail_destroy_conversion_options(conversion_options);
@@ -616,11 +613,8 @@ static sail_status_t extract_frames_impl(const char* input,
                 {
                     r = g = b = 0;
                 }
-                else if (background[0] == '#' && strlen(background) == 7)
-                {
-                    sail_sscanf(background + 1, "%02x%02x%02x", &r, &g, &b);
-                }
-                else
+                else if (background[0] != '#' || strlen(background) != 7
+                         || sail_sscanf(background + 1, "%02x%02x%02x", &r, &g, &b) != 3)
                 {
                     SAIL_LOG_ERROR("Invalid background color: %s", background);
                     sail_destroy_conversion_options(conversion_options);
