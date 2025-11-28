@@ -206,7 +206,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail
         unsigned char* jbig_data = jbg_dec_getimage(&decoder, 0);
         unsigned long jbig_size  = jbg_dec_getsize(&decoder);
 
-        size_t expected_size = ((image->width + 7) / 8) * image->height;
+        size_t expected_size = (size_t)((image->width + 7) / 8) * image->height;
 
         if (jbig_size < expected_size)
         {
