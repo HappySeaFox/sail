@@ -199,7 +199,7 @@ sail_status_t sail_rotate_image(const struct sail_image* image,
     output->bytes_per_line = sail_bytes_per_line(new_width, image->pixel_format);
 
     /* Allocate pixels */
-    const size_t pixels_size = output->height * output->bytes_per_line;
+    const size_t pixels_size = (size_t)output->height * output->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &output->pixels),
                        /* cleanup */ sail_destroy_image(output));
 
