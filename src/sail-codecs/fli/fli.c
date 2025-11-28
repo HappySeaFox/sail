@@ -143,9 +143,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_fli(struct sail_io* io,
 
     /* Allocate buffer for previous frame (for delta decompression). */
     void* ptr;
-    SAIL_TRY(sail_malloc(fli_state->fli_header.width * fli_state->fli_header.height, &ptr));
+    SAIL_TRY(sail_malloc((size_t)fli_state->fli_header.width * fli_state->fli_header.height, &ptr));
     fli_state->prev_frame = ptr;
-    memset(fli_state->prev_frame, 0, fli_state->fli_header.width * fli_state->fli_header.height);
+    memset(fli_state->prev_frame, 0, (size_t)fli_state->fli_header.width * fli_state->fli_header.height);
 
     SAIL_LOG_TRACE("FLI: %s format, %ux%u, %u frames, speed=%u", fli_state->is_fli ? "FLI" : "FLC",
                    fli_state->fli_header.width, fli_state->fli_header.height, fli_state->fli_header.frames,
@@ -223,7 +223,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
     }
 
     /* Copy previous frame to current frame. */
-    memcpy(image->pixels, fli_state->prev_frame, image->width * image->height);
+    memcpy(image->pixels, fli_state->prev_frame, (size_t)image->width * image->height);
 
     /* Process chunks. */
     for (unsigned i = 0; i < frame_header.chunks; i++)
@@ -254,7 +254,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
 
         case SAIL_FLI_BLACK:
         {
-            memset(image->pixels, 0, image->width * image->height);
+            memset(image->pixels, 0, (size_t)image->width * image->height);
             break;
         }
 
@@ -322,7 +322,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
     SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)next_frame_pos, SEEK_SET));
 
     /* Save current frame for next delta. */
-    memcpy(fli_state->prev_frame, image->pixels, image->width * image->height);
+    memcpy(fli_state->prev_frame, image->pixels, (size_t)image->width * image->height);
 
     fli_state->current_frame_index++;
 
@@ -428,7 +428,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_fli(void* state, co
         SAIL_TRY(fli_private_write_header(fli_state->io, &fli_state->fli_header));
 
         void* ptr;
-        SAIL_TRY(sail_malloc(image->width * image->height, &ptr));
+        SAIL_TRY(sail_malloc((size_t)image->width * image->height, &ptr));
         fli_state->first_frame = ptr;
     }
 
@@ -506,7 +506,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
         chunk_count++;
 
         /* Save first frame for later. */
-        memcpy(fli_state->first_frame, image->pixels, image->width * image->height);
+        memcpy(fli_state->first_frame, image->pixels, (size_t)image->width * image->height);
     }
     else
     {
