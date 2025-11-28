@@ -27,8 +27,7 @@
 
 #include <cstddef> /* size_t */
 
-#include <libraw/libraw.h> /* To define LIBRAW_WIN32_CALLS. */
-#include <libraw/libraw_datastream.h>
+#include <libraw/libraw.h>
 
 #include <sail-common/sail-common.h>
 
