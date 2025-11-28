@@ -438,26 +438,29 @@ void read_ycbcr_and_convert(OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile& file,
     const auto chroma_height = (height + info.ry_ysampling - 1) / info.ry_ysampling;
 
     // Allocate temporary buffers for Y, RY, BY channels
-    std::vector<Imath::half> y_buffer(width * height);
-    std::vector<Imath::half> ry_buffer(chroma_width * chroma_height);
-    std::vector<Imath::half> by_buffer(chroma_width * chroma_height);
+    std::vector<Imath::half> y_buffer((size_t)width * height);
+    std::vector<Imath::half> ry_buffer((size_t)chroma_width * chroma_height);
+    std::vector<Imath::half> by_buffer((size_t)chroma_width * chroma_height);
 
     auto* y_base = reinterpret_cast<char*>(y_buffer.data());
     auto* ry_base = reinterpret_cast<char*>(ry_buffer.data());
     auto* by_base = reinterpret_cast<char*>(by_buffer.data());
 
-    y_base = y_base - data_window.min.x * sizeof(Imath::half) - data_window.min.y * width * sizeof(Imath::half);
+    y_base = y_base - data_window.min.x * sizeof(Imath::half) - data_window.min.y * (size_t)width * sizeof(Imath::half);
     ry_base = ry_base - (data_window.min.x / info.ry_xsampling) * sizeof(Imath::half)
-            - (data_window.min.y / info.ry_ysampling) * chroma_width * sizeof(Imath::half);
+              - (data_window.min.y / info.ry_ysampling) * (size_t)chroma_width * sizeof(Imath::half);
     by_base = by_base - (data_window.min.x / info.by_xsampling) * sizeof(Imath::half)
-            - (data_window.min.y / info.by_ysampling) * chroma_width * sizeof(Imath::half);
+              - (data_window.min.y / info.by_ysampling) * (size_t)chroma_width * sizeof(Imath::half);
 
     OPENEXR_IMF_INTERNAL_NAMESPACE::FrameBuffer fb;
-    fb.insert("Y", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, y_base, sizeof(Imath::half), width * sizeof(Imath::half), 1, 1));
-    fb.insert("RY", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, ry_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
-                         info.ry_xsampling, info.ry_ysampling));
-    fb.insert("BY", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, by_base, sizeof(Imath::half), chroma_width * sizeof(Imath::half),
-                         info.by_xsampling, info.by_ysampling));
+    fb.insert("Y", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, y_base,
+                                                         sizeof(Imath::half), width * sizeof(Imath::half), 1, 1));
+    fb.insert("RY", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, ry_base,
+                                                          sizeof(Imath::half), chroma_width * sizeof(Imath::half),
+                                                          info.ry_xsampling, info.ry_ysampling));
+    fb.insert("BY", OPENEXR_IMF_INTERNAL_NAMESPACE::Slice(OPENEXR_IMF_INTERNAL_NAMESPACE::HALF, by_base,
+                                                          sizeof(Imath::half), chroma_width * sizeof(Imath::half),
+                                                          info.by_xsampling, info.by_ysampling));
 
     file.setFrameBuffer(fb);
     file.readPixels(data_window.min.y, data_window.max.y);
