@@ -351,8 +351,7 @@ void init_image(py::module_& m)
                 sail::image_output output(io, codec);
 
                 // Write image
-                auto status = output.next_frame(img);
-                if (status != SAIL_OK)
+                if (output.next_frame(img) != SAIL_OK)
                 {
                     throw std::runtime_error("Failed to save image to bytes");
                 }
@@ -361,20 +360,23 @@ void init_image(py::module_& m)
                 output.finish();
 
                 // Get size and read data
-                size_t data_size = io.size();
-
-                // Seek to beginning
-                io.seek(0, SEEK_SET);
+                size_t data_size;
+                if (io.size(&data_size) != SAIL_OK)
+                {
+                    throw std::runtime_error("Failed to get expanding buffer size");
+                }
+                if (io.seek(0, SEEK_SET) != SAIL_OK)
+                {
+                    throw std::runtime_error("Failed to seek to beginning of expanding buffer");
+                }
 
                 // Read all data
                 std::vector<char> buffer(data_size);
-                status = io.strict_read(buffer.data(), data_size);
-                if (status != SAIL_OK)
+                if (io.strict_read(buffer.data(), data_size) != SAIL_OK)
                 {
                     throw std::runtime_error("Failed to read from expanding buffer");
                 }
 
-                // Return as bytes
                 return py::bytes(buffer.data(), data_size);
             },
             py::arg("format") = "png", "Save image to bytes in specified format (default: png)")
