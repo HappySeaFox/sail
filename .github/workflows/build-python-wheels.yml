@@ -88,8 +88,10 @@ jobs:
       if: runner.os == 'macOS'
       working-directory: src/bindings/sail-python
       env:
-        CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES=arm64
+        CMAKE_OSX_ARCHITECTURES: arm64
         _PYTHON_HOST_PLATFORM: macosx-11.0-arm64
+        MACOSX_DEPLOYMENT_TARGET: 11.0
+        CMAKE_OSX_DEPLOYMENT_TARGET: 11.0
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
