@@ -1,27 +1,27 @@
 {
-    "$schema" : "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-    "name" : "sail",
-    "homepage" : "https://github.com/HappySeaFox/sail",
-    "dependencies": [
-        "giflib",
-        "jbigkit",
-        {
-          "name": "libavif",
-            "features": [
-              "aom"
-            ]
-        },
-        "libheif",
-        "libjpeg-turbo",
-        "libjxl",
-        "libpng",
-        "libraw",
-        "libwebp",
-        "nanosvg",
-        "openexr",
-        "openjpeg",
-        "tiff",
-        "zlib"
-    ],
-    "builtin-baseline": "cf1490f51190945a70666eaeeb6f63482da080b5"
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "sail",
+  "homepage": "https://github.com/HappySeaFox/sail",
+  "dependencies": [
+    "giflib",
+    "jbigkit",
+    {
+      "name": "libavif",
+      "features": [
+        "aom"
+      ]
+    },
+    "libheif",
+    "libjpeg-turbo",
+    "libjxl",
+    "libpng",
+    "libraw",
+    "libwebp",
+    "nanosvg",
+    "openexr",
+    "openjpeg",
+    "tiff",
+    "zlib"
+  ],
+  "builtin-baseline": "ef7dbf94b9198bc58f45951adcf1f041fcbc5ea0"
 }
