@@ -53,7 +53,18 @@ int heif_private_reader_read(void* data, size_t size, void* user_data)
         return -1;
     }
 
-    return (bytes_read == size) ? 0 : -1;
+    /* If we read all requested bytes, success. */
+    if (bytes_read == size)
+    {
+        return 0;
+    }
+
+    /* Check EOF. */
+    bool is_eof;
+    SAIL_TRY_OR_EXECUTE(context->io->eof(context->io->stream, &is_eof),
+                        /* on error */ return -1);
+
+    return (is_eof) ? 0 : -1;
 }
 
 int heif_private_reader_seek(int64_t position, void* user_data)
