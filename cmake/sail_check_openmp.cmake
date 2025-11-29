@@ -14,19 +14,21 @@ function(sail_check_openmp)
         # but don't support /openmp:llvm.
         #
         if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-            set(SAIL_OPENMP_FLAGS "/openmp:llvm" CACHE INTERNAL "")
+            set(SAIL_OPENMP_FLAGS "/openmp:llvm" CACHE INTERNAL "OpenMP flags")
         else()
-            set(SAIL_OPENMP_FLAGS ${OpenMP_C_FLAGS} CACHE INTERNAL "")
+            set(SAIL_OPENMP_FLAGS ${OpenMP_C_FLAGS} CACHE INTERNAL "OpenMP flags")
         endif()
 
-        set(SAIL_OPENMP_INCLUDE_DIRS ${OpenMP_C_INCLUDE_DIRS} CACHE INTERNAL "")
+        set(SAIL_OPENMP_INCLUDE_DIRS ${OpenMP_C_INCLUDE_DIRS} CACHE INTERNAL "OpenMP include directories")
 
         # Build a list of direct paths to libraries. This is needed on macOS with brew specifically
         # as the installed libomp version lays in /usr/local/opt/libomp and is not globally visible.
         #
+        set(SAIL_OPENMP_LIBS_TMP "")
         foreach(lib IN LISTS OpenMP_C_LIB_NAMES)
-            set(SAIL_OPENMP_LIBS ${SAIL_OPENMP_LIBS} "${OpenMP_${lib}_LIBRARY}" CACHE INTERNAL "")
+            list(APPEND SAIL_OPENMP_LIBS_TMP "${OpenMP_${lib}_LIBRARY}")
         endforeach()
+        set(SAIL_OPENMP_LIBS ${SAIL_OPENMP_LIBS_TMP} CACHE INTERNAL "OpenMP libraries")
 
         # Try to compile a sample program to make sure the compiler
         # supports at least OpenMP 3.0 with unsigned integers in for loops.
