@@ -97,7 +97,7 @@ set_target_properties(sail-common PROPERTIES
 
 # Definitions, includes, link
 #
-target_link_libraries(sail-common PRIVATE sail-common-flags)
+target_link_libraries(sail-common PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 # fileno, mkstemp
 sail_enable_posix_c_source(TARGET sail-common VERSION 200809L)

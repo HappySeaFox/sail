@@ -21,7 +21,7 @@ add_executable(external-c++-api-link main.cpp)
 add_library(sail-common-flags INTERFACE)
 sail_enable_asan(INTERFACE_LIB sail-common-flags)
 
-target_link_libraries(external-c++-api-link PRIVATE sail-common-flags)
+target_link_libraries(external-c++-api-link PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 # Add SAIL dependency
 #

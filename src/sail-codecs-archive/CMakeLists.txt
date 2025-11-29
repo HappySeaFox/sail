@@ -49,7 +49,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/enabled_codecs.c.in
 add_library(sail-codecs ${CMAKE_CURRENT_BINARY_DIR}/enabled_codecs.c)
 target_link_libraries(sail-codecs PRIVATE sail-common)
 
-target_link_libraries(sail-codecs PRIVATE sail-common-flags)
+target_link_libraries(sail-codecs PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 if (SAIL_WINDOWS_INSTALL_PDB)
     sail_windows_install_pdb(TARGET sail-codecs)

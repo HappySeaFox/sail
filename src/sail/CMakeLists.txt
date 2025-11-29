@@ -74,7 +74,7 @@ set_target_properties(sail PROPERTIES
 
 # Definitions, includes, link
 #
-target_link_libraries(sail PRIVATE sail-common-flags)
+target_link_libraries(sail PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 # setenv
 sail_enable_posix_c_source(TARGET sail VERSION 200112L)

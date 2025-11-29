@@ -26,7 +26,7 @@ macro(sail_codec)
 
     # Common flags
     #
-    target_link_libraries(${SAIL_CODEC_TARGET} PRIVATE sail-common-flags)
+    target_link_libraries(${SAIL_CODEC_TARGET} PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
     # Disable a "lib" prefix on Unix
     #

@@ -7,7 +7,7 @@ macro(sail_test)
     #
     add_executable(${SAIL_TEST_TARGET} ${SAIL_TEST_SOURCES})
 
-    target_link_libraries(${SAIL_TEST_TARGET} PRIVATE sail-common-flags)
+    target_link_libraries(${SAIL_TEST_TARGET} PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
     if (WIN32)
         add_test(NAME "${SAIL_TEST_TARGET}" WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin COMMAND ${SAIL_TEST_TARGET})

@@ -36,7 +36,7 @@ set_target_properties(sail-manip PROPERTIES
 
 # Definitions, includes, link
 #
-target_link_libraries(sail-manip PRIVATE sail-common-flags)
+target_link_libraries(sail-manip PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 sail_enable_pch(TARGET sail-manip HEADER sail-manip.h)
 

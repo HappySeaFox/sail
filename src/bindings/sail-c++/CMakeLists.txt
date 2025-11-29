@@ -105,7 +105,7 @@ set_target_properties(sail-c++ PROPERTIES
 
 # Definitions, includes, link
 #
-target_link_libraries(sail-c++ PRIVATE sail-common-flags)
+target_link_libraries(sail-c++ PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 

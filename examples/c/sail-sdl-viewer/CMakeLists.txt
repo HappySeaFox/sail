@@ -47,4 +47,4 @@ target_link_libraries(sail-sdl-viewer PRIVATE sail)
 #
 target_link_libraries(sail-sdl-viewer PRIVATE sail-manip)
 
-target_link_libraries(sail-sdl-viewer PRIVATE sail-common-flags)
+target_link_libraries(sail-sdl-viewer PRIVATE $<BUILD_INTERFACE:sail-common-flags>)

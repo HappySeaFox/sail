@@ -10,7 +10,7 @@ target_link_libraries(sail-app PRIVATE sail)
 #
 target_link_libraries(sail-app PRIVATE sail-manip)
 
-target_link_libraries(sail-app PRIVATE sail-common-flags)
+target_link_libraries(sail-app PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 # Install PDB
 #
