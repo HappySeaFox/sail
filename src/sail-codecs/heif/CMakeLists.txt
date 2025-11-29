@@ -73,6 +73,6 @@ endif()
 # Common codec configuration
 #
 sail_codec(NAME heif
-            SOURCES helpers.h helpers.c io.h io.c heif.c
+            SOURCES helpers.h helpers.c io_src.h io_src.c io_dest.h io_dest.c heif.c
             ICON heif.png
             DEPENDENCY_LIBS heif)

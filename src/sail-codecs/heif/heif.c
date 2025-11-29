@@ -34,7 +34,8 @@
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
-#include "io.h"
+#include "io_dest.h"
+#include "io_src.h"
 #include "sail-common/status.h"
 
 static const double COMPRESSION_MIN     = 0;

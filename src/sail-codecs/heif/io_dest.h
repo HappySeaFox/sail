@@ -25,30 +25,20 @@
 
 #pragma once
 
+#include <stddef.h> /* size_t */
+
 #include <libheif/heif.h>
 
 #include <sail-common/export.h>
 
 struct sail_io;
 
-struct sail_heif_reader_context
-{
-    struct sail_io* io;
-    void* buffer;
-    size_t buffer_size;
-};
-
 struct sail_heif_writer_context
 {
     struct sail_io* io;
 };
 
-SAIL_HIDDEN int64_t heif_private_reader_get_position(void* user_data);
-
-SAIL_HIDDEN int heif_private_reader_read(void* data, size_t size, void* user_data);
-
-SAIL_HIDDEN int heif_private_reader_seek(int64_t position, void* user_data);
-
-SAIL_HIDDEN enum heif_reader_grow_status heif_private_reader_wait_for_file_size(int64_t target_size, void* user_data);
-
-SAIL_HIDDEN struct heif_error heif_private_writer_write(struct heif_context* ctx, const void* data, size_t size, void* user_data);
+SAIL_HIDDEN struct heif_error heif_private_writer_write(struct heif_context* ctx,
+                                                        const void* data,
+                                                        size_t size,
+                                                        void* user_data);

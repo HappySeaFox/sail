@@ -29,61 +29,7 @@
 
 #include <sail-common/sail-common.h>
 
-#include "io.h"
-
-int64_t heif_private_reader_get_position(void* user_data)
-{
-    struct sail_heif_reader_context* context = user_data;
-
-    size_t position;
-    sail_status_t status = context->io->tell(context->io->stream, &position);
-
-    return (status == SAIL_OK) ? (int64_t)position : -1;
-}
-
-int heif_private_reader_read(void* data, size_t size, void* user_data)
-{
-    struct sail_heif_reader_context* context = user_data;
-
-    size_t bytes_read;
-    sail_status_t status = context->io->tolerant_read(context->io->stream, data, size, &bytes_read);
-
-    if (status != SAIL_OK && status != SAIL_ERROR_EOF)
-    {
-        return -1;
-    }
-
-    /* If we read all requested bytes, success. */
-    if (bytes_read == size)
-    {
-        return 0;
-    }
-
-    /* Check EOF. */
-    bool is_eof;
-    SAIL_TRY_OR_EXECUTE(context->io->eof(context->io->stream, &is_eof),
-                        /* on error */ return -1);
-
-    return (is_eof) ? 0 : -1;
-}
-
-int heif_private_reader_seek(int64_t position, void* user_data)
-{
-    struct sail_heif_reader_context* context = user_data;
-
-    sail_status_t status = context->io->seek(context->io->stream, (long)position, SEEK_SET);
-
-    return (status == SAIL_OK) ? 0 : -1;
-}
-
-enum heif_reader_grow_status heif_private_reader_wait_for_file_size(int64_t target_size, void* user_data)
-{
-    (void)target_size;
-    (void)user_data;
-
-    /* We don't support streaming, so file size is always available. */
-    return heif_reader_grow_status_size_reached;
-}
+#include "io_dest.h"
 
 struct heif_error heif_private_writer_write(struct heif_context* ctx, const void* data, size_t size, void* user_data)
 {
