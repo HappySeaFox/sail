@@ -16,7 +16,12 @@ include(sail_enable_asan)
 
 add_executable(external-c++-api-link main.cpp)
 
-sail_enable_asan(TARGET external-c++-api-link)
+# Create and configure common flags interface library
+#
+add_library(sail-common-flags INTERFACE)
+sail_enable_asan(INTERFACE_LIB sail-common-flags)
+
+target_link_libraries(external-c++-api-link PRIVATE sail-common-flags)
 
 # Add SAIL dependency
 #

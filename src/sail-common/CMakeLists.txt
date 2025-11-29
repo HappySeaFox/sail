@@ -95,7 +95,9 @@ set_target_properties(sail-common PROPERTIES
                                   SOVERSION ${PROJECT_VERSION_MAJOR}
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
-sail_enable_asan(TARGET sail-common)
+# Definitions, includes, link
+#
+target_link_libraries(sail-common PRIVATE sail-common-flags)
 
 # fileno, mkstemp
 sail_enable_posix_c_source(TARGET sail-common VERSION 200809L)
@@ -106,8 +108,6 @@ if (SAIL_WINDOWS_INSTALL_PDB)
     sail_windows_install_pdb(TARGET sail-common)
 endif()
 
-# Definitions, includes, link
-#
 if (SAIL_COLORED_OUTPUT)
     target_compile_definitions(sail-common PRIVATE SAIL_COLORED_OUTPUT=1)
 endif()

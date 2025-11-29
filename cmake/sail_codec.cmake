@@ -22,9 +22,11 @@ macro(sail_codec)
         add_library(${SAIL_CODEC_TARGET} OBJECT ${SAIL_CODEC_SOURCES})
     else()
         add_library(${SAIL_CODEC_TARGET} MODULE ${SAIL_CODEC_SOURCES})
-
-        sail_enable_asan(TARGET ${SAIL_CODEC_TARGET})
     endif()
+
+    # Common flags
+    #
+    target_link_libraries(${SAIL_CODEC_TARGET} PRIVATE sail-common-flags)
 
     # Disable a "lib" prefix on Unix
     #

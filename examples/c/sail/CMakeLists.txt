@@ -10,9 +10,7 @@ target_link_libraries(sail-app PRIVATE sail)
 #
 target_link_libraries(sail-app PRIVATE sail-manip)
 
-# Enable ASAN if possible
-#
-sail_enable_asan(TARGET sail-app)
+target_link_libraries(sail-app PRIVATE sail-common-flags)
 
 # Install PDB
 #

@@ -23,7 +23,9 @@ include(sail_check_init_once_execute_once)
 include(sail_check_openmp)
 include(sail_codec)
 include(sail_enable_asan)
+include(sail_enable_no_undefined)
 include(sail_enable_pch)
+include(sail_enable_pic)
 include(sail_enable_posix_c_source)
 include(sail_enable_xopen_source)
 include(sail_enable_warnings)
@@ -125,42 +127,37 @@ endif()
 #
 set(SAIL_MAGIC_BUFFER_SIZE 16)
 
+# Create common flags interface library and enable warnings/ASAN/PIC/undefined flags
+#
+add_library(sail-common-flags INTERFACE)
+
 # Enable strict C11
 #
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
+set_target_properties(sail-common-flags PROPERTIES
+    C_STANDARD 11
+    C_STANDARD_REQUIRED ON
+    C_EXTENSIONS OFF
+)
 
 # Enable strict C++11
 #
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set_target_properties(sail-common-flags PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+)
 
-# Build position-independent targets
-#
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+sail_enable_warnings(INTERFACE_LIB sail-common-flags)
+sail_enable_asan(INTERFACE_LIB sail-common-flags)
+sail_enable_pic(INTERFACE_LIB sail-common-flags)
+sail_enable_no_undefined(INTERFACE_LIB sail-common-flags)
 
 # Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
-add_definitions(-DSAIL_BUILD)
+target_compile_definitions(sail-common-flags INTERFACE SAIL_BUILD)
 
 if (SAIL_DEV)
-    add_definitions(-DSAIL_DEV)
-endif()
-
-# Enable as many warnings as possible
-#
-sail_enable_warnings()
-
-# Disable undefined symbols
-#
-if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    string(APPEND CMAKE_SHARED_LINKER_FLAGS " " "-Wl,--no-undefined")
-    string(APPEND CMAKE_MODULE_LINKER_FLAGS " " "-Wl,--no-undefined")
-elseif (CMAKE_C_COMPILER_ID MATCHES "Clang")
-    string(APPEND CMAKE_SHARED_LINKER_FLAGS " " "-Wl,-undefined,error")
-    string(APPEND CMAKE_MODULE_LINKER_FLAGS " " "-Wl,-undefined,error")
+    target_compile_definitions(sail-common-flags INTERFACE SAIL_DEV)
 endif()
 
 # Windows CRT selection for static builds
@@ -170,10 +167,16 @@ if (WIN32 AND MSVC)
         set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Default (shared build)")
     else()
         if (SAIL_WINDOWS_STATIC_CRT)
-            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+            target_compile_options(sail-common-flags INTERFACE
+                $<$<CONFIG:Debug>:/MTd>
+                $<$<NOT:$<CONFIG:Debug>>:/MT>
+            )
             set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Static (/MT)")
         else()
-            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+            target_compile_options(sail-common-flags INTERFACE
+                $<$<CONFIG:Debug>:/MDd>
+                $<$<NOT:$<CONFIG:Debug>>:/MD>
+            )
             set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Dynamic (/MD)")
         endif()
     endif()
@@ -301,17 +304,19 @@ if (SAIL_COLORED_OUTPUT)
     set(SAIL_COLORED_OUTPUT_CLARIFY " (on Windows >= 10 and Unix)")
 endif()
 
+get_target_property(SAIL_COMMON_COMPILE_OPTIONS     sail-common-flags INTERFACE_COMPILE_OPTIONS)
+get_target_property(SAIL_COMMON_COMPILE_DEFINITIONS sail-common-flags INTERFACE_COMPILE_DEFINITIONS)
+get_target_property(SAIL_COMMON_LINK_OPTIONS        sail-common-flags INTERFACE_LINK_OPTIONS)
+
 message("")
 message("***************************************")
 message("*")
 message("* Configuration statistics: ")
 message("*")
 message("* CMake version:                ${CMAKE_VERSION}")
-message("* CMake C flags:                ${CMAKE_C_FLAGS}")
-message("* CMake CXX flags:              ${CMAKE_CXX_FLAGS}")
-message("* CMake shared link flags:      ${CMAKE_SHARED_LINKER_FLAGS}")
-message("* CMake static link flags:      ${CMAKE_STATIC_LINKER_FLAGS}")
-message("* CMake module link flags:      ${CMAKE_MODULE_LINKER_FLAGS}")
+message("* Common compile options:       ${SAIL_COMMON_COMPILE_OPTIONS}")
+message("* Common compile definitions:   ${SAIL_COMMON_COMPILE_DEFINITIONS}")
+message("* Common link options:          ${SAIL_COMMON_LINK_OPTIONS}")
 message("*")
 message("* SAIL version:                 ${PROJECT_VERSION}")
 message("* Developer mode:               ${SAIL_DEV}")

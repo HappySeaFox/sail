@@ -47,6 +47,4 @@ target_link_libraries(sail-sdl-viewer PRIVATE sail)
 #
 target_link_libraries(sail-sdl-viewer PRIVATE sail-manip)
 
-# Enable ASAN if possible
-#
-sail_enable_asan(TARGET sail-sdl-viewer)
+target_link_libraries(sail-sdl-viewer PRIVATE sail-common-flags)

@@ -103,7 +103,9 @@ set_target_properties(sail-c++ PROPERTIES
                                SOVERSION ${PROJECT_VERSION_MAJOR}
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
-sail_enable_asan(TARGET sail-c++)
+# Definitions, includes, link
+#
+target_link_libraries(sail-c++ PRIVATE sail-common-flags)
 
 sail_enable_pch(TARGET sail-c++ HEADER sail-c++.h)
 
@@ -111,8 +113,6 @@ if (SAIL_WINDOWS_INSTALL_PDB)
     sail_windows_install_pdb(TARGET sail-c++)
 endif()
 
-# Definitions, includes, link
-#
 target_include_directories(sail-c++ PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>)
 
 if (MSVC)

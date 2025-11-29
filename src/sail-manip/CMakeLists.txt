@@ -34,7 +34,9 @@ set_target_properties(sail-manip PROPERTIES
                                  SOVERSION ${PROJECT_VERSION_MAJOR}
                                  PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
-sail_enable_asan(TARGET sail-manip)
+# Definitions, includes, link
+#
+target_link_libraries(sail-manip PRIVATE sail-common-flags)
 
 sail_enable_pch(TARGET sail-manip HEADER sail-manip.h)
 
@@ -42,8 +44,6 @@ if (SAIL_WINDOWS_INSTALL_PDB)
     sail_windows_install_pdb(TARGET sail-manip)
 endif()
 
-# Definitions, includes, link
-#
 target_include_directories(sail-manip PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>)
 
 if (SAIL_HAVE_OPENMP)

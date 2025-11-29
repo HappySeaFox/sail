@@ -1,22 +1,30 @@
-# Enable as many warnings as possible
+# Enable as many warnings as possible on an interface library.
+#
+# Usage:
+#   sail_enable_warnings(INTERFACE_LIB sail-common-flags)
 #
 macro(sail_enable_warnings)
+    cmake_parse_arguments(SAIL_WARNINGS "" "INTERFACE_LIB" "" ${ARGN})
+
+    if (NOT TARGET ${SAIL_WARNINGS_INTERFACE_LIB})
+        message(FATAL_ERROR "Interface library '${SAIL_WARNINGS_INTERFACE_LIB}' not found.")
+    endif()
+
+    # Add warnings to the interface library
+    #
     if (MSVC)
-        if (CMAKE_C_FLAGS MATCHES "/W[0-4]")
-            string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-            string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-        else()
-            string(APPEND CMAKE_C_FLAGS " " "/W4")
-            string(APPEND CMAKE_CXX_FLAGS " " "/W4")
-        endif()
+        target_compile_options(${SAIL_WARNINGS_INTERFACE_LIB} INTERFACE /W4)
     elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-        string(APPEND CMAKE_C_FLAGS " " "-Wall -Wextra")
-        string(APPEND CMAKE_CXX_FLAGS " " "-Wall -Wextra")
+        target_compile_options(${SAIL_WARNINGS_INTERFACE_LIB} INTERFACE
+            $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra>
+            $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra>
+        )
 
         if (SAIL_DEV)
-            string(APPEND CMAKE_C_FLAGS " " "-pedantic")
-            string(APPEND CMAKE_CXX_FLAGS " " "-pedantic")
+            target_compile_options(${SAIL_WARNINGS_INTERFACE_LIB} INTERFACE
+                $<$<COMPILE_LANGUAGE:C>:-pedantic>
+                $<$<COMPILE_LANGUAGE:CXX>:-pedantic>
+            )
         endif()
     endif()
 endmacro()
-

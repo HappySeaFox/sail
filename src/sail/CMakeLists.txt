@@ -72,7 +72,9 @@ set_target_properties(sail PROPERTIES
                            SOVERSION ${PROJECT_VERSION_MAJOR}
                            PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
-sail_enable_asan(TARGET sail)
+# Definitions, includes, link
+#
+target_link_libraries(sail PRIVATE sail-common-flags)
 
 # setenv
 sail_enable_posix_c_source(TARGET sail VERSION 200112L)
@@ -83,8 +85,6 @@ if (SAIL_WINDOWS_INSTALL_PDB)
     sail_windows_install_pdb(TARGET sail)
 endif()
 
-# Definitions, includes, link
-#
 target_include_directories(sail PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>)
 # Simplify the INIH parser
 target_compile_definitions(sail PRIVATE INI_ALLOW_MULTILINE=0 INI_ALLOW_INLINE_COMMENTS=0 INI_CUSTOM_ALLOCATOR=1 INI_STOP_ON_FIRST_ERROR=1 INI_MAX_LINE=500 INI_API=SAIL_HIDDEN)
