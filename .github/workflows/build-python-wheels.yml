@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
@@ -41,7 +41,6 @@ jobs:
     - name: Install build dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install python
         brew install giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libraw libtiff openexr openjpeg resvg webp
 
     - name: Cache vcpkg (Windows)
@@ -90,6 +89,7 @@ jobs:
       working-directory: src/bindings/sail-python
       env:
         CMAKE_ARGS: -DCMAKE_OSX_ARCHITECTURES=arm64
+        _PYTHON_HOST_PLATFORM: macosx-11.0-arm64
       run: |
         python -m build --wheel
         mkdir -p wheelhouse
