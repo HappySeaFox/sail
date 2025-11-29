@@ -135,21 +135,13 @@ sail_enable_asan(INTERFACE_LIB sail-common-flags)
 sail_enable_pic(INTERFACE_LIB sail-common-flags)
 sail_enable_no_undefined(INTERFACE_LIB sail-common-flags)
 
-# Enable strict C11
+# Enable C11
 #
-set_target_properties(sail-common-flags PROPERTIES
-    C_STANDARD 11
-    C_STANDARD_REQUIRED ON
-    C_EXTENSIONS OFF
-)
+target_compile_features(sail-common-flags INTERFACE c_std_11)
 
-# Enable strict C++11
+# Enable C++11
 #
-set_target_properties(sail-common-flags PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-)
+target_compile_features(sail-common-flags INTERFACE cxx_std_11)
 
 # Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
