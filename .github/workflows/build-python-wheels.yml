@@ -96,7 +96,7 @@ jobs:
         python -m build --wheel
         mkdir -p wheelhouse
         for wheel in dist/*.whl; do
-          python -m delocate.libsana delocate-wheel -w wheelhouse/ "$wheel"
+          delocate-wheel -w wheelhouse/ "$wheel"
         done
 
     - name: Build wheel (Windows)
