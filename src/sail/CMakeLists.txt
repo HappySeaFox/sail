@@ -75,7 +75,7 @@ set_target_properties(sail PROPERTIES
 sail_enable_asan(TARGET sail)
 
 # setenv
-sail_enable_posix_source(TARGET sail VERSION 200112L)
+sail_enable_posix_c_source(TARGET sail VERSION 200112L)
 
 sail_enable_pch(TARGET sail HEADER sail.h)
 

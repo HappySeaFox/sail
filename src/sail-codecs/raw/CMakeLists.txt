@@ -44,4 +44,4 @@ set_target_properties(sail-codec-raw PROPERTIES
     CXX_EXTENSIONS NO)
 
 # getc_unlocked
-sail_enable_posix_source(TARGET sail-codec-raw VERSION 200112L)
+sail_enable_posix_c_source(TARGET sail-codec-raw VERSION 200112L)
