@@ -127,26 +127,25 @@ endif()
 #
 set(SAIL_MAGIC_BUFFER_SIZE 16)
 
-# Create common flags interface library and enable warnings/ASAN/PIC/undefined flags
-#
-add_library(sail-common-flags INTERFACE)
-
 # Enable strict C11
 #
-set_target_properties(sail-common-flags PROPERTIES
-    C_STANDARD 11
-    C_STANDARD_REQUIRED ON
-    C_EXTENSIONS OFF
-)
+if (NOT DEFINED CMAKE_C_STANDARD)
+    set(CMAKE_C_STANDARD 11)
+    set(CMAKE_C_STANDARD_REQUIRED ON)
+    set(CMAKE_C_EXTENSIONS OFF)
+endif()
 
 # Enable strict C++11
 #
-set_target_properties(sail-common-flags PROPERTIES
-    CXX_STANDARD 11
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-)
+if (NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
 
+# Create common flags interface library and enable warnings/ASAN/PIC/undefined flags
+#
+add_library(sail-common-flags INTERFACE)
 sail_enable_warnings(INTERFACE_LIB sail-common-flags)
 sail_enable_asan(INTERFACE_LIB sail-common-flags)
 sail_enable_pic(INTERFACE_LIB sail-common-flags)
