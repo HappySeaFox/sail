@@ -299,6 +299,16 @@ get_target_property(SAIL_COMMON_COMPILE_OPTIONS     sail-common-flags INTERFACE_
 get_target_property(SAIL_COMMON_COMPILE_DEFINITIONS sail-common-flags INTERFACE_COMPILE_DEFINITIONS)
 get_target_property(SAIL_COMMON_LINK_OPTIONS        sail-common-flags INTERFACE_LINK_OPTIONS)
 
+if (NOT SAIL_COMMON_COMPILE_OPTIONS)
+    set(SAIL_COMMON_COMPILE_OPTIONS "")
+endif()
+if (NOT SAIL_COMMON_COMPILE_DEFINITIONS)
+    set(SAIL_COMMON_COMPILE_DEFINITIONS "")
+endif()
+if (NOT SAIL_COMMON_LINK_OPTIONS)
+    set(SAIL_COMMON_LINK_OPTIONS "")
+endif()
+
 message("")
 message("***************************************")
 message("*")
