@@ -112,7 +112,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vcpkg
-        key: vcpkg-${{ runner.os }}-${{ matrix.config.name }}-${{ hashFiles('vcpkg.json') }}
+        key: vcpkg-${{ hashFiles('vcpkg.json') }}
 
     - name: Set up vcpkg
       shell: bash
