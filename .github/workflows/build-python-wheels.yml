@@ -103,6 +103,7 @@ jobs:
       if: runner.os == 'Windows'
       working-directory: src/bindings/sail-python
       env:
+        VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg/archives
         # When we build Python wheels, CMAKE_SOURCE_DIR is src/bindings/sail-python.
         # VCPKG will try to search for vcpkg.json there. Redirect vcpkg to the project root.
         #

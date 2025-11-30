@@ -92,6 +92,8 @@ jobs:
   build-windows:
     name: Build and Test on Windows - ${{ matrix.config.name }}
     runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg/archives
     strategy:
       fail-fast: false
       matrix:
