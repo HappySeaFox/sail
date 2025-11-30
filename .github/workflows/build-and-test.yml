@@ -169,19 +169,3 @@ jobs:
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
-
-    - name: Archive vcpkg to tar.zstd
-      shell: bash
-      run: |
-        echo "Archiving vcpkg directory..."
-        tar --zstd -cf vcpkg-${{ matrix.config.name }}-${{ matrix.config.triplet }}.tar.zstd vcpkg
-        ls -lh vcpkg-*.tar.zstd
-
-    - name: Upload vcpkg archive as artifact
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: vcpkg-${{ matrix.config.name }}-${{ matrix.config.triplet }}
-        path: vcpkg-*.tar.zstd
-        retention-days: 7
-        if-no-files-found: warn
