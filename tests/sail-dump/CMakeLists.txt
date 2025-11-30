@@ -10,9 +10,11 @@ set_target_properties(sail-dump PROPERTIES
 #
 target_include_directories(sail-dump PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(sail-dump PRIVATE sail-common $<BUILD_INTERFACE:sail-common-flags>)
+target_link_libraries(sail-dump PRIVATE sail-common)
+target_link_libraries(sail-dump PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
 # Application to dump images
 #
 add_executable(sail-dump-app sail-dump-app.c)
-target_link_libraries(sail-dump-app PRIVATE sail sail-dump $<BUILD_INTERFACE:sail-common-flags>)
+target_link_libraries(sail-dump-app PRIVATE sail sail-dump)
+target_link_libraries(sail-dump-app PRIVATE $<BUILD_INTERFACE:sail-common-flags>)

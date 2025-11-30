@@ -32,6 +32,7 @@ include(sail_enable_warnings)
 include(sail_install_cmake_config)
 include(sail_test)
 include(sail_windows_install_pdb)
+include(sail_windows_set_crt)
 
 include(JoinPaths)
 
@@ -154,20 +155,14 @@ endif()
 # Windows CRT selection for static builds
 #
 if (WIN32 AND MSVC)
+    sail_windows_set_crt(INTERFACE_LIB sail-common-flags STATIC_CRT ${SAIL_WINDOWS_STATIC_CRT})
+
     if (BUILD_SHARED_LIBS)
-        set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Default (shared build)")
+        set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Dynamic (/MD) - shared build")
     else()
         if (SAIL_WINDOWS_STATIC_CRT)
-            target_compile_options(sail-common-flags INTERFACE
-                $<$<CONFIG:Debug>:/MTd>
-                $<$<NOT:$<CONFIG:Debug>>:/MT>
-            )
             set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Static (/MT)")
         else()
-            target_compile_options(sail-common-flags INTERFACE
-                $<$<CONFIG:Debug>:/MDd>
-                $<$<NOT:$<CONFIG:Debug>>:/MD>
-            )
             set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Dynamic (/MD)")
         endif()
     endif()

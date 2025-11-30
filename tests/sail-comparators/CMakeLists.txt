@@ -10,5 +10,6 @@ set_target_properties(sail-comparators PROPERTIES
 #
 target_include_directories(sail-comparators PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(sail-comparators PRIVATE sail-common $<BUILD_INTERFACE:sail-common-flags>)
+target_link_libraries(sail-comparators PRIVATE sail-common)
 target_link_libraries(sail-comparators PRIVATE sail-munit)
+target_link_libraries(sail-comparators PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
