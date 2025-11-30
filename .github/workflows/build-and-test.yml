@@ -96,10 +96,10 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows",           appflags: "/MDd" }
-          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON",  static_crt: "OFF", triplet: "x64-windows",           appflags: "/MDd" }
-          - { name: "Static /MT",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "ON",  triplet: "x64-windows-static",    appflags: "/MTd" }
-          - { name: "Static /MD",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows-static-md", appflags: "/MDd" }
+          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows",          }
+          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON",  static_crt: "OFF", triplet: "x64-windows",          }
+          - { name: "Static /MT",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "ON",  triplet: "x64-windows-static",   }
+          - { name: "Static /MD",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows-static-md" }
 
     steps:
     - uses: actions/checkout@v4
@@ -151,8 +151,6 @@ jobs:
         cmake -S . -B build `
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
-          -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} `
-          -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
@@ -165,8 +163,6 @@ jobs:
         cmake -S . -B build `
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
-          -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} `
-          -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
