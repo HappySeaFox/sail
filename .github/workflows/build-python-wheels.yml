@@ -109,9 +109,9 @@ jobs:
         # When we build Python wheels, CMAKE_SOURCE_DIR is src/bindings/sail-python.
         # VCPKG will try to search for vcpkg.json there. Redirect vcpkg to the project root.
         #
-        CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake"
                         -DVCPKG_TARGET_TRIPLET=x64-windows
-                        -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
+                        -DVCPKG_MANIFEST_DIR="${{ github.workspace }}"
                         -DVCPKG_INSTALL_OPTIONS="--clean-buildtrees-after-build"
                         -DCMAKE_C_FLAGS=-MP
                         -DCMAKE_CXX_FLAGS=-MP
