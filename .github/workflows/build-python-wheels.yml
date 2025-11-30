@@ -101,6 +101,7 @@ jobs:
 
     - name: Build wheel (Windows)
       if: runner.os == 'Windows'
+      shell: bash
       working-directory: src/bindings/sail-python
       env:
         VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg/archives
@@ -115,6 +116,7 @@ jobs:
                         -DCMAKE_C_FLAGS=-MP
                         -DCMAKE_CXX_FLAGS=-MP
       run: |
+        mkdir -p "$VCPKG_DEFAULT_BINARY_CACHE"
         python -m build --wheel
         mkdir -p wheelhouse
         mv dist/*.whl wheelhouse/
