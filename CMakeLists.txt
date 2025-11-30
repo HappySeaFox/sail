@@ -31,6 +31,7 @@ include(sail_enable_xopen_source)
 include(sail_enable_warnings)
 include(sail_install_cmake_config)
 include(sail_test)
+include(sail_windows_enable_exception_handling)
 include(sail_windows_install_pdb)
 include(sail_windows_set_crt)
 
@@ -136,6 +137,7 @@ sail_enable_warnings(INTERFACE_LIB sail-common-flags)
 sail_enable_asan(INTERFACE_LIB sail-common-flags)
 sail_enable_pic(INTERFACE_LIB sail-common-flags)
 sail_enable_no_undefined(INTERFACE_LIB sail-common-flags)
+sail_windows_enable_exception_handling(INTERFACE_LIB sail-common-flags)
 
 # Enable C11
 #
