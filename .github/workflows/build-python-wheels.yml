@@ -115,6 +115,7 @@ jobs:
                         -DVCPKG_INSTALL_OPTIONS=--clean-buildtrees-after-build
                         -DCMAKE_C_FLAGS=-MP
                         -DCMAKE_CXX_FLAGS=-MP
+                        -DSAIL_WINDOWS_STATIC_CRT=OFF
       run: |
         mkdir -p "$VCPKG_DEFAULT_BINARY_CACHE"
         python -m build --wheel
