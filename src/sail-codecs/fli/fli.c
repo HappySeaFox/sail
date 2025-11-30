@@ -397,13 +397,21 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_fli(void* state, co
         /* Determine if we're writing FLI or FLC. */
         fli_state->is_fli = (image->width == 320 && image->height == 200);
 
+        /* Validate dimensions fit in uint16_t. */
+        if (image->width > UINT16_MAX || image->height > UINT16_MAX)
+        {
+            SAIL_LOG_ERROR("FLI: Image dimensions %ux%u exceed maximum allowed (%ux%u)",
+                           image->width, image->height, UINT16_MAX, UINT16_MAX);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
         /* Fill FLI header. */
         memset(&fli_state->fli_header, 0, sizeof(fli_state->fli_header));
         fli_state->fli_header.size   = 0;
         fli_state->fli_header.magic  = fli_state->is_fli ? SAIL_FLI_MAGIC : SAIL_FLC_MAGIC;
         fli_state->fli_header.frames = 0;
-        fli_state->fli_header.width  = image->width;
-        fli_state->fli_header.height = image->height;
+        fli_state->fli_header.width  = (uint16_t)image->width;
+        fli_state->fli_header.height = (uint16_t)image->height;
         fli_state->fli_header.depth  = 8;
         fli_state->fli_header.flags  = 0;
 
