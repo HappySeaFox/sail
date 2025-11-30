@@ -25,6 +25,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>  /* _O_RDWR, _O_CREAT, etc. */
 #include <limits.h> /* UINT_MAX */
 #include <stdarg.h>
 #include <stdio.h>
@@ -34,13 +35,11 @@
 #include <sys/types.h>
 
 #ifdef SAIL_WIN32
-#include <fcntl.h> /* _O_RDWR, _O_CREAT, etc. */
 #include <io.h>
 #include <share.h> /* _SH_DENYWR */
 #include <windows.h>
 #else
 #include <errno.h>
-#include <fcntl.h> /* O_RDWR, O_CREAT, etc. */
 #include <sys/time.h>
 #include <unistd.h>
 #endif

@@ -51,6 +51,7 @@ sail_check_c11_thread_local()
 #
 sail_check_include(ctype.h)
 sail_check_include(errno.h)
+sail_check_include(fcntl.h)
 sail_check_include(setjmp.h)
 sail_check_include(stdarg.h)
 sail_check_include(stdbool.h)
