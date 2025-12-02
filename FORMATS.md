@@ -354,7 +354,7 @@
         Possible values: int/unsigned int 0-100.
         <br/>See the libjpeg docs for more.
     </td>
-    <td>Thumbnails (EXIF thumbnails cannot be saved, but EXIF metadata can be preserved as binary data).</td>
+    <td>-</td>
     <td>libjpeg or libjpeg-turbo</td>
 </tr>
 <tr>
