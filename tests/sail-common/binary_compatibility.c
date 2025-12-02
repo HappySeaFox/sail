@@ -131,9 +131,13 @@ static MunitResult test_meta_data_binary_compatibility(const MunitParameter para
     (void)params;
     (void)user_data;
 
+    /* Version < 1.0.0 */
     munit_assert_int(SAIL_META_DATA_LABEL, ==, 15);
     munit_assert_int(SAIL_META_DATA_SOURCE, ==, 22);
     munit_assert_int(SAIL_META_DATA_XMP, ==, 27);
+
+    /* Version = 1.0.0 */
+    munit_assert_int(SAIL_META_DATA_THUMBNAIL, ==, 28);
 
     return MUNIT_OK;
 }

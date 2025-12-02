@@ -341,6 +341,9 @@ enum SailMetaData
     SAIL_META_DATA_URL,
     SAIL_META_DATA_WARNING,
     SAIL_META_DATA_XMP,
+
+    /* Since 1.0.0 */
+    SAIL_META_DATA_THUMBNAIL,
 };
 
 /* Resolution units. */

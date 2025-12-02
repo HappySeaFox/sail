@@ -312,6 +312,8 @@ void init_enums(py::module_& m)
         .value("URL", SAIL_META_DATA_URL)
         .value("WARNING", SAIL_META_DATA_WARNING)
         .value("XMP", SAIL_META_DATA_XMP)
+        // Since 1.0.0
+        .value("THUMBNAIL", SAIL_META_DATA_THUMBNAIL)
         .export_values();
 
     // ============================================================================

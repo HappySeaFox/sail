@@ -566,6 +566,7 @@ const char* sail_meta_data_to_string(enum SailMetaData meta_data)
     case SAIL_META_DATA_URL: return "URL";
     case SAIL_META_DATA_WARNING: return "Warning";
     case SAIL_META_DATA_XMP: return "XMP";
+    case SAIL_META_DATA_THUMBNAIL: return "Thumbnail";
     }
 
     return NULL;
@@ -604,6 +605,8 @@ enum SailMetaData sail_meta_data_from_string(const char* str)
     case UINT64_C(193472344): return SAIL_META_DATA_URL;
     case UINT64_C(229446134771803): return SAIL_META_DATA_WARNING;
     case UINT64_C(193475450): return SAIL_META_DATA_XMP;
+
+    case UINT64_C(249862923696703689): return SAIL_META_DATA_THUMBNAIL;
     }
 
     return SAIL_META_DATA_UNKNOWN;

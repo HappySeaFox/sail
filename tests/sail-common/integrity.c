@@ -629,6 +629,7 @@ static MunitResult test_meta_data_to_string(const MunitParameter params[], void*
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_URL), "URL");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_WARNING), "Warning");
     munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_XMP), "XMP");
+    munit_assert_string_equal(sail_meta_data_to_string(SAIL_META_DATA_THUMBNAIL), "Thumbnail");
 
     return MUNIT_OK;
 }
@@ -670,6 +671,7 @@ static MunitResult test_meta_data_from_string(const MunitParameter params[], voi
     munit_assert(sail_meta_data_from_string("URL") == SAIL_META_DATA_URL);
     munit_assert(sail_meta_data_from_string("Warning") == SAIL_META_DATA_WARNING);
     munit_assert(sail_meta_data_from_string("XMP") == SAIL_META_DATA_XMP);
+    munit_assert(sail_meta_data_from_string("Thumbnail") == SAIL_META_DATA_THUMBNAIL);
 
     return MUNIT_OK;
 }
