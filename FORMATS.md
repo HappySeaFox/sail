@@ -64,7 +64,7 @@
         <b>Tuning:</b> Key: <i>"avif-threads"</i>. Description: Number of decoder threads.
         Possible values: positive int/unsigned int (default: 1).
     </td>
-    <td>-</td>
+    <td>Thumbnails.</td>
     <td>
         <b>RGB:</b> 24-bit.
         <b>BGR:</b> 24-bit.
@@ -84,7 +84,7 @@
         <br/>Key: <i>"avif-auto-tiling"</i>. Description: Enable automatic tiling for parallel encoding.
         Possible values: true or false.
     </td>
-    <td>10-bit and 12-bit depths</td>
+    <td>10-bit and 12-bit depths, Thumbnails.</td>
     <td>libavif</td>
 </tr>
 <tr>
@@ -234,7 +234,7 @@
         <br/><br/>
         <b>Tuning:</b> Key: <i>"heif-threads"</i>. Description: Number of decoder threads. Possible values: int (1-256, default: 1).
     </td>
-    <td>-</td>
+    <td>Thumbnails.</td>
     <td>
         <b>Grayscale:</b> 8-bit, 16-bit<sup><a href="#star-underlying">[1]</a></sup>.
         <b>RGB:</b> 24-bit, 48-bit<sup><a href="#star-underlying">[1]</a></sup>.
@@ -252,7 +252,7 @@
         <br/>Key: <i>"heif-chroma"</i>. Description: Chroma subsampling. Possible values: 420, 422, 444.
         <br/>Key: <i>"heif-threads"</i>. Description: Number of encoder threads. Possible values: int (1-256, default: 1).
     </td>
-    <td>-</td>
+    <td>Thumbnails.</td>
     <td>libheif</td>
 </tr>
 <tr>
@@ -354,7 +354,7 @@
         Possible values: int/unsigned int 0-100.
         <br/>See the libjpeg docs for more.
     </td>
-    <td>-</td>
+    <td>Thumbnails (EXIF thumbnails cannot be saved, but EXIF metadata can be preserved as binary data).</td>
     <td>libjpeg or libjpeg-turbo</td>
 </tr>
 <tr>
@@ -685,7 +685,7 @@
         <br/>Key: <i>"raw-no-interpolation"</i>. Description: Disable interpolation. Possible values: bool.
         <br/>Key: <i>"raw-median-passes"</i>. Description: Median filter passes (0-100). Possible values: int/unsigned int 0-100.
     </td>
-    <td><b>Content:</b> Multi-paged.</td>
+    <td><b>Content:</b> Multi-paged, Thumbnails.</td>
     <td>Unsupported</td>
     <td>-</td>
     <td>libraw</td>
@@ -724,7 +724,7 @@
         <br/><br/>
         <b>TGA Versions:</b> TGA 1.0, TGA 2.0 (with Extension Area).
     </td>
-    <td><b>Content:</b> Thumbnail images.</td>
+    <td><b>Content:</b> Thumbnails.</td>
     <td>
         <b>Grayscale:</b> 8-bit.
         <b>Indexed:</b> 8-bit.
@@ -752,7 +752,7 @@
         <br/><br/>
         <b>Content:</b> Static, Multi-paged, Meta data, ICC profiles.
     </td>
-    <td>Tiled TIFFs, Planar configuration (PLANARCONFIG_SEPARATE), EXIF</td>
+    <td>Tiled TIFFs, Planar configuration (PLANARCONFIG_SEPARATE), EXIF, Thumbnails./td>
     <td>
         <b>Grayscale:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 32-bit (float), 32-bit (uint).
         <br/>
@@ -781,7 +781,7 @@
         <br/><i>tiff-jpeg-quality</i>: JPEG quality (1-100). Values: int/unsigned int. Default: 75.
         <br/><i>tiff-zip-quality</i>: ZIP/DEFLATE quality (1-9). Values: int/unsigned int. Default: 6.
     </td>
-    <td>Tiled TIFFs, Planar configuration (PLANARCONFIG_SEPARATE), EXIF</td>
+    <td>Tiled TIFFs, Planar configuration (PLANARCONFIG_SEPARATE), EXIF, Thumbnails.</td>
     <td>libtiff</td>
 </tr>
 <tr>
