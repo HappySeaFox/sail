@@ -162,7 +162,8 @@ sail_status_t tga_private_fetch_id(struct sail_io* io,
 
 sail_status_t tga_private_fetch_extension(struct sail_io* io,
                                           double* gamma,
-                                          struct sail_meta_data_node** meta_data_node)
+                                          struct sail_meta_data_node** meta_data_node,
+                                          struct sail_hash_map* special_properties)
 {
     /* Find the last node. */
     struct sail_meta_data_node** last_meta_data_node = meta_data_node;
@@ -333,11 +334,36 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
         }
     }
 
-    /* Key Color. */
-    SAIL_TRY(io->seek(io->stream, 4, SEEK_CUR));
+    /* Key Color (ARGB). */
+    {
+        uint32_t key_color;
+        SAIL_TRY(io->strict_read(io->stream, &key_color, sizeof(key_color)));
+
+        if (special_properties != NULL && key_color != 0)
+        {
+            struct sail_variant* variant;
+            SAIL_TRY(sail_alloc_variant(&variant));
+            sail_set_variant_unsigned_int(variant, key_color);
+            sail_put_hash_map(special_properties, "tga-key-color", variant);
+            sail_destroy_variant(variant);
+        }
+    }
 
     /* Pixel Aspect Ratio. */
-    SAIL_TRY(io->seek(io->stream, 4, SEEK_CUR));
+    {
+        uint16_t pixel_aspect_num, pixel_aspect_denom;
+        SAIL_TRY(io->strict_read(io->stream, &pixel_aspect_num, sizeof(pixel_aspect_num)));
+        SAIL_TRY(io->strict_read(io->stream, &pixel_aspect_denom, sizeof(pixel_aspect_denom)));
+
+        if (special_properties != NULL && pixel_aspect_denom != 0)
+        {
+            struct sail_variant* variant;
+            SAIL_TRY(sail_alloc_variant(&variant));
+            sail_set_variant_double(variant, (double)pixel_aspect_num / pixel_aspect_denom);
+            sail_put_hash_map(special_properties, "tga-pixel-aspect-ratio", variant);
+            sail_destroy_variant(variant);
+        }
+    }
 
     /* Gamma. */
     {
@@ -348,6 +374,54 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
         if (gamma_denom != 0)
         {
             *gamma = (double)gamma_num / gamma_denom;
+        }
+    }
+
+    /* Color Correction Offset. */
+    {
+        uint32_t color_correction_offset;
+        SAIL_TRY(io->strict_read(io->stream, &color_correction_offset, sizeof(color_correction_offset)));
+
+        if (special_properties != NULL && color_correction_offset != 0)
+        {
+            struct sail_variant* variant;
+            SAIL_TRY(sail_alloc_variant(&variant));
+            sail_set_variant_unsigned_int(variant, color_correction_offset);
+            sail_put_hash_map(special_properties, "tga-color-correction-offset", variant);
+            sail_destroy_variant(variant);
+        }
+    }
+
+    /* Postage Stamp Offset. */
+    SAIL_TRY(io->seek(io->stream, 4, SEEK_CUR));
+
+    /* Scan Line Offset. */
+    {
+        uint32_t scan_line_offset;
+        SAIL_TRY(io->strict_read(io->stream, &scan_line_offset, sizeof(scan_line_offset)));
+
+        if (special_properties != NULL && scan_line_offset != 0)
+        {
+            struct sail_variant* variant;
+            SAIL_TRY(sail_alloc_variant(&variant));
+            sail_set_variant_unsigned_int(variant, scan_line_offset);
+            sail_put_hash_map(special_properties, "tga-scan-line-offset", variant);
+            sail_destroy_variant(variant);
+        }
+    }
+
+    /* Attributes Type. */
+    {
+        uint8_t attributes_type;
+        SAIL_TRY(io->strict_read(io->stream, &attributes_type, sizeof(attributes_type)));
+
+        if (special_properties != NULL)
+        {
+            struct sail_variant* variant;
+            SAIL_TRY(sail_alloc_variant(&variant));
+            sail_set_variant_unsigned_char(variant, attributes_type);
+            sail_put_hash_map(special_properties, "tga-attributes-type", variant);
+            sail_destroy_variant(variant);
         }
     }
 

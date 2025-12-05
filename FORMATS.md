@@ -723,6 +723,25 @@
         <b>Content:</b> Static, Meta data.
         <br/><br/>
         <b>TGA Versions:</b> TGA 1.0, TGA 2.0 (with Extension Area).
+        <br/><br/>
+        <b>Special properties:</b> Key: <i>"tga-origin-x"</i>. Description: X coordinate of image origin.
+        Possible values: unsigned short.
+        Key: <i>"tga-origin-y"</i>. Description: Y coordinate of image origin.
+        Possible values: unsigned short.
+        Key: <i>"tga-alpha-bits"</i>. Description: Number of alpha channel bits (0-15).
+        Possible values: unsigned char.
+        Key: <i>"tga-flipped-h"</i>. Description: Image is flipped horizontally.
+        Possible values: bool.
+        Key: <i>"tga-flipped-v"</i>. Description: Image is flipped vertically.
+        Possible values: bool.
+        Key: <i>"tga-key-color"</i>. Description: Key color (ARGB, 32-bit).
+        Possible values: unsigned int (only if not zero).
+        Key: <i>"tga-pixel-aspect-ratio"</i>. Description: Pixel aspect ratio.
+        Possible values: double.
+        Key: <i>"tga-scan-line-offset"</i>. Description: Offset to scan line table.
+        Possible values: unsigned int (only if not zero).
+        Key: <i>"tga-attributes-type"</i>. Description: Attributes type byte indicating how to interpret alpha channel (0=no alpha, 1=undefined/ignore, 2=useful non-premultiplied, 3=useful premultiplied, 4=premultiplied non-linear).
+        Possible values: unsigned char.
     </td>
     <td><b>Content:</b> Thumbnails.</td>
     <td>

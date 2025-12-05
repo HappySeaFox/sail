@@ -31,6 +31,7 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+struct sail_hash_map;
 struct sail_io;
 struct sail_meta_data_node;
 struct sail_palette;
@@ -89,7 +90,8 @@ SAIL_HIDDEN sail_status_t tga_private_fetch_id(struct sail_io* io,
 
 SAIL_HIDDEN sail_status_t tga_private_fetch_extension(struct sail_io* io,
                                                       double* gamma,
-                                                      struct sail_meta_data_node** meta_data_node);
+                                                      struct sail_meta_data_node** meta_data_node,
+                                                      struct sail_hash_map* special_properties);
 
 SAIL_HIDDEN sail_status_t tga_private_fetch_palette(struct sail_io* io,
                                                     const struct TgaFileHeader* file_header,
