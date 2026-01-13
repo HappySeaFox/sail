@@ -113,6 +113,13 @@ public:
     void set_options(int options);
 
     /*
+     * Sets or clears a single conversion option flag.
+     * If on is true, the option is set (added to the current options).
+     * If on is false, the option is cleared (removed from the current options).
+     */
+    void set_option(SailConversionOption option, bool on = true);
+
+    /*
      * Sets a new 48-bit background color to blend 48-bit images.
      * Additionally, calculates and sets a new 24-bit background color to blend 24-bit images.
      */

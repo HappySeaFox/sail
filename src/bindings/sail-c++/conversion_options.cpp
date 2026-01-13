@@ -120,6 +120,18 @@ void conversion_options::set_options(int options)
     d->conversion_options->options = options;
 }
 
+void conversion_options::set_option(SailConversionOption option, bool on)
+{
+    if (on)
+    {
+        d->conversion_options->options |= option;
+    }
+    else
+    {
+        d->conversion_options->options &= ~option;
+    }
+}
+
 void conversion_options::set_background(const sail_rgb48_t& rgb48)
 {
     d->conversion_options->background48 = rgb48;
