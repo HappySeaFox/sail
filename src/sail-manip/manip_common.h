@@ -58,6 +58,17 @@ enum SailConversionOption
      * quantization error to neighboring pixels.
      */
     SAIL_CONVERSION_OPTION_DITHERING = 1 << 2,
+
+    /*
+     * Preserve the ICC profile when converting between pixel formats.
+     * By default, ICC profiles are cleared when converting between different
+     * color spaces (e.g., RGB to Grayscale, CMYK to RGB). When this option is set,
+     * the ICC profile is preserved even during color space conversion.
+     *
+     * Note: The ICC profile may become not applicable after color space conversion,
+     * and applications should handle this appropriately.
+     */
+    SAIL_CONVERSION_OPTION_PRESERVE_ICCP = 1 << 3,
 };
 
 /* Convert 8-bit component to 16-bit: v * 257 = (v << 8) | v */

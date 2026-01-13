@@ -28,6 +28,7 @@
 #include <pybind11/stl.h>
 
 #include <sail-c++/sail-c++.h>
+#include <sail-manip/manip_common.h>
 
 #include <fstream>
 #include <limits>
@@ -193,16 +194,16 @@ void init_image(py::module_& m)
             "blend_alpha",
             [](const sail::conversion_options& opts) { return opts.options() & SAIL_CONVERSION_OPTION_BLEND_ALPHA; },
             [](sail::conversion_options& opts, bool blend) {
-                if (blend)
-                {
-                    opts.set_options(opts.options() | SAIL_CONVERSION_OPTION_BLEND_ALPHA);
-                }
-                else
-                {
-                    opts.set_options(opts.options() & ~SAIL_CONVERSION_OPTION_BLEND_ALPHA);
-                }
+                opts.set_option(SAIL_CONVERSION_OPTION_BLEND_ALPHA, blend);
             },
             "Blend alpha channel with background when converting")
+        .def_property(
+            "preserve_iccp",
+            [](const sail::conversion_options& opts) { return opts.options() & SAIL_CONVERSION_OPTION_PRESERVE_ICCP; },
+            [](sail::conversion_options& opts, bool preserve) {
+                opts.set_option(SAIL_CONVERSION_OPTION_PRESERVE_ICCP, preserve);
+            },
+            "Preserve ICC profile when converting between pixel formats")
         .def("__repr__", [](const sail::conversion_options&) { return "ConversionOptions()"; });
 
     // ============================================================================

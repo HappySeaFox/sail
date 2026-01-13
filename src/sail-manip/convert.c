@@ -2256,24 +2256,36 @@ sail_status_t sail_convert_image_with_options(const struct sail_image* image,
     image_local->pixel_format   = output_pixel_format;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
-    /* Clear ICC profile if changing color space (RGB <-> Grayscale, CMYK <-> RGB, etc). */
-    bool input_is_rgb    = sail_is_rgb_family(image->pixel_format);
-    bool output_is_rgb   = sail_is_rgb_family(output_pixel_format);
-    bool input_is_gray   = sail_is_grayscale(image->pixel_format);
-    bool output_is_gray  = sail_is_grayscale(output_pixel_format);
-    bool input_is_cmyk   = sail_is_cmyk(image->pixel_format);
-    bool output_is_cmyk  = sail_is_cmyk(output_pixel_format);
-    bool input_is_ycbcr  = sail_is_ycbcr(image->pixel_format);
-    bool output_is_ycbcr = sail_is_ycbcr(output_pixel_format);
-    bool input_is_ycck   = sail_is_ycck(image->pixel_format);
-    bool output_is_ycck  = sail_is_ycck(output_pixel_format);
+    /*
+     * Clear ICC profile if changing color space (RGB <-> Grayscale, CMYK <-> RGB, etc),
+     * unless SAIL_CONVERSION_OPTION_PRESERVE_ICCP is set.
+     */
+    bool preserve_iccp = (options != NULL && (options->options & SAIL_CONVERSION_OPTION_PRESERVE_ICCP));
 
-    if (input_is_rgb != output_is_rgb || input_is_gray != output_is_gray || input_is_cmyk != output_is_cmyk
-        || input_is_ycbcr != output_is_ycbcr || input_is_ycck != output_is_ycck)
+    if (!preserve_iccp)
     {
-        SAIL_LOG_DEBUG("Color space conversion detected, clearing ICC profile");
-        sail_destroy_iccp(image_local->iccp);
-        image_local->iccp = NULL;
+        bool input_is_rgb    = sail_is_rgb_family(image->pixel_format);
+        bool output_is_rgb   = sail_is_rgb_family(output_pixel_format);
+        bool input_is_gray   = sail_is_grayscale(image->pixel_format);
+        bool output_is_gray  = sail_is_grayscale(output_pixel_format);
+        bool input_is_cmyk   = sail_is_cmyk(image->pixel_format);
+        bool output_is_cmyk  = sail_is_cmyk(output_pixel_format);
+        bool input_is_ycbcr  = sail_is_ycbcr(image->pixel_format);
+        bool output_is_ycbcr = sail_is_ycbcr(output_pixel_format);
+        bool input_is_ycck   = sail_is_ycck(image->pixel_format);
+        bool output_is_ycck  = sail_is_ycck(output_pixel_format);
+
+        if (input_is_rgb != output_is_rgb || input_is_gray != output_is_gray || input_is_cmyk != output_is_cmyk
+            || input_is_ycbcr != output_is_ycbcr || input_is_ycck != output_is_ycck)
+        {
+            SAIL_LOG_DEBUG("Color space conversion detected, clearing ICC profile");
+            sail_destroy_iccp(image_local->iccp);
+            image_local->iccp = NULL;
+        }
+    }
+    else
+    {
+        SAIL_LOG_DEBUG("ICC profile preservation requested, keeping ICC profile during conversion");
     }
 
     const size_t pixels_size = (size_t)image_local->height * image_local->bytes_per_line;
