@@ -77,7 +77,8 @@ jobs:
         rm -rf tests/external/link/c/build
         mkdir tests/external/link/c/build
         cmake -S tests/external/link/c -B tests/external/link/c/build \
-          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DSAIL_ASAN=${{ matrix.config.sail_asan }}
         cmake --build tests/external/link/c/build -j$(nproc)
         tests/external/link/c/build/external-c-api-link
 
@@ -86,7 +87,8 @@ jobs:
         rm -rf tests/external/link/c++/build
         mkdir tests/external/link/c++/build
         cmake -S tests/external/link/c++ -B tests/external/link/c++/build \
-          -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DSAIL_ASAN=${{ matrix.config.sail_asan }}
         cmake --build tests/external/link/c++/build -j$(nproc)
         tests/external/link/c++/build/external-c++-api-link
 

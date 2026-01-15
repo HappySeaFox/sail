@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(external-c-api-link)
 
+option(SAIL_ASAN "Enable AddressSanitizer." OFF)
+
 include(CheckCSourceRuns)
 include(CMakePushCheckState)
 
@@ -13,7 +15,9 @@ add_executable(external-c-api-link main.c)
 # Create and configure common flags interface library
 #
 add_library(sail-common-flags INTERFACE)
-sail_enable_asan(INTERFACE_LIB sail-common-flags)
+if (SAIL_ASAN)
+    sail_enable_asan(INTERFACE_LIB sail-common-flags)
+endif()
 
 target_link_libraries(external-c-api-link PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
