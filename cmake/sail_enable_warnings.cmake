@@ -16,15 +16,8 @@ macro(sail_enable_warnings)
         target_compile_options(${SAIL_WARNINGS_INTERFACE_LIB} INTERFACE /W4)
     elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
         target_compile_options(${SAIL_WARNINGS_INTERFACE_LIB} INTERFACE
-            $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra>
-            $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra>
+            $<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -pedantic>
+            $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -pedantic>
         )
-
-        if (SAIL_DEV)
-            target_compile_options(${SAIL_WARNINGS_INTERFACE_LIB} INTERFACE
-                $<$<COMPILE_LANGUAGE:C>:-pedantic>
-                $<$<COMPILE_LANGUAGE:CXX>:-pedantic>
-            )
-        endif()
     endif()
 endmacro()

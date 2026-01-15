@@ -23,6 +23,7 @@ include(sail_check_init_once_execute_once)
 include(sail_check_openmp)
 include(sail_codec)
 include(sail_enable_asan)
+include(sail_enable_tsan)
 include(sail_enable_no_undefined)
 include(sail_enable_pch)
 include(sail_enable_pic)
@@ -84,7 +85,8 @@ endif()
 option(SAIL_BUILD_APPS "Build client applications." ON)
 option(SAIL_BUILD_BINDINGS "Build C++ and other bindings." ON)
 option(SAIL_BUILD_EXAMPLES "Build examples." ON)
-option(SAIL_DEV "Enable developer mode with pedantic warnings and optional ASAN for examples." OFF)
+option(SAIL_ASAN "Enable AddressSanitizer." OFF)
+option(SAIL_TSAN "Enable ThreadSanitizer." OFF)
 option(SAIL_ENABLE_OPENMP "Enable OpenMP support if available in the compiler. See also SAIL_OPENMP_SCHEDULE." ON)
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Force-enable the codecs specified in this ';'-separated list. \
 Configuration fails if an enabled codec cannot find its dependencies. \
@@ -130,11 +132,12 @@ endif()
 #
 set(SAIL_MAGIC_BUFFER_SIZE 16)
 
-# Create common flags interface library and enable warnings/ASAN/PIC/undefined flags
+# Create common flags interface library and enable warnings/ASAN/TSAN/PIC/undefined flags
 #
 add_library(sail-common-flags INTERFACE)
 sail_enable_warnings(INTERFACE_LIB sail-common-flags)
 sail_enable_asan(INTERFACE_LIB sail-common-flags)
+sail_enable_tsan(INTERFACE_LIB sail-common-flags)
 sail_enable_pic(INTERFACE_LIB sail-common-flags)
 sail_enable_no_undefined(INTERFACE_LIB sail-common-flags)
 sail_windows_enable_exception_handling(INTERFACE_LIB sail-common-flags)
@@ -150,10 +153,6 @@ target_compile_features(sail-common-flags INTERFACE cxx_std_11)
 # Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
 target_compile_definitions(sail-common-flags INTERFACE SAIL_BUILD)
-
-if (SAIL_DEV)
-    target_compile_definitions(sail-common-flags INTERFACE SAIL_DEV)
-endif()
 
 # Windows CRT selection for static builds
 #
@@ -318,7 +317,8 @@ message("* Common compile definitions:   ${SAIL_COMMON_COMPILE_DEFINITIONS}")
 message("* Common link options:          ${SAIL_COMMON_LINK_OPTIONS}")
 message("*")
 message("* SAIL version:                 ${PROJECT_VERSION}")
-message("* Developer mode:               ${SAIL_DEV}")
+message("* AddressSanitizer:             ${SAIL_ASAN}")
+message("* ThreadSanitizer:              ${SAIL_TSAN}")
 message("* VCPKG mode:                   ${SAIL_VCPKG}")
 message("* Shared build:                 ${BUILD_SHARED_LIBS}")
 message("*   Combine codecs [*]:         ${SAIL_COMBINE_CODECS}")

@@ -28,7 +28,8 @@ brew install libsail
 - `SAIL_BUILD_EXAMPLES=ON|OFF` - Build examples. Default: `ON`
 - `SAIL_COLORED_OUTPUT=ON|OFF` - Enable colored console output on Windows 10+ and Unix platforms. Default: `ON`
 - `SAIL_COMBINE_CODECS=ON|OFF` - Combine all codecs into a single library. Static builds automatically set this to `ON`. Default: `OFF`
-- `SAIL_DEV=ON|OFF` - Enable developer mode with pedantic warnings and optional `ASAN` for examples. Default: `OFF`
+- `SAIL_ASAN=ON|OFF` - Enable AddressSanitizer (`sanitize=address`). Default: `OFF`
+- `SAIL_TSAN=ON|OFF` - Enable ThreadSanitizer (`sanitize=thread`). Default: `OFF`
 - `SAIL_DISABLE_CODECS="a;b;c"` - Disable the codecs specified in this ';'-separated list. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Default: empty list
 - `SAIL_ENABLE_CODECS="a;b;c"` - Force-enable the codecs specified in this ';'-separated list. Configuration fails if an enabled codec cannot find its dependencies. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Other codecs may be enabled based on available dependencies. When set, `SAIL_ONLY_CODECS` is ignored. Default: empty list
 - `SAIL_ENABLE_OPENMP=ON|OFF` - Enable OpenMP support if available in the compiler. Default: `ON`

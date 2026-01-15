@@ -15,9 +15,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         config:
-          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF" }
-          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON" }
-          - { name: "Static",          build_shared: "OFF", combine_codecs: "OFF" }
+          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "OFF" }
+          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON",  sail_asan: "OFF", sail_tsan: "OFF" }
+          - { name: "Static",          build_shared: "OFF", combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "OFF" }
+          - { name: "Shared ASAN",     build_shared: "ON",  combine_codecs: "ON",  sail_asan: "ON",  sail_tsan: "OFF" }
+          - { name: "Shared TSAN",     build_shared: "ON",  combine_codecs: "ON",  sail_asan: "OFF", sail_tsan: "ON"  }
 
     steps:
     - uses: actions/checkout@v4
@@ -44,8 +46,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug \
           -DCMAKE_INSTALL_PREFIX=/usr/local \
           -DBUILD_SHARED_LIBS=${{ matrix.config.build_shared }} \
-          -DSAIL_DEV=ON \
-          -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }}
+          -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }} \
+          -DSAIL_ASAN=${{ matrix.config.sail_asan }} \
+          -DSAIL_TSAN=${{ matrix.config.sail_tsan }}
 
     - name: Build
       run: cmake --build build -j$(nproc)
@@ -74,7 +77,6 @@ jobs:
         rm -rf tests/external/link/c/build
         mkdir tests/external/link/c/build
         cmake -S tests/external/link/c -B tests/external/link/c/build \
-          -DSAIL_DEV=ON \
           -DCMAKE_BUILD_TYPE=Debug
         cmake --build tests/external/link/c/build -j$(nproc)
         tests/external/link/c/build/external-c-api-link
@@ -84,7 +86,6 @@ jobs:
         rm -rf tests/external/link/c++/build
         mkdir tests/external/link/c++/build
         cmake -S tests/external/link/c++ -B tests/external/link/c++/build \
-          -DSAIL_DEV=ON \
           -DCMAKE_BUILD_TYPE=Debug
         cmake --build tests/external/link/c++/build -j$(nproc)
         tests/external/link/c++/build/external-c++-api-link
@@ -132,7 +133,6 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug       \
           -DCMAKE_INSTALL_PREFIX=C:/SAIL \
           -DBUILD_SHARED_LIBS=${{ matrix.config.build_shared }} \
-          -DSAIL_DEV=ON \
           -DSAIL_COMBINE_CODECS=${{ matrix.config.combine_codecs }} \
           -DSAIL_WINDOWS_STATIC_CRT=${{ matrix.config.static_crt }} \
           -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \

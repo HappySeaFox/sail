@@ -1,7 +1,7 @@
 # Enables ASAN on an interface library if supported.
-# ASAN is enabled in DEV mode only. We try to compile and RUN a test program
-# with -fsanitize=address as ASAN may be accessible in MSVC 2019 on Windows 7,
-# but the resulting program may fail to run due to missing symbols in kernel32.
+# We try to compile and RUN a test program with -fsanitize=address as ASAN may be
+# accessible in MSVC 2019 on Windows 7, but the resulting program may fail to run
+# due to missing symbols in kernel32.
 #
 # Usage:
 #   sail_enable_asan(INTERFACE_LIB sail-common-flags)
@@ -13,7 +13,7 @@ macro(sail_enable_asan)
         message(FATAL_ERROR "Interface library '${SAIL_ASAN_INTERFACE_LIB}' not found.")
     endif()
 
-    if (SAIL_DEV)
+    if (SAIL_ASAN)
         if (NOT MSVC OR MSVC_TOOLSET_VERSION GREATER 141)
             cmake_push_check_state(RESET)
                 set(CMAKE_REQUIRED_FLAGS "-fsanitize=address")
