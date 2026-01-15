@@ -49,8 +49,8 @@ typedef void* (*thread_func_t)(void*);
 #include "tests/images/acceptance/test-images.h"
 
 /* Stress test configuration */
-#define STRESS_NUM_THREADS 4
-#define STRESS_ITERATIONS_PER_THREAD 5
+#define STRESS_NUM_THREADS 8
+#define STRESS_ITERATIONS_PER_THREAD 100
 
 struct stress_thread_data
 {
