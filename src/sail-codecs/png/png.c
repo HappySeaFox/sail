@@ -750,8 +750,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
             }
         }
 
-        /* Save gamma. */
-        png_set_gAMA(png_state->png_ptr, png_state->info_ptr, image->gamma);
+        /* Save gamma only if it's set (not zero). */
+        if (image->gamma != 0)
+        {
+            png_set_gAMA(png_state->png_ptr, png_state->info_ptr, image->gamma);
+        }
 
         /* Set compression. */
         const double compression = (png_state->save_options->compression_level < COMPRESSION_MIN
