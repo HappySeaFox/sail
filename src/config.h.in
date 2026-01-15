@@ -87,8 +87,23 @@
 /* Enabled built-in codecs. */
 @SAIL_HAVE_CODEC_DEFINES@
 
+/* OpenMP support. */
+#cmakedefine SAIL_HAVE_OPENMP
+
 /* OpenMP scheduling algorithm. */
 #cmakedefine SAIL_OPENMP_SCHEDULE @SAIL_OPENMP_SCHEDULE@
+
+/* OpenMP parallel for directive macro. */
+#ifdef SAIL_HAVE_OPENMP
+    #ifdef SAIL_OPENMP_SCHEDULE
+        #define SAIL_OMP_PARALLEL_FOR_IMPL(schedule) _Pragma("omp parallel for schedule(" #schedule ")")
+        #define SAIL_OMP_PARALLEL_FOR SAIL_OMP_PARALLEL_FOR_IMPL(SAIL_OPENMP_SCHEDULE)
+    #else
+        #define SAIL_OMP_PARALLEL_FOR _Pragma("omp parallel for schedule(dynamic)")
+    #endif
+#else
+    #define SAIL_OMP_PARALLEL_FOR
+#endif
 
 #cmakedefine SAIL_WINDOWS_UTF8_PATHS
 

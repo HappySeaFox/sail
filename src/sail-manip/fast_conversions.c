@@ -39,7 +39,7 @@ static bool fast_convert_rgb24_bgr24(const struct sail_image* image_input, struc
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image_input, row);
@@ -64,7 +64,7 @@ static bool fast_convert_rgb48_bgr48(const struct sail_image* image_input, struc
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image_input, row);
@@ -98,7 +98,7 @@ static bool fast_convert_rgba32_variants(const struct sail_image* image_input,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image_input, row);
@@ -133,7 +133,7 @@ static bool fast_convert_rgba64_variants(const struct sail_image* image_input,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image_input, row);
@@ -166,7 +166,7 @@ static bool fast_convert_rgba32_to_rgb24(const struct sail_image* image_input,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image_input, row);
@@ -198,7 +198,7 @@ static bool fast_convert_rgba64_to_rgb48(const struct sail_image* image_input,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image_input, row);
@@ -231,7 +231,7 @@ static bool fast_convert_rgb24_to_rgba32(const struct sail_image* image_input,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image_input, row);
@@ -265,7 +265,7 @@ static bool fast_convert_rgb48_to_rgba64(const struct sail_image* image_input,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image_input, row);
@@ -291,7 +291,7 @@ static bool fast_convert_rgb555_bgr555(const struct sail_image* image_input, str
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image_input, row);
@@ -315,7 +315,7 @@ static bool fast_convert_rgb565_bgr565(const struct sail_image* image_input, str
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image_input->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image_input, row);

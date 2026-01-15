@@ -1159,7 +1159,7 @@ static sail_status_t convert_from_indexed(const struct sail_image* image,
 
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1239,7 +1239,7 @@ static sail_status_t convert_from_grayscale_up_to_bpp8(const struct sail_image* 
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1315,7 +1315,7 @@ static sail_status_t convert_from_bpp16_grayscale(const struct sail_image* image
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1339,7 +1339,7 @@ static sail_status_t convert_from_bpp16_grayscale_alpha(const struct sail_image*
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1365,7 +1365,7 @@ static sail_status_t convert_from_bpp32_grayscale_alpha(const struct sail_image*
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1391,7 +1391,7 @@ static sail_status_t convert_from_bpp16_rgb555(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1417,7 +1417,7 @@ static sail_status_t convert_from_bpp16_bgr555(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1443,7 +1443,7 @@ static sail_status_t convert_from_bpp16_rgb565(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1469,7 +1469,7 @@ static sail_status_t convert_from_bpp16_bgr565(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1498,7 +1498,7 @@ static sail_status_t convert_from_bpp24_rgb_kind(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1526,7 +1526,7 @@ static sail_status_t convert_from_bpp48_rgb_kind(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1555,7 +1555,7 @@ static sail_status_t convert_from_bpp32_rgba_kind(const struct sail_image* image
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1585,7 +1585,7 @@ static sail_status_t convert_from_bpp64_rgba_kind(const struct sail_image* image
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1611,7 +1611,7 @@ static sail_status_t convert_from_bpp32_cmyk(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1638,7 +1638,7 @@ static sail_status_t convert_from_bpp64_cmyk(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1665,7 +1665,7 @@ static sail_status_t convert_from_bpp40_cmyka(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1692,7 +1692,7 @@ static sail_status_t convert_from_bpp80_cmyka(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1719,7 +1719,7 @@ static sail_status_t convert_from_bpp24_ycbcr(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1745,7 +1745,7 @@ static sail_status_t convert_from_bpp32_ycck(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint8_t* scan_input = sail_scan_line(image, row);
@@ -1773,7 +1773,7 @@ static sail_status_t convert_from_bpp16_grayscale_half(const struct sail_image* 
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1798,7 +1798,7 @@ static sail_status_t convert_from_bpp32_grayscale_float(const struct sail_image*
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const float* scan_input = sail_scan_line(image, row);
@@ -1823,7 +1823,7 @@ static sail_status_t convert_from_bpp48_rgb_half(const struct sail_image* image,
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1853,7 +1853,7 @@ static sail_status_t convert_from_bpp64_rgba_half(const struct sail_image* image
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const uint16_t* scan_input = sail_scan_line(image, row);
@@ -1883,7 +1883,7 @@ static sail_status_t convert_from_bpp96_rgb_float(const struct sail_image* image
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const float* scan_input = sail_scan_line(image, row);
@@ -1913,7 +1913,7 @@ static sail_status_t convert_from_bpp128_rgba_float(const struct sail_image* ima
 {
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < image->height; row++)
     {
         const float* scan_input = sail_scan_line(image, row);

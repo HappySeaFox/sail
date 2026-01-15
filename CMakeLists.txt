@@ -116,6 +116,7 @@ endif()
 if (SAIL_ENABLE_OPENMP)
     sail_check_openmp()
 else()
+    set(SAIL_HAVE_OPENMP OFF CACHE INTERNAL "")
     set(SAIL_HAVE_OPENMP_DISPLAY "OFF (forced)" CACHE INTERNAL "")
 endif()
 

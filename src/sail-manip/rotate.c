@@ -57,7 +57,7 @@ static sail_status_t rotate_90_clockwise(const struct sail_image* image, struct 
     /* For 90° CW rotation: new[x][y] = old[height-1-y][x] */
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < src_height; row++)
     {
         const uint8_t* src_scan = (const uint8_t*)sail_scan_line(image, row);
@@ -96,7 +96,7 @@ static sail_status_t rotate_180(const struct sail_image* image, struct sail_imag
     /* For 180° rotation: new[x][y] = old[width-1-x][height-1-y] */
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < height; row++)
     {
         const uint8_t* src_scan = (const uint8_t*)sail_scan_line(image, row);
@@ -135,7 +135,7 @@ static sail_status_t rotate_270_clockwise(const struct sail_image* image, struct
     /* For 270° CW rotation: new[x][y] = old[y][width-1-x] */
     unsigned row;
 
-#pragma omp parallel for schedule(SAIL_OPENMP_SCHEDULE)
+    SAIL_OMP_PARALLEL_FOR
     for (row = 0; row < src_height; row++)
     {
         const uint8_t* src_scan = (const uint8_t*)sail_scan_line(image, row);
