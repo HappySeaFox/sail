@@ -58,6 +58,8 @@ jobs:
         sudo make -C build install
 
     - name: Run tests
+      env:
+        TSAN_OPTIONS: allocator_may_return_null=1
       run: ctest --test-dir build --output-on-failure -j$(nproc)
 
     - name: Test SAIL binary (Linux)
