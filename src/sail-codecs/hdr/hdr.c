@@ -309,6 +309,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_hdr(void* state, co
         SAIL_TRY(hdr_private_fetch_properties(image->source_image->special_properties, &hdr_codec_state->header));
     }
 
+    if (image->gamma != 0)
+    {
+        hdr_codec_state->header.gamma = (float)image->gamma;
+    }
+
     /* Write header. */
     SAIL_TRY(hdr_private_write_header(hdr_codec_state->io, &hdr_codec_state->header, image->meta_data_node));
 

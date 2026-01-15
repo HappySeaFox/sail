@@ -733,7 +733,7 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
     /* Gamma Value (4 bytes). */
     uint16_t gamma_num   = 0;
     uint16_t gamma_denom = 0;
-    if (gamma > 0.0)
+    if (gamma != 0)
     {
         gamma_num   = (uint16_t)(gamma * 1000);
         gamma_denom = 1000;

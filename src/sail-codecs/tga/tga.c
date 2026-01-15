@@ -565,7 +565,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tga(void* state, const struct
 
     /* Write extension area if meta data or gamma is present. */
     if ((tga_state->save_options->options & SAIL_OPTION_META_DATA && image->meta_data_node != NULL)
-        || image->gamma > 0.0)
+        || image->gamma != 0)
     {
         SAIL_TRY(tga_state->io->tell(tga_state->io->stream, &tga_state->extension_offset));
         SAIL_TRY(tga_private_write_extension_area(tga_state->io, image->gamma, image->meta_data_node));
