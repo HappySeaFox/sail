@@ -93,11 +93,13 @@
 /* OpenMP scheduling algorithm. */
 #cmakedefine SAIL_OPENMP_SCHEDULE @SAIL_OPENMP_SCHEDULE@
 
+#define SAIL_STRINGIFY(x) SAIL_STRINGIFY_(x)
+#define SAIL_STRINGIFY_(x) #x
+
 /* OpenMP parallel for directive macro. */
 #ifdef SAIL_HAVE_OPENMP
     #ifdef SAIL_OPENMP_SCHEDULE
-        #define SAIL_OMP_PARALLEL_FOR_IMPL(schedule) _Pragma("omp parallel for schedule(" #schedule ")")
-        #define SAIL_OMP_PARALLEL_FOR SAIL_OMP_PARALLEL_FOR_IMPL(SAIL_OPENMP_SCHEDULE)
+        #define SAIL_OMP_PARALLEL_FOR _Pragma(SAIL_STRINGIFY(omp parallel for schedule(SAIL_OPENMP_SCHEDULE)))
     #else
         #define SAIL_OMP_PARALLEL_FOR _Pragma("omp parallel for schedule(dynamic)")
     #endif
