@@ -103,9 +103,9 @@ struct sail_image
     /*
      * Image gamma.
      *
-     * LOAD: Set by SAIL to a valid gamma if it's available. 1 by default.
+     * LOAD: Set by SAIL to a valid gamma if it's available. 0 by default (gamma not set).
      * SAVE: Must be set by a caller to a valid gamma. Not all codecs support saving
-     *       gamma.
+     *       gamma. Gamma is saved only if it's valid (not zero).
      */
     double gamma;
 
