@@ -28,6 +28,13 @@
 #include <stdlib.h> /* atoi */
 #include <string.h>
 
+#ifdef _WIN32
+#include <io.h> /* _access */
+#define F_OK 0
+#else
+#include <unistd.h> /* access */
+#endif
+
 #include <sail/sail.h>
 
 #include <sail-manip/sail-manip.h>
@@ -43,16 +50,61 @@
 #define sail_snprintf(buf, size, fmt, ...) _snprintf_s(buf, size, _TRUNCATE, fmt, __VA_ARGS__)
 #define sail_strncpy(dst, src, size) strncpy_s(dst, size, src, _TRUNCATE)
 #define sail_sscanf sscanf_s
+#define sail_access _access
 #else
 /* Standard C functions with manual null-termination for safety */
 #define sail_snprintf snprintf
 #define sail_strncpy(dst, src, size) (strncpy(dst, src, size), (dst)[(size) - 1] = '\0')
 #define sail_sscanf sscanf
+#define sail_access access
 #endif
 
 static void print_invalid_argument(void)
 {
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
+}
+
+static bool check_file_overwrite(const char* filepath, bool auto_yes)
+{
+    if (sail_access(filepath, F_OK) == 0)
+    {
+        if (auto_yes)
+        {
+            return true;
+        }
+
+        fprintf(stderr, "File '%s' already exists. Overwrite? [y/N]: ", filepath);
+        fflush(stderr);
+
+        int c = getchar();
+        if (c == 'y' || c == 'Y')
+        {
+            /* Consume the newline character if present. */
+            int next = getchar();
+            if (next != '\n' && next != EOF)
+            {
+                /* Clear the rest of the line. */
+                int ch;
+                while ((ch = getchar()) != '\n' && ch != EOF)
+                    ;
+            }
+            return true;
+        }
+        else
+        {
+            /* Consume the newline character if present. */
+            if (c != '\n' && c != EOF)
+            {
+                int ch;
+                while ((ch = getchar()) != '\n' && ch != EOF)
+                    ;
+            }
+            fprintf(stderr, "Skipping file '%s'.\n", filepath);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 static sail_status_t convert_impl(const char** inputs,
@@ -68,7 +120,8 @@ static sail_status_t convert_impl(const char** inputs,
                                   const char* background,
                                   bool strip_metadata,
                                   bool flip_horizontal,
-                                  bool flip_vertical)
+                                  bool flip_vertical,
+                                  bool auto_yes)
 {
     SAIL_CHECK_PTR(inputs);
     SAIL_CHECK_PTR(output);
@@ -88,6 +141,12 @@ static sail_status_t convert_impl(const char** inputs,
 
     SAIL_TRY(sail_codec_info_from_path(output, &output_codec_info));
     SAIL_LOG_DEBUG("Output codec: %s", output_codec_info->description);
+
+    /* Check if output file exists and ask for confirmation. */
+    if (!check_file_overwrite(output, auto_yes))
+    {
+        return SAIL_OK;
+    }
 
     struct sail_save_options* save_options;
     SAIL_TRY(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options));
@@ -410,15 +469,12 @@ static sail_status_t convert_impl(const char** inputs,
             /* Apply delay based on user intent and format capabilities. */
             if (delay >= 0)
             {
-                /* User specified delay - create animation with this delay. */
                 image->delay = delay;
             }
             else if (output_supports_multi_paged)
             {
-                /* No delay specified and format supports multi-page - create multi-page document. */
                 image->delay = 0;
             }
-            /* Otherwise keep original delay for animation. */
 
             /* Start saving on first frame to be processed (not skipped). */
             if (save_state == NULL)
@@ -486,7 +542,8 @@ static sail_status_t extract_frames_impl(const char* input,
                                          const char* background,
                                          bool strip_metadata,
                                          bool flip_horizontal,
-                                         bool flip_vertical)
+                                         bool flip_vertical,
+                                         bool auto_yes)
 {
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output_template);
@@ -588,6 +645,14 @@ static sail_status_t extract_frames_impl(const char* input,
         }
 
         SAIL_LOG_DEBUG("Extracting frame #%d to %s", frame_count, output_filename);
+
+        /* Check if output file exists and ask for confirmation. */
+        if (!check_file_overwrite(output_filename, auto_yes))
+        {
+            sail_destroy_image(image);
+            frame_count++;
+            continue;
+        }
 
         /* Determine output codec from filename. */
         const struct sail_codec_info* output_codec_info;
@@ -768,6 +833,14 @@ static sail_status_t extract_frames_impl(const char* input,
             }
         }
 
+        /* Check if output file exists and ask for confirmation. */
+        if (!check_file_overwrite(output_filename, auto_yes))
+        {
+            sail_destroy_image(image);
+            frame_count++;
+            continue;
+        }
+
         /* Setup save options. */
         struct sail_save_options* save_options;
         SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options),
@@ -847,6 +920,8 @@ static sail_status_t convert(int argc, char* argv[])
     /* false: no flip (default). */
     bool flip_horizontal = false;
     bool flip_vertical   = false;
+    /* false: ask for confirmation (default), true: auto-overwrite. */
+    bool auto_yes = false;
 
     /* Collect positional arguments (file paths). */
     const char* files[256];
@@ -983,6 +1058,13 @@ static sail_status_t convert(int argc, char* argv[])
                 continue;
             }
 
+            if (strcmp(argv[i], "-y") == 0 || strcmp(argv[i], "--yes") == 0)
+            {
+                auto_yes  = true;
+                i        += 1;
+                continue;
+            }
+
             if (strcmp(argv[i], "-n") == 0 || strcmp(argv[i], "--frame-number") == 0)
             {
                 if (i == argc - 1)
@@ -1045,12 +1127,12 @@ static sail_status_t convert(int argc, char* argv[])
         }
 
         SAIL_TRY(extract_frames_impl(files[0], output, pixel_format, compression, max_frames, target_frame, colors,
-                                     dither, background, strip_metadata, flip_horizontal, flip_vertical));
+                                     dither, background, strip_metadata, flip_horizontal, flip_vertical, auto_yes));
     }
     else
     {
         SAIL_TRY(convert_impl(files, input_count, output, pixel_format, compression, max_frames, target_frame, delay,
-                              colors, dither, background, strip_metadata, flip_horizontal, flip_vertical));
+                              colors, dither, background, strip_metadata, flip_horizontal, flip_vertical, auto_yes));
     }
 
     return SAIL_OK;
@@ -1081,6 +1163,14 @@ static void print_aligned_image_info(const struct sail_image* image)
     printf("  Pixel format: %s\n", sail_pixel_format_to_string(image->source_image->pixel_format));
     printf("  Compression : %s\n", sail_compression_to_string(image->source_image->compression));
     printf("  ICC profile : %s\n", image->iccp == NULL ? "no" : "yes");
+    if (image->gamma != 0)
+    {
+        printf("  Gamma       : %.6f\n", image->gamma);
+    }
+    else
+    {
+        printf("  Gamma       : -\n");
+    }
     printf("  Interlaced  : %s\n", image->source_image->interlaced ? "yes" : "no");
     printf("  Delay       : %d ms.\n", image->delay);
 
@@ -1417,6 +1507,7 @@ static void help(const char* app)
     fprintf(stderr, "  %s -v, --version             Display version information and exit\n", app);
     fprintf(stderr, "  %s -l, --log-level <level>   Set log level: silence, error, warning (default),\n", app);
     fprintf(stderr, "                                              info, message, debug, trace\n");
+    fprintf(stderr, "  %s -y, --yes                 Automatically overwrite existing files without prompting\n", app);
 }
 
 int main(int argc, char* argv[])
