@@ -91,7 +91,7 @@ static MunitResult test_options_from_features(const MunitParameter params[], voi
                               | SAIL_CODEC_FEATURE_SOURCE_IMAGE;
     munit_assert(sail_alloc_save_options_from_features(save_features, &save_options) == SAIL_OK);
 
-    munit_assert(save_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_INTERLACED | SAIL_OPTION_ICCP));
+    munit_assert(save_options->options == (SAIL_OPTION_META_DATA | SAIL_OPTION_ICCP));
     munit_assert(save_options->compression == save_features->default_compression);
     munit_assert(save_options->compression_level == save_features->compression_level->default_level);
     munit_assert_null(save_options->tuning);
