@@ -113,10 +113,16 @@ if (WIN32)
     endif()
 endif()
 
+if (SAIL_TSAN AND SAIL_ENABLE_OPENMP)
+    message(STATUS "ThreadSanitizer is enabled, disabling OpenMP to avoid false positives")
+    set(SAIL_ENABLE_OPENMP OFF CACHE BOOL "Disabled because ThreadSanitizer is enabled" FORCE)
+endif()
+
 if (SAIL_ENABLE_OPENMP)
     sail_check_openmp()
 else()
-    set(SAIL_HAVE_OPENMP OFF CACHE INTERNAL "")
+    unset(SAIL_HAVE_OPENMP CACHE)
+    unset(SAIL_HAVE_OPENMP)
     set(SAIL_HAVE_OPENMP_DISPLAY "OFF (forced)" CACHE INTERNAL "")
 endif()
 
