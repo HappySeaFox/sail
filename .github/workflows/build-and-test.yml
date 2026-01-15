@@ -15,11 +15,12 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         config:
-          - { name: "Shared",          build_shared: "ON",  combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "OFF" }
-          - { name: "Shared Combined", build_shared: "ON",  combine_codecs: "ON",  sail_asan: "OFF", sail_tsan: "OFF" }
-          - { name: "Static",          build_shared: "OFF", combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "OFF" }
-          - { name: "Shared ASAN",     build_shared: "ON",  combine_codecs: "ON",  sail_asan: "ON",  sail_tsan: "OFF" }
-          - { name: "Shared TSAN",     build_shared: "ON",  combine_codecs: "ON",  sail_asan: "OFF", sail_tsan: "ON"  }
+          - { name: "Shared ASAN",          build_shared: "ON",  combine_codecs: "OFF", sail_asan: "ON",  sail_tsan: "OFF" }
+          - { name: "Shared TSAN",          build_shared: "ON",  combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "ON"  }
+          - { name: "Shared Combined ASAN", build_shared: "ON",  combine_codecs: "ON",  sail_asan: "ON",  sail_tsan: "OFF" }
+          - { name: "Shared Combined TSAN", build_shared: "ON",  combine_codecs: "ON",  sail_asan: "OFF", sail_tsan: "ON"  }
+          - { name: "Static ASAN",          build_shared: "OFF", combine_codecs: "OFF", sail_asan: "ON",  sail_tsan: "OFF" }
+          - { name: "Static TSAN",          build_shared: "OFF", combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "ON"  }
 
     steps:
     - uses: actions/checkout@v4
