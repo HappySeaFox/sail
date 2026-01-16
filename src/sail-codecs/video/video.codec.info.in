@@ -1,0 +1,26 @@
+# Video codec information
+#
+[codec]
+layout=8
+version=1.0.0
+priority=MEDIUM
+name=VIDEO
+description=Video file formats
+magic-numbers=
+extensions=mp4;m4v;mov;avi;mkv;webm;flv;wmv;mpg;mpeg;3gp;ogv;ts;mts;m2ts
+mime-types=video/mp4;video/x-m4v;video/quicktime;video/x-msvideo;video/x-matroska;video/webm;video/x-flv;video/x-ms-wmv;video/mpeg;video/3gpp;video/ogg;video/mp2t
+
+[load-features]
+features=STATIC;META-DATA;SOURCE-IMAGE
+tuning=
+
+[save-features]
+features=
+pixel-formats=
+compressions=
+default-compression=
+compression-level-min=
+compression-level-max=
+compression-level-default=
+compression-level-step=
+tuning=

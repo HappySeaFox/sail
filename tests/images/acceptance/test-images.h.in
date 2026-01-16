@@ -233,6 +233,13 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/xwd/bpp32-rgba.xwd",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_VIDEO
+    "@SAIL_TEST_IMAGES_PATH@/video/bpp24-yuv.mp4",
+    "@SAIL_TEST_IMAGES_PATH@/video/bpp24-rgb.mp4",
+    "@SAIL_TEST_IMAGES_PATH@/video/bpp32-rgba.mp4",
+    "@SAIL_TEST_IMAGES_PATH@/video/bpp8-grayscale.mp4",
+#endif
+
     NULL,
 };
 
