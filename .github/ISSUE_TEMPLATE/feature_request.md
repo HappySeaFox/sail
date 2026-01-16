@@ -7,10 +7,9 @@ assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-
-**Describe the solution you'd like**
-
-**Describe alternatives you've considered**
+**Describe your feature request**
 
 **Additional context**
+
+**Images as a ZIP archive**
+Please don't put images inline. Attach them as a ZIP archive.
