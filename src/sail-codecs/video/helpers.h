@@ -25,6 +25,8 @@
 
 #pragma once
 
+#include <stdbool.h>
+
 #include <libavformat/avformat.h>
 #include <libavutil/pixfmt.h>
 
@@ -34,6 +36,7 @@
 
 struct sail_hash_map;
 struct sail_meta_data_node;
+struct sail_variant;
 
 SAIL_HIDDEN enum SailPixelFormat video_private_av_pixel_format_to_sail(enum AVPixelFormat av_pix_fmt);
 
@@ -48,3 +51,7 @@ SAIL_HIDDEN sail_status_t video_private_fetch_meta_data(struct AVFormatContext* 
 SAIL_HIDDEN sail_status_t video_private_fetch_special_properties(struct AVFormatContext* format_ctx,
                                                                  struct AVStream* video_stream,
                                                                  struct sail_hash_map* special_properties);
+
+SAIL_HIDDEN bool video_private_load_tuning_key_value_callback(const char* key,
+                                                               const struct sail_variant* value,
+                                                               void* user_data);

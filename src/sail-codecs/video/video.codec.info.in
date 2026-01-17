@@ -12,7 +12,7 @@ mime-types=video/mp4;video/x-m4v;video/quicktime;video/x-msvideo;video/x-matrosk
 
 [load-features]
 features=STATIC;META-DATA;SOURCE-IMAGE
-tuning=
+tuning=video-threads;video-low-resolution;video-skip-frame;video-skip-idct;video-skip-loop-filter;video-error-concealment
 
 [save-features]
 features=

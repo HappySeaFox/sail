@@ -248,6 +248,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_video(struct sail_io* io,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
+    /* Handle tuning options. */
+    if (video_state->load_options->tuning != NULL)
+    {
+        sail_traverse_hash_map_with_user_data(video_state->load_options->tuning,
+                                              video_private_load_tuning_key_value_callback,
+                                              video_state->codec_ctx);
+    }
+
     /* Open codec. */
     ret = avcodec_open2(video_state->codec_ctx, codec, NULL);
     if (ret < 0)

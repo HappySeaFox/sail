@@ -26,6 +26,7 @@
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavutil/dict.h>
+#include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
 
 #include <sail-common/sail-common.h>
@@ -610,4 +611,233 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     }
 
     return SAIL_OK;
+}
+
+static unsigned video_private_read_variant_uint(const struct sail_variant* value)
+{
+    if (value->type == SAIL_VARIANT_TYPE_INT)
+    {
+        int64_t int_val = sail_variant_to_int(value);
+        return (int_val < 0) ? 0 : (unsigned)int_val;
+    }
+    else
+    {
+        return sail_variant_to_unsigned_int(value);
+    }
+}
+
+static int video_private_parse_skip_frame(const char* str_value)
+{
+    if (strcmp(str_value, "none") == 0)
+    {
+        return AVDISCARD_NONE;
+    }
+    else if (strcmp(str_value, "non-ref") == 0)
+    {
+        return AVDISCARD_NONREF;
+    }
+    else if (strcmp(str_value, "bidir") == 0)
+    {
+        return AVDISCARD_BIDIR;
+    }
+    else if (strcmp(str_value, "non-key") == 0)
+    {
+        return AVDISCARD_NONKEY;
+    }
+    else if (strcmp(str_value, "all") == 0)
+    {
+        return AVDISCARD_ALL;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+static int video_private_parse_lowres(const char* str_value)
+{
+    if (str_value == NULL)
+    {
+        return -1;
+    }
+    else if (strcmp(str_value, "full") == 0)
+    {
+        return 0;
+    }
+    else if (strcmp(str_value, "half") == 0)
+    {
+        return 1;
+    }
+    else if (strcmp(str_value, "quarter") == 0)
+    {
+        return 2;
+    }
+    else if (strcmp(str_value, "eighth") == 0)
+    {
+        return 3;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+static int video_private_parse_error_concealment(const char* str_value)
+{
+    struct sail_string_node* string_node_flags;
+    if (sail_split_into_string_node_chain(str_value, &string_node_flags) != SAIL_OK)
+    {
+        return -1;
+    }
+
+    int flags = 0;
+
+    for (const struct sail_string_node* node = string_node_flags; node != NULL; node = node->next)
+    {
+        if (strcmp(node->string, "flags") == 0)
+        {
+            flags |= FF_EC_GUESS_MVS | FF_EC_DEBLOCK;
+        }
+        else if (strcmp(node->string, "mv") == 0)
+        {
+            flags |= FF_EC_GUESS_MVS;
+        }
+        else if (strcmp(node->string, "dc") == 0)
+    {
+            flags |= FF_EC_DEBLOCK;
+        }
+    }
+
+    sail_destroy_string_node_chain(string_node_flags);
+
+    return flags;
+}
+
+bool video_private_load_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
+{
+    AVCodecContext* codec_ctx = user_data;
+
+    if (strcmp(key, "video-threads") == 0)
+    {
+        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        {
+            unsigned threads = video_private_read_variant_uint(value);
+            if (threads > 0 && threads <= 64)
+            {
+                av_opt_set_int(codec_ctx, "threads", (int64_t)threads, 0);
+                SAIL_LOG_TRACE("VIDEO: Set decoder threads to %u", threads);
+            }
+        }
+        else
+        {
+            SAIL_LOG_ERROR("VIDEO: 'video-threads' must be an integer");
+        }
+    }
+    else if (strcmp(key, "video-low-resolution") == 0)
+    {
+        if (value->type == SAIL_VARIANT_TYPE_STRING)
+        {
+            const char* str_value = sail_variant_to_string(value);
+            int lowres = video_private_parse_lowres(str_value);
+            if (lowres >= 0)
+            {
+                av_opt_set_int(codec_ctx, "lowres", (int64_t)lowres, 0);
+                SAIL_LOG_TRACE("VIDEO: Set lowres to %s", str_value);
+            }
+            else
+            {
+                SAIL_LOG_ERROR("VIDEO: 'video-low-resolution' must be one of: full, half, quarter, eighth (or 0, 1, 2, 3)");
+            }
+        }
+        else
+        {
+            SAIL_LOG_ERROR("VIDEO: 'video-low-resolution' must be a string");
+        }
+    }
+    else if (strcmp(key, "video-skip-frame") == 0)
+    {
+        if (value->type == SAIL_VARIANT_TYPE_STRING)
+        {
+            const char* str_value = sail_variant_to_string(value);
+            int skip_frame = video_private_parse_skip_frame(str_value);
+            if (skip_frame >= 0)
+            {
+                codec_ctx->skip_frame = skip_frame;
+                SAIL_LOG_TRACE("VIDEO: Set skip_frame to %s", str_value);
+            }
+            else
+            {
+                SAIL_LOG_ERROR("VIDEO: 'video-skip-frame' must be one of: none, non-ref, bidir, non-key, all");
+            }
+        }
+        else
+        {
+            SAIL_LOG_ERROR("VIDEO: 'video-skip-frame' must be a string");
+        }
+    }
+    else if (strcmp(key, "video-skip-idct") == 0)
+    {
+        if (value->type == SAIL_VARIANT_TYPE_STRING)
+        {
+            const char* str_value = sail_variant_to_string(value);
+            int skip_idct = video_private_parse_skip_frame(str_value);
+            if (skip_idct >= 0)
+            {
+                codec_ctx->skip_idct = skip_idct;
+                SAIL_LOG_TRACE("VIDEO: Set skip_idct to %s", str_value);
+            }
+            else
+            {
+                SAIL_LOG_ERROR("VIDEO: 'video-skip-idct' must be one of: none, non-ref, bidir, non-key, all");
+            }
+        }
+        else
+        {
+            SAIL_LOG_ERROR("VIDEO: 'video-skip-idct' must be a string");
+        }
+    }
+    else if (strcmp(key, "video-skip-loop-filter") == 0)
+    {
+        if (value->type == SAIL_VARIANT_TYPE_STRING)
+        {
+            const char* str_value = sail_variant_to_string(value);
+            int skip_loop_filter = video_private_parse_skip_frame(str_value);
+            if (skip_loop_filter >= 0)
+            {
+                codec_ctx->skip_loop_filter = skip_loop_filter;
+                SAIL_LOG_TRACE("VIDEO: Set skip_loop_filter to %s", str_value);
+            }
+            else
+            {
+                SAIL_LOG_ERROR("VIDEO: 'video-skip-loop-filter' must be one of: none, non-ref, bidir, non-key, all");
+            }
+        }
+        else
+        {
+            SAIL_LOG_ERROR("VIDEO: 'video-skip-loop-filter' must be a string");
+        }
+    }
+    else if (strcmp(key, "video-error-concealment") == 0)
+    {
+        if (value->type == SAIL_VARIANT_TYPE_STRING)
+        {
+            const char* str_value = sail_variant_to_string(value);
+            int error_concealment = video_private_parse_error_concealment(str_value);
+            if (error_concealment >= 0)
+            {
+                codec_ctx->error_concealment = error_concealment;
+                SAIL_LOG_TRACE("VIDEO: Set error_concealment to %s", str_value);
+            }
+            else
+            {
+                SAIL_LOG_ERROR("VIDEO: 'video-error-concealment' must be a ';'-separated list of: flags, mv, dc");
+            }
+        }
+        else
+        {
+            SAIL_LOG_ERROR("VIDEO: 'video-error-concealment' must be a string");
+        }
+    }
+
+    return true;
 }
