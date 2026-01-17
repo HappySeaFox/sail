@@ -64,41 +64,91 @@ static void print_invalid_argument(void)
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
 }
 
-static bool check_file_overwrite(const char* filepath, bool auto_yes)
+static void consume_input_line(void)
+{
+    int next = getchar();
+    if (next != '\n' && next != EOF)
+    {
+        /* Clear the rest of the line. */
+        int ch;
+        while ((ch = getchar()) != '\n' && ch != EOF)
+            ;
+    }
+}
+
+enum OverwriteChoice
+{
+    OVERWRITE_CHOICE_YES,
+    OVERWRITE_CHOICE_NO,
+    OVERWRITE_CHOICE_YES_ALL,
+    OVERWRITE_CHOICE_NO_ALL
+};
+
+static enum OverwriteChoice read_overwrite_choice(void)
+{
+    int c = getchar();
+
+    if (c == 'y' || c == 'Y')
+    {
+        consume_input_line();
+        return OVERWRITE_CHOICE_YES;
+    }
+    else if (c == 'a' || c == 'A')
+    {
+        consume_input_line();
+        return OVERWRITE_CHOICE_YES_ALL;
+    }
+    else if (c == 'd' || c == 'D')
+    {
+        consume_input_line();
+        return OVERWRITE_CHOICE_NO_ALL;
+    }
+    else
+    {
+        if (c != '\n' && c != EOF)
+        {
+            consume_input_line();
+        }
+        return OVERWRITE_CHOICE_NO;
+    }
+}
+
+static bool check_file_overwrite(const char* filepath, bool* auto_yes, bool* auto_no)
 {
     if (sail_access(filepath, F_OK) == 0)
     {
-        if (auto_yes)
+        if (*auto_no)
+        {
+            fprintf(stderr, "Skipping file '%s'.\n", filepath);
+            return false;
+        }
+
+        if (*auto_yes)
         {
             return true;
         }
 
-        fprintf(stderr, "File '%s' already exists. Overwrite? [y/N]: ", filepath);
+        fprintf(stderr, "File '%s' already exists. Overwrite? [y/N/a(all)/d(none)]: ", filepath);
         fflush(stderr);
 
-        int c = getchar();
-        if (c == 'y' || c == 'Y')
+        enum OverwriteChoice choice = read_overwrite_choice();
+
+        switch (choice)
         {
-            /* Consume the newline character if present. */
-            int next = getchar();
-            if (next != '\n' && next != EOF)
-            {
-                /* Clear the rest of the line. */
-                int ch;
-                while ((ch = getchar()) != '\n' && ch != EOF)
-                    ;
-            }
+        case OVERWRITE_CHOICE_YES:
             return true;
-        }
-        else
-        {
-            /* Consume the newline character if present. */
-            if (c != '\n' && c != EOF)
-            {
-                int ch;
-                while ((ch = getchar()) != '\n' && ch != EOF)
-                    ;
-            }
+
+        case OVERWRITE_CHOICE_YES_ALL:
+            *auto_yes = true;
+            return true;
+
+        case OVERWRITE_CHOICE_NO_ALL:
+            *auto_no = true;
+            fprintf(stderr, "Skipping file '%s'.\n", filepath);
+            return false;
+
+        case OVERWRITE_CHOICE_NO:
+        default:
             fprintf(stderr, "Skipping file '%s'.\n", filepath);
             return false;
         }
@@ -121,7 +171,8 @@ static sail_status_t convert_impl(const char** inputs,
                                   bool strip_metadata,
                                   bool flip_horizontal,
                                   bool flip_vertical,
-                                  bool auto_yes)
+                                  bool* auto_yes,
+                                  bool* auto_no)
 {
     SAIL_CHECK_PTR(inputs);
     SAIL_CHECK_PTR(output);
@@ -143,7 +194,7 @@ static sail_status_t convert_impl(const char** inputs,
     SAIL_LOG_DEBUG("Output codec: %s", output_codec_info->description);
 
     /* Check if output file exists and ask for confirmation. */
-    if (!check_file_overwrite(output, auto_yes))
+    if (!check_file_overwrite(output, auto_yes, auto_no))
     {
         return SAIL_OK;
     }
@@ -543,7 +594,8 @@ static sail_status_t extract_frames_impl(const char* input,
                                          bool strip_metadata,
                                          bool flip_horizontal,
                                          bool flip_vertical,
-                                         bool auto_yes,
+                                         bool* auto_yes,
+                                         bool* auto_no,
                                          int suffix_digits)
 {
     SAIL_CHECK_PTR(input);
@@ -661,7 +713,7 @@ static sail_status_t extract_frames_impl(const char* input,
         SAIL_LOG_DEBUG("Extracting frame #%d to %s", frame_count, output_filename);
 
         /* Check if output file exists and ask for confirmation. */
-        if (!check_file_overwrite(output_filename, auto_yes))
+        if (!check_file_overwrite(output_filename, auto_yes, auto_no))
         {
             sail_destroy_image(image);
             frame_count++;
@@ -930,6 +982,8 @@ static sail_status_t convert(int argc, char* argv[])
     bool flip_vertical   = false;
     /* false: ask for confirmation (default), true: auto-overwrite. */
     bool auto_yes = false;
+    /* false: ask for confirmation (default), true: auto-skip all. */
+    bool auto_no = false;
 
     /* Collect positional arguments (file paths). */
     const char* files[256];
@@ -1152,13 +1206,14 @@ static sail_status_t convert(int argc, char* argv[])
         }
 
         SAIL_TRY(extract_frames_impl(files[0], output, pixel_format, compression, max_frames, target_frame, colors,
-                                     dither, background, strip_metadata, flip_horizontal, flip_vertical, auto_yes,
-                                     suffix_digits));
+                                     dither, background, strip_metadata, flip_horizontal, flip_vertical, &auto_yes,
+                                     &auto_no, suffix_digits));
     }
     else
     {
         SAIL_TRY(convert_impl(files, input_count, output, pixel_format, compression, max_frames, target_frame, delay,
-                              colors, dither, background, strip_metadata, flip_horizontal, flip_vertical, auto_yes));
+                              colors, dither, background, strip_metadata, flip_horizontal, flip_vertical, &auto_yes,
+                              &auto_no));
     }
 
     return SAIL_OK;
