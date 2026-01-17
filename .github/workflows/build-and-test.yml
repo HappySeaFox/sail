@@ -82,6 +82,7 @@ jobs:
         mkdir tests/external/link/c/build
         cmake -S tests/external/link/c -B tests/external/link/c/build \
           -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_FIND_DEBUG_MODE=ON \
           -DSAIL_ASAN=${{ matrix.config.sail_asan }} \
           -DSAIL_TSAN=${{ matrix.config.sail_tsan }}
         cmake --build tests/external/link/c/build --verbose -j$(nproc)
