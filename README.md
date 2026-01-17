@@ -58,7 +58,6 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 
 | Image format                                                        | Operations    | Dependencies      |
 | --------------------------------------------------------------------| ------------- | ----------------- |
-| [APNG](https://wikipedia.org/wiki/APNG)                             | RW            | libpng+APNG patch |
 | [AVIF](https://wikipedia.org/wiki/AV1#AV1_Image_File_Format_(AVIF)) | RW            | libavif           |
 | [GIF](https://wikipedia.org/wiki/GIF)                               | RW            | giflib            |
 | [HEIF](https://wikipedia.org/wiki/High_Efficiency_Image_File_Format)| RW            | libheif, libheif-plugin-x265 |
@@ -66,9 +65,7 @@ images with the help of [ksquirrel-libs](FAQ.md#how-old-is-sail), the predecesso
 | [JPEG 2000](https://wikipedia.org/wiki/JPEG_2000)                   | RW            | openjpeg          |
 | [JPEG XL](https://wikipedia.org/wiki/JPEG_XL)                       | RW            | libjxl            |
 | [PNG](https://wikipedia.org/wiki/Portable_Network_Graphics)         | RW            | libpng            |
-| [PSD](https://en.wikipedia.org/wiki/Adobe_Photoshop#File_format)    | R             |                   |
 | [SVG](https://wikipedia.org/wiki/Scalable_Vector_Graphics)          | R             | resvg/nanosvg     |
-| [TGA](https://wikipedia.org/wiki/Truevision_TGA)                    | RW            |                   |
 | [TIFF](https://wikipedia.org/wiki/TIFF)                             | RW            | libtiff           |
 | [WEBP](https://wikipedia.org/wiki/WebP)                             | RW            | libwebp           |
 | ...                                                                 |               |                   |
