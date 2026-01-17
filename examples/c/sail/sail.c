@@ -543,7 +543,8 @@ static sail_status_t extract_frames_impl(const char* input,
                                          bool strip_metadata,
                                          bool flip_horizontal,
                                          bool flip_vertical,
-                                         bool auto_yes)
+                                         bool auto_yes,
+                                         int suffix_digits)
 {
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output_template);
@@ -616,8 +617,21 @@ static sail_status_t extract_frames_impl(const char* input,
             safe_base_name_len = sizeof(output_filename) - 20; /* Reserve space for "-N" and extension */
         }
 
-        long written = sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len,
+        long written;
+        if (suffix_digits > 0)
+        {
+            /* Format with specified number of digits, e.g., %03d for 3 digits */
+            char format_str[32];
+            sail_snprintf(format_str, sizeof(format_str), "%%.*s-%%0%dd%%s", suffix_digits);
+            written = sail_snprintf(output_filename, sizeof(output_filename), format_str, (int)safe_base_name_len,
                                      base_name_start, frame_count + 1, ext ? ext : "");
+        }
+        else
+        {
+            /* Default format without zero-padding */
+            written = sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len,
+                                     base_name_start, frame_count + 1, ext ? ext : "");
+        }
         if (written < 0 || written >= (long)sizeof(output_filename))
         {
             SAIL_LOG_ERROR("Failed to construct path from '%s' and '%s'", input, output_template);
@@ -901,6 +915,8 @@ static sail_status_t convert(int argc, char* argv[])
     int delay = -1;
     /* false: compose/convert mode, true: extract frames mode. */
     bool extract_frames = false;
+    /* 0: default suffix format, >0: number of digits in suffix (e.g., 3 for 001, 002, ...). */
+    int suffix_digits = 0;
     /* 0: no quantization, >0: quantize to N colors. */
     int colors = 0;
     /* false: no dithering (default), true: apply Floyd-Steinberg dithering. */
@@ -990,6 +1006,23 @@ static sail_status_t convert(int argc, char* argv[])
             {
                 extract_frames  = true;
                 i              += 1;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-z") == 0 || strcmp(argv[i], "--suffix-digits") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing suffix-digits value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                suffix_digits = atoi(argv[i + 1]);
+                if (suffix_digits < 1 || suffix_digits > 10)
+                {
+                    fprintf(stderr, "Error: Suffix digits must be between 1 and 10.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                i += 2;
                 continue;
             }
 
@@ -1119,7 +1152,8 @@ static sail_status_t convert(int argc, char* argv[])
         }
 
         SAIL_TRY(extract_frames_impl(files[0], output, pixel_format, compression, max_frames, target_frame, colors,
-                                     dither, background, strip_metadata, flip_horizontal, flip_vertical, auto_yes));
+                                     dither, background, strip_metadata, flip_horizontal, flip_vertical, auto_yes,
+                                     suffix_digits));
     }
     else
     {
@@ -1457,6 +1491,7 @@ static void help(const char* app)
     fprintf(stderr, "        -m, --max-frames <count>     Limit number of frames to process\n");
     fprintf(stderr, "        -d, --delay <ms>             Set frame delay for animations in milliseconds\n");
     fprintf(stderr, "        -e, --extract-frames         Extract each frame to separate file\n");
+    fprintf(stderr, "        -z, --suffix-digits <N>      Set number of digits in frame suffix (1-10, e.g., 3 for 001, 002, ...)\n");
     fprintf(stderr, "        -C, --colors <N>             Quantize image to N colors (2-256) using Wu algorithm\n");
     fprintf(stderr, "        -D, --dither                 Apply Floyd-Steinberg dithering for better gradients\n");
     fprintf(stderr,
@@ -1466,30 +1501,32 @@ static void help(const char* app)
     fprintf(stderr, "        -V, --flip-vertical          Flip image vertically (mirror top-bottom)\n");
     fprintf(stderr, "        -n, --frame-number <N>       Extract specific frame number N (1-based)\n\n");
     fprintf(stderr, "      Use cases:\n");
-    fprintf(stderr, "        # Simple format conversion between codecs\n");
-    fprintf(stderr, "        %s convert input.jpg output.png\n\n", app);
-    fprintf(stderr, "        # Convert with custom quality and pixel format\n");
-    fprintf(stderr, "        %s convert input.png output.jpg -c 90 -p BPP24-RGB\n\n", app);
-    fprintf(stderr, "        # Convert animation with specified frame delay\n");
-    fprintf(stderr, "        %s convert animation.gif output.webp -d 100\n\n", app);
-    fprintf(stderr, "        # Convert animation to multi-page document format\n");
-    fprintf(stderr, "        %s convert animation.gif output.tiff\n\n", app);
-    fprintf(stderr, "        # Compose multiple images into single animation\n");
-    fprintf(stderr, "        %s convert frame1.png frame2.png frame3.png animation.gif -d 100\n\n", app);
-    fprintf(stderr, "        # Extract all frames from animation into frame-1.jpg...\n");
-    fprintf(stderr, "        %s convert animation.gif frame.jpg -e\n\n", app);
-    fprintf(stderr, "        # Extract first 5 frames only from animation\n");
-    fprintf(stderr, "        %s convert animation.webp frame.png -e -m 5\n\n", app);
-    fprintf(stderr, "        # Reduce colors to 16 with dithering for smaller file size\n");
-    fprintf(stderr, "        %s convert photo.jpg output.gif --colors 16 --dither\n\n", app);
-    fprintf(stderr, "        # Convert RGBA to RGB with white background blend\n");
-    fprintf(stderr, "        %s convert transparent.png opaque.jpg --background white\n\n", app);
-    fprintf(stderr, "        # Strip metadata for privacy and smaller size\n");
-    fprintf(stderr, "        %s convert photo.jpg clean.jpg --strip\n\n", app);
-    fprintf(stderr, "        # Flip image horizontally or vertically\n");
-    fprintf(stderr, "        %s convert photo.jpg flipped.jpg -H -V\n\n", app);
-    fprintf(stderr, "        # Extract frame #2 from animation\n");
-    fprintf(stderr, "        %s convert animation.gif frame2.png -n 2\n\n", app);
+    fprintf(stderr, "        Simple format conversion between codecs:\n");
+    fprintf(stderr, "          %s convert input.jpg output.png\n\n", app);
+    fprintf(stderr, "        Convert with custom quality and pixel format:\n");
+    fprintf(stderr, "          %s convert input.png output.jpg -c 90 -p BPP24-RGB\n\n", app);
+    fprintf(stderr, "        Convert animation with specified frame delay:\n");
+    fprintf(stderr, "          %s convert animation.gif output.webp -d 100\n\n", app);
+    fprintf(stderr, "        Convert animation to multi-page document format:\n");
+    fprintf(stderr, "          %s convert animation.gif output.tiff\n\n", app);
+    fprintf(stderr, "        Compose multiple images into single animation:\n");
+    fprintf(stderr, "          %s convert frame1.png frame2.png frame3.png animation.gif -d 100\n\n", app);
+        fprintf(stderr, "        Extract all frames from animation into (frame-1.jpg, frame-2.jpg, ...):\n");
+        fprintf(stderr, "          %s convert animation.gif frame.jpg -e\n\n", app);
+        fprintf(stderr, "        Extract frames with 3-digit suffix (frame-001.jpg, frame-002.jpg, ...):\n");
+        fprintf(stderr, "          %s convert animation.gif frame.jpg -e -z 3\n\n", app);
+    fprintf(stderr, "        Extract first 5 frames from animation:\n");
+    fprintf(stderr, "          %s convert animation.webp frame.png -e -m 5\n\n", app);
+    fprintf(stderr, "        Reduce colors to 16 with dithering for smaller file size:\n");
+    fprintf(stderr, "          %s convert photo.jpg output.gif --colors 16 --dither\n\n", app);
+    fprintf(stderr, "        Convert RGBA to RGB with white background blend:\n");
+    fprintf(stderr, "          %s convert transparent.png opaque.jpg --background white\n\n", app);
+    fprintf(stderr, "        Strip metadata for privacy and smaller size:\n");
+    fprintf(stderr, "          %s convert photo.jpg clean.jpg --strip\n\n", app);
+    fprintf(stderr, "        Flip image horizontally or vertically:\n");
+    fprintf(stderr, "          %s convert photo.jpg flipped.jpg -H -V\n\n", app);
+    fprintf(stderr, "        Extract frame #2 from animation\n");
+    fprintf(stderr, "          %s convert animation.gif frame2.png -n 2\n\n", app);
 
     fprintf(stderr, "  probe <path>     Display detailed information about image file\n");
     fprintf(stderr, "  decode <path>    Decode file and show information for all frames\n\n");
