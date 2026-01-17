@@ -53,7 +53,7 @@ jobs:
           -DSAIL_TSAN=${{ matrix.config.sail_tsan }}
 
     - name: Build
-      run: cmake --build build --verbose -j$(nproc)
+      run: cmake --build build -j$(nproc)
 
     - name: Install
       run: |
@@ -82,10 +82,9 @@ jobs:
         mkdir tests/external/link/c/build
         cmake -S tests/external/link/c -B tests/external/link/c/build \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_FIND_DEBUG_MODE=ON \
           -DSAIL_ASAN=${{ matrix.config.sail_asan }} \
           -DSAIL_TSAN=${{ matrix.config.sail_tsan }}
-        cmake --build tests/external/link/c/build --verbose -j$(nproc)
+        cmake --build tests/external/link/c/build -j$(nproc)
         tests/external/link/c/build/external-c-api-link
 
     - name: Test external C++ API link
@@ -96,7 +95,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Debug \
           -DSAIL_ASAN=${{ matrix.config.sail_asan }} \
           -DSAIL_TSAN=${{ matrix.config.sail_tsan }}
-        cmake --build tests/external/link/c++/build --verbose -j$(nproc)
+        cmake --build tests/external/link/c++/build -j$(nproc)
         tests/external/link/c++/build/external-c++-api-link
 
   build-windows:
@@ -150,7 +149,7 @@ jobs:
           -DVCPKG_INSTALL_OPTIONS="--clean-buildtrees-after-build"
 
     - name: Build
-      run: cmake --build build --config Debug --target install --verbose "-j$env:NUMBER_OF_PROCESSORS"
+      run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Run tests
       run: ctest --test-dir build/tests -C Debug --output-on-failure "-j$env:NUMBER_OF_PROCESSORS"
@@ -169,7 +168,7 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
-        cmake --build build --config Debug --verbose "-j$env:NUMBER_OF_PROCESSORS"
+        cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Test external C++ API link
       working-directory: tests/external/link/c++
@@ -182,4 +181,4 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
-        cmake --build build --config Debug --verbose "-j$env:NUMBER_OF_PROCESSORS"
+        cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
