@@ -3,6 +3,14 @@
   "name": "sail",
   "homepage": "https://github.com/HappySeaFox/sail",
   "dependencies": [
+    {
+      "name": "ffmpeg",
+      "features": [
+        "avcodec",
+        "avformat",
+        "swscale"
+      ]
+    },
     "giflib",
     "jbigkit",
     {
