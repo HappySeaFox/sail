@@ -13,69 +13,9 @@ The missing small and fast image decoding library for humans (not for machines).
 
 ## Installation
 
-### From PyPI (Recommended)
-
 Pre-built wheels with all dependencies included:
 
 ```bash
-pip install sailpy
-```
-
-### From Source
-
-If building from source, you'll need system libraries installed first.
-
-### Linux (Debian/Ubuntu)
-
-**Minimal installation (JPEG, PNG, basic formats):**
-```bash
-sudo apt-get update
-sudo apt-get install -y \
-    build-essential \
-    cmake \
-    libjpeg-dev \
-    libpng-dev \
-    libgif-dev \
-    zlib1g-dev
-pip install sailpy
-```
-
-**Full installation (all codecs):**
-```bash
-sudo apt-get update
-sudo apt-get install -y \
-    build-essential \
-    cmake \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
-    libwebp-dev \
-    libavif-dev \
-    libheif-dev \
-    libgif-dev \
-    libjxl-dev \
-    libopenjp2-7-dev \
-    libopenexr-dev \
-    zlib1g-dev
-pip install sailpy
-```
-
-### macOS (Homebrew)
-
-```bash
-brew install \
-    cmake \
-    jpeg \
-    libpng \
-    libtiff \
-    webp \
-    libavif \
-    libheif \
-    giflib \
-    jpeg-xl \
-    openjpeg \
-    openexr \
-    zlib
 pip install sailpy
 ```
 
