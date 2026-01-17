@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -37,9 +38,19 @@
 #include <libswscale/swscale.h>
 
 #include <sail-common/sail-common.h>
+#include <sail-common/string_node.h>
 
 #include "helpers.h"
 #include "io_src.h"
+
+/*
+ * Time range for frame extraction.
+ */
+struct video_time_range
+{
+    int64_t start_ms;
+    int64_t end_ms;
+};
 
 /*
  * Codec-specific state.
@@ -62,6 +73,14 @@ struct video_state
     struct SwsContext* sws_ctx;
     enum AVPixelFormat target_av_pix_fmt;
     AVFrame* converted_frame;
+
+    /* Time-based frame extraction */
+    struct video_time_range* time_ranges;
+    unsigned time_ranges_count;
+    unsigned current_time_range_index;
+    int64_t current_seek_time_ms;
+    bool seeking_mode;
+    bool seek_performed; /* Track if seek was performed for current range */
 };
 
 static sail_status_t alloc_video_state(const struct sail_load_options* load_options,
@@ -73,21 +92,27 @@ static sail_status_t alloc_video_state(const struct sail_load_options* load_opti
     *video_state = ptr;
 
     **video_state = (struct video_state){
-        .load_options        = load_options,
-        .save_options        = save_options,
-        .io                  = NULL,
-        .format_ctx          = NULL,
-        .avio_ctx            = NULL,
-        .avio_buffer         = NULL,
-        .video_stream_index  = -1,
-        .codec_ctx           = NULL,
-        .frame               = NULL,
-        .packet              = NULL,
-        .frame_decoded       = false,
-        .current_frame_index = 0,
-        .sws_ctx             = NULL,
-        .target_av_pix_fmt   = AV_PIX_FMT_NONE,
-        .converted_frame     = NULL,
+        .load_options             = load_options,
+        .save_options             = save_options,
+        .io                       = NULL,
+        .format_ctx               = NULL,
+        .avio_ctx                 = NULL,
+        .avio_buffer              = NULL,
+        .video_stream_index       = -1,
+        .codec_ctx                = NULL,
+        .frame                    = NULL,
+        .packet                   = NULL,
+        .frame_decoded            = false,
+        .current_frame_index      = 0,
+        .sws_ctx                  = NULL,
+        .target_av_pix_fmt        = AV_PIX_FMT_NONE,
+        .converted_frame          = NULL,
+        .time_ranges              = NULL,
+        .time_ranges_count        = 0,
+        .current_time_range_index = 0,
+        .current_seek_time_ms     = -1,
+        .seeking_mode             = false,
+        .seek_performed           = false,
     };
 
     return SAIL_OK;
@@ -144,7 +169,109 @@ static void destroy_video_state(struct video_state* video_state)
         avformat_close_input(&video_state->format_ctx);
     }
 
+    if (video_state->time_ranges != NULL)
+    {
+        sail_free(video_state->time_ranges);
+    }
+
     sail_free(video_state);
+}
+
+/*
+ * Parse video-seek-time parameter.
+ * Format: "1000;2000;3000" or "1000-2000" or combinations.
+ * Times are in milliseconds.
+ */
+static sail_status_t video_private_parse_seek_time_ms(const char* str_value,
+                                                      struct video_time_range** time_ranges,
+                                                      unsigned* time_ranges_count)
+{
+    SAIL_CHECK_PTR(str_value);
+    SAIL_CHECK_PTR(time_ranges);
+    SAIL_CHECK_PTR(time_ranges_count);
+
+    struct sail_string_node* string_node_list;
+    SAIL_TRY(sail_split_into_string_node_chain(str_value, &string_node_list));
+
+    /* Count ranges. */
+    unsigned count = 0;
+    for (const struct sail_string_node* node = string_node_list; node != NULL; node = node->next)
+    {
+        count++;
+    }
+
+    if (count == 0)
+    {
+        sail_destroy_string_node_chain(string_node_list);
+        *time_ranges       = NULL;
+        *time_ranges_count = 0;
+        return SAIL_OK;
+    }
+
+    void* ptr;
+    SAIL_TRY_OR_CLEANUP(sail_malloc((size_t)count * sizeof(struct video_time_range), &ptr),
+                        /* cleanup */ sail_destroy_string_node_chain(string_node_list));
+    *time_ranges = ptr;
+
+    /* Parse each entry. */
+    unsigned index = 0;
+    for (const struct sail_string_node* node = string_node_list; node != NULL; node = node->next)
+    {
+        const char* entry = node->string;
+        char* dash_pos    = strchr(entry, '-');
+
+        if (dash_pos != NULL)
+        {
+            /* Range: "start-end" */
+            char* end_ptr;
+            long start_ms = strtol(entry, &end_ptr, 10);
+            if (end_ptr != dash_pos || start_ms < 0)
+            {
+                sail_destroy_string_node_chain(string_node_list);
+                sail_free(*time_ranges);
+                *time_ranges = NULL;
+                SAIL_LOG_ERROR("VIDEO: Invalid range start in 'video-seek-time': %s", entry);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+
+            long end_ms = strtol(dash_pos + 1, &end_ptr, 10);
+            if (*end_ptr != '\0' || end_ms < 0 || end_ms <= start_ms)
+            {
+                sail_destroy_string_node_chain(string_node_list);
+                sail_free(*time_ranges);
+                *time_ranges = NULL;
+                SAIL_LOG_ERROR("VIDEO: Invalid range end in 'video-seek-time': %s", entry);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+
+            (*time_ranges)[index].start_ms = (int64_t)start_ms;
+            (*time_ranges)[index].end_ms   = (int64_t)end_ms;
+        }
+        else
+        {
+            /* Single timestamp: "1000" */
+            char* end_ptr;
+            long timestamp_ms = strtol(entry, &end_ptr, 10);
+            if (*end_ptr != '\0' || timestamp_ms < 0)
+            {
+                sail_destroy_string_node_chain(string_node_list);
+                sail_free(*time_ranges);
+                *time_ranges = NULL;
+                SAIL_LOG_ERROR("VIDEO: Invalid timestamp in 'video-seek-time': %s", entry);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+
+            (*time_ranges)[index].start_ms = (int64_t)timestamp_ms;
+            (*time_ranges)[index].end_ms   = -1; /* Single timestamp */
+        }
+
+        index++;
+    }
+
+    sail_destroy_string_node_chain(string_node_list);
+    *time_ranges_count = count;
+
+    return SAIL_OK;
 }
 
 /*
@@ -252,8 +379,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_video(struct sail_io* io,
     if (video_state->load_options->tuning != NULL)
     {
         sail_traverse_hash_map_with_user_data(video_state->load_options->tuning,
-                                              video_private_load_tuning_key_value_callback,
-                                              video_state->codec_ctx);
+                                              video_private_load_tuning_key_value_callback, video_state->codec_ctx);
+
+        /* Parse video-seek-time if present. */
+        const struct sail_variant* seek_time_variant =
+            sail_hash_map_value(video_state->load_options->tuning, "video-seek-time");
+        if (seek_time_variant != NULL && seek_time_variant->type == SAIL_VARIANT_TYPE_STRING)
+        {
+            const char* str_value = sail_variant_to_string(seek_time_variant);
+            SAIL_TRY(video_private_parse_seek_time_ms(str_value, &video_state->time_ranges,
+                                                      &video_state->time_ranges_count));
+            if (video_state->time_ranges_count > 0)
+            {
+                video_state->seeking_mode             = true;
+                video_state->current_time_range_index = 0;
+                SAIL_LOG_TRACE("VIDEO: Parsed %u time range(s) for frame extraction", video_state->time_ranges_count);
+            }
+        }
     }
 
     /* Open codec. */
@@ -285,10 +427,78 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_video(void* state, 
 {
     struct video_state* video_state = state;
 
-    /* By default, read first frame only. */
-    if (video_state->current_frame_index > 0)
+    /* Handle time-based seeking mode. */
+    if (video_state->seeking_mode)
     {
-        return SAIL_ERROR_NO_MORE_FRAMES;
+        /* Check if we need to move to next range. */
+        if (video_state->current_time_range_index >= video_state->time_ranges_count)
+        {
+            return SAIL_ERROR_NO_MORE_FRAMES;
+        }
+
+        struct video_time_range* current_range = &video_state->time_ranges[video_state->current_time_range_index];
+
+        /* Set up current range or timestamp. */
+        if (!video_state->frame_decoded)
+        {
+            video_state->current_seek_time_ms = current_range->start_ms;
+            video_state->seek_performed       = false;
+        }
+        else
+        {
+            if (current_range->end_ms < 0)
+            {
+                /* Single timestamp: move to next after decoding. */
+                video_state->current_time_range_index++;
+                if (video_state->current_time_range_index >= video_state->time_ranges_count)
+                {
+                    return SAIL_ERROR_NO_MORE_FRAMES;
+                }
+                current_range                     = &video_state->time_ranges[video_state->current_time_range_index];
+                video_state->current_seek_time_ms = current_range->start_ms;
+                video_state->frame_decoded        = false;
+                video_state->seek_performed       = false;
+            }
+            else
+            {
+                /* Check if we need to continue or move to next range. */
+                if (video_state->frame->pts != AV_NOPTS_VALUE)
+                {
+                    AVStream* video_stream = video_state->format_ctx->streams[video_state->video_stream_index];
+                    int64_t frame_time_ms =
+                        av_rescale_q(video_state->frame->pts, video_stream->time_base, (AVRational){1, 1000000}) / 1000;
+
+                    if (frame_time_ms < current_range->end_ms)
+                    {
+                        video_state->frame_decoded = false;
+                    }
+                    else
+                    {
+                        video_state->current_time_range_index++;
+                        if (video_state->current_time_range_index >= video_state->time_ranges_count)
+                        {
+                            return SAIL_ERROR_NO_MORE_FRAMES;
+                        }
+                        current_range = &video_state->time_ranges[video_state->current_time_range_index];
+                        video_state->current_seek_time_ms = current_range->start_ms;
+                        video_state->frame_decoded        = false;
+                        video_state->seek_performed       = false;
+                    }
+                }
+                else
+                {
+                    video_state->frame_decoded = false;
+                }
+            }
+        }
+    }
+    else
+    {
+        /* By default, read first frame only. */
+        if (video_state->current_frame_index > 0)
+        {
+            return SAIL_ERROR_NO_MORE_FRAMES;
+        }
     }
 
     /* Allocate image. */
@@ -370,16 +580,65 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
 {
     struct video_state* video_state = state;
 
-    /* Decode first frame. */
+    /* Seek to target time if needed. */
+    if (video_state->seeking_mode && video_state->current_seek_time_ms >= 0 && !video_state->seek_performed)
+    {
+        AVStream* video_stream = video_state->format_ctx->streams[video_state->video_stream_index];
+
+        int64_t timestamp = av_rescale_q(video_state->current_seek_time_ms * (int64_t)1000, (AVRational){1, 1000000},
+                                         video_stream->time_base);
+
+        int ret = avformat_seek_file(video_state->format_ctx, video_state->video_stream_index, INT64_MIN, timestamp,
+                                     INT64_MAX, AVSEEK_FLAG_BACKWARD);
+        if (ret < 0)
+        {
+            SAIL_LOG_ERROR("VIDEO: Failed to seek to %" PRId64 " ms: %s", video_state->current_seek_time_ms,
+                           av_err2str(ret));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        avcodec_flush_buffers(video_state->codec_ctx);
+        video_state->seek_performed = true;
+    }
+
+    /* Decode frame. */
     if (!video_state->frame_decoded)
     {
         int ret;
+        AVStream* video_stream                 = video_state->format_ctx->streams[video_state->video_stream_index];
+        struct video_time_range* current_range = NULL;
+
+        if (video_state->seeking_mode && video_state->current_time_range_index < video_state->time_ranges_count)
+        {
+            current_range = &video_state->time_ranges[video_state->current_time_range_index];
+        }
 
         /* Read frames until we get a video frame. */
         while ((ret = av_read_frame(video_state->format_ctx, video_state->packet)) >= 0)
         {
             if (video_state->packet->stream_index == video_state->video_stream_index)
             {
+                /* Check packet timestamp to skip out of range packets. */
+                if (current_range != NULL && current_range->end_ms >= 0 && video_state->packet->pts != AV_NOPTS_VALUE)
+                {
+                    int64_t packet_time_ms =
+                        av_rescale_q(video_state->packet->pts, video_stream->time_base, (AVRational){1, 1000000})
+                        / 1000;
+
+                    if (packet_time_ms < current_range->start_ms)
+                    {
+                        av_packet_unref(video_state->packet);
+                        continue;
+                    }
+
+                    if (packet_time_ms >= current_range->end_ms)
+                    {
+                        av_packet_unref(video_state->packet);
+                        video_state->frame_decoded = false;
+                        goto range_end;
+                    }
+                }
+
                 /* Send packet to decoder. */
                 ret = avcodec_send_packet(video_state->codec_ctx, video_state->packet);
                 if (ret < 0)
@@ -395,9 +654,33 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
                     ret = avcodec_receive_frame(video_state->codec_ctx, video_state->frame);
                     if (ret == 0)
                     {
-                        video_state->frame_decoded = true;
-                        av_packet_unref(video_state->packet);
-                        break;
+                        /* Verify frame timestamp is within range. */
+                        if (current_range != NULL && current_range->end_ms >= 0
+                            && video_state->frame->pts != AV_NOPTS_VALUE)
+                        {
+                            int64_t frame_time_ms =
+                                av_rescale_q(video_state->frame->pts, video_stream->time_base, (AVRational){1, 1000000})
+                                / 1000;
+
+                            if (frame_time_ms >= current_range->start_ms && frame_time_ms < current_range->end_ms)
+                            {
+                                video_state->frame_decoded = true;
+                                av_packet_unref(video_state->packet);
+                                break;
+                            }
+                            else if (frame_time_ms >= current_range->end_ms)
+                            {
+                                av_packet_unref(video_state->packet);
+                                video_state->frame_decoded = false;
+                                goto range_end;
+                            }
+                        }
+                        else
+                        {
+                            video_state->frame_decoded = true;
+                            av_packet_unref(video_state->packet);
+                            break;
+                        }
                     }
                     else if (ret == AVERROR(EAGAIN))
                     {
@@ -425,41 +708,69 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
             av_packet_unref(video_state->packet);
         }
 
-        /* If we haven't decoded a frame yet, try flushing the decoder. */
+    range_end:
+
+        /* Try flushing decoder if no frame decoded. */
         if (!video_state->frame_decoded)
         {
-            ret = avcodec_send_packet(video_state->codec_ctx, NULL);
-            if (ret < 0 && ret != AVERROR_EOF)
+            if (current_range != NULL && current_range->end_ms >= 0)
             {
-                SAIL_LOG_ERROR("VIDEO: Error flushing decoder: %s", av_err2str(ret));
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+                /* Reached end of range. */
             }
-
-            while (true)
+            else
             {
-                ret = avcodec_receive_frame(video_state->codec_ctx, video_state->frame);
-                if (ret == 0)
+                ret = avcodec_send_packet(video_state->codec_ctx, NULL);
+                if (ret < 0 && ret != AVERROR_EOF)
                 {
-                    video_state->frame_decoded = true;
-                    break;
+                    SAIL_LOG_ERROR("VIDEO: Error flushing decoder: %s", av_err2str(ret));
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
-                else if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
+
+                while (true)
                 {
-                    break;
+                    ret = avcodec_receive_frame(video_state->codec_ctx, video_state->frame);
+                    if (ret == 0)
+                    {
+                        video_state->frame_decoded = true;
+                        break;
+                    }
+                    else if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        SAIL_LOG_ERROR("VIDEO: Error receiving frame during flush: %s", av_err2str(ret));
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+                    }
                 }
-                else
+
+                if (!video_state->frame_decoded)
                 {
-                    SAIL_LOG_ERROR("VIDEO: Error receiving frame during flush: %s", av_err2str(ret));
+                    SAIL_LOG_ERROR("VIDEO: Failed to decode frame");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                 }
             }
+        }
+    }
 
-            if (!video_state->frame_decoded)
+    if (!video_state->frame_decoded)
+    {
+        if (video_state->seeking_mode)
+        {
+            if (video_state->current_time_range_index < video_state->time_ranges_count)
             {
-                SAIL_LOG_ERROR("VIDEO: Failed to decode frame");
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+                struct video_time_range* current_range =
+                    &video_state->time_ranges[video_state->current_time_range_index];
+                if (current_range->end_ms >= 0)
+                {
+                    /* Reached end of range. */
+                    return SAIL_ERROR_NO_MORE_FRAMES;
+                }
             }
         }
+        SAIL_LOG_ERROR("VIDEO: Failed to decode frame");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
     /* Get source pixel format from decoded frame. */
