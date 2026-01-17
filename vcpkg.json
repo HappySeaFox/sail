@@ -3,6 +3,15 @@
   "name": "sail",
   "homepage": "https://github.com/HappySeaFox/sail",
   "dependencies": [
+    {
+      "name": "ffmpeg",
+      "features": [
+        "avcodec",
+        "avformat",
+        "swscale",
+        "swresample"
+      ]
+    },
     "giflib",
     "jbigkit",
     {
@@ -23,5 +32,5 @@
     "tiff",
     "zlib"
   ],
-  "builtin-baseline": "5bf0c55239da398b8c6f450818c9e28d36bf9966"
+  "builtin-baseline": "66c0373dc7fca549e5803087b9487edfe3aca0a1"
 }
