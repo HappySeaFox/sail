@@ -24,6 +24,7 @@
 */
 
 #include <libavcodec/avcodec.h>
+#include <libavcodec/defs.h>
 #include <libavformat/avformat.h>
 #include <libavutil/dict.h>
 #include <libavutil/opt.h>
@@ -516,7 +517,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     }
 
     /* Profile (check for unknown values). */
-    if (codecpar->profile != FF_PROFILE_UNKNOWN && codecpar->profile >= 0)
+    if (codecpar->profile != AV_PROFILE_UNKNOWN && codecpar->profile >= 0)
     {
         const char* profile_name = avcodec_profile_name(codecpar->codec_id, codecpar->profile);
         if (profile_name != NULL)
@@ -526,7 +527,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     }
 
     /* Level (check for unknown values). */
-    if (codecpar->level != FF_LEVEL_UNKNOWN && codecpar->level >= 0)
+    if (codecpar->level != AV_LEVEL_UNKNOWN && codecpar->level >= 0)
     {
         const char* level_str = av_level_to_string(codecpar->level);
         SAIL_TRY(store_string_property(special_properties, "video-level", level_str));
