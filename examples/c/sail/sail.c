@@ -833,14 +833,6 @@ static sail_status_t extract_frames_impl(const char* input,
             }
         }
 
-        /* Check if output file exists and ask for confirmation. */
-        if (!check_file_overwrite(output_filename, auto_yes))
-        {
-            sail_destroy_image(image);
-            frame_count++;
-            continue;
-        }
-
         /* Setup save options. */
         struct sail_save_options* save_options;
         SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options),
