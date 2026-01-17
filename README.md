@@ -2,11 +2,9 @@
 <h3 align="center">The missing fast imaging library for humans (not for machines).</h3>
 <p align="center">
   <a href="https://github.com/HappySeaFox/sail/actions">
-    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/HappySeaFox/sail/build-and-test.yml"/>
-  </a>
+    <img alt="Build Status" src="https://img.shields.io/github/actions/workflow/status/HappySeaFox/sail/build-and-test.yml"/></a>
   <a href="https://github.com/HappySeaFox/sail/releases">
-    <img alt="Latest release" src="https://img.shields.io/github/v/release/HappySeaFox/sail?include_prereleases"/>
-  </a>
+    <img alt="Latest release" src="https://img.shields.io/github/v/release/HappySeaFox/sail?include_prereleases"/></a>
 </p>
 <p align="center">
   <a href="#target-audience">Target Audience</a> •
