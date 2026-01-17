@@ -796,7 +796,7 @@
     </td>
     <td>Unsupported</td>
     <td>-</td>
-    <td>FFmpeg (libavcodec, libavformat, libavutil, libswscale)</td>
+    <td>FFmpeg (libavcodec, libavformat, libavutil, libswscale, libswresample)</td>
 </tr>
 <tr>
     <td>23</td>
