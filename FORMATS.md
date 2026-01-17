@@ -761,6 +761,45 @@
 </tr>
 <tr>
     <td>22</td>
+    <td><a href="https://wikipedia.org/wiki/Video_file_format">VIDEO</a></td>
+    <td>
+        <b>Grayscale:</b> 8-bit, 16-bit.
+        <b>RGB:</b> 24-bit, 48-bit.
+        <b>RGBA:</b> 32-bit, 64-bit.
+        <b>YUV:</b> 24-bit, 30-bit, 36-bit, 48-bit.
+        <br/><br/>
+        <b>Content:</b> Static, Meta data.
+        <br/><br/>
+        <b>Supported formats:</b> MP4, M4V, MOV, AVI, MKV, WEBM, FLV, WMV, MPG, MPEG, 3GP, OGV, TS, MTS, M2TS.
+        <br/><br/>
+        <b>Special properties:</b>
+        Key: <i>"video-codec"</i>. Description: Video codec name. Possible values: string.
+        Key: <i>"video-profile"</i>. Description: Codec profile name. Possible values: string.
+        Key: <i>"video-level"</i>. Description: Codec level. Possible values: string.
+        Key: <i>"video-bitrate"</i>. Description: Video bitrate in bits per second. Possible values: unsigned long.
+        Key: <i>"video-framerate-num"</i>. Description: Frame rate numerator. Possible values: int.
+        Key: <i>"video-framerate-den"</i>. Description: Frame rate denominator. Possible values: int.
+        Key: <i>"video-width"</i>. Description: Video width in pixels. Possible values: int.
+        Key: <i>"video-height"</i>. Description: Video height in pixels. Possible values: int.
+        <br/><br/>
+        <b>Tuning:</b>
+        Key: <i>"video-threads"</i>. Description: Number of decoder threads. Possible values: int/unsigned int (default: 0 = auto).
+        <br/>Key: <i>"video-low-resolution"</i>. Description: Decode at lower resolution for speed. Possible values: bool.
+        <br/>Key: <i>"video-skip-frame"</i>. Description: Skip frame decoding. Possible values: int/unsigned int (0=none, 1=skip non-reference, 2=skip bidir, 4=skip non-keyframes, 8=skip all).
+        <br/>Key: <i>"video-skip-idct"</i>. Description: Skip IDCT step. Possible values: int/unsigned int (0=none, 1=skip B-frames, 2=skip all).
+        <br/>Key: <i>"video-skip-loop-filter"</i>. Description: Skip loop filtering. Possible values: int/unsigned int (0=none, 1=skip non-reference, 2=skip bidir, 4=skip non-keyframes, 8=skip all).
+        <br/>Key: <i>"video-error-concealment"</i>. Description: Error concealment strategy. Possible values: int/unsigned int (bitmask: 1=frame, 2=partitions, 4=drift, 8=merge).
+        <br/>Key: <i>"video-seek-time"</i>. Description: Extract frames at specific timestamps or time ranges (milliseconds). Possible values: string (semicolon-separated list of timestamps or ranges, e.g., "1000;2000;3000-5000").
+    </td>
+    <td>
+        <b>Content:</b> Animated (only first frame extracted), Audio streams, Subtitles.
+    </td>
+    <td>Unsupported</td>
+    <td>-</td>
+    <td>FFmpeg (libavcodec, libavformat, libavutil, libswscale)</td>
+</tr>
+<tr>
+    <td>23</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
         <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 40-bit, 48-bit, 64-bit, 80-bit.
@@ -804,7 +843,7 @@
     <td>libtiff</td>
 </tr>
 <tr>
-    <td>23</td>
+    <td>24</td>
     <td><a href="http://fileformats.archiveteam.org/wiki/Quake_2_Texture">WAL</a></td>
     <td>
         <b>Indexed:</b> 8-bit.
@@ -823,7 +862,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>24</td>
+    <td>25</td>
     <td><a href="https://wikipedia.org/wiki/WebP">WEBP</a></td>
     <td>
         <b>RGBA:</b> 32-bit.
@@ -898,7 +937,7 @@
     <td>libwebp</td>
 </tr>
 <tr>
-    <td>25</td>
+    <td>26</td>
     <td><a href="https://wikipedia.org/wiki/X_BitMap">XBM</a></td>
     <td>
         <b>Indexed:</b> 1-bit.
@@ -927,7 +966,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>26</td>
+    <td>27</td>
     <td><a href="https://wikipedia.org/wiki/X_PixMap">XPM</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
@@ -954,7 +993,7 @@
     <td>-</td>
 </tr>
 <tr>
-    <td>27</td>
+    <td>28</td>
     <td><a href="https://wikipedia.org/wiki/Xwd">XWD</a></td>
     <td>
         <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
