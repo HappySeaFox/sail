@@ -46,6 +46,8 @@ const std::unordered_map<std::type_index, SailVariantType> cpp_to_sail_variant_t
     {std::type_index(typeid(unsigned int)), SAIL_VARIANT_TYPE_UNSIGNED_INT},
     {std::type_index(typeid(long)), SAIL_VARIANT_TYPE_LONG},
     {std::type_index(typeid(unsigned long)), SAIL_VARIANT_TYPE_UNSIGNED_LONG},
+    {std::type_index(typeid(long long)), SAIL_VARIANT_TYPE_LONG_LONG},
+    {std::type_index(typeid(unsigned long long)), SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG},
     {std::type_index(typeid(float)), SAIL_VARIANT_TYPE_FLOAT},
     {std::type_index(typeid(double)), SAIL_VARIANT_TYPE_DOUBLE},
     {std::type_index(typeid(std::string)), SAIL_VARIANT_TYPE_STRING},
@@ -100,6 +102,8 @@ public:
         unsigned int v_unsigned_int;
         long v_long;
         unsigned long v_unsigned_long;
+        long long v_long_long;
+        unsigned long long v_unsigned_long_long;
         float v_float;
         double v_double;
         std::string v_string;
@@ -188,6 +192,22 @@ template <> SAIL_EXPORT void variant::set_value<>(const unsigned long& value)
     d->v_unsigned_long = value;
 }
 
+template <> SAIL_EXPORT void variant::set_value<>(const long long& value)
+{
+    d->destroy_value();
+
+    d->type      = SAIL_VARIANT_TYPE_LONG_LONG;
+    d->v_long_long = value;
+}
+
+template <> SAIL_EXPORT void variant::set_value<>(const unsigned long long& value)
+{
+    d->destroy_value();
+
+    d->type                = SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG;
+    d->v_unsigned_long_long = value;
+}
+
 template <> SAIL_EXPORT void variant::set_value<>(const float& value)
 {
     d->destroy_value();
@@ -251,6 +271,9 @@ template SAIL_EXPORT variant::variant(const unsigned int&);
 template SAIL_EXPORT variant::variant(const long&);
 template SAIL_EXPORT variant::variant(const unsigned long&);
 
+template SAIL_EXPORT variant::variant(const long long&);
+template SAIL_EXPORT variant::variant(const unsigned long long&);
+
 template SAIL_EXPORT variant::variant(const float&);
 template SAIL_EXPORT variant::variant(const double&);
 
@@ -281,6 +304,8 @@ SAIL_EXPORT variant::variant(const sail_variant_type_workaround_alias_const& var
     case SAIL_VARIANT_TYPE_UNSIGNED_INT: set_value(sail_variant_to_unsigned_int(variant)); break;
     case SAIL_VARIANT_TYPE_LONG: set_value(sail_variant_to_long(variant)); break;
     case SAIL_VARIANT_TYPE_UNSIGNED_LONG: set_value(sail_variant_to_unsigned_long(variant)); break;
+    case SAIL_VARIANT_TYPE_LONG_LONG: set_value(sail_variant_to_long_long(variant)); break;
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG: set_value(sail_variant_to_unsigned_long_long(variant)); break;
     case SAIL_VARIANT_TYPE_FLOAT: set_value(sail_variant_to_float(variant)); break;
     case SAIL_VARIANT_TYPE_DOUBLE: set_value(sail_variant_to_double(variant)); break;
     case SAIL_VARIANT_TYPE_STRING: set_value(std::string(sail_variant_to_string(variant))); break;
@@ -321,6 +346,8 @@ variant& variant::operator=(const sail::variant& variant)
     case SAIL_VARIANT_TYPE_UNSIGNED_INT: set_value(variant.d->v_unsigned_int); break;
     case SAIL_VARIANT_TYPE_LONG: set_value(variant.d->v_long); break;
     case SAIL_VARIANT_TYPE_UNSIGNED_LONG: set_value(variant.d->v_unsigned_long); break;
+    case SAIL_VARIANT_TYPE_LONG_LONG: set_value(variant.d->v_long_long); break;
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG: set_value(variant.d->v_unsigned_long_long); break;
     case SAIL_VARIANT_TYPE_FLOAT: set_value(variant.d->v_float); break;
     case SAIL_VARIANT_TYPE_DOUBLE: set_value(variant.d->v_double); break;
     case SAIL_VARIANT_TYPE_STRING: set_value(variant.d->v_string); break;
@@ -379,6 +406,9 @@ template SAIL_EXPORT bool variant::has_value<unsigned int>() const;
 template SAIL_EXPORT bool variant::has_value<long>() const;
 template SAIL_EXPORT bool variant::has_value<unsigned long>() const;
 
+template SAIL_EXPORT bool variant::has_value<long long>() const;
+template SAIL_EXPORT bool variant::has_value<unsigned long long>() const;
+
 template SAIL_EXPORT bool variant::has_value<float>() const;
 template SAIL_EXPORT bool variant::has_value<double>() const;
 
@@ -432,6 +462,16 @@ template <> SAIL_EXPORT const unsigned long& variant::value() const
     return d->v_unsigned_long;
 }
 
+template <> SAIL_EXPORT const long long& variant::value() const
+{
+    return d->v_long_long;
+}
+
+template <> SAIL_EXPORT const unsigned long long& variant::value() const
+{
+    return d->v_unsigned_long_long;
+}
+
 template <> SAIL_EXPORT const float& variant::value() const
 {
     return d->v_float;
@@ -482,6 +522,10 @@ sail_status_t variant::to_sail_variant(sail_variant** variant) const
     case SAIL_VARIANT_TYPE_UNSIGNED_LONG:
         SAIL_TRY(sail_set_variant_unsigned_long(variant_local, d->v_unsigned_long));
         break;
+    case SAIL_VARIANT_TYPE_LONG_LONG: SAIL_TRY(sail_set_variant_long_long(variant_local, d->v_long_long)); break;
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG:
+        SAIL_TRY(sail_set_variant_unsigned_long_long(variant_local, d->v_unsigned_long_long));
+        break;
     case SAIL_VARIANT_TYPE_FLOAT: SAIL_TRY(sail_set_variant_float(variant_local, d->v_float)); break;
     case SAIL_VARIANT_TYPE_DOUBLE: SAIL_TRY(sail_set_variant_double(variant_local, d->v_double)); break;
     case SAIL_VARIANT_TYPE_STRING: SAIL_TRY(sail_set_variant_string(variant_local, d->v_string.c_str())); break;
@@ -519,6 +563,8 @@ bool operator==(const sail::variant& a, const sail::variant& b)
     case SAIL_VARIANT_TYPE_UNSIGNED_INT: return a.d->v_unsigned_int == b.d->v_unsigned_int;
     case SAIL_VARIANT_TYPE_LONG: return a.d->v_long == b.d->v_long;
     case SAIL_VARIANT_TYPE_UNSIGNED_LONG: return a.d->v_unsigned_long == b.d->v_unsigned_long;
+    case SAIL_VARIANT_TYPE_LONG_LONG: return a.d->v_long_long == b.d->v_long_long;
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG: return a.d->v_unsigned_long_long == b.d->v_unsigned_long_long;
     case SAIL_VARIANT_TYPE_FLOAT: return a.d->v_float == b.d->v_float;
     case SAIL_VARIANT_TYPE_DOUBLE: return a.d->v_double == b.d->v_double;
     case SAIL_VARIANT_TYPE_STRING: return a.d->v_string == b.d->v_string;

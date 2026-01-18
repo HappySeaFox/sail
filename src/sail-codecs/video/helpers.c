@@ -438,9 +438,9 @@ static const char* av_level_to_string(int level)
     return level_str;
 }
 
-static sail_status_t store_unsigned_long_property(struct sail_hash_map* special_properties,
-                                                  const char* key,
-                                                  unsigned long value)
+static sail_status_t store_unsigned_long_long_property(struct sail_hash_map* special_properties,
+                                                        const char* key,
+                                                        unsigned long long value)
 {
     if (special_properties == NULL)
     {
@@ -449,7 +449,7 @@ static sail_status_t store_unsigned_long_property(struct sail_hash_map* special_
 
     struct sail_variant* variant;
     SAIL_TRY(sail_alloc_variant(&variant));
-    sail_set_variant_unsigned_long(variant, value);
+    sail_set_variant_unsigned_long_long(variant, value);
     SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
                         /* cleanup */ sail_destroy_variant(variant));
     sail_destroy_variant(variant);
@@ -513,7 +513,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     /* Bitrate. */
     if (codecpar->bit_rate > 0)
     {
-        SAIL_TRY(store_unsigned_long_property(special_properties, "video-bitrate", (unsigned long)codecpar->bit_rate));
+        SAIL_TRY(store_unsigned_long_long_property(special_properties, "video-bitrate", (unsigned long long)codecpar->bit_rate));
     }
 
     /* Profile (check for unknown values). */
@@ -600,15 +600,15 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         int64_t duration_ms = av_rescale_q(video_stream->duration, video_stream->time_base, (AVRational){1, 1000});
         if (duration_ms > 0)
         {
-            SAIL_TRY(store_unsigned_long_property(special_properties, "video-duration", (unsigned long)duration_ms));
+            SAIL_TRY(store_unsigned_long_long_property(special_properties, "video-duration", (unsigned long long)duration_ms));
         }
     }
 
     /* Number of frames. */
     if (video_stream->nb_frames > 0)
     {
-        SAIL_TRY(store_unsigned_long_property(special_properties, "video-nb-frames",
-                                              (unsigned long)video_stream->nb_frames));
+        SAIL_TRY(store_unsigned_long_long_property(special_properties, "video-nb-frames",
+                                                   (unsigned long long)video_stream->nb_frames));
     }
 
     return SAIL_OK;

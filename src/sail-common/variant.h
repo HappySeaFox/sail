@@ -57,6 +57,10 @@ enum SailVariantType
     SAIL_VARIANT_TYPE_STRING,
     SAIL_VARIANT_TYPE_DATA,
     SAIL_VARIANT_TYPE_INVALID,
+
+    /* Since 0.9.11. */
+    SAIL_VARIANT_TYPE_LONG_LONG,
+    SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG,
 };
 
 /*
@@ -154,6 +158,20 @@ SAIL_EXPORT sail_status_t sail_set_variant_long(struct sail_variant* variant, lo
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_set_variant_unsigned_long(struct sail_variant* variant, unsigned long value);
+
+/*
+ * Sets the specified long long value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_long_long(struct sail_variant* variant, long long value);
+
+/*
+ * Sets the specified unsigned long long value as a new variant value.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_set_variant_unsigned_long_long(struct sail_variant* variant, unsigned long long value);
 
 /*
  * Sets the specified float value as a new variant value.
@@ -264,6 +282,18 @@ SAIL_EXPORT long sail_variant_to_long(const struct sail_variant* variant);
  * Effectively, it casts the value pointer to unsigned long*, and then dereferences the resulting pointer.
  */
 SAIL_EXPORT unsigned long sail_variant_to_unsigned_long(const struct sail_variant* variant);
+
+/*
+ * Returns the variant value as a long long. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to long long*, and then dereferences the resulting pointer.
+ */
+SAIL_EXPORT long long sail_variant_to_long_long(const struct sail_variant* variant);
+
+/*
+ * Returns the variant value as an unsigned long long. Behavior is undefined if the variant is invalid.
+ * Effectively, it casts the value pointer to unsigned long long*, and then dereferences the resulting pointer.
+ */
+SAIL_EXPORT unsigned long long sail_variant_to_unsigned_long_long(const struct sail_variant* variant);
 
 /*
  * Returns the variant value as a float. Behavior is undefined if the variant is invalid.

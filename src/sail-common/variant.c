@@ -179,6 +179,20 @@ sail_status_t sail_set_variant_unsigned_long(struct sail_variant* variant, unsig
     return SAIL_OK;
 }
 
+sail_status_t sail_set_variant_long_long(struct sail_variant* variant, long long value)
+{
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_LONG_LONG, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_set_variant_unsigned_long_long(struct sail_variant* variant, unsigned long long value)
+{
+    SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG, &value, sizeof(value)));
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_set_variant_float(struct sail_variant* variant, float value)
 {
     SAIL_TRY(set_variant_value(variant, SAIL_VARIANT_TYPE_FLOAT, &value, sizeof(value)));
@@ -288,6 +302,16 @@ unsigned long sail_variant_to_unsigned_long(const struct sail_variant* variant)
     return *(unsigned long*)(variant->value);
 }
 
+long long sail_variant_to_long_long(const struct sail_variant* variant)
+{
+    return *(long long*)(variant->value);
+}
+
+unsigned long long sail_variant_to_unsigned_long_long(const struct sail_variant* variant)
+{
+    return *(unsigned long long*)(variant->value);
+}
+
 float sail_variant_to_float(const struct sail_variant* variant)
 {
     return *(float*)(variant->value);
@@ -370,6 +394,8 @@ int sail_fprintf_variant(const struct sail_variant* variant, FILE* f)
     case SAIL_VARIANT_TYPE_UNSIGNED_INT: return fprintf(f, "%u", sail_variant_to_unsigned_int(variant));
     case SAIL_VARIANT_TYPE_LONG: return fprintf(f, "%ld", sail_variant_to_long(variant));
     case SAIL_VARIANT_TYPE_UNSIGNED_LONG: return fprintf(f, "%lu", sail_variant_to_unsigned_long(variant));
+    case SAIL_VARIANT_TYPE_LONG_LONG: return fprintf(f, "%lld", sail_variant_to_long_long(variant));
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG: return fprintf(f, "%llu", sail_variant_to_unsigned_long_long(variant));
     case SAIL_VARIANT_TYPE_FLOAT: return fprintf(f, "%f", sail_variant_to_float(variant));
     case SAIL_VARIANT_TYPE_DOUBLE: return fprintf(f, "%f", sail_variant_to_double(variant));
     case SAIL_VARIANT_TYPE_STRING: return fprintf(f, "%s", sail_variant_to_string(variant));
@@ -399,6 +425,8 @@ int sail_snprintf_variant(const struct sail_variant* variant, char* str, size_t 
     case SAIL_VARIANT_TYPE_UNSIGNED_INT: return snprintf(str, str_size, "%u", sail_variant_to_unsigned_int(variant));
     case SAIL_VARIANT_TYPE_LONG: return snprintf(str, str_size, "%ld", sail_variant_to_long(variant));
     case SAIL_VARIANT_TYPE_UNSIGNED_LONG: return snprintf(str, str_size, "%lu", sail_variant_to_unsigned_long(variant));
+    case SAIL_VARIANT_TYPE_LONG_LONG: return snprintf(str, str_size, "%lld", sail_variant_to_long_long(variant));
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG: return snprintf(str, str_size, "%llu", sail_variant_to_unsigned_long_long(variant));
     case SAIL_VARIANT_TYPE_FLOAT: return snprintf(str, str_size, "%f", sail_variant_to_float(variant));
     case SAIL_VARIANT_TYPE_DOUBLE: return snprintf(str, str_size, "%f", sail_variant_to_double(variant));
     case SAIL_VARIANT_TYPE_STRING: return snprintf(str, str_size, "%s", sail_variant_to_string(variant));

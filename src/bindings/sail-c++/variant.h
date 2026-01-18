@@ -48,6 +48,8 @@ namespace sail
  *   - unsigned int
  *   - long
  *   - unsigned long
+ *   - long long
+ *   - unsigned long long
  *   - float
  *   - double
  *   - std::string
