@@ -30,6 +30,7 @@ include(sail_enable_pic)
 include(sail_enable_posix_c_source)
 include(sail_enable_xopen_source)
 include(sail_enable_warnings)
+include(sail_find_swscale)
 include(sail_install_cmake_config)
 include(sail_test)
 include(sail_windows_enable_exception_handling)
@@ -88,6 +89,7 @@ option(SAIL_BUILD_EXAMPLES "Build examples." ON)
 option(SAIL_ASAN "Enable AddressSanitizer." OFF)
 option(SAIL_TSAN "Enable ThreadSanitizer." OFF)
 option(SAIL_ENABLE_OPENMP "Enable OpenMP support if available in the compiler. See also SAIL_OPENMP_SCHEDULE." ON)
+set(SAIL_MANIP_USE_SWSCALE "AUTO" CACHE STRING "Use libswscale for pixel format conversion: AUTO (use if available), ON (require), OFF (disable)")
 set(SAIL_ENABLE_CODECS "" CACHE STRING "Force-enable the codecs specified in this ';'-separated list. \
 Configuration fails if an enabled codec cannot find its dependencies. \
 Supports individual codecs and codec groups by priority (e.g., highest-priority;xbm). \
@@ -125,6 +127,8 @@ else()
     unset(SAIL_HAVE_OPENMP)
     set(SAIL_HAVE_OPENMP_DISPLAY "OFF (forced)" CACHE INTERNAL "")
 endif()
+
+sail_find_swscale(${SAIL_MANIP_USE_SWSCALE})
 
 # When we compile for VCPKG, VCPKG_TARGET_TRIPLET is defined
 #
@@ -352,7 +356,7 @@ message("* SAIL_OPENMP_SCHEDULE:         ${SAIL_OPENMP_SCHEDULE}")
 message("* SAIL_OPENMP_FLAGS:            ${SAIL_OPENMP_FLAGS}")
 message("* SAIL_OPENMP_INCLUDE_DIRS:     ${SAIL_OPENMP_INCLUDE_DIRS}")
 message("* SAIL_OPENMP_LIBS:             ${SAIL_OPENMP_LIBS}")
-message("* SAIL_MANIP_USE_SWSCALE:       ${SAIL_MANIP_USE_SWSCALE}")
+message("* SAIL_MANIP_SWSCALE_ENABLED:   ${SAIL_MANIP_SWSCALE_ENABLED_DISPLAY}")
 if (WIN32)
     message("* SAIL_WINDOWS_UTF8_PATHS:      ${SAIL_WINDOWS_UTF8_PATHS}")
 endif()

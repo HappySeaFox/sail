@@ -33,7 +33,7 @@
 
 struct sail_image;
 
-#ifdef SAIL_MANIP_USE_SWSCALE
+#ifdef SAIL_MANIP_SWSCALE_ENABLED
 
 /*
  * Fast pixel format conversion using libswscale (FFmpeg).
@@ -69,4 +69,4 @@ static inline bool sail_try_swscale_conversion(const struct sail_image* image_in
     return false;
 }
 
-#endif /* SAIL_MANIP_USE_SWSCALE */
+#endif /* SAIL_MANIP_SWSCALE_ENABLED */

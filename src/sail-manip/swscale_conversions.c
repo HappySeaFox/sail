@@ -23,7 +23,7 @@
  *  SOFTWARE.
  */
 
-#ifdef SAIL_MANIP_USE_SWSCALE
+#ifdef SAIL_MANIP_SWSCALE_ENABLED
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -206,4 +206,4 @@ bool sail_try_swscale_conversion(const struct sail_image* image_input,
     return true;
 }
 
-#endif /* SAIL_MANIP_USE_SWSCALE */
+#endif /* SAIL_MANIP_SWSCALE_ENABLED */

@@ -1,6 +1,3 @@
-# Option to enable swscale support for pixel format conversion
-option(SAIL_MANIP_USE_SWSCALE "Use libswscale for pixel format conversion (faster, requires FFmpeg)" OFF)
-
 set(SAIL_MANIP_SOURCES
     cmyk.c
     cmyk.h
@@ -23,17 +20,10 @@ set(SAIL_MANIP_SOURCES
     ycck.c
     ycck.h)
 
-if (SAIL_MANIP_USE_SWSCALE)
-    find_path(SAIL_SWSCALE_INCLUDE_DIR NAMES libswscale/swscale.h)
-    find_library(SAIL_SWSCALE_LIBS NAMES swscale)
+sail_find_swscale(${SAIL_MANIP_USE_SWSCALE})
 
-    if (SAIL_SWSCALE_INCLUDE_DIR AND SAIL_SWSCALE_LIBS)
-        message(STATUS "SAIL-MANIP: Using libswscale for pixel format conversion")
-        list(APPEND SAIL_MANIP_SOURCES swscale_conversions.c swscale_conversions.h)
-    else()
-        message(WARNING "SAIL-MANIP: libswscale not found, disabling SAIL_MANIP_USE_SWSCALE")
-        set(SAIL_MANIP_USE_SWSCALE OFF CACHE BOOL "Use libswscale for pixel format conversion" FORCE)
-    endif()
+if (SAIL_MANIP_SWSCALE_ENABLED)
+    list(APPEND SAIL_MANIP_SOURCES swscale_conversions.c swscale_conversions.h)
 endif()
 
 add_library(sail-manip ${SAIL_MANIP_SOURCES})
@@ -72,10 +62,10 @@ endif()
 
 target_link_libraries(sail-manip PUBLIC sail-common)
 
-if (SAIL_MANIP_USE_SWSCALE AND SAIL_SWSCALE_INCLUDE_DIR AND SAIL_SWSCALE_LIBS)
+if (SAIL_MANIP_SWSCALE_ENABLED)
     target_include_directories(sail-manip PRIVATE ${SAIL_SWSCALE_INCLUDE_DIR})
     target_link_libraries(sail-manip PRIVATE ${SAIL_SWSCALE_LIBS})
-    target_compile_definitions(sail-manip PRIVATE SAIL_MANIP_USE_SWSCALE)
+    target_compile_definitions(sail-manip PRIVATE SAIL_MANIP_SWSCALE_ENABLED)
 endif()
 
 # pkg-config integration
