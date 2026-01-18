@@ -31,6 +31,7 @@
 #include <vector>
 
 #include <sail-common/common.h>
+#include <sail-common/config.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
@@ -38,6 +39,8 @@
 #include <sail-c++/palette.h>
 #include <sail-c++/resolution.h>
 #include <sail-c++/source_image.h>
+
+#include <sail-manip/scale.h>
 
 struct sail_image;
 
@@ -644,6 +647,42 @@ public:
      * Returns an invalid image on error.
      */
     image rotate_to(SailOrientation angle) const;
+
+    /*
+     * Scales the image to the specified dimensions using the specified algorithm.
+     *
+     * Updates the image dimensions and pixels.
+     *
+     * All pixel formats with byte-aligned pixels (bits_per_pixel % 8 == 0) are supported.
+     *
+     * Uses libswscale for scaling with SIMD optimizations when available, otherwise falls back to manual scaling.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t scale(unsigned new_width, unsigned new_height, SailScaling algorithm);
+
+    /*
+     * Scales the image to the specified dimensions using the specified algorithm and assigns the result to the 'image'
+     * argument.
+     *
+     * All pixel formats with byte-aligned pixels (bits_per_pixel % 8 == 0) are supported.
+     *
+     * Uses libswscale for scaling with SIMD optimizations when available, otherwise falls back to manual scaling.
+     *
+     * Returns SAIL_OK on success.
+     */
+    sail_status_t scale_to(unsigned new_width, unsigned new_height, SailScaling algorithm, sail::image* image) const;
+
+    /*
+     * Scales the image to the specified dimensions using the specified algorithm and returns the resulting image.
+     *
+     * All pixel formats with byte-aligned pixels (bits_per_pixel % 8 == 0) are supported.
+     *
+     * Uses libswscale for scaling with SIMD optimizations when available, otherwise falls back to manual scaling.
+     *
+     * Returns an invalid image on error.
+     */
+    image scale_to(unsigned new_width, unsigned new_height, SailScaling algorithm) const;
 
     /*
      * Returns true if the conversion or updating functions can convert or update from the input

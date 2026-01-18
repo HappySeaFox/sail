@@ -93,6 +93,9 @@
 /* OpenMP scheduling algorithm. */
 #cmakedefine SAIL_OPENMP_SCHEDULE @SAIL_OPENMP_SCHEDULE@
 
+/* libswscale support for pixel format conversion and image scaling. */
+#cmakedefine SAIL_MANIP_SWSCALE_ENABLED
+
 #define SAIL_STRINGIFY(x) SAIL_STRINGIFY_(x)
 #define SAIL_STRINGIFY_(x) #x
 

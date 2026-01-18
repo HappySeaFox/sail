@@ -500,6 +500,28 @@ void init_image(py::module_& m)
              },
              py::arg("angle"), "Rotate image by 90, 180, or 270 degrees clockwise and return new image")
 
+        .def("scale",
+             [](sail::image& img, unsigned new_width, unsigned new_height, SailScaling algorithm) {
+                 auto status = img.scale(new_width, new_height, algorithm);
+                 if (status != SAIL_OK)
+                 {
+                     throw std::runtime_error("Failed to scale image");
+                 }
+             },
+             py::arg("new_width"), py::arg("new_height"), py::arg("algorithm") = SAIL_SCALING_BILINEAR,
+             "Scale image in-place to specified dimensions using the specified algorithm")
+        .def("scale_to",
+             [](const sail::image& img, unsigned new_width, unsigned new_height, SailScaling algorithm) {
+                 sail::image result = img.scale_to(new_width, new_height, algorithm);
+                 if (!result.is_valid())
+                 {
+                     throw std::runtime_error("Failed to scale image");
+                 }
+                 return result;
+             },
+             py::arg("new_width"), py::arg("new_height"), py::arg("algorithm") = SAIL_SCALING_BILINEAR,
+             "Scale image to specified dimensions using the specified algorithm and return new image")
+
         // NumPy integration
         .def("to_numpy", &image_to_numpy,
              "Convert image to NumPy array with appropriate dtype (uint8 or uint16, zero-copy)")

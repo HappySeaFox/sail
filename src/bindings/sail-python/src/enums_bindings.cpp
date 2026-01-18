@@ -26,6 +26,7 @@
 #include <pybind11/pybind11.h>
 #include <sail-c++/sail-c++.h>
 #include <sail-common/common.h>
+#include <sail-manip/scale.h>
 
 namespace py = pybind11;
 
@@ -413,5 +414,16 @@ void init_enums(py::module_& m)
         .value("MESSAGE", SAIL_LOG_LEVEL_MESSAGE, "Regular messages")
         .value("DEBUG", SAIL_LOG_LEVEL_DEBUG, "Debug messages (default)")
         .value("TRACE", SAIL_LOG_LEVEL_TRACE, "Verbose trace messages")
+        .export_values();
+
+    // ============================================================================
+    // SailScaling
+    // ============================================================================
+
+    py::enum_<SailScaling>(m, "Scaling", py::arithmetic(), "Scaling algorithm enumeration")
+        .value("NEAREST_NEIGHBOR", SAIL_SCALING_NEAREST_NEIGHBOR, "Nearest Neighbor (Point): Very fast, but blocky, no smoothing")
+        .value("BILINEAR", SAIL_SCALING_BILINEAR, "Standard Bilinear: Good balance of speed and quality")
+        .value("BICUBIC", SAIL_SCALING_BICUBIC, "Bicubic: High quality, tunable parameters")
+        .value("LANCZOS", SAIL_SCALING_LANCZOS, "Lanczos: Excellent quality and sharpness, moderate performance")
         .export_values();
 }
