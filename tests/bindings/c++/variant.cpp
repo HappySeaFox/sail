@@ -109,6 +109,9 @@ static MunitResult test_set_value(const MunitParameter params[], void* user_data
     test_set_type<long>(-500);
     test_set_type<unsigned long>(0xFFFF5);
 
+    test_set_type<long long>(-500LL);
+    test_set_type<unsigned long long>(0xFFFF5ULL);
+
     test_set_type<float>(-5.0f);
     test_set_type<double>(120.0);
 
@@ -160,6 +163,9 @@ static MunitResult test_compare(const MunitParameter params[], void* user_data)
     test_equal<long>(-500);
     test_equal<unsigned long>(0xFFFF5);
 
+    test_equal<long long>(-500LL);
+    test_equal<unsigned long long>(0xFFFF5ULL);
+
     test_equal<float>(-5.0f);
     test_equal<double>(120.0);
 
@@ -193,6 +199,12 @@ static MunitResult test_compare(const MunitParameter params[], void* user_data)
 
     test_not_equal<unsigned long, unsigned long>(500, 501);
     test_not_equal<unsigned long, long>(500, 500);
+
+    test_not_equal<long long, long long>(500LL, 501LL);
+    test_not_equal<long long, unsigned long long>(500LL, 500ULL);
+
+    test_not_equal<unsigned long long, unsigned long long>(500ULL, 501ULL);
+    test_not_equal<unsigned long long, long long>(500ULL, 500LL);
 
     test_not_equal<float, float>(-5.0f, -10.0f);
     test_not_equal<float, int>(-5.0f, 1);
@@ -232,6 +244,9 @@ static MunitResult test_clear(const MunitParameter params[], void* user_data)
 
     test_clear_type<long>(-500);
     test_clear_type<unsigned long>(0xFFFF5);
+
+    test_clear_type<long long>(-500LL);
+    test_clear_type<unsigned long long>(0xFFFF5ULL);
 
     test_clear_type<float>(-5.0f);
     test_clear_type<double>(120.0);

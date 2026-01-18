@@ -112,6 +112,10 @@ static MunitResult test_from_value(const MunitParameter params[], void* user_dat
     TEST_VARIANT_FROM_VALUE(unsigned long, 0xFFFF6, sail_set_variant_unsigned_long, SAIL_VARIANT_TYPE_UNSIGNED_LONG,
                             sail_variant_to_unsigned_long);
 
+    TEST_VARIANT_FROM_VALUE(long long, 0xFFFF7LL, sail_set_variant_long_long, SAIL_VARIANT_TYPE_LONG_LONG, sail_variant_to_long_long);
+    TEST_VARIANT_FROM_VALUE(unsigned long long, 0xFFFF7ULL, sail_set_variant_unsigned_long_long, SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG,
+                            sail_variant_to_unsigned_long_long);
+
     TEST_VARIANT_FROM_VALUE(float, 160.f, sail_set_variant_float, SAIL_VARIANT_TYPE_FLOAT, sail_variant_to_float);
     TEST_VARIANT_FROM_VALUE(double, 29555.0, sail_set_variant_double, SAIL_VARIANT_TYPE_DOUBLE, sail_variant_to_double);
 
@@ -235,6 +239,12 @@ static MunitResult test_set(const MunitParameter params[], void* user_data)
     munit_assert(sail_set_variant_unsigned_long(variant, 0xFFFFFF9) == SAIL_OK);
     munit_assert(sail_variant_to_unsigned_long(variant) == 0xFFFFFF9);
 
+    munit_assert(sail_set_variant_long_long(variant, 0xFFFFA) == SAIL_OK);
+    munit_assert(sail_variant_to_long_long(variant) == 0xFFFFA);
+
+    munit_assert(sail_set_variant_unsigned_long_long(variant, 0xFFFFFFA) == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_long_long(variant) == 0xFFFFFFA);
+
     munit_assert(sail_set_variant_string(variant, "abc") == SAIL_OK);
     munit_assert(strcmp(sail_variant_to_string(variant), "abc") == 0);
 
@@ -273,6 +283,12 @@ static MunitResult test_snprintf(const MunitParameter params[], void* user_data)
     sail_set_variant_int(variant, 105);
     munit_assert(sail_snprintf_variant(variant, buffer, sizeof(buffer)) == 3);
     munit_assert_string_equal(buffer, "105");
+
+    sail_set_variant_long_long(variant, 9223372036854775807LL);
+    munit_assert(sail_snprintf_variant(variant, buffer, sizeof(buffer)) > 0);
+
+    sail_set_variant_unsigned_long_long(variant, 18446744073709551615ULL);
+    munit_assert(sail_snprintf_variant(variant, buffer, sizeof(buffer)) > 0);
 
     sail_destroy_variant(variant);
 
