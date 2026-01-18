@@ -58,7 +58,7 @@ enum SailVariantType
     SAIL_VARIANT_TYPE_DATA,
     SAIL_VARIANT_TYPE_INVALID,
 
-    /* Since 0.9.11. */
+    /* Since 1.0.0. */
     SAIL_VARIANT_TYPE_LONG_LONG,
     SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG,
 };
