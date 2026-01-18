@@ -108,6 +108,52 @@ sail_status_t sail_put_hash_map(struct sail_hash_map* hash_map, const char* key,
     return SAIL_OK;
 }
 
+sail_status_t sail_put_hash_map_shallow(struct sail_hash_map* hash_map, const char* key, struct sail_variant* value)
+{
+    SAIL_CHECK_PTR(hash_map);
+    SAIL_CHECK_PTR(key);
+    SAIL_CHECK_PTR(value);
+
+    struct sail_variant_node** key_variant_node;
+
+    for (key_variant_node = &hash_map->buckets[calculate_hash(key)]; *key_variant_node != NULL;
+         key_variant_node = &(*key_variant_node)->next->next)
+    {
+        struct sail_variant_node* value_variant_node = (*key_variant_node)->next;
+
+        if (strcmp(sail_variant_to_string((*key_variant_node)->variant), key) == 0)
+        {
+            if (!sail_equal_variants(value_variant_node->variant, value))
+            {
+                /* Overwrite value. */
+                sail_destroy_variant(value_variant_node->variant);
+                value_variant_node->variant = value;
+            }
+            else
+            {
+                /* Same value, destroy the passed variant. */
+                sail_destroy_variant(value);
+            }
+
+            return SAIL_OK;
+        }
+    }
+
+    struct sail_variant_node* local_variant_node;
+
+    SAIL_TRY(sail_alloc_variant_node_and_value(&local_variant_node));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_string(local_variant_node->variant, key),
+                        /* cleanup */ sail_destroy_variant_node_chain(local_variant_node));
+
+    SAIL_TRY_OR_CLEANUP(sail_alloc_variant_node(&local_variant_node->next),
+                        /* cleanup */ sail_destroy_variant_node_chain(local_variant_node));
+    local_variant_node->next->variant = value;
+
+    *key_variant_node = local_variant_node;
+
+    return SAIL_OK;
+}
+
 bool sail_hash_map_has_key(const struct sail_hash_map* hash_map, const char* key)
 {
     if (key == NULL)
@@ -252,6 +298,261 @@ sail_status_t sail_copy_hash_map(const struct sail_hash_map* source_hash_map, st
     }
 
     *target_hash_map = hash_map_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_bool(struct sail_hash_map* hash_map, const char* key, bool value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_bool(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_char(struct sail_hash_map* hash_map, const char* key, char value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_char(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_unsigned_char(struct sail_hash_map* hash_map, const char* key, unsigned char value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_unsigned_char(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_short(struct sail_hash_map* hash_map, const char* key, short value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_short(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_unsigned_short(struct sail_hash_map* hash_map, const char* key, unsigned short value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_unsigned_short(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_int(struct sail_hash_map* hash_map, const char* key, int value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_int(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_unsigned_int(struct sail_hash_map* hash_map, const char* key, unsigned int value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_unsigned_int(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_long(struct sail_hash_map* hash_map, const char* key, long value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_long(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_unsigned_long(struct sail_hash_map* hash_map, const char* key, unsigned long value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_unsigned_long(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_long_long(struct sail_hash_map* hash_map, const char* key, long long value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_long_long(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_unsigned_long_long(struct sail_hash_map* hash_map, const char* key, unsigned long long value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_unsigned_long_long(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_float(struct sail_hash_map* hash_map, const char* key, float value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_float(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_double(struct sail_hash_map* hash_map, const char* key, double value)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_double(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_string(struct sail_hash_map* hash_map, const char* key, const char* value)
+{
+    if (hash_map == NULL || value == NULL || value[0] == '\0')
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_string(variant, value),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_put_hash_map_data(struct sail_hash_map* hash_map, const char* key, const void* value, size_t size)
+{
+    if (hash_map == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    struct sail_variant* variant;
+    SAIL_TRY(sail_alloc_variant(&variant));
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_data(variant, value, size),
+                        /* cleanup */ sail_destroy_variant(variant));
+    SAIL_TRY_OR_CLEANUP(sail_put_hash_map_shallow(hash_map, key, variant),
+                        /* cleanup */ sail_destroy_variant(variant));
 
     return SAIL_OK;
 }

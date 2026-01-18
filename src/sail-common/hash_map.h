@@ -26,6 +26,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h> /* size_t */
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -58,6 +59,16 @@ SAIL_EXPORT void sail_destroy_hash_map(struct sail_hash_map* hash_map);
 SAIL_EXPORT sail_status_t sail_put_hash_map(struct sail_hash_map* hash_map,
                                             const char* key,
                                             const struct sail_variant* value);
+
+/*
+ * Puts a new key-value pair into the hash map. Takes ownership of the variant.
+ * The variant will be destroyed when the hash map is destroyed or when the key is erased.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_shallow(struct sail_hash_map* hash_map,
+                                                     const char* key,
+                                                     struct sail_variant* value);
 
 /*
  * Returns true if the hash map contains the specified key.
@@ -109,6 +120,139 @@ SAIL_EXPORT void sail_clear_hash_map(struct sail_hash_map* hash_map);
  */
 SAIL_EXPORT sail_status_t sail_copy_hash_map(const struct sail_hash_map* source_hash_map,
                                              struct sail_hash_map** target_hash_map);
+
+/*
+ * Creates a variant with the specified boolean value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_bool(struct sail_hash_map* hash_map, const char* key, bool value);
+
+/*
+ * Creates a variant with the specified char value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_char(struct sail_hash_map* hash_map, const char* key, char value);
+
+/*
+ * Creates a variant with the specified unsigned char value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_unsigned_char(struct sail_hash_map* hash_map,
+                                                          const char* key,
+                                                          unsigned char value);
+
+/*
+ * Creates a variant with the specified short value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_short(struct sail_hash_map* hash_map, const char* key, short value);
+
+/*
+ * Creates a variant with the specified unsigned short value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_unsigned_short(struct sail_hash_map* hash_map,
+                                                           const char* key,
+                                                           unsigned short value);
+
+/*
+ * Creates a variant with the specified int value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_int(struct sail_hash_map* hash_map, const char* key, int value);
+
+/*
+ * Creates a variant with the specified unsigned int value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_unsigned_int(struct sail_hash_map* hash_map,
+                                                         const char* key,
+                                                         unsigned int value);
+
+/*
+ * Creates a variant with the specified long value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_long(struct sail_hash_map* hash_map, const char* key, long value);
+
+/*
+ * Creates a variant with the specified unsigned long value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_unsigned_long(struct sail_hash_map* hash_map,
+                                                          const char* key,
+                                                          unsigned long value);
+
+/*
+ * Creates a variant with the specified long long value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_long_long(struct sail_hash_map* hash_map, const char* key, long long value);
+
+/*
+ * Creates a variant with the specified unsigned long long value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_unsigned_long_long(struct sail_hash_map* hash_map,
+                                                               const char* key,
+                                                               unsigned long long value);
+
+/*
+ * Creates a variant with the specified float value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_float(struct sail_hash_map* hash_map, const char* key, float value);
+
+/*
+ * Creates a variant with the specified double value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_double(struct sail_hash_map* hash_map, const char* key, double value);
+
+/*
+ * Creates a variant with the specified string value and puts it into the hash map.
+ * If hash_map is NULL, or value is NULL or empty, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_string(struct sail_hash_map* hash_map, const char* key, const char* value);
+
+/*
+ * Creates a variant with the specified data value and puts it into the hash map.
+ * If hash_map is NULL, does nothing and returns SAIL_OK.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_put_hash_map_data(struct sail_hash_map* hash_map,
+                                                 const char* key,
+                                                 const void* value,
+                                                 size_t size);
 
 /* extern "C" */
 #ifdef __cplusplus
