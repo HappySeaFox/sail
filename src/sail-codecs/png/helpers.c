@@ -825,26 +825,18 @@ sail_status_t png_private_store_num_frames_and_plays(png_structp png_ptr,
                                                      png_infop info_ptr,
                                                      struct sail_hash_map* special_properties)
 {
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
     const unsigned num_frames = png_get_num_frames(png_ptr, info_ptr);
     const unsigned num_plays  = png_get_num_plays(png_ptr, info_ptr);
 
     SAIL_LOG_TRACE("PNG: Number of frames: %u", num_frames);
-    sail_set_variant_unsigned_int(variant, num_frames);
-    sail_put_hash_map(special_properties, "apng-frames", variant);
+    SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "apng-frames", num_frames));
 
     SAIL_LOG_TRACE("PNG: Number of plays: %u", num_plays);
-    sail_set_variant_unsigned_int(variant, num_plays);
-    sail_put_hash_map(special_properties, "apng-plays", variant);
+    SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "apng-plays", num_plays));
 
     const bool first_frame_hidden = png_get_first_frame_is_hidden(png_ptr, info_ptr);
     SAIL_LOG_TRACE("PNG: First frame is hidden: %s", first_frame_hidden ? "yes" : "no");
-    sail_set_variant_bool(variant, first_frame_hidden);
-    sail_put_hash_map(special_properties, "apng-first-frame-hidden", variant);
-
-    sail_destroy_variant(variant);
+    SAIL_TRY(sail_put_hash_map_bool(special_properties, "apng-first-frame-hidden", first_frame_hidden));
 
     return SAIL_OK;
 }

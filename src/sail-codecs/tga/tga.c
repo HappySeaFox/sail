@@ -193,31 +193,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, st
 
         special_properties = image_local->source_image->special_properties;
 
-        /* Add file header specific properties. */
-        struct sail_variant* variant;
-        SAIL_TRY(sail_alloc_variant(&variant));
-
         /* Origin X coordinate. */
-        sail_set_variant_unsigned_short(variant, tga_state->file_header.x);
-        sail_put_hash_map(special_properties, "tga-origin-x", variant);
+        SAIL_TRY(sail_put_hash_map_unsigned_short(special_properties, "tga-origin-x", tga_state->file_header.x));
 
         /* Origin Y coordinate. */
-        sail_set_variant_unsigned_short(variant, tga_state->file_header.y);
-        sail_put_hash_map(special_properties, "tga-origin-y", variant);
+        SAIL_TRY(sail_put_hash_map_unsigned_short(special_properties, "tga-origin-y", tga_state->file_header.y));
 
         /* Alpha bits (bits 0-3 of descriptor). */
-        sail_set_variant_unsigned_char(variant, tga_state->file_header.descriptor & 0x0F);
-        sail_put_hash_map(special_properties, "tga-alpha-bits", variant);
+        SAIL_TRY(sail_put_hash_map_unsigned_char(special_properties, "tga-alpha-bits",
+                                                 tga_state->file_header.descriptor & 0x0F));
 
         /* Flipped horizontally. */
-        sail_set_variant_bool(variant, tga_state->flipped_h);
-        sail_put_hash_map(special_properties, "tga-flipped-h", variant);
+        SAIL_TRY(sail_put_hash_map_bool(special_properties, "tga-flipped-h", tga_state->flipped_h));
 
         /* Flipped vertically. */
-        sail_set_variant_bool(variant, tga_state->flipped_v);
-        sail_put_hash_map(special_properties, "tga-flipped-v", variant);
-
-        sail_destroy_variant(variant);
+        SAIL_TRY(sail_put_hash_map_bool(special_properties, "tga-flipped-v", tga_state->flipped_v));
     }
 
     /* Identificator. */
@@ -238,9 +228,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, st
             tga_state->io->seek(tga_state->io->stream, (long)tga_state->footer.extension_area_offset, SEEK_SET),
             /* cleanup */ sail_destroy_image(image_local));
 
-        SAIL_TRY_OR_CLEANUP(
-            tga_private_fetch_extension(tga_state->io, &image_local->gamma, &image_local->meta_data_node, special_properties),
-            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(tga_private_fetch_extension(tga_state->io, &image_local->gamma,
+                                                        &image_local->meta_data_node, special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
 
         SAIL_TRY_OR_CLEANUP(tga_state->io->seek(tga_state->io->stream, (long)offset, SEEK_SET),
                             /* cleanup */ sail_destroy_image(image_local));
@@ -400,9 +390,15 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tga(void* state, co
     {
         switch (image_type)
         {
-        case TGA_INDEXED: image_type = TGA_INDEXED_RLE; break;
-        case TGA_TRUE_COLOR: image_type = TGA_TRUE_COLOR_RLE; break;
-        case TGA_GRAY: image_type = TGA_GRAY_RLE; break;
+        case TGA_INDEXED:
+            image_type = TGA_INDEXED_RLE;
+            break;
+        case TGA_TRUE_COLOR:
+            image_type = TGA_TRUE_COLOR_RLE;
+            break;
+        case TGA_GRAY:
+            image_type = TGA_GRAY_RLE;
+            break;
         }
     }
     else if (tga_state->save_options->compression != SAIL_COMPRESSION_NONE)

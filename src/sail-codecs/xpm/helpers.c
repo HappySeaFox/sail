@@ -1440,18 +1440,11 @@ sail_status_t xpm_private_store_hotspot(int x_hotspot, int y_hotspot, struct sai
         return SAIL_OK;
     }
 
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
     SAIL_LOG_TRACE("XPM: X hotspot(%d)", x_hotspot);
-    sail_set_variant_int(variant, x_hotspot);
-    sail_put_hash_map(special_properties, "xpm-hotspot-x", variant);
+    SAIL_TRY(sail_put_hash_map_int(special_properties, "xpm-hotspot-x", x_hotspot));
 
     SAIL_LOG_TRACE("XPM: Y hotspot(%d)", y_hotspot);
-    sail_set_variant_int(variant, y_hotspot);
-    sail_put_hash_map(special_properties, "xpm-hotspot-y", variant);
-
-    sail_destroy_variant(variant);
+    SAIL_TRY(sail_put_hash_map_int(special_properties, "xpm-hotspot-y", y_hotspot));
 
     return SAIL_OK;
 }

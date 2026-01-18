@@ -615,51 +615,39 @@ void hdr_private_destroy_header(struct hdr_header* header)
 
 sail_status_t hdr_private_store_properties(const struct hdr_header* header, struct sail_hash_map* special_properties)
 {
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
     /* Store exposure (always, as it's important for HDR). */
     SAIL_LOG_TRACE("HDR: Storing exposure=%f", header->exposure);
-    sail_set_variant_float(variant, header->exposure);
-    sail_put_hash_map(special_properties, "hdr-exposure", variant);
+    SAIL_TRY(sail_put_hash_map_float(special_properties, "hdr-exposure", header->exposure));
 
     /* Store gamma (always, as it's important for HDR). */
     SAIL_LOG_TRACE("HDR: Storing gamma=%f", header->gamma);
-    sail_set_variant_float(variant, header->gamma);
-    sail_put_hash_map(special_properties, "hdr-gamma", variant);
+    SAIL_TRY(sail_put_hash_map_float(special_properties, "hdr-gamma", header->gamma));
 
     /* Store view. */
     if (header->view != NULL)
     {
-        sail_set_variant_string(variant, header->view);
-        sail_put_hash_map(special_properties, "hdr-view", variant);
+        SAIL_TRY(sail_put_hash_map_string(special_properties, "hdr-view", header->view));
     }
 
     /* Store primaries. */
     if (header->primaries != NULL)
     {
-        sail_set_variant_string(variant, header->primaries);
-        sail_put_hash_map(special_properties, "hdr-primaries", variant);
+        SAIL_TRY(sail_put_hash_map_string(special_properties, "hdr-primaries", header->primaries));
     }
 
     /* Store color correction. */
     if (header->colorcorr[0] != 1.0f)
     {
-        sail_set_variant_float(variant, header->colorcorr[0]);
-        sail_put_hash_map(special_properties, "hdr-color-correction-1", variant);
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "hdr-color-correction-1", header->colorcorr[0]));
     }
     if (header->colorcorr[1] != 1.0f)
     {
-        sail_set_variant_float(variant, header->colorcorr[1]);
-        sail_put_hash_map(special_properties, "hdr-color-correction-2", variant);
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "hdr-color-correction-2", header->colorcorr[1]));
     }
     if (header->colorcorr[2] != 1.0f)
     {
-        sail_set_variant_float(variant, header->colorcorr[2]);
-        sail_put_hash_map(special_properties, "hdr-color-correction-3", variant);
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "hdr-color-correction-3", header->colorcorr[2]));
     }
-
-    sail_destroy_variant(variant);
 
     return SAIL_OK;
 }

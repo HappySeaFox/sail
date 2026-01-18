@@ -375,24 +375,14 @@ sail_status_t heif_private_fetch_depth_info(const struct heif_image_handle* imag
 
     if (has_depth)
     {
-        struct sail_variant* variant;
-        SAIL_TRY(sail_alloc_variant(&variant));
-
-        sail_set_variant_bool(variant, true);
-        SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, "heif-has-depth", variant),
-                            /* cleanup */ sail_destroy_variant(variant));
+        SAIL_TRY(sail_put_hash_map_bool(special_properties, "heif-has-depth", true));
 
         /* Get depth image count */
         int depth_count = heif_image_handle_get_number_of_depth_images(image_handle);
         if (depth_count > 0)
         {
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_int(variant, depth_count);
-            SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, "heif-depth-count", variant),
-                                /* cleanup */ sail_destroy_variant(variant));
+            SAIL_TRY(sail_put_hash_map_int(special_properties, "heif-depth-count", depth_count));
         }
-
-        sail_destroy_variant(variant);
     }
 
     return SAIL_OK;
@@ -412,14 +402,7 @@ sail_status_t heif_private_fetch_thumbnail_info(const struct heif_image_handle* 
 
     if (thumbnail_count > 0)
     {
-        struct sail_variant* variant;
-        SAIL_TRY(sail_alloc_variant(&variant));
-
-        sail_set_variant_int(variant, thumbnail_count);
-        SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, "heif-thumbnail-count", variant),
-                            /* cleanup */ sail_destroy_variant(variant));
-
-        sail_destroy_variant(variant);
+        SAIL_TRY(sail_put_hash_map_int(special_properties, "heif-thumbnail-count", thumbnail_count));
     }
 
     return SAIL_OK;
@@ -439,14 +422,7 @@ sail_status_t heif_private_fetch_primary_flag(const struct heif_image_handle* im
 
     if (is_primary)
     {
-        struct sail_variant* variant;
-        SAIL_TRY(sail_alloc_variant(&variant));
-
-        sail_set_variant_bool(variant, true);
-        SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, "heif-is-primary", variant),
-                            /* cleanup */ sail_destroy_variant(variant));
-
-        sail_destroy_variant(variant);
+        SAIL_TRY(sail_put_hash_map_bool(special_properties, "heif-is-primary", true));
     }
 
     return SAIL_OK;
@@ -467,24 +443,16 @@ sail_status_t heif_private_fetch_hdr_metadata(const struct heif_image* heif_imag
 
     if (cll.max_content_light_level > 0 || cll.max_pic_average_light_level > 0)
     {
-        struct sail_variant* variant;
-
         if (cll.max_content_light_level > 0)
         {
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_unsigned_int(variant, cll.max_content_light_level);
-            SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, "heif-content-light-level-max", variant),
-                                /* cleanup */ sail_destroy_variant(variant));
-            sail_destroy_variant(variant);
+            SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "heif-content-light-level-max",
+                                                    cll.max_content_light_level));
         }
 
         if (cll.max_pic_average_light_level > 0)
         {
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_unsigned_int(variant, cll.max_pic_average_light_level);
-            SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, "heif-content-light-level-avg", variant),
-                                /* cleanup */ sail_destroy_variant(variant));
-            sail_destroy_variant(variant);
+            SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "heif-content-light-level-avg",
+                                                    cll.max_pic_average_light_level));
         }
     }
 

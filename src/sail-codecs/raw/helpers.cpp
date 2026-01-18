@@ -184,145 +184,6 @@ sail_status_t raw_private_fetch_meta_data(libraw_data_t* raw_data,
     return SAIL_OK;
 }
 
-static sail_status_t store_float_property(struct sail_hash_map* special_properties, const char* key, float value)
-{
-    if (special_properties == NULL)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
-    sail_set_variant_float(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_unsigned_int_property(struct sail_hash_map* special_properties,
-                                                 const char* key,
-                                                 unsigned value)
-{
-    if (special_properties == NULL)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
-    sail_set_variant_unsigned_int(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_int_property(struct sail_hash_map* special_properties, const char* key, int value)
-{
-    if (special_properties == NULL)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
-    sail_set_variant_int(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_ushort_property(struct sail_hash_map* special_properties,
-                                           const char* key,
-                                           unsigned short value)
-{
-    if (special_properties == NULL)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
-    sail_set_variant_unsigned_short(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_bool_property(struct sail_hash_map* special_properties, const char* key, bool value)
-{
-    if (special_properties == NULL)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
-    sail_set_variant_bool(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_string_property(struct sail_hash_map* special_properties, const char* key, const char* value)
-{
-    if (special_properties == NULL || value == NULL || value[0] == '\0')
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
-    sail_set_variant_string(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_unsigned_long_long_property(struct sail_hash_map* special_properties,
-                                                       const char* key,
-                                                       unsigned long long value)
-{
-    if (special_properties == NULL)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
-    // Use unsigned long as closest match for unsigned long long.
-    sail_set_variant_unsigned_long(variant, static_cast<unsigned long>(value));
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
 
 sail_status_t raw_private_store_special_properties(libraw_data_t* raw_data, struct sail_hash_map* special_properties)
 {
@@ -335,19 +196,19 @@ sail_status_t raw_private_store_special_properties(libraw_data_t* raw_data, stru
 
     if (raw_data->other.iso_speed > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-iso", raw_data->other.iso_speed));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-iso", raw_data->other.iso_speed));
     }
     if (raw_data->other.shutter > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-shutter", raw_data->other.shutter));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-shutter", raw_data->other.shutter));
     }
     if (raw_data->other.aperture > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-aperture", raw_data->other.aperture));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-aperture", raw_data->other.aperture));
     }
     if (raw_data->other.focal_len > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-focal-length", raw_data->other.focal_len));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-focal-length", raw_data->other.focal_len));
     }
 
     // Temperatures are not directly available in libraw_imgother_t.
@@ -356,39 +217,41 @@ sail_status_t raw_private_store_special_properties(libraw_data_t* raw_data, stru
     // Lens parameters from libraw_lensinfo_t.
     if (raw_data->lens.makernotes.LensID != 0)
     {
-        SAIL_TRY(
-            store_unsigned_long_long_property(special_properties, "raw-lens-id", raw_data->lens.makernotes.LensID));
+        SAIL_TRY(sail_put_hash_map_unsigned_long_long(special_properties, "raw-lens-id",
+                                                        raw_data->lens.makernotes.LensID));
     }
-    SAIL_TRY(store_string_property(special_properties, "raw-lens", raw_data->lens.Lens));
+    SAIL_TRY(sail_put_hash_map_string(special_properties, "raw-lens", raw_data->lens.Lens));
     if (raw_data->lens.MinFocal > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-min-focal-length", raw_data->lens.MinFocal));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-min-focal-length", raw_data->lens.MinFocal));
     }
     if (raw_data->lens.MaxFocal > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-max-focal-length", raw_data->lens.MaxFocal));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-max-focal-length", raw_data->lens.MaxFocal));
     }
     if (raw_data->lens.MaxAp4MinFocal > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-max-aperture-min-focal", raw_data->lens.MaxAp4MinFocal));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-max-aperture-min-focal",
+                                          raw_data->lens.MaxAp4MinFocal));
     }
     if (raw_data->lens.MaxAp4MaxFocal > 0.0f)
     {
-        SAIL_TRY(store_float_property(special_properties, "raw-max-aperture-max-focal", raw_data->lens.MaxAp4MaxFocal));
+        SAIL_TRY(sail_put_hash_map_float(special_properties, "raw-max-aperture-max-focal",
+                                         raw_data->lens.MaxAp4MaxFocal));
     }
     if (raw_data->lens.FocalLengthIn35mmFormat > 0)
     {
-        SAIL_TRY(store_ushort_property(special_properties, "raw-focal-length-in-35mm-format",
-                                       raw_data->lens.FocalLengthIn35mmFormat));
+        SAIL_TRY(sail_put_hash_map_unsigned_short(special_properties, "raw-focal-length-in-35mm-format",
+                                                    raw_data->lens.FocalLengthIn35mmFormat));
     }
 
-    SAIL_TRY(store_unsigned_int_property(special_properties, "raw-filters", raw_data->idata.filters));
-    SAIL_TRY(store_int_property(special_properties, "raw-colors", raw_data->idata.colors));
-    SAIL_TRY(store_ushort_property(special_properties, "raw-width", raw_data->sizes.raw_width));
-    SAIL_TRY(store_ushort_property(special_properties, "raw-height", raw_data->sizes.raw_height));
-    SAIL_TRY(store_ushort_property(special_properties, "raw-top-margin", raw_data->sizes.top_margin));
-    SAIL_TRY(store_ushort_property(special_properties, "raw-left-margin", raw_data->sizes.left_margin));
-    SAIL_TRY(store_bool_property(special_properties, "raw-is-foveon", raw_data->idata.is_foveon != 0));
+    SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "raw-filters", raw_data->idata.filters));
+    SAIL_TRY(sail_put_hash_map_int(special_properties, "raw-colors", raw_data->idata.colors));
+    SAIL_TRY(sail_put_hash_map_unsigned_short(special_properties, "raw-width", raw_data->sizes.raw_width));
+    SAIL_TRY(sail_put_hash_map_unsigned_short(special_properties, "raw-height", raw_data->sizes.raw_height));
+    SAIL_TRY(sail_put_hash_map_unsigned_short(special_properties, "raw-top-margin", raw_data->sizes.top_margin));
+    SAIL_TRY(sail_put_hash_map_unsigned_short(special_properties, "raw-left-margin", raw_data->sizes.left_margin));
+    SAIL_TRY(sail_put_hash_map_bool(special_properties, "raw-is-foveon", raw_data->idata.is_foveon != 0));
 
     return SAIL_OK;
 }

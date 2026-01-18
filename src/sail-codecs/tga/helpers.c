@@ -341,11 +341,7 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
 
         if (special_properties != NULL && key_color != 0)
         {
-            struct sail_variant* variant;
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_unsigned_int(variant, key_color);
-            sail_put_hash_map(special_properties, "tga-key-color", variant);
-            sail_destroy_variant(variant);
+            SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "tga-key-color", key_color));
         }
     }
 
@@ -357,11 +353,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
 
         if (special_properties != NULL && pixel_aspect_denom != 0)
         {
-            struct sail_variant* variant;
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_double(variant, (double)pixel_aspect_num / pixel_aspect_denom);
-            sail_put_hash_map(special_properties, "tga-pixel-aspect-ratio", variant);
-            sail_destroy_variant(variant);
+            SAIL_TRY(sail_put_hash_map_double(special_properties, "tga-pixel-aspect-ratio",
+                                              (double)pixel_aspect_num / pixel_aspect_denom));
         }
     }
 
@@ -384,11 +377,8 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
 
         if (special_properties != NULL && color_correction_offset != 0)
         {
-            struct sail_variant* variant;
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_unsigned_int(variant, color_correction_offset);
-            sail_put_hash_map(special_properties, "tga-color-correction-offset", variant);
-            sail_destroy_variant(variant);
+            SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "tga-color-correction-offset",
+                                                      color_correction_offset));
         }
     }
 
@@ -402,11 +392,7 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
 
         if (special_properties != NULL && scan_line_offset != 0)
         {
-            struct sail_variant* variant;
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_unsigned_int(variant, scan_line_offset);
-            sail_put_hash_map(special_properties, "tga-scan-line-offset", variant);
-            sail_destroy_variant(variant);
+            SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "tga-scan-line-offset", scan_line_offset));
         }
     }
 
@@ -417,11 +403,7 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
 
         if (special_properties != NULL)
         {
-            struct sail_variant* variant;
-            SAIL_TRY(sail_alloc_variant(&variant));
-            sail_set_variant_unsigned_char(variant, attributes_type);
-            sail_put_hash_map(special_properties, "tga-attributes-type", variant);
-            sail_destroy_variant(variant);
+            SAIL_TRY(sail_put_hash_map_unsigned_char(special_properties, "tga-attributes-type", attributes_type));
         }
     }
 

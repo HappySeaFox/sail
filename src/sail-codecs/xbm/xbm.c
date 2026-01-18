@@ -210,21 +210,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
         SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
                             /* cleanup */ sail_destroy_image(image_local));
 
-        struct sail_variant* variant;
-        SAIL_TRY_OR_CLEANUP(sail_alloc_variant(&variant),
+        const char* version_str = (xbm_state->version == SAIL_XBM_VERSION_10) ? "X10" : "X11";
+        SAIL_TRY_OR_CLEANUP(sail_put_hash_map_string(image_local->source_image->special_properties, "xbm-version",
+                                                      version_str),
                             /* cleanup */ sail_destroy_image(image_local));
-
-        if (xbm_state->version == SAIL_XBM_VERSION_10)
-        {
-            sail_set_variant_string(variant, "X10");
-        }
-        else
-        {
-            sail_set_variant_string(variant, "X11");
-        }
-
-        sail_put_hash_map(image_local->source_image->special_properties, "xbm-version", variant);
-        sail_destroy_variant(variant);
     }
 
     *image = image_local;

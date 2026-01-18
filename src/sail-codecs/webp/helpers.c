@@ -187,14 +187,8 @@ sail_status_t webp_private_store_loop_count(WebPDemuxer* webp_demux, struct sail
     {
         const uint32_t loop_count = WebPDemuxGetI(webp_demux, WEBP_FF_LOOP_COUNT);
 
-        struct sail_variant* variant;
-        SAIL_TRY(sail_alloc_variant(&variant));
-
         SAIL_LOG_TRACE("WEBP: Loop count: %u", loop_count);
-        sail_set_variant_unsigned_int(variant, loop_count);
-        sail_put_hash_map(special_properties, "webp-loop-count", variant);
-
-        sail_destroy_variant(variant);
+        SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "webp-loop-count", loop_count));
     }
 
     return SAIL_OK;

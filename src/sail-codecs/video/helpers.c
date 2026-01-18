@@ -438,58 +438,6 @@ static const char* av_level_to_string(int level)
     return level_str;
 }
 
-static sail_status_t store_unsigned_long_long_property(struct sail_hash_map* special_properties,
-                                                        const char* key,
-                                                        unsigned long long value)
-{
-    if (special_properties == NULL)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-    sail_set_variant_unsigned_long_long(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_string_property(struct sail_hash_map* special_properties, const char* key, const char* value)
-{
-    if (special_properties == NULL || value == NULL || value[0] == '\0')
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-    sail_set_variant_string(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
-
-static sail_status_t store_double_property(struct sail_hash_map* special_properties, const char* key, double value)
-{
-    if (special_properties == NULL || value == 0.0)
-    {
-        return SAIL_OK;
-    }
-
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-    sail_set_variant_double(variant, value);
-    SAIL_TRY_OR_CLEANUP(sail_put_hash_map(special_properties, key, variant),
-                        /* cleanup */ sail_destroy_variant(variant));
-    sail_destroy_variant(variant);
-
-    return SAIL_OK;
-}
 
 sail_status_t video_private_fetch_special_properties(struct AVFormatContext* format_ctx,
                                                      struct AVStream* video_stream,
@@ -506,14 +454,14 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         const char* codec_name = avcodec_get_name(codecpar->codec_id);
         if (codec_name != NULL)
         {
-            SAIL_TRY(store_string_property(special_properties, "video-codec", codec_name));
+            SAIL_TRY(sail_put_hash_map_string(special_properties, "video-codec", codec_name));
         }
     }
 
     /* Bitrate. */
     if (codecpar->bit_rate > 0)
     {
-        SAIL_TRY(store_unsigned_long_long_property(special_properties, "video-bitrate", (unsigned long long)codecpar->bit_rate));
+        SAIL_TRY(sail_put_hash_map_unsigned_long_long(special_properties, "video-bitrate", (unsigned long long)codecpar->bit_rate));
     }
 
     /* Profile (check for unknown values). */
@@ -522,7 +470,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         const char* profile_name = avcodec_profile_name(codecpar->codec_id, codecpar->profile);
         if (profile_name != NULL)
         {
-            SAIL_TRY(store_string_property(special_properties, "video-profile", profile_name));
+            SAIL_TRY(sail_put_hash_map_string(special_properties, "video-profile", profile_name));
         }
     }
 
@@ -530,28 +478,28 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     if (codecpar->level != AV_LEVEL_UNKNOWN && codecpar->level >= 0)
     {
         const char* level_str = av_level_to_string(codecpar->level);
-        SAIL_TRY(store_string_property(special_properties, "video-level", level_str));
+        SAIL_TRY(sail_put_hash_map_string(special_properties, "video-level", level_str));
     }
 
     /* Framerate from codecpar (constant framerate). */
     if (codecpar->framerate.num > 0 && codecpar->framerate.den > 0)
     {
         double framerate = av_rational_to_double(codecpar->framerate);
-        SAIL_TRY(store_double_property(special_properties, "video-framerate", framerate));
+        SAIL_TRY(sail_put_hash_map_double(special_properties, "video-framerate", framerate));
     }
 
     /* Estimated framerate from stream. */
     if (video_stream->r_frame_rate.num > 0 && video_stream->r_frame_rate.den > 0)
     {
         double r_framerate = av_rational_to_double(video_stream->r_frame_rate);
-        SAIL_TRY(store_double_property(special_properties, "video-estimated-framerate", r_framerate));
+        SAIL_TRY(sail_put_hash_map_double(special_properties, "video-estimated-framerate", r_framerate));
     }
 
     /* Time base. */
     if (video_stream->time_base.num > 0 && video_stream->time_base.den > 0)
     {
         double time_base = av_rational_to_double(video_stream->time_base);
-        SAIL_TRY(store_double_property(special_properties, "video-time-base", time_base));
+        SAIL_TRY(sail_put_hash_map_double(special_properties, "video-time-base", time_base));
     }
 
     /* Color space. */
@@ -560,7 +508,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         const char* color_space_name = av_color_space_name(codecpar->color_space);
         if (color_space_name != NULL)
         {
-            SAIL_TRY(store_string_property(special_properties, "video-color-space", color_space_name));
+            SAIL_TRY(sail_put_hash_map_string(special_properties, "video-color-space", color_space_name));
         }
     }
 
@@ -570,7 +518,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         const char* color_range_name = av_color_range_name(codecpar->color_range);
         if (color_range_name != NULL)
         {
-            SAIL_TRY(store_string_property(special_properties, "video-color-range", color_range_name));
+            SAIL_TRY(sail_put_hash_map_string(special_properties, "video-color-range", color_range_name));
         }
     }
 
@@ -580,7 +528,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         const char* color_primaries_name = av_color_primaries_name(codecpar->color_primaries);
         if (color_primaries_name != NULL)
         {
-            SAIL_TRY(store_string_property(special_properties, "video-color-primaries", color_primaries_name));
+            SAIL_TRY(sail_put_hash_map_string(special_properties, "video-color-primaries", color_primaries_name));
         }
     }
 
@@ -590,7 +538,7 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         const char* color_transfer_name = av_color_transfer_name(codecpar->color_trc);
         if (color_transfer_name != NULL)
         {
-            SAIL_TRY(store_string_property(special_properties, "video-color-transfer", color_transfer_name));
+            SAIL_TRY(sail_put_hash_map_string(special_properties, "video-color-transfer", color_transfer_name));
         }
     }
 
@@ -600,15 +548,15 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         int64_t duration_ms = av_rescale_q(video_stream->duration, video_stream->time_base, (AVRational){1, 1000});
         if (duration_ms > 0)
         {
-            SAIL_TRY(store_unsigned_long_long_property(special_properties, "video-duration", (unsigned long long)duration_ms));
+            SAIL_TRY(sail_put_hash_map_unsigned_long_long(special_properties, "video-duration", (unsigned long long)duration_ms));
         }
     }
 
     /* Number of frames. */
     if (video_stream->nb_frames > 0)
     {
-        SAIL_TRY(store_unsigned_long_long_property(special_properties, "video-nb-frames",
-                                                   (unsigned long long)video_stream->nb_frames));
+        SAIL_TRY(sail_put_hash_map_unsigned_long_long(special_properties, "video-nb-frames",
+                                                       (unsigned long long)video_stream->nb_frames));
     }
 
     return SAIL_OK;

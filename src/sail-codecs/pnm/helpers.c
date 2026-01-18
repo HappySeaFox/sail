@@ -193,8 +193,7 @@ enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmVersion pnm_v
 
 sail_status_t pnm_private_store_ascii(enum SailPnmVersion pnm_version, struct sail_hash_map* special_properties)
 {
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
+    bool is_ascii = false;
 
     switch (pnm_version)
     {
@@ -202,19 +201,18 @@ sail_status_t pnm_private_store_ascii(enum SailPnmVersion pnm_version, struct sa
     case SAIL_PNM_VERSION_P2:
     case SAIL_PNM_VERSION_P3:
     {
-        sail_set_variant_bool(variant, true);
+        is_ascii = true;
         break;
     }
 
     default:
     {
-        sail_set_variant_bool(variant, false);
+        is_ascii = false;
+        break;
     }
     }
 
-    sail_put_hash_map(special_properties, "pnm-ascii", variant);
-
-    sail_destroy_variant(variant);
+    SAIL_TRY(sail_put_hash_map_bool(special_properties, "pnm-ascii", is_ascii));
 
     return SAIL_OK;
 }

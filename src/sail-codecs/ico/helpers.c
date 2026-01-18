@@ -72,18 +72,11 @@ sail_status_t ico_private_probe_image_type(struct sail_io* io, enum SailIcoImage
 sail_status_t ico_private_store_cur_hotspot(const struct SailIcoDirEntry* ico_dir_entry,
                                             struct sail_hash_map* special_properties)
 {
-    struct sail_variant* variant;
-    SAIL_TRY(sail_alloc_variant(&variant));
-
     SAIL_LOG_TRACE("CUR: X hotspot(%u)", ico_dir_entry->planes);
-    sail_set_variant_unsigned_int(variant, ico_dir_entry->planes);
-    sail_put_hash_map(special_properties, "cur-hotspot-x", variant);
+    SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "cur-hotspot-x", ico_dir_entry->planes));
 
     SAIL_LOG_TRACE("CUR: Y hotspot(%u)", ico_dir_entry->bit_count);
-    sail_set_variant_unsigned_int(variant, ico_dir_entry->bit_count);
-    sail_put_hash_map(special_properties, "cur-hotspot-y", variant);
-
-    sail_destroy_variant(variant);
+    SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "cur-hotspot-y", ico_dir_entry->bit_count));
 
     return SAIL_OK;
 }
