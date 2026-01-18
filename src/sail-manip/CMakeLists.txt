@@ -1,24 +1,42 @@
-add_library(sail-manip
-                cmyk.c
-                cmyk.h
-                conversion_options.c
-                conversion_options.h
-                convert.c
-                convert.h
-                fast_conversions.c
-                fast_conversions.h
-                manip_common.h
-                manip_utils.c
-                manip_utils.h
-                quantize.c
-                quantize.h
-                rotate.c
-                rotate.h
-                sail-manip.h
-                ycbcr.c
-                ycbcr.h
-                ycck.c
-                ycck.h)
+# Option to enable swscale support for pixel format conversion
+option(SAIL_MANIP_USE_SWSCALE "Use libswscale for pixel format conversion (faster, requires FFmpeg)" OFF)
+
+set(SAIL_MANIP_SOURCES
+    cmyk.c
+    cmyk.h
+    conversion_options.c
+    conversion_options.h
+    convert.c
+    convert.h
+    fast_conversions.c
+    fast_conversions.h
+    manip_common.h
+    manip_utils.c
+    manip_utils.h
+    quantize.c
+    quantize.h
+    rotate.c
+    rotate.h
+    sail-manip.h
+    ycbcr.c
+    ycbcr.h
+    ycck.c
+    ycck.h)
+
+if (SAIL_MANIP_USE_SWSCALE)
+    find_path(SAIL_SWSCALE_INCLUDE_DIR NAMES libswscale/swscale.h)
+    find_library(SAIL_SWSCALE_LIBS NAMES swscale)
+
+    if (SAIL_SWSCALE_INCLUDE_DIR AND SAIL_SWSCALE_LIBS)
+        message(STATUS "SAIL-MANIP: Using libswscale for pixel format conversion")
+        list(APPEND SAIL_MANIP_SOURCES swscale_conversions.c swscale_conversions.h)
+    else()
+        message(WARNING "SAIL-MANIP: libswscale not found, disabling SAIL_MANIP_USE_SWSCALE")
+        set(SAIL_MANIP_USE_SWSCALE OFF CACHE BOOL "Use libswscale for pixel format conversion" FORCE)
+    endif()
+endif()
+
+add_library(sail-manip ${SAIL_MANIP_SOURCES})
 
 # Build a list of public headers to install
 #
@@ -53,6 +71,12 @@ if (SAIL_HAVE_OPENMP)
 endif()
 
 target_link_libraries(sail-manip PUBLIC sail-common)
+
+if (SAIL_MANIP_USE_SWSCALE AND SAIL_SWSCALE_INCLUDE_DIR AND SAIL_SWSCALE_LIBS)
+    target_include_directories(sail-manip PRIVATE ${SAIL_SWSCALE_INCLUDE_DIR})
+    target_link_libraries(sail-manip PRIVATE ${SAIL_SWSCALE_LIBS})
+    target_compile_definitions(sail-manip PRIVATE SAIL_MANIP_USE_SWSCALE)
+endif()
 
 # pkg-config integration
 #

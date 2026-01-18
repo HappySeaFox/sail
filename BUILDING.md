@@ -32,6 +32,7 @@ brew install libsail
 - `SAIL_DISABLE_CODECS="a;b;c"` - Disable the codecs specified in this ';'-separated list. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Default: empty list
 - `SAIL_ENABLE_CODECS="a;b;c"` - Force-enable the codecs specified in this ';'-separated list. Configuration fails if an enabled codec cannot find its dependencies. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Other codecs may be enabled based on available dependencies. When set, `SAIL_ONLY_CODECS` is ignored. Default: empty list
 - `SAIL_ENABLE_OPENMP=ON|OFF` - Enable OpenMP support if available in the compiler. Default: `ON`
+- `SAIL_MANIP_USE_SWSCALE=ON|OFF` - Use libswscale (FFmpeg) for faster pixel format conversion in sail-manip. Provides SIMD-optimized conversions for RGB/BGR, RGBA variants, and YUV formats. Requires FFmpeg's libswscale library. Default: `OFF`
 - `SAIL_ONLY_CODECS="a;b;c"` - Force-enable only the codecs specified in this ';'-separated list and disable all others. Configuration fails if an enabled codec cannot find its dependencies. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Default: empty list
 - `SAIL_OPENMP_SCHEDULE="dynamic"` - OpenMP scheduling algorithm. Default: `dynamic`
 - `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
