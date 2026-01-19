@@ -230,6 +230,36 @@ SAIL_EXPORT sail_status_t sail_set_variant_data(struct sail_variant* variant, co
 SAIL_EXPORT sail_status_t sail_set_variant_shallow_data(struct sail_variant* variant, void* value, size_t size);
 
 /*
+ * Sets the variant value using _Generic macro to automatically select
+ * the appropriate function based on the value type.
+ *
+ * Example:
+ *   sail_set_variant(variant, 42);       // int
+ *   sail_set_variant(variant, 3.14);     // double
+ *   sail_set_variant(variant, "hello");  // const char*
+ *
+ * Returns SAIL_OK on success.
+ */
+#define sail_set_variant_value(variant, value) \
+    _Generic((value), \
+        bool: sail_set_variant_bool, \
+        char: sail_set_variant_char, \
+        unsigned char: sail_set_variant_unsigned_char, \
+        short: sail_set_variant_short, \
+        unsigned short: sail_set_variant_unsigned_short, \
+        int: sail_set_variant_int, \
+        unsigned int: sail_set_variant_unsigned_int, \
+        long: sail_set_variant_long, \
+        unsigned long: sail_set_variant_unsigned_long, \
+        long long: sail_set_variant_long_long, \
+        unsigned long long: sail_set_variant_unsigned_long_long, \
+        float: sail_set_variant_float, \
+        double: sail_set_variant_double, \
+        const char*: sail_set_variant_string, \
+        char*: sail_set_variant_string \
+    )(variant, value)
+
+/*
  * Returns the variant value as a boolean. Behavior is undefined if the variant is invalid.
  * Effectively, it casts the value pointer to bool*, and then dereferences the resulting pointer.
  */
