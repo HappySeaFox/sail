@@ -118,8 +118,10 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info* codec_in
     SAIL_LOG_ERROR("Failed to resolve '%s' in '%s': %s", symbol, codec_info->path, dlerror())
 #endif
 
+#if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
+#endif
 
 #define SAIL_RESOLVE(target, handle, symbol, name)                                                                     \
     {                                                                                                                  \
@@ -154,7 +156,9 @@ static sail_status_t load_codec_from_file(const struct sail_codec_info* codec_in
     SAIL_RESOLVE(codec->v8->save_frame, handle, sail_codec_save_frame_v8, codec_info->name);
     SAIL_RESOLVE(codec->v8->save_finish, handle, sail_codec_save_finish_v8, codec_info->name);
 
+#if defined(__GNUC__) || defined(__clang__)
 #pragma GCC diagnostic pop
+#endif
 
     return SAIL_OK;
 }

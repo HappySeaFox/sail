@@ -28,6 +28,7 @@
 #include <stdbool.h>
 
 #include <sail-common/common.h>
+#include <sail-common/config.h>
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 

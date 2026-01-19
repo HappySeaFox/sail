@@ -495,6 +495,118 @@ static MunitResult test_put_hash_map_string_empty(const MunitParameter params[],
     return MUNIT_OK;
 }
 
+static MunitResult test_put_value(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    struct sail_hash_map* hash_map;
+    munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
+
+    bool bool_value = true;
+    munit_assert(sail_put_hash_map_value(hash_map, "bool", bool_value) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "bool"));
+    const struct sail_variant* variant = sail_hash_map_value(hash_map, "bool");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_bool(variant) == true);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "char", 'a') == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "char"));
+    variant = sail_hash_map_value(hash_map, "char");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_char(variant) == 'a');
+
+    unsigned char uc = 200;
+    munit_assert(sail_put_hash_map_value(hash_map, "unsigned-char", uc) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "unsigned-char"));
+    variant = sail_hash_map_value(hash_map, "unsigned-char");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_unsigned_char(variant) == uc);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "short", (short)1234) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "short"));
+    variant = sail_hash_map_value(hash_map, "short");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_short(variant) == 1234);
+
+    unsigned short us = 5678;
+    munit_assert(sail_put_hash_map_value(hash_map, "unsigned-short", us) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "unsigned-short"));
+    variant = sail_hash_map_value(hash_map, "unsigned-short");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_unsigned_short(variant) == us);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "int", 42) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "int"));
+    variant = sail_hash_map_value(hash_map, "int");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_int(variant) == 42);
+
+    unsigned int ui = 0xFFFFFF9;
+    munit_assert(sail_put_hash_map_value(hash_map, "unsigned-int", ui) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "unsigned-int"));
+    variant = sail_hash_map_value(hash_map, "unsigned-int");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_unsigned_int(variant) == ui);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "long", 0xFFFF9L) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "long"));
+    variant = sail_hash_map_value(hash_map, "long");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_long(variant) == 0xFFFF9L);
+
+    unsigned long ul = 0xFFFFFF9UL;
+    munit_assert(sail_put_hash_map_value(hash_map, "unsigned-long", ul) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "unsigned-long"));
+    variant = sail_hash_map_value(hash_map, "unsigned-long");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_unsigned_long(variant) == ul);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "long-long", 0xFFFFALL) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "long-long"));
+    variant = sail_hash_map_value(hash_map, "long-long");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_long_long(variant) == 0xFFFFALL);
+
+    unsigned long long ull = 0xFFFFFFAULL;
+    munit_assert(sail_put_hash_map_value(hash_map, "unsigned-long-long", ull) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "unsigned-long-long"));
+    variant = sail_hash_map_value(hash_map, "unsigned-long-long");
+    munit_assert_not_null(variant);
+    munit_assert(sail_variant_to_unsigned_long_long(variant) == ull);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "float", 3.14f) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "float"));
+    variant = sail_hash_map_value(hash_map, "float");
+    munit_assert_not_null(variant);
+    munit_assert_float(sail_variant_to_float(variant), ==, 3.14f);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "double", 2.71828) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "double"));
+    variant = sail_hash_map_value(hash_map, "double");
+    munit_assert_not_null(variant);
+    munit_assert_double(sail_variant_to_double(variant), ==, 2.71828);
+
+    munit_assert(sail_put_hash_map_value(hash_map, "string", "hello") == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "string"));
+    variant = sail_hash_map_value(hash_map, "string");
+    munit_assert_not_null(variant);
+    munit_assert_string_equal(sail_variant_to_string(variant), "hello");
+
+    char* char_ptr = "world";
+    munit_assert(sail_put_hash_map_value(hash_map, "char-ptr", char_ptr) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "char-ptr"));
+    variant = sail_hash_map_value(hash_map, "char-ptr");
+    munit_assert_not_null(variant);
+    munit_assert_string_equal(sail_variant_to_string(variant), "world");
+
+    munit_assert_size(sail_hash_map_size(hash_map), ==, 15);
+
+    sail_destroy_hash_map(hash_map);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/put",                       test_put,                              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -506,6 +618,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/put-type-functions",        test_put_type_functions,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/put-type-functions-null",   test_put_type_functions_null_hash_map, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/put-hash-map-string-empty", test_put_hash_map_string_empty,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/put-value",                 test_put_value,                        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

@@ -23,8 +23,6 @@
  *  SOFTWARE.
  */
 
-#ifdef SAIL_MANIP_SWSCALE_ENABLED
-
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -34,6 +32,8 @@
 #include <sail-common/sail-common.h>
 
 #include "swscale_conversions.h"
+
+#ifdef SAIL_MANIP_SWSCALE_ENABLED
 
 /*
  * Private functions.

@@ -229,6 +229,7 @@ if (SAIL_BUILD_APPS)
 endif()
 
 if (SAIL_BUILD_EXAMPLES)
+    add_subdirectory(examples/c)
     find_package(SDL2 QUIET)
     set(SAIL_SDL_EXAMPLE OFF)
 
