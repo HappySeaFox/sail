@@ -23,6 +23,9 @@
  *  SOFTWARE.
  */
 
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -262,6 +265,18 @@ struct pixel_format_desc
 /*
  * Template macros for generating pixel sampling functions.
  */
+
+#ifdef _MSC_VER
+/*
+ * MSVC warning C4127: conditional expression is constant. For example:
+ *
+ * if (R_OFF >= 0) becomes if (0 >= 0)
+ *
+ * It's intentional in template macros, so we need to disable the warning.
+ */
+#pragma warning(push)
+#pragma warning(disable: 4127)
+#endif
 
 /* Sample pixel from format with channel offsets (8-bit channels) */
 #define SAMPLE_PIXEL_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF, IS_16BIT)                        \
@@ -504,6 +519,10 @@ WRITE_PIXEL_TEMPLATE(write_xbgr32, 4, 3, 2, 1, -1)
 /* RGBA64 variants */
 WRITE_PIXEL_16BIT_TEMPLATE(write_rgba64, 8, 0, 2, 4, 6)
 WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 /*
  * Template macros for generating scaling functions.
