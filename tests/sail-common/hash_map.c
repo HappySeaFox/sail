@@ -503,7 +503,8 @@ static MunitResult test_put_value(const MunitParameter params[], void* user_data
     struct sail_hash_map* hash_map;
     munit_assert(sail_alloc_hash_map(&hash_map) == SAIL_OK);
 
-    munit_assert(sail_put_hash_map_value(hash_map, "bool", true) == SAIL_OK);
+    bool bool_value = true;
+    munit_assert(sail_put_hash_map_value(hash_map, "bool", bool_value) == SAIL_OK);
     munit_assert(sail_hash_map_has_key(hash_map, "bool"));
     const struct sail_variant* variant = sail_hash_map_value(hash_map, "bool");
     munit_assert_not_null(variant);
@@ -591,6 +592,13 @@ static MunitResult test_put_value(const MunitParameter params[], void* user_data
     variant = sail_hash_map_value(hash_map, "string");
     munit_assert_not_null(variant);
     munit_assert_string_equal(sail_variant_to_string(variant), "hello");
+
+    char* char_ptr = "world";
+    munit_assert(sail_put_hash_map_value(hash_map, "char-ptr", char_ptr) == SAIL_OK);
+    munit_assert(sail_hash_map_has_key(hash_map, "char-ptr"));
+    variant = sail_hash_map_value(hash_map, "char-ptr");
+    munit_assert_not_null(variant);
+    munit_assert_string_equal(sail_variant_to_string(variant), "world");
 
     munit_assert_size(sail_hash_map_size(hash_map), ==, 15);
 

@@ -259,7 +259,7 @@ SAIL_EXPORT sail_status_t sail_put_hash_map_data(struct sail_hash_map* hash_map,
  * the appropriate function based on the value type.
  *
  * Example:
- *   sail_put_hash_map_value(hash_map, "count", 42);      / int
+ *   sail_put_hash_map_value(hash_map, "count", 42);      // int
  *   sail_put_hash_map_value(hash_map, "pi", 3.14);       // double
  *   sail_put_hash_map_value(hash_map, "name", "hello");  // const char*
  *

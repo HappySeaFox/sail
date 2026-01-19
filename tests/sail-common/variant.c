@@ -270,11 +270,13 @@ static MunitResult test_set_value(const MunitParameter params[], void* user_data
     struct sail_variant* variant;
     munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
 
-    munit_assert(sail_set_variant_value(variant, true) == SAIL_OK);
+    bool bool_value = true;
+    munit_assert(sail_set_variant_value(variant, bool_value) == SAIL_OK);
     munit_assert(variant->type == SAIL_VARIANT_TYPE_BOOL);
     munit_assert(sail_variant_to_bool(variant) == true);
 
-    munit_assert(sail_set_variant_value(variant, 'a') == SAIL_OK);
+    char char_value = 'a';
+    munit_assert(sail_set_variant_value(variant, char_value) == SAIL_OK);
     munit_assert(variant->type == SAIL_VARIANT_TYPE_CHAR);
     munit_assert(sail_variant_to_char(variant) == 'a');
 
