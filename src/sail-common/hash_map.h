@@ -254,6 +254,36 @@ SAIL_EXPORT sail_status_t sail_put_hash_map_data(struct sail_hash_map* hash_map,
                                                  const void* value,
                                                  size_t size);
 
+/*
+ * Puts a key-value pair into the hash map using _Generic macro to automatically select
+ * the appropriate function based on the value type.
+ *
+ * Example:
+ *   sail_put_hash_map_value(hash_map, "count", 42);      / int
+ *   sail_put_hash_map_value(hash_map, "pi", 3.14);       // double
+ *   sail_put_hash_map_value(hash_map, "name", "hello");  // const char*
+ *
+ * Returns SAIL_OK on success.
+ */
+#define sail_put_hash_map_value(hash_map, key, value) \
+    _Generic((value), \
+        bool: sail_put_hash_map_bool, \
+        char: sail_put_hash_map_char, \
+        unsigned char: sail_put_hash_map_unsigned_char, \
+        short: sail_put_hash_map_short, \
+        unsigned short: sail_put_hash_map_unsigned_short, \
+        int: sail_put_hash_map_int, \
+        unsigned int: sail_put_hash_map_unsigned_int, \
+        long: sail_put_hash_map_long, \
+        unsigned long: sail_put_hash_map_unsigned_long, \
+        long long: sail_put_hash_map_long_long, \
+        unsigned long long: sail_put_hash_map_unsigned_long_long, \
+        float: sail_put_hash_map_float, \
+        double: sail_put_hash_map_double, \
+        const char*: sail_put_hash_map_string, \
+        char*: sail_put_hash_map_string \
+    )(hash_map, key, value)
+
 /* extern "C" */
 #ifdef __cplusplus
 }
