@@ -72,33 +72,33 @@ sail_status_t sail_scale_image(const struct sail_image* image,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
-    /* If dimensions are the same, just copy the image */
+    /* If dimensions are the same, just copy the image. */
     if (image->width == new_width && image->height == new_height)
     {
         SAIL_TRY(sail_copy_image(image, image_output));
         return SAIL_OK;
     }
 
-    /* Determine if we need 64-bit RGBA (use 64-bit for formats with more than 32 bits per pixel) */
+    /* Determine if we need 64-bit RGBA (use 64-bit for formats with more than 32 bits per pixel). */
     const bool use_64bit                   = (bits_per_pixel > 32);
     const enum SailPixelFormat rgba_format = use_64bit ? SAIL_PIXEL_FORMAT_BPP64_RGBA : SAIL_PIXEL_FORMAT_BPP32_RGBA;
 
-    /* Convert to RGBA format for scaling */
+    /* Convert to RGBA format for scaling. */
     struct sail_image* rgba_image = NULL;
     SAIL_TRY(sail_convert_image(image, rgba_format, &rgba_image));
 
-    /* Create output image skeleton with metadata */
+    /* Create output image skeleton with metadata. */
     struct sail_image* output = NULL;
     SAIL_TRY_OR_CLEANUP(sail_copy_image_skeleton(image, &output),
                         /* cleanup */ sail_destroy_image(rgba_image));
 
-    /* Update dimensions and pixel format */
+    /* Update dimensions and pixel format. */
     output->width          = new_width;
     output->height         = new_height;
     output->pixel_format   = rgba_format;
     output->bytes_per_line = sail_bytes_per_line(new_width, rgba_format);
 
-    /* Copy palette if present */
+    /* Copy palette if present. */
     if (image->palette != NULL)
     {
         SAIL_TRY_OR_CLEANUP(sail_copy_palette(image->palette, &output->palette),
@@ -106,19 +106,19 @@ sail_status_t sail_scale_image(const struct sail_image* image,
                             sail_destroy_image(rgba_image));
     }
 
-    /* Allocate pixels */
+    /* Allocate pixels. */
     const size_t pixels_size = (size_t)output->height * output->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &output->pixels),
                         /* cleanup */ sail_destroy_image(output);
                         sail_destroy_image(rgba_image));
 
-    /* Try swscale first if available */
+    /* Try swscale first if available. */
 #ifdef SAIL_MANIP_SWSCALE_ENABLED
     sail_status_t status = scale_with_swscale(rgba_image, output, algorithm);
 
     if (status == SAIL_OK)
     {
-        /* Swscale succeeded - convert back to original format if needed */
+        /* Swscale succeeded - convert back to original format if needed. */
         if (output->pixel_format != image->pixel_format)
         {
             struct sail_image* converted = NULL;
@@ -138,29 +138,29 @@ sail_status_t sail_scale_image(const struct sail_image* image,
         return SAIL_OK;
     }
 
-    /* Swscale failed - fallback to manual scaling */
+    /* Swscale failed - fallback to manual scaling. */
     SAIL_LOG_DEBUG("SWSCALE: Scaling failed, falling back to manual scaling");
     sail_destroy_image(output);
     sail_destroy_image(rgba_image);
 #endif /* SAIL_MANIP_SWSCALE_ENABLED */
 
-    /* Fallback to manual scaling (or use it directly if swscale is not available) */
-    /* Convert to RGBA format for scaling */
+    /* Fallback to manual scaling (or use it directly if swscale is not available). */
+    /* Convert to RGBA format for scaling. */
     rgba_image = NULL;
     SAIL_TRY(sail_convert_image(image, rgba_format, &rgba_image));
 
-    /* Create output image skeleton with metadata */
+    /* Create output image skeleton with metadata. */
     output = NULL;
     SAIL_TRY_OR_CLEANUP(sail_copy_image_skeleton(image, &output),
                         /* cleanup */ sail_destroy_image(rgba_image));
 
-    /* Update dimensions and pixel format */
+    /* Update dimensions and pixel format. */
     output->width          = new_width;
     output->height         = new_height;
     output->pixel_format   = rgba_format;
     output->bytes_per_line = sail_bytes_per_line(new_width, rgba_format);
 
-    /* Copy palette if present */
+    /* Copy palette if present. */
     if (image->palette != NULL)
     {
         SAIL_TRY_OR_CLEANUP(sail_copy_palette(image->palette, &output->palette),
@@ -173,7 +173,7 @@ sail_status_t sail_scale_image(const struct sail_image* image,
                         /* cleanup */ sail_destroy_image(output);
                         sail_destroy_image(rgba_image));
 
-    /* Scale using manual implementation */
+    /* Scale using manual implementation. */
     sail_status_t manual_status = scale_with_manual(rgba_image, output, algorithm);
 
     sail_destroy_image(rgba_image);
@@ -184,7 +184,7 @@ sail_status_t sail_scale_image(const struct sail_image* image,
         return manual_status;
     }
 
-    /* Convert back to original format if needed */
+    /* Convert back to original format if needed. */
     if (output->pixel_format != image->pixel_format)
     {
         struct sail_image* converted = NULL;
@@ -203,13 +203,13 @@ sail_status_t sail_scale_image(const struct sail_image* image,
  * Manual scaling implementation (fallback when swscale is not available or fails).
  */
 
-/* Clamp value to [0, max] */
+/* Clamp value to [0, max]. */
 static inline unsigned clamp_unsigned(unsigned value, unsigned max)
 {
     return (value > max) ? max : value;
 }
 
-/* Clamp value to [0, max] for int */
+/* Clamp value to [0, max] for int. */
 static inline int clamp_int(int value, int max)
 {
     if (value < 0)
@@ -219,7 +219,7 @@ static inline int clamp_int(int value, int max)
     return (value > max) ? max : value;
 }
 
-/* Cubic kernel for bicubic interpolation */
+/* Cubic kernel for bicubic interpolation. */
 static inline float cubic_kernel(float x)
 {
     x = fabsf(x);
@@ -234,7 +234,7 @@ static inline float cubic_kernel(float x)
     return 0.0f;
 }
 
-/* Lanczos kernel */
+/* Lanczos kernel. */
 static inline float lanczos_kernel(float x, int a)
 {
     if (x == 0.0f)
@@ -257,7 +257,7 @@ struct pixel_format_desc
 {
     unsigned bytes_per_pixel;
     unsigned channels;                          /* 1=grayscale, 2=grayscale+alpha, 3=RGB, 4=RGBA */
-    int r_offset, g_offset, b_offset, a_offset; /* Byte offsets, -1 if channel doesn't exist */
+    int r_offset, g_offset, b_offset, a_offset; /* Byte offsets, -1 if channel doesn't exist. */
     bool is_16bit;                              /* true for 16-bit per channel formats */
     bool is_64bit;                              /* true for 64-bit formats (16-bit per channel RGBA) */
 };
@@ -278,7 +278,7 @@ struct pixel_format_desc
 #pragma warning(disable: 4127)
 #endif
 
-/* Sample pixel from format with channel offsets (8-bit channels) */
+/* Sample pixel from format with channel offsets (8-bit channels). */
 #define SAMPLE_PIXEL_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF, IS_16BIT)                        \
     static inline void FUNC_NAME(const uint8_t* pixels, unsigned width, unsigned height, unsigned bytes_per_line,      \
                                  int x, int y, uint8_t* r_out, uint8_t* g_out, uint8_t* b_out, uint8_t* a_out)         \
@@ -288,7 +288,7 @@ struct pixel_format_desc
         const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL;                                      \
         if (IS_16BIT)                                                                                                  \
         {                                                                                                              \
-            /* 16-bit per channel: take high byte (MSB) for 8-bit output */                                            \
+            /* 16-bit per channel: take high byte (MSB) for 8-bit output. */                                            \
             if (R_OFF >= 0)                                                                                            \
                 *r_out = pixel[R_OFF + 1];                                                                             \
             if (G_OFF >= 0)                                                                                            \
@@ -311,7 +311,7 @@ struct pixel_format_desc
         }                                                                                                              \
     }
 
-/* Sample grayscale pixel */
+/* Sample grayscale pixel. */
 #define SAMPLE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                                                          \
     static inline uint8_t FUNC_NAME(const uint8_t* pixels, unsigned width, unsigned height, unsigned bytes_per_line,   \
                                     int x, int y)                                                                      \
@@ -322,7 +322,7 @@ struct pixel_format_desc
         return pixel[0];                                                                                               \
     }
 
-/* Sample grayscale+alpha pixel */
+/* Sample grayscale+alpha pixel. */
 #define SAMPLE_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                                                    \
     static inline void FUNC_NAME(const uint8_t* pixels, unsigned width, unsigned height, unsigned bytes_per_line,      \
                                  int x, int y, uint8_t* g_out, uint8_t* a_out)                                         \
@@ -334,7 +334,7 @@ struct pixel_format_desc
         *a_out               = pixel[BYTES_PER_PIXEL / 2];                                                             \
     }
 
-/* Sample grayscale+alpha pixel (8-bit: 1 byte grayscale + 1 byte alpha) */
+/* Sample grayscale+alpha pixel (8-bit: 1 byte grayscale + 1 byte alpha). */
 static inline void sample_grayscale_alpha8(const uint8_t* pixels,
                                            unsigned width,
                                            unsigned height,
@@ -351,7 +351,7 @@ static inline void sample_grayscale_alpha8(const uint8_t* pixels,
     *a_out               = pixel[1];
 }
 
-/* Sample grayscale+alpha pixel (16-bit: 2 bytes grayscale + 2 bytes alpha) */
+/* Sample grayscale+alpha pixel (16-bit: 2 bytes grayscale + 2 bytes alpha). */
 static inline void sample_grayscale_alpha16(const uint8_t* pixels,
                                             unsigned width,
                                             unsigned height,
@@ -368,7 +368,7 @@ static inline void sample_grayscale_alpha16(const uint8_t* pixels,
     *a_out               = pixel[2];
 }
 
-/* Sample grayscale+alpha pixel (32-bit: 2 bytes grayscale + 2 bytes alpha, but stored as 4 bytes) */
+/* Sample grayscale+alpha pixel (32-bit: 2 bytes grayscale + 2 bytes alpha, but stored as 4 bytes). */
 static inline void sample_grayscale_alpha32(const uint8_t* pixels,
                                             unsigned width,
                                             unsigned height,
@@ -385,7 +385,7 @@ static inline void sample_grayscale_alpha32(const uint8_t* pixels,
     *a_out               = pixel[4];
 }
 
-/* Write pixel to format with channel offsets (8-bit channels) */
+/* Write pixel to format with channel offsets (8-bit channels). */
 #define WRITE_PIXEL_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF)                                   \
     static inline void FUNC_NAME(uint8_t* pixel, uint8_t r, uint8_t g, uint8_t b, uint8_t a)                           \
     {                                                                                                                  \
@@ -399,11 +399,11 @@ static inline void sample_grayscale_alpha32(const uint8_t* pixels,
             pixel[A_OFF] = a;                                                                                          \
     }
 
-/* Write pixel to format with channel offsets (16-bit channels) */
+/* Write pixel to format with channel offsets (16-bit channels). */
 #define WRITE_PIXEL_16BIT_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF)                             \
     static inline void FUNC_NAME(uint8_t* pixel, uint8_t r, uint8_t g, uint8_t b, uint8_t a)                           \
     {                                                                                                                  \
-        /* 16-bit per channel: duplicate byte for both LSB and MSB */                                                  \
+        /* 16-bit per channel: duplicate byte for both LSB and MSB. */                                                  \
         if (R_OFF >= 0)                                                                                                \
         {                                                                                                              \
             pixel[R_OFF]     = r;                                                                                      \
@@ -426,14 +426,14 @@ static inline void sample_grayscale_alpha32(const uint8_t* pixels,
         }                                                                                                              \
     }
 
-/* Write grayscale pixel */
+/* Write grayscale pixel. */
 #define WRITE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                                                           \
     static inline void FUNC_NAME(uint8_t* pixel, uint8_t g)                                                            \
     {                                                                                                                  \
         pixel[0] = g;                                                                                                  \
     }
 
-/* Write grayscale+alpha pixel */
+/* Write grayscale+alpha pixel. */
 static inline void write_grayscale_alpha8(uint8_t* pixel, uint8_t g, uint8_t a)
 {
     pixel[0] = g;
@@ -460,7 +460,7 @@ static inline void write_grayscale_alpha32(uint8_t* pixel, uint8_t g, uint8_t a)
 SAMPLE_GRAYSCALE_TEMPLATE(sample_grayscale8, 1)
 SAMPLE_GRAYSCALE_TEMPLATE(sample_grayscale16, 2)
 
-/* Grayscale+Alpha formats - defined as inline functions above */
+/* Grayscale+Alpha formats - defined as inline functions above. */
 
 /* RGB24/BGR24 */
 SAMPLE_PIXEL_TEMPLATE(sample_rgb24, 3, 0, 1, 2, -1, false)
@@ -476,7 +476,7 @@ SAMPLE_PIXEL_TEMPLATE(sample_bgra32, 4, 2, 1, 0, 3, false)
 SAMPLE_PIXEL_TEMPLATE(sample_argb32, 4, 1, 2, 3, 0, false)
 SAMPLE_PIXEL_TEMPLATE(sample_abgr32, 4, 3, 2, 1, 0, false)
 
-/* RGBX32 variants (X = unused) */
+/* RGBX32 variants (X = unused). */
 SAMPLE_PIXEL_TEMPLATE(sample_rgbx32, 4, 0, 1, 2, -1, false)
 SAMPLE_PIXEL_TEMPLATE(sample_bgrx32, 4, 2, 1, 0, -1, false)
 SAMPLE_PIXEL_TEMPLATE(sample_xrgb32, 4, 1, 2, 3, -1, false)
@@ -494,7 +494,7 @@ SAMPLE_PIXEL_TEMPLATE(sample_bgra64, 8, 4, 2, 0, 6, true)
 WRITE_GRAYSCALE_TEMPLATE(write_grayscale8, 1)
 WRITE_GRAYSCALE_TEMPLATE(write_grayscale16, 2)
 
-/* Grayscale+Alpha formats - defined as inline functions above */
+/* Grayscale+Alpha formats - defined as inline functions above. */
 
 /* RGB24/BGR24 */
 WRITE_PIXEL_TEMPLATE(write_rgb24, 3, 0, 1, 2, -1)
@@ -528,7 +528,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
  * Template macros for generating scaling functions.
  */
 
-/* Nearest neighbor scaling template */
+/* Nearest neighbor scaling template. */
 #define SCALE_NEAREST_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                    \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -553,7 +553,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Nearest neighbor for grayscale */
+/* Nearest neighbor for grayscale. */
 #define SCALE_NEAREST_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                          \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -577,7 +577,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Nearest neighbor for grayscale+alpha */
+/* Nearest neighbor for grayscale+alpha. */
 #define SCALE_NEAREST_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                    \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -602,7 +602,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Bilinear scaling template for RGB/RGBA */
+/* Bilinear scaling template for RGB/RGBA. */
 #define SCALE_BILINEAR_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                   \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -648,7 +648,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Bilinear scaling template for grayscale */
+/* Bilinear scaling template for grayscale. */
 #define SCALE_BILINEAR_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                         \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -686,7 +686,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Bilinear scaling template for grayscale+alpha */
+/* Bilinear scaling template for grayscale+alpha. */
 #define SCALE_BILINEAR_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                   \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -726,7 +726,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Bicubic scaling template for RGB/RGBA */
+/* Bicubic scaling template for RGB/RGBA. */
 #define SCALE_BICUBIC_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                    \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -781,7 +781,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Bicubic scaling template for grayscale */
+/* Bicubic scaling template for grayscale. */
 #define SCALE_BICUBIC_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                           \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                  \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,                \
@@ -828,7 +828,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                 \
     }
 
-/* Lanczos scaling template for RGB/RGBA */
+/* Lanczos scaling template for RGB/RGBA. */
 #define SCALE_LANCZOS_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                    \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
@@ -886,7 +886,7 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
         return SAIL_OK;                                                                                                \
     }
 
-/* Lanczos scaling template for grayscale */
+/* Lanczos scaling template for grayscale. */
 #define SCALE_LANCZOS_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                           \
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                  \
                                    unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,                \
@@ -1138,17 +1138,17 @@ static const struct format_dispatcher* find_dispatcher_manual(enum SailPixelForm
     return NULL;
 }
 
-/* Scale using manual implementation (fallback) */
+/* Scale using manual implementation (fallback). */
 static sail_status_t scale_with_manual(const struct sail_image* src_image,
                                        struct sail_image* dst_image,
                                        enum SailScaling algorithm)
 {
-    /* Try to find direct format support */
+    /* Try to find direct format support. */
     const struct format_dispatcher* dispatcher = find_dispatcher_manual(src_image->pixel_format);
 
     if (dispatcher != NULL)
     {
-        /* Direct format support - scale without conversion */
+        /* Direct format support - scale without conversion. */
         scale_func_t scale_func = NULL;
 
         switch (algorithm)
@@ -1176,18 +1176,18 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
             return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
         }
 
-        /* Perform scaling */
+        /* Perform scaling. */
         return scale_func((const uint8_t*)src_image->pixels, src_image->width, src_image->height,
                           src_image->bytes_per_line, (uint8_t*)dst_image->pixels, dst_image->width, dst_image->height,
                           dst_image->bytes_per_line);
     }
 
-    /* Fallback: convert to RGBA32/64, scale, then convert back */
+    /* Fallback: convert to RGBA32/64, scale, then convert back. */
     const unsigned bits_per_pixel = sail_bits_per_pixel(src_image->pixel_format);
     const enum SailPixelFormat rgba_format =
         (bits_per_pixel > 32) ? SAIL_PIXEL_FORMAT_BPP64_RGBA : SAIL_PIXEL_FORMAT_BPP32_RGBA;
 
-    /* Check if RGBA format is supported */
+    /* Check if RGBA format is supported. */
     const struct format_dispatcher* rgba_dispatcher = find_dispatcher_manual(rgba_format);
     if (rgba_dispatcher == NULL)
     {
@@ -1195,7 +1195,7 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
         return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
 
-    /* Convert to RGBA format for scaling */
+    /* Convert to RGBA format for scaling. */
     struct sail_image* rgba_image = NULL;
     sail_status_t status          = sail_convert_image(src_image, rgba_format, &rgba_image);
     if (status != SAIL_OK)
@@ -1203,7 +1203,7 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
         return status;
     }
 
-    /* Create RGBA output image skeleton */
+    /* Create RGBA output image skeleton. */
     struct sail_image* rgba_output = NULL;
     status                         = sail_copy_image_skeleton(src_image, &rgba_output);
     if (status != SAIL_OK)
@@ -1237,7 +1237,7 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
         return status;
     }
 
-    /* Scale RGBA image */
+    /* Scale RGBA image. */
     scale_func_t scale_func = NULL;
 
     switch (algorithm)
@@ -1281,7 +1281,7 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
         return status;
     }
 
-    /* Convert back to original format if needed */
+    /* Convert back to original format if needed. */
     if (rgba_output->pixel_format != dst_image->pixel_format)
     {
         struct sail_image* converted = NULL;
@@ -1294,7 +1294,7 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
         rgba_output = converted;
     }
 
-    /* Copy result to destination */
+    /* Copy result to destination. */
     memcpy(dst_image->pixels, rgba_output->pixels, (size_t)dst_image->height * dst_image->bytes_per_line);
     sail_destroy_image(rgba_output);
 
