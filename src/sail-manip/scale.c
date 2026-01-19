@@ -279,59 +279,77 @@ struct pixel_format_desc
 #endif
 
 /* Sample pixel from format with channel offsets (8-bit channels). */
-#define SAMPLE_PIXEL_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF, IS_16BIT)                        \
-    static inline void FUNC_NAME(const uint8_t* pixels, unsigned width, unsigned height, unsigned bytes_per_line,      \
-                                 int x, int y, uint8_t* r_out, uint8_t* g_out, uint8_t* b_out, uint8_t* a_out)         \
-    {                                                                                                                  \
-        x                    = clamp_int(x, (int)width - 1);                                                           \
-        y                    = clamp_int(y, (int)height - 1);                                                          \
-        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL;                                      \
-        if (IS_16BIT)                                                                                                  \
-        {                                                                                                              \
-            /* 16-bit per channel: take high byte (MSB) for 8-bit output. */                                            \
-            if (R_OFF >= 0)                                                                                            \
-                *r_out = pixel[R_OFF + 1];                                                                             \
-            if (G_OFF >= 0)                                                                                            \
-                *g_out = pixel[G_OFF + 1];                                                                             \
-            if (B_OFF >= 0)                                                                                            \
-                *b_out = pixel[B_OFF + 1];                                                                             \
-            if (A_OFF >= 0)                                                                                            \
-                *a_out = pixel[A_OFF + 1];                                                                             \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            if (R_OFF >= 0)                                                                                            \
-                *r_out = pixel[R_OFF];                                                                                 \
-            if (G_OFF >= 0)                                                                                            \
-                *g_out = pixel[G_OFF];                                                                                 \
-            if (B_OFF >= 0)                                                                                            \
-                *b_out = pixel[B_OFF];                                                                                 \
-            if (A_OFF >= 0)                                                                                            \
-                *a_out = pixel[A_OFF];                                                                                 \
-        }                                                                                                              \
+#define SAMPLE_PIXEL_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF, IS_16BIT) \
+    static inline void FUNC_NAME(const uint8_t* pixels,                                        \
+                                  unsigned width,                                              \
+                                  unsigned height,                                             \
+                                  unsigned bytes_per_line,                                     \
+                                  int x,                                                       \
+                                  int y,                                                       \
+                                  uint8_t* r_out,                                              \
+                                  uint8_t* g_out,                                              \
+                                  uint8_t* b_out,                                              \
+                                  uint8_t* a_out)                                              \
+    {                                                                                          \
+        x                    = clamp_int(x, (int)width - 1);                                   \
+        y                    = clamp_int(y, (int)height - 1);                                  \
+        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL;              \
+        if (IS_16BIT)                                                                          \
+        {                                                                                      \
+            /* 16-bit per channel: take high byte (MSB) for 8-bit output. */                   \
+            if (R_OFF >= 0)                                                                    \
+                *r_out = pixel[R_OFF + 1];                                                     \
+            if (G_OFF >= 0)                                                                    \
+                *g_out = pixel[G_OFF + 1];                                                     \
+            if (B_OFF >= 0)                                                                    \
+                *b_out = pixel[B_OFF + 1];                                                     \
+            if (A_OFF >= 0)                                                                    \
+                *a_out = pixel[A_OFF + 1];                                                     \
+        }                                                                                      \
+        else                                                                                   \
+        {                                                                                      \
+            if (R_OFF >= 0)                                                                    \
+                *r_out = pixel[R_OFF];                                                         \
+            if (G_OFF >= 0)                                                                    \
+                *g_out = pixel[G_OFF];                                                         \
+            if (B_OFF >= 0)                                                                    \
+                *b_out = pixel[B_OFF];                                                         \
+            if (A_OFF >= 0)                                                                    \
+                *a_out = pixel[A_OFF];                                                         \
+        }                                                                                      \
     }
 
 /* Sample grayscale pixel. */
-#define SAMPLE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                                                          \
-    static inline uint8_t FUNC_NAME(const uint8_t* pixels, unsigned width, unsigned height, unsigned bytes_per_line,   \
-                                    int x, int y)                                                                      \
-    {                                                                                                                  \
-        x                    = clamp_int(x, (int)width - 1);                                                           \
-        y                    = clamp_int(y, (int)height - 1);                                                          \
-        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL;                                      \
-        return pixel[0];                                                                                               \
+#define SAMPLE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                    \
+    static inline uint8_t FUNC_NAME(const uint8_t* pixels,                       \
+                                     unsigned width,                             \
+                                     unsigned height,                            \
+                                     unsigned bytes_per_line,                    \
+                                     int x,                                      \
+                                     int y)                                      \
+    {                                                                            \
+        x                    = clamp_int(x, (int)width - 1);                     \
+        y                    = clamp_int(y, (int)height - 1);                    \
+        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL; \
+        return pixel[0];                                                         \
     }
 
 /* Sample grayscale+alpha pixel. */
-#define SAMPLE_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                                                    \
-    static inline void FUNC_NAME(const uint8_t* pixels, unsigned width, unsigned height, unsigned bytes_per_line,      \
-                                 int x, int y, uint8_t* g_out, uint8_t* a_out)                                         \
-    {                                                                                                                  \
-        x                    = clamp_int(x, (int)width - 1);                                                           \
-        y                    = clamp_int(y, (int)height - 1);                                                          \
-        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL;                                      \
-        *g_out               = pixel[0];                                                                               \
-        *a_out               = pixel[BYTES_PER_PIXEL / 2];                                                             \
+#define SAMPLE_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)              \
+    static inline void FUNC_NAME(const uint8_t* pixels,                          \
+                                  unsigned width,                                \
+                                  unsigned height,                               \
+                                  unsigned bytes_per_line,                       \
+                                  int x,                                         \
+                                  int y,                                         \
+                                  uint8_t* g_out,                                \
+                                  uint8_t* a_out)                                \
+    {                                                                            \
+        x                    = clamp_int(x, (int)width - 1);                     \
+        y                    = clamp_int(y, (int)height - 1);                    \
+        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL; \
+        *g_out               = pixel[0];                                         \
+        *a_out               = pixel[BYTES_PER_PIXEL / 2];                       \
     }
 
 /* Sample grayscale+alpha pixel (8-bit: 1 byte grayscale + 1 byte alpha). */
@@ -386,51 +404,60 @@ static inline void sample_grayscale_alpha32(const uint8_t* pixels,
 }
 
 /* Write pixel to format with channel offsets (8-bit channels). */
-#define WRITE_PIXEL_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF)                                   \
-    static inline void FUNC_NAME(uint8_t* pixel, uint8_t r, uint8_t g, uint8_t b, uint8_t a)                           \
-    {                                                                                                                  \
-        if (R_OFF >= 0)                                                                                                \
-            pixel[R_OFF] = r;                                                                                          \
-        if (G_OFF >= 0)                                                                                                \
-            pixel[G_OFF] = g;                                                                                          \
-        if (B_OFF >= 0)                                                                                                \
-            pixel[B_OFF] = b;                                                                                          \
-        if (A_OFF >= 0)                                                                                                \
-            pixel[A_OFF] = a;                                                                                          \
+#define WRITE_PIXEL_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF) \
+    static inline void FUNC_NAME(uint8_t* pixel,                                    \
+                                  uint8_t r,                                        \
+                                  uint8_t g,                                        \
+                                  uint8_t b,                                        \
+                                  uint8_t a)                                        \
+    {                                                                               \
+        if (R_OFF >= 0)                                                             \
+            pixel[R_OFF] = r;                                                       \
+        if (G_OFF >= 0)                                                             \
+            pixel[G_OFF] = g;                                                       \
+        if (B_OFF >= 0)                                                             \
+            pixel[B_OFF] = b;                                                       \
+        if (A_OFF >= 0)                                                             \
+            pixel[A_OFF] = a;                                                       \
     }
 
 /* Write pixel to format with channel offsets (16-bit channels). */
-#define WRITE_PIXEL_16BIT_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF)                             \
-    static inline void FUNC_NAME(uint8_t* pixel, uint8_t r, uint8_t g, uint8_t b, uint8_t a)                           \
-    {                                                                                                                  \
-        /* 16-bit per channel: duplicate byte for both LSB and MSB. */                                                  \
-        if (R_OFF >= 0)                                                                                                \
-        {                                                                                                              \
-            pixel[R_OFF]     = r;                                                                                      \
-            pixel[R_OFF + 1] = r;                                                                                      \
-        }                                                                                                              \
-        if (G_OFF >= 0)                                                                                                \
-        {                                                                                                              \
-            pixel[G_OFF]     = g;                                                                                      \
-            pixel[G_OFF + 1] = g;                                                                                      \
-        }                                                                                                              \
-        if (B_OFF >= 0)                                                                                                \
-        {                                                                                                              \
-            pixel[B_OFF]     = b;                                                                                      \
-            pixel[B_OFF + 1] = b;                                                                                      \
-        }                                                                                                              \
-        if (A_OFF >= 0)                                                                                                \
-        {                                                                                                              \
-            pixel[A_OFF]     = a;                                                                                      \
-            pixel[A_OFF + 1] = a;                                                                                      \
-        }                                                                                                              \
+#define WRITE_PIXEL_16BIT_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL, R_OFF, G_OFF, B_OFF, A_OFF) \
+    static inline void FUNC_NAME(uint8_t* pixel,                                          \
+                                  uint8_t r,                                              \
+                                  uint8_t g,                                              \
+                                  uint8_t b,                                              \
+                                  uint8_t a)                                              \
+    {                                                                                     \
+        /* 16-bit per channel: duplicate byte for both LSB and MSB. */                    \
+        if (R_OFF >= 0)                                                                   \
+        {                                                                                 \
+            pixel[R_OFF]     = r;                                                         \
+            pixel[R_OFF + 1] = r;                                                         \
+        }                                                                                 \
+        if (G_OFF >= 0)                                                                   \
+        {                                                                                 \
+            pixel[G_OFF]     = g;                                                         \
+            pixel[G_OFF + 1] = g;                                                         \
+        }                                                                                 \
+        if (B_OFF >= 0)                                                                   \
+        {                                                                                 \
+            pixel[B_OFF]     = b;                                                         \
+            pixel[B_OFF + 1] = b;                                                         \
+        }                                                                                 \
+        if (A_OFF >= 0)                                                                   \
+        {                                                                                 \
+            pixel[A_OFF]     = a;                                                         \
+            pixel[A_OFF + 1] = a;                                                         \
+        }                                                                                 \
     }
 
 /* Write grayscale pixel. */
-#define WRITE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                                                           \
-    static inline void FUNC_NAME(uint8_t* pixel, uint8_t g)                                                            \
-    {                                                                                                                  \
-        pixel[0] = g;                                                                                                  \
+#define WRITE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL) \
+    static inline void FUNC_NAME(uint8_t* pixel,            \
+                                  uint8_t g)                \
+    {                                                       \
+        pixel[0] = g;                                       \
     }
 
 /* Write grayscale+alpha pixel. */
@@ -529,208 +556,303 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
  */
 
 /* Nearest neighbor scaling template. */
-#define SCALE_NEAREST_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                    \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
-    {                                                                                                                  \
-        const double x_scale = (double)src_width / (double)dst_width;                                                  \
-        const double y_scale = (double)src_height / (double)dst_height;                                                \
-        unsigned row;                                                                                                  \
-        SAIL_OMP_PARALLEL_FOR                                                                                          \
-        for (row = 0; row < dst_height; row++)                                                                         \
-        {                                                                                                              \
-            const int src_y   = (int)((double)row * y_scale + 0.5);                                                    \
-            uint8_t* dst_scan = dst_pixels + row * dst_bytes_per_line;                                                 \
-            for (unsigned col = 0; col < dst_width; col++)                                                             \
-            {                                                                                                          \
-                const int src_x = (int)((double)col * x_scale + 0.5);                                                  \
-                uint8_t r, g, b, a;                                                                                    \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, src_x, src_y, &r, &g, &b, &a);      \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, r, g, b, a);                                              \
-            }                                                                                                          \
-        }                                                                                                              \
-        return SAIL_OK;                                                                                                \
+#define SCALE_NEAREST_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                              \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                    \
+                                    unsigned src_width,                                                          \
+                                    unsigned src_height,                                                         \
+                                    unsigned src_bytes_per_line,                                                 \
+                                    uint8_t* dst_pixels,                                                         \
+                                    unsigned dst_width,                                                          \
+                                    unsigned dst_height,                                                         \
+                                    unsigned dst_bytes_per_line)                                                 \
+    {                                                                                                            \
+        const double x_scale = (double)src_width / (double)dst_width;                                            \
+        const double y_scale = (double)src_height / (double)dst_height;                                          \
+        unsigned row;                                                                                            \
+        SAIL_OMP_PARALLEL_FOR                                                                                    \
+        for (row = 0; row < dst_height; row++)                                                                   \
+        {                                                                                                        \
+            const int src_y   = (int)((double)row * y_scale + 0.5);                                              \
+            uint8_t* dst_scan = dst_pixels + row * dst_bytes_per_line;                                           \
+            for (unsigned col = 0; col < dst_width; col++)                                                       \
+            {                                                                                                    \
+                const int src_x = (int)((double)col * x_scale + 0.5);                                            \
+                uint8_t r, g, b, a;                                                                              \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, src_x, src_y, &r, &g, &b, &a); \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, r, g, b, a);                                        \
+            }                                                                                                    \
+        }                                                                                                        \
+        return SAIL_OK;                                                                                          \
     }
 
 /* Nearest neighbor for grayscale. */
-#define SCALE_NEAREST_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                          \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
-    {                                                                                                                  \
-        const double x_scale = (double)src_width / (double)dst_width;                                                  \
-        const double y_scale = (double)src_height / (double)dst_height;                                                \
-        unsigned row;                                                                                                  \
-        SAIL_OMP_PARALLEL_FOR                                                                                          \
-        for (row = 0; row < dst_height; row++)                                                                         \
-        {                                                                                                              \
-            const int src_y   = (int)((double)row * y_scale + 0.5);                                                    \
-            uint8_t* dst_scan = dst_pixels + row * dst_bytes_per_line;                                                 \
-            for (unsigned col = 0; col < dst_width; col++)                                                             \
-            {                                                                                                          \
-                const int src_x = (int)((double)col * x_scale + 0.5);                                                  \
-                uint8_t g       = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, src_x, src_y);    \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, g);                                                       \
-            }                                                                                                          \
-        }                                                                                                              \
-        return SAIL_OK;                                                                                                \
+#define SCALE_NEAREST_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                      \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                      \
+                                    unsigned src_width,                                                            \
+                                    unsigned src_height,                                                           \
+                                    unsigned src_bytes_per_line,                                                   \
+                                    uint8_t* dst_pixels,                                                           \
+                                    unsigned dst_width,                                                            \
+                                    unsigned dst_height,                                                           \
+                                    unsigned dst_bytes_per_line)                                                   \
+    {                                                                                                              \
+        const double x_scale = (double)src_width / (double)dst_width;                                              \
+        const double y_scale = (double)src_height / (double)dst_height;                                            \
+        unsigned row;                                                                                              \
+        SAIL_OMP_PARALLEL_FOR                                                                                      \
+        for (row = 0; row < dst_height; row++)                                                                     \
+        {                                                                                                          \
+            const int src_y   = (int)((double)row * y_scale + 0.5);                                                \
+            uint8_t* dst_scan = dst_pixels + row * dst_bytes_per_line;                                             \
+            for (unsigned col = 0; col < dst_width; col++)                                                         \
+            {                                                                                                      \
+                const int src_x = (int)((double)col * x_scale + 0.5);                                              \
+                uint8_t g       = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, src_x, src_y); \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, g);                                                   \
+            }                                                                                                      \
+        }                                                                                                          \
+        return SAIL_OK;                                                                                            \
     }
 
 /* Nearest neighbor for grayscale+alpha. */
-#define SCALE_NEAREST_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                    \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
-    {                                                                                                                  \
-        const double x_scale = (double)src_width / (double)dst_width;                                                  \
-        const double y_scale = (double)src_height / (double)dst_height;                                                \
-        unsigned row;                                                                                                  \
-        SAIL_OMP_PARALLEL_FOR                                                                                          \
-        for (row = 0; row < dst_height; row++)                                                                         \
-        {                                                                                                              \
-            const int src_y   = (int)((double)row * y_scale + 0.5);                                                    \
-            uint8_t* dst_scan = dst_pixels + row * dst_bytes_per_line;                                                 \
-            for (unsigned col = 0; col < dst_width; col++)                                                             \
-            {                                                                                                          \
-                const int src_x = (int)((double)col * x_scale + 0.5);                                                  \
-                uint8_t g, a;                                                                                          \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, src_x, src_y, &g, &a);              \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, g, a);                                                    \
-            }                                                                                                          \
-        }                                                                                                              \
-        return SAIL_OK;                                                                                                \
+#define SCALE_NEAREST_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)      \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                            \
+                                    unsigned src_width,                                                  \
+                                    unsigned src_height,                                                 \
+                                    unsigned src_bytes_per_line,                                         \
+                                    uint8_t* dst_pixels,                                                 \
+                                    unsigned dst_width,                                                  \
+                                    unsigned dst_height,                                                 \
+                                    unsigned dst_bytes_per_line)                                         \
+    {                                                                                                    \
+        const double x_scale = (double)src_width / (double)dst_width;                                    \
+        const double y_scale = (double)src_height / (double)dst_height;                                  \
+        unsigned row;                                                                                    \
+        SAIL_OMP_PARALLEL_FOR                                                                            \
+        for (row = 0; row < dst_height; row++)                                                           \
+        {                                                                                                \
+            const int src_y   = (int)((double)row * y_scale + 0.5);                                      \
+            uint8_t* dst_scan = dst_pixels + row * dst_bytes_per_line;                                   \
+            for (unsigned col = 0; col < dst_width; col++)                                               \
+            {                                                                                            \
+                const int src_x = (int)((double)col * x_scale + 0.5);                                    \
+                uint8_t g, a;                                                                            \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, src_x, src_y, &g, &a); \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, g, a);                                      \
+            }                                                                                            \
+        }                                                                                                \
+        return SAIL_OK;                                                                                  \
     }
 
 /* Bilinear scaling template for RGB/RGBA. */
-#define SCALE_BILINEAR_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                   \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
-    {                                                                                                                  \
-        const double x_scale = (double)src_width / (double)dst_width;                                                  \
-        const double y_scale = (double)src_height / (double)dst_height;                                                \
-        unsigned row;                                                                                                  \
-        SAIL_OMP_PARALLEL_FOR                                                                                          \
-        for (row = 0; row < dst_height; row++)                                                                         \
-        {                                                                                                              \
-            const double src_y = (double)row * y_scale;                                                                \
-            const int y0       = (int)src_y;                                                                           \
-            const int y1       = clamp_unsigned(y0 + 1, src_height - 1);                                               \
-            const float dy     = (float)(src_y - (double)y0);                                                          \
-            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                                \
-            for (unsigned col = 0; col < dst_width; col++)                                                             \
-            {                                                                                                          \
-                const double src_x = (double)col * x_scale;                                                            \
-                const int x0       = (int)src_x;                                                                       \
-                const int x1       = clamp_unsigned(x0 + 1, src_width - 1);                                            \
-                const float dx     = (float)(src_x - (double)x0);                                                      \
-                uint8_t r00, g00, b00, a00;                                                                            \
-                uint8_t r01, g01, b01, a01;                                                                            \
-                uint8_t r10, g10, b10, a10;                                                                            \
-                uint8_t r11, g11, b11, a11;                                                                            \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y0, &r00, &g00, &b00, &a00);    \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y0, &r01, &g01, &b01, &a01);    \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y1, &r10, &g10, &b10, &a10);    \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y1, &r11, &g11, &b11, &a11);    \
-                const float w00 = (1.0f - dx) * (1.0f - dy);                                                           \
-                const float w01 = dx * (1.0f - dy);                                                                    \
-                const float w10 = (1.0f - dx) * dy;                                                                    \
-                const float w11 = dx * dy;                                                                             \
-                const float r   = (float)r00 * w00 + (float)r01 * w01 + (float)r10 * w10 + (float)r11 * w11;           \
-                const float g   = (float)g00 * w00 + (float)g01 * w01 + (float)g10 * w10 + (float)g11 * w11;           \
-                const float b   = (float)b00 * w00 + (float)b01 * w01 + (float)b10 * w10 + (float)b11 * w11;           \
-                const float a   = (float)a00 * w00 + (float)a01 * w01 + (float)a10 * w10 + (float)a11 * w11;           \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(r + 0.5f), (uint8_t)(g + 0.5f),                 \
-                           (uint8_t)(b + 0.5f), (uint8_t)(a + 0.5f));                                                  \
-            }                                                                                                          \
-        }                                                                                                              \
-        return SAIL_OK;                                                                                                \
+#define SCALE_BILINEAR_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                               \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                      \
+                                    unsigned src_width,                                                            \
+                                    unsigned src_height,                                                           \
+                                    unsigned src_bytes_per_line,                                                   \
+                                    uint8_t* dst_pixels,                                                           \
+                                    unsigned dst_width,                                                            \
+                                    unsigned dst_height,                                                           \
+                                    unsigned dst_bytes_per_line)                                                   \
+    {                                                                                                              \
+        const double x_scale = (double)src_width / (double)dst_width;                                              \
+        const double y_scale = (double)src_height / (double)dst_height;                                            \
+        unsigned row;                                                                                              \
+        SAIL_OMP_PARALLEL_FOR                                                                                      \
+        for (row = 0; row < dst_height; row++)                                                                     \
+        {                                                                                                          \
+            const double src_y = (double)row * y_scale;                                                            \
+            const int y0       = (int)src_y;                                                                       \
+            const int y1       = clamp_unsigned(y0 + 1, src_height - 1);                                           \
+            const float dy     = (float)(src_y - (double)y0);                                                      \
+            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                            \
+            for (unsigned col = 0; col < dst_width; col++)                                                         \
+            {                                                                                                      \
+                const double src_x = (double)col * x_scale;                                                        \
+                const int x0       = (int)src_x;                                                                   \
+                const int x1       = clamp_unsigned(x0 + 1, src_width - 1);                                        \
+                const float dx     = (float)(src_x - (double)x0);                                                  \
+                uint8_t r00, g00, b00, a00;                                                                        \
+                uint8_t r01, g01, b01, a01;                                                                        \
+                uint8_t r10, g10, b10, a10;                                                                        \
+                uint8_t r11, g11, b11, a11;                                                                        \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y0, &r00, &g00, &b00, &a00); \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y0, &r01, &g01, &b01, &a01); \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y1, &r10, &g10, &b10, &a10); \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y1, &r11, &g11, &b11, &a11); \
+                const float w00 = (1.0f - dx) * (1.0f - dy);                                                       \
+                const float w01 = dx * (1.0f - dy);                                                                \
+                const float w10 = (1.0f - dx) * dy;                                                                \
+                const float w11 = dx * dy;                                                                         \
+                const float r   = (float)r00 * w00 + (float)r01 * w01 + (float)r10 * w10 + (float)r11 * w11;       \
+                const float g   = (float)g00 * w00 + (float)g01 * w01 + (float)g10 * w10 + (float)g11 * w11;       \
+                const float b   = (float)b00 * w00 + (float)b01 * w01 + (float)b10 * w10 + (float)b11 * w11;       \
+                const float a   = (float)a00 * w00 + (float)a01 * w01 + (float)a10 * w10 + (float)a11 * w11;       \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(r + 0.5f), (uint8_t)(g + 0.5f),             \
+                           (uint8_t)(b + 0.5f), (uint8_t)(a + 0.5f));                                              \
+            }                                                                                                      \
+        }                                                                                                          \
+        return SAIL_OK;                                                                                            \
     }
 
 /* Bilinear scaling template for grayscale. */
-#define SCALE_BILINEAR_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                         \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
-    {                                                                                                                  \
-        const double x_scale = (double)src_width / (double)dst_width;                                                  \
-        const double y_scale = (double)src_height / (double)dst_height;                                                \
-        unsigned row;                                                                                                  \
-        SAIL_OMP_PARALLEL_FOR                                                                                          \
-        for (row = 0; row < dst_height; row++)                                                                         \
-        {                                                                                                              \
-            const double src_y = (double)row * y_scale;                                                                \
-            const int y0       = (int)src_y;                                                                           \
-            const int y1       = clamp_unsigned(y0 + 1, src_height - 1);                                               \
-            const float dy     = (float)(src_y - (double)y0);                                                          \
-            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                                \
-            for (unsigned col = 0; col < dst_width; col++)                                                             \
-            {                                                                                                          \
-                const double src_x = (double)col * x_scale;                                                            \
-                const int x0       = (int)src_x;                                                                       \
-                const int x1       = clamp_unsigned(x0 + 1, src_width - 1);                                            \
-                const float dx     = (float)(src_x - (double)x0);                                                      \
-                const uint8_t g00  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y0);       \
-                const uint8_t g01  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y0);       \
-                const uint8_t g10  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y1);       \
-                const uint8_t g11  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y1);       \
-                const float w00    = (1.0f - dx) * (1.0f - dy);                                                        \
-                const float w01    = dx * (1.0f - dy);                                                                 \
-                const float w10    = (1.0f - dx) * dy;                                                                 \
-                const float w11    = dx * dy;                                                                          \
-                const float g      = (float)g00 * w00 + (float)g01 * w01 + (float)g10 * w10 + (float)g11 * w11;        \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g + 0.5f));                                     \
-            }                                                                                                          \
-        }                                                                                                              \
-        return SAIL_OK;                                                                                                \
+#define SCALE_BILINEAR_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                  \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                   \
+                                    unsigned src_width,                                                         \
+                                    unsigned src_height,                                                        \
+                                    unsigned src_bytes_per_line,                                                \
+                                    uint8_t* dst_pixels,                                                        \
+                                    unsigned dst_width,                                                         \
+                                    unsigned dst_height,                                                        \
+                                    unsigned dst_bytes_per_line)                                                \
+    {                                                                                                           \
+        const double x_scale = (double)src_width / (double)dst_width;                                           \
+        const double y_scale = (double)src_height / (double)dst_height;                                         \
+        unsigned row;                                                                                           \
+        SAIL_OMP_PARALLEL_FOR                                                                                   \
+        for (row = 0; row < dst_height; row++)                                                                  \
+        {                                                                                                       \
+            const double src_y = (double)row * y_scale;                                                         \
+            const int y0       = (int)src_y;                                                                    \
+            const int y1       = clamp_unsigned(y0 + 1, src_height - 1);                                        \
+            const float dy     = (float)(src_y - (double)y0);                                                   \
+            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                         \
+            for (unsigned col = 0; col < dst_width; col++)                                                      \
+            {                                                                                                   \
+                const double src_x = (double)col * x_scale;                                                     \
+                const int x0       = (int)src_x;                                                                \
+                const int x1       = clamp_unsigned(x0 + 1, src_width - 1);                                     \
+                const float dx     = (float)(src_x - (double)x0);                                               \
+                const uint8_t g00  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y0); \
+                const uint8_t g01  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y0); \
+                const uint8_t g10  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y1); \
+                const uint8_t g11  = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y1); \
+                const float w00    = (1.0f - dx) * (1.0f - dy);                                                 \
+                const float w01    = dx * (1.0f - dy);                                                          \
+                const float w10    = (1.0f - dx) * dy;                                                          \
+                const float w11    = dx * dy;                                                                   \
+                const float g      = (float)g00 * w00 + (float)g01 * w01 + (float)g10 * w10 + (float)g11 * w11; \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g + 0.5f));                              \
+            }                                                                                                   \
+        }                                                                                                       \
+        return SAIL_OK;                                                                                         \
     }
 
 /* Bilinear scaling template for grayscale+alpha. */
-#define SCALE_BILINEAR_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                   \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
-    {                                                                                                                  \
-        const double x_scale = (double)src_width / (double)dst_width;                                                  \
-        const double y_scale = (double)src_height / (double)dst_height;                                                \
-        unsigned row;                                                                                                  \
-        SAIL_OMP_PARALLEL_FOR                                                                                          \
-        for (row = 0; row < dst_height; row++)                                                                         \
-        {                                                                                                              \
-            const double src_y = (double)row * y_scale;                                                                \
-            const int y0       = (int)src_y;                                                                           \
-            const int y1       = clamp_unsigned(y0 + 1, src_height - 1);                                               \
-            const float dy     = (float)(src_y - (double)y0);                                                          \
-            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                                \
-            for (unsigned col = 0; col < dst_width; col++)                                                             \
-            {                                                                                                          \
-                const double src_x = (double)col * x_scale;                                                            \
-                const int x0       = (int)src_x;                                                                       \
-                const int x1       = clamp_unsigned(x0 + 1, src_width - 1);                                            \
-                const float dx     = (float)(src_x - (double)x0);                                                      \
-                uint8_t g00, a00, g01, a01, g10, a10, g11, a11;                                                        \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y0, &g00, &a00);                \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y0, &g01, &a01);                \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y1, &g10, &a10);                \
-                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y1, &g11, &a11);                \
-                const float w00 = (1.0f - dx) * (1.0f - dy);                                                           \
-                const float w01 = dx * (1.0f - dy);                                                                    \
-                const float w10 = (1.0f - dx) * dy;                                                                    \
-                const float w11 = dx * dy;                                                                             \
-                const float g   = (float)g00 * w00 + (float)g01 * w01 + (float)g10 * w10 + (float)g11 * w11;           \
-                const float a   = (float)a00 * w00 + (float)a01 * w01 + (float)a10 * w10 + (float)a11 * w11;           \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g + 0.5f), (uint8_t)(a + 0.5f));                \
-            }                                                                                                          \
-        }                                                                                                              \
-        return SAIL_OK;                                                                                                \
+#define SCALE_BILINEAR_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)        \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                               \
+                                    unsigned src_width,                                                     \
+                                    unsigned src_height,                                                    \
+                                    unsigned src_bytes_per_line,                                            \
+                                    uint8_t* dst_pixels,                                                    \
+                                    unsigned dst_width,                                                     \
+                                    unsigned dst_height,                                                    \
+                                    unsigned dst_bytes_per_line)                                            \
+    {                                                                                                       \
+        const double x_scale = (double)src_width / (double)dst_width;                                       \
+        const double y_scale = (double)src_height / (double)dst_height;                                     \
+        unsigned row;                                                                                       \
+        SAIL_OMP_PARALLEL_FOR                                                                               \
+        for (row = 0; row < dst_height; row++)                                                              \
+        {                                                                                                   \
+            const double src_y = (double)row * y_scale;                                                     \
+            const int y0       = (int)src_y;                                                                \
+            const int y1       = clamp_unsigned(y0 + 1, src_height - 1);                                    \
+            const float dy     = (float)(src_y - (double)y0);                                               \
+            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                     \
+            for (unsigned col = 0; col < dst_width; col++)                                                  \
+            {                                                                                               \
+                const double src_x = (double)col * x_scale;                                                 \
+                const int x0       = (int)src_x;                                                            \
+                const int x1       = clamp_unsigned(x0 + 1, src_width - 1);                                 \
+                const float dx     = (float)(src_x - (double)x0);                                           \
+                uint8_t g00, a00, g01, a01, g10, a10, g11, a11;                                             \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y0, &g00, &a00);     \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y0, &g01, &a01);     \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x0, y1, &g10, &a10);     \
+                SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x1, y1, &g11, &a11);     \
+                const float w00 = (1.0f - dx) * (1.0f - dy);                                                \
+                const float w01 = dx * (1.0f - dy);                                                         \
+                const float w10 = (1.0f - dx) * dy;                                                         \
+                const float w11 = dx * dy;                                                                  \
+                const float g   = (float)g00 * w00 + (float)g01 * w01 + (float)g10 * w10 + (float)g11 * w11; \
+                const float a   = (float)a00 * w00 + (float)a01 * w01 + (float)a10 * w10 + (float)a11 * w11; \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g + 0.5f), (uint8_t)(a + 0.5f));     \
+            }                                                                                               \
+        }                                                                                                   \
+        return SAIL_OK;                                                                                     \
     }
 
 /* Bicubic scaling template for RGB/RGBA. */
-#define SCALE_BICUBIC_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                    \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
+#define SCALE_BICUBIC_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                              \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                    \
+                                    unsigned src_width,                                                          \
+                                    unsigned src_height,                                                         \
+                                    unsigned src_bytes_per_line,                                                 \
+                                    uint8_t* dst_pixels,                                                         \
+                                    unsigned dst_width,                                                          \
+                                    unsigned dst_height,                                                         \
+                                    unsigned dst_bytes_per_line)                                                 \
+    {                                                                                                            \
+        const double x_scale = (double)src_width / (double)dst_width;                                            \
+        const double y_scale = (double)src_height / (double)dst_height;                                          \
+        unsigned row;                                                                                            \
+        SAIL_OMP_PARALLEL_FOR                                                                                    \
+        for (row = 0; row < dst_height; row++)                                                                   \
+        {                                                                                                        \
+            const double src_y = (double)row * y_scale;                                                          \
+            const int y0       = (int)floor(src_y);                                                              \
+            const float dy     = (float)(src_y - (double)y0);                                                    \
+            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                          \
+            for (unsigned col = 0; col < dst_width; col++)                                                       \
+            {                                                                                                    \
+                const double src_x = (double)col * x_scale;                                                      \
+                const int x0       = (int)floor(src_x);                                                          \
+                const float dx     = (float)(src_x - (double)x0);                                                \
+                float r_sum = 0.0f, g_sum = 0.0f, b_sum = 0.0f, a_sum = 0.0f;                                    \
+                float weight_sum = 0.0f;                                                                         \
+                for (int j = -1; j <= 2; j++)                                                                    \
+                {                                                                                                \
+                    const int y    = clamp_unsigned(y0 + j, src_height - 1);                                     \
+                    const float wy = cubic_kernel((float)j - dy);                                                \
+                    for (int i = -1; i <= 2; i++)                                                                \
+                    {                                                                                            \
+                        const int x        = clamp_unsigned(x0 + i, src_width - 1);                              \
+                        const float wx     = cubic_kernel((float)i - dx);                                        \
+                        const float weight = wx * wy;                                                            \
+                        uint8_t r, g, b, a;                                                                      \
+                        SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y, &r, &g, &b, &a); \
+                        r_sum      += (float)r * weight;                                                         \
+                        g_sum      += (float)g * weight;                                                         \
+                        b_sum      += (float)b * weight;                                                         \
+                        a_sum      += (float)a * weight;                                                         \
+                        weight_sum += weight;                                                                    \
+                    }                                                                                            \
+                }                                                                                                \
+                if (weight_sum > 0.0f)                                                                           \
+                {                                                                                                \
+                    r_sum /= weight_sum;                                                                         \
+                    g_sum /= weight_sum;                                                                         \
+                    b_sum /= weight_sum;                                                                         \
+                    a_sum /= weight_sum;                                                                         \
+                }                                                                                                \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(r_sum + 0.5f), (uint8_t)(g_sum + 0.5f),   \
+                           (uint8_t)(b_sum + 0.5f), (uint8_t)(a_sum + 0.5f));                                    \
+            }                                                                                                    \
+        }                                                                                                        \
+        return SAIL_OK;                                                                                          \
+    }
+
+/* Bicubic scaling template for grayscale. */
+#define SCALE_BICUBIC_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                          \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                          \
+                                    unsigned src_width,                                                                \
+                                    unsigned src_height,                                                               \
+                                    unsigned src_bytes_per_line,                                                       \
+                                    uint8_t* dst_pixels,                                                               \
+                                    unsigned dst_width,                                                                \
+                                    unsigned dst_height,                                                               \
+                                    unsigned dst_bytes_per_line)                                                       \
     {                                                                                                                  \
         const double x_scale = (double)src_width / (double)dst_width;                                                  \
         const double y_scale = (double)src_height / (double)dst_height;                                                \
@@ -747,92 +869,105 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
                 const double src_x = (double)col * x_scale;                                                            \
                 const int x0       = (int)floor(src_x);                                                                \
                 const float dx     = (float)(src_x - (double)x0);                                                      \
-                float r_sum = 0.0f, g_sum = 0.0f, b_sum = 0.0f, a_sum = 0.0f;                                          \
-                float weight_sum = 0.0f;                                                                               \
+                float g_sum        = 0.0f;                                                                             \
+                float weight_sum   = 0.0f;                                                                             \
                 for (int j = -1; j <= 2; j++)                                                                          \
                 {                                                                                                      \
                     const int y    = clamp_unsigned(y0 + j, src_height - 1);                                           \
                     const float wy = cubic_kernel((float)j - dy);                                                      \
                     for (int i = -1; i <= 2; i++)                                                                      \
                     {                                                                                                  \
-                        const int x        = clamp_unsigned(x0 + i, src_width - 1);                                    \
-                        const float wx     = cubic_kernel((float)i - dx);                                              \
-                        const float weight = wx * wy;                                                                  \
-                        uint8_t r, g, b, a;                                                                            \
-                        SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y, &r, &g, &b, &a);      \
-                        r_sum      += (float)r * weight;                                                               \
-                        g_sum      += (float)g * weight;                                                               \
-                        b_sum      += (float)b * weight;                                                               \
-                        a_sum      += (float)a * weight;                                                               \
-                        weight_sum += weight;                                                                          \
+                        const int x         = clamp_unsigned(x0 + i, src_width - 1);                                   \
+                        const float wx      = cubic_kernel((float)i - dx);                                             \
+                        const float weight  = wx * wy;                                                                 \
+                        const uint8_t g     = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y); \
+                        g_sum              += (float)g * weight;                                                       \
+                        weight_sum         += weight;                                                                  \
                     }                                                                                                  \
                 }                                                                                                      \
                 if (weight_sum > 0.0f)                                                                                 \
                 {                                                                                                      \
-                    r_sum /= weight_sum;                                                                               \
                     g_sum /= weight_sum;                                                                               \
-                    b_sum /= weight_sum;                                                                               \
-                    a_sum /= weight_sum;                                                                               \
                 }                                                                                                      \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(r_sum + 0.5f), (uint8_t)(g_sum + 0.5f),         \
-                           (uint8_t)(b_sum + 0.5f), (uint8_t)(a_sum + 0.5f));                                          \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g_sum + 0.5f));                                 \
             }                                                                                                          \
         }                                                                                                              \
         return SAIL_OK;                                                                                                \
     }
 
-/* Bicubic scaling template for grayscale. */
-#define SCALE_BICUBIC_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                           \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                  \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,                \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                    \
-    {                                                                                                                   \
-        const double x_scale = (double)src_width / (double)dst_width;                                                   \
-        const double y_scale = (double)src_height / (double)dst_height;                                                 \
-        unsigned row;                                                                                                   \
-        SAIL_OMP_PARALLEL_FOR                                                                                           \
-        for (row = 0; row < dst_height; row++)                                                                          \
-        {                                                                                                               \
-            const double src_y = (double)row * y_scale;                                                                 \
-            const int y0       = (int)floor(src_y);                                                                     \
-            const float dy     = (float)(src_y - (double)y0);                                                           \
-            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                                 \
-            for (unsigned col = 0; col < dst_width; col++)                                                              \
-            {                                                                                                           \
-                const double src_x = (double)col * x_scale;                                                             \
-                const int x0       = (int)floor(src_x);                                                                 \
-                const float dx     = (float)(src_x - (double)x0);                                                       \
-                float g_sum        = 0.0f;                                                                              \
-                float weight_sum   = 0.0f;                                                                              \
-                for (int j = -1; j <= 2; j++)                                                                           \
-                {                                                                                                       \
-                    const int y    = clamp_unsigned(y0 + j, src_height - 1);                                            \
-                    const float wy = cubic_kernel((float)j - dy);                                                       \
-                    for (int i = -1; i <= 2; i++)                                                                       \
-                    {                                                                                                   \
-                        const int x         = clamp_unsigned(x0 + i, src_width - 1);                                    \
-                        const float wx      = cubic_kernel((float)i - dx);                                              \
-                        const float weight  = wx * wy;                                                                  \
-                        const uint8_t g     = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y); \
-                        g_sum              += (float)g * weight;                                                        \
-                        weight_sum         += weight;                                                                   \
-                    }                                                                                                   \
-                }                                                                                                       \
-                if (weight_sum > 0.0f)                                                                                  \
-                {                                                                                                       \
-                    g_sum /= weight_sum;                                                                                \
-                }                                                                                                       \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g_sum + 0.5f));                                  \
-            }                                                                                                           \
-        }                                                                                                               \
-        return SAIL_OK;                                                                                                 \
+/* Lanczos scaling template for RGB/RGBA. */
+#define SCALE_LANCZOS_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                              \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                    \
+                                    unsigned src_width,                                                          \
+                                    unsigned src_height,                                                         \
+                                    unsigned src_bytes_per_line,                                                 \
+                                    uint8_t* dst_pixels,                                                         \
+                                    unsigned dst_width,                                                          \
+                                    unsigned dst_height,                                                         \
+                                    unsigned dst_bytes_per_line)                                                 \
+    {                                                                                                            \
+        const int lanczos_a  = 3;                                                                                \
+        const double x_scale = (double)src_width / (double)dst_width;                                            \
+        const double y_scale = (double)src_height / (double)dst_height;                                          \
+        unsigned row;                                                                                            \
+        SAIL_OMP_PARALLEL_FOR                                                                                    \
+        for (row = 0; row < dst_height; row++)                                                                   \
+        {                                                                                                        \
+            const double src_y = (double)row * y_scale;                                                          \
+            const int y0       = (int)floor(src_y);                                                              \
+            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                          \
+            for (unsigned col = 0; col < dst_width; col++)                                                       \
+            {                                                                                                    \
+                const double src_x = (double)col * x_scale;                                                      \
+                const int x0       = (int)floor(src_x);                                                          \
+                float r_sum = 0.0f, g_sum = 0.0f, b_sum = 0.0f, a_sum = 0.0f;                                    \
+                float weight_sum = 0.0f;                                                                         \
+                for (int j = -lanczos_a + 1; j <= lanczos_a; j++)                                                \
+                {                                                                                                \
+                    const int y    = clamp_unsigned(y0 + j, src_height - 1);                                     \
+                    const float wy = lanczos_kernel((float)j + (float)(src_y - (double)y0), lanczos_a);          \
+                    if (wy == 0.0f)                                                                              \
+                        continue;                                                                                \
+                    for (int i = -lanczos_a + 1; i <= lanczos_a; i++)                                            \
+                    {                                                                                            \
+                        const int x    = clamp_unsigned(x0 + i, src_width - 1);                                  \
+                        const float wx = lanczos_kernel((float)i + (float)(src_x - (double)x0), lanczos_a);      \
+                        if (wx == 0.0f)                                                                          \
+                            continue;                                                                            \
+                        const float weight = wx * wy;                                                            \
+                        uint8_t r, g, b, a;                                                                      \
+                        SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y, &r, &g, &b, &a); \
+                        r_sum      += (float)r * weight;                                                         \
+                        g_sum      += (float)g * weight;                                                         \
+                        b_sum      += (float)b * weight;                                                         \
+                        a_sum      += (float)a * weight;                                                         \
+                        weight_sum += weight;                                                                    \
+                    }                                                                                            \
+                }                                                                                                \
+                if (weight_sum > 0.0f)                                                                           \
+                {                                                                                                \
+                    r_sum /= weight_sum;                                                                         \
+                    g_sum /= weight_sum;                                                                         \
+                    b_sum /= weight_sum;                                                                         \
+                    a_sum /= weight_sum;                                                                         \
+                }                                                                                                \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(r_sum + 0.5f), (uint8_t)(g_sum + 0.5f),   \
+                           (uint8_t)(b_sum + 0.5f), (uint8_t)(a_sum + 0.5f));                                    \
+            }                                                                                                    \
+        }                                                                                                        \
+        return SAIL_OK;                                                                                          \
     }
 
-/* Lanczos scaling template for RGB/RGBA. */
-#define SCALE_LANCZOS_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                                    \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                 \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,               \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                   \
+/* Lanczos scaling template for grayscale. */
+#define SCALE_LANCZOS_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                          \
+    static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                          \
+                                    unsigned src_width,                                                                \
+                                    unsigned src_height,                                                               \
+                                    unsigned src_bytes_per_line,                                                       \
+                                    uint8_t* dst_pixels,                                                               \
+                                    unsigned dst_width,                                                                \
+                                    unsigned dst_height,                                                               \
+                                    unsigned dst_bytes_per_line)                                                       \
     {                                                                                                                  \
         const int lanczos_a  = 3;                                                                                      \
         const double x_scale = (double)src_width / (double)dst_width;                                                  \
@@ -848,8 +983,8 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
             {                                                                                                          \
                 const double src_x = (double)col * x_scale;                                                            \
                 const int x0       = (int)floor(src_x);                                                                \
-                float r_sum = 0.0f, g_sum = 0.0f, b_sum = 0.0f, a_sum = 0.0f;                                          \
-                float weight_sum = 0.0f;                                                                               \
+                float g_sum        = 0.0f;                                                                             \
+                float weight_sum   = 0.0f;                                                                             \
                 for (int j = -lanczos_a + 1; j <= lanczos_a; j++)                                                      \
                 {                                                                                                      \
                     const int y    = clamp_unsigned(y0 + j, src_height - 1);                                           \
@@ -862,78 +997,20 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
                         const float wx = lanczos_kernel((float)i + (float)(src_x - (double)x0), lanczos_a);            \
                         if (wx == 0.0f)                                                                                \
                             continue;                                                                                  \
-                        const float weight = wx * wy;                                                                  \
-                        uint8_t r, g, b, a;                                                                            \
-                        SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y, &r, &g, &b, &a);      \
-                        r_sum      += (float)r * weight;                                                               \
-                        g_sum      += (float)g * weight;                                                               \
-                        b_sum      += (float)b * weight;                                                               \
-                        a_sum      += (float)a * weight;                                                               \
-                        weight_sum += weight;                                                                          \
+                        const float weight  = wx * wy;                                                                 \
+                        const uint8_t g     = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y); \
+                        g_sum              += (float)g * weight;                                                       \
+                        weight_sum         += weight;                                                                  \
                     }                                                                                                  \
                 }                                                                                                      \
                 if (weight_sum > 0.0f)                                                                                 \
                 {                                                                                                      \
-                    r_sum /= weight_sum;                                                                               \
                     g_sum /= weight_sum;                                                                               \
-                    b_sum /= weight_sum;                                                                               \
-                    a_sum /= weight_sum;                                                                               \
                 }                                                                                                      \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(r_sum + 0.5f), (uint8_t)(g_sum + 0.5f),         \
-                           (uint8_t)(b_sum + 0.5f), (uint8_t)(a_sum + 0.5f));                                          \
+                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g_sum + 0.5f));                                 \
             }                                                                                                          \
         }                                                                                                              \
         return SAIL_OK;                                                                                                \
-    }
-
-/* Lanczos scaling template for grayscale. */
-#define SCALE_LANCZOS_GRAYSCALE_TEMPLATE(FUNC_NAME, SAMPLE_FUNC, WRITE_FUNC, BYTES_PER_PIXEL)                           \
-    static sail_status_t FUNC_NAME(const uint8_t* src_pixels, unsigned src_width, unsigned src_height,                  \
-                                   unsigned src_bytes_per_line, uint8_t* dst_pixels, unsigned dst_width,                \
-                                   unsigned dst_height, unsigned dst_bytes_per_line)                                    \
-    {                                                                                                                   \
-        const int lanczos_a  = 3;                                                                                       \
-        const double x_scale = (double)src_width / (double)dst_width;                                                   \
-        const double y_scale = (double)src_height / (double)dst_height;                                                 \
-        unsigned row;                                                                                                   \
-        SAIL_OMP_PARALLEL_FOR                                                                                           \
-        for (row = 0; row < dst_height; row++)                                                                          \
-        {                                                                                                               \
-            const double src_y = (double)row * y_scale;                                                                 \
-            const int y0       = (int)floor(src_y);                                                                     \
-            uint8_t* dst_scan  = dst_pixels + row * dst_bytes_per_line;                                                 \
-            for (unsigned col = 0; col < dst_width; col++)                                                              \
-            {                                                                                                           \
-                const double src_x = (double)col * x_scale;                                                             \
-                const int x0       = (int)floor(src_x);                                                                 \
-                float g_sum        = 0.0f;                                                                              \
-                float weight_sum   = 0.0f;                                                                              \
-                for (int j = -lanczos_a + 1; j <= lanczos_a; j++)                                                       \
-                {                                                                                                       \
-                    const int y    = clamp_unsigned(y0 + j, src_height - 1);                                            \
-                    const float wy = lanczos_kernel((float)j + (float)(src_y - (double)y0), lanczos_a);                 \
-                    if (wy == 0.0f)                                                                                     \
-                        continue;                                                                                       \
-                    for (int i = -lanczos_a + 1; i <= lanczos_a; i++)                                                   \
-                    {                                                                                                   \
-                        const int x    = clamp_unsigned(x0 + i, src_width - 1);                                         \
-                        const float wx = lanczos_kernel((float)i + (float)(src_x - (double)x0), lanczos_a);             \
-                        if (wx == 0.0f)                                                                                 \
-                            continue;                                                                                   \
-                        const float weight  = wx * wy;                                                                  \
-                        const uint8_t g     = SAMPLE_FUNC(src_pixels, src_width, src_height, src_bytes_per_line, x, y); \
-                        g_sum              += (float)g * weight;                                                        \
-                        weight_sum         += weight;                                                                   \
-                    }                                                                                                   \
-                }                                                                                                       \
-                if (weight_sum > 0.0f)                                                                                  \
-                {                                                                                                       \
-                    g_sum /= weight_sum;                                                                                \
-                }                                                                                                       \
-                WRITE_FUNC(dst_scan + col * BYTES_PER_PIXEL, (uint8_t)(g_sum + 0.5f));                                  \
-            }                                                                                                           \
-        }                                                                                                               \
-        return SAIL_OK;                                                                                                 \
     }
 
 /*
