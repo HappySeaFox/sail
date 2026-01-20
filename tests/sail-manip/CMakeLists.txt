@@ -3,3 +3,4 @@ sail_test(TARGET format-conversion  SOURCES format-conversion.c  LINK sail sail-
 sail_test(TARGET indexed-conversion SOURCES indexed-conversion.c LINK sail sail-manip)
 sail_test(TARGET pixel-conversions  SOURCES pixel-conversions.c  LINK sail sail-manip)
 sail_test(TARGET rotate             SOURCES rotate.c             LINK sail sail-manip)
+sail_test(TARGET scale              SOURCES scale.c              LINK sail sail-manip)
