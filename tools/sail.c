@@ -660,19 +660,19 @@ static sail_status_t extract_frames_impl(const char* input,
             break;
         }
 
-        /* Construct output filename: base-N.ext */
+        /* Construct output filename: base-N.ext. */
         char output_filename[1024];
         size_t safe_base_name_len = base_name_len;
 
         if (safe_base_name_len > sizeof(output_filename) - 20)
         {
-            safe_base_name_len = sizeof(output_filename) - 20; /* Reserve space for "-N" and extension */
+            safe_base_name_len = sizeof(output_filename) - 20; /* Reserve space for "-N" and extension. */
         }
 
         long written;
         if (suffix_digits > 0)
         {
-            /* Format with specified number of digits, e.g., %03d for 3 digits */
+            /* Format with specified number of digits, e.g., %03d for 3 digits. */
             char format_str[32];
             sail_snprintf(format_str, sizeof(format_str), "%%.*s-%%0%dd%%s", suffix_digits);
             written = sail_snprintf(output_filename, sizeof(output_filename), format_str, (int)safe_base_name_len,
@@ -680,7 +680,7 @@ static sail_status_t extract_frames_impl(const char* input,
         }
         else
         {
-            /* Default format without zero-padding */
+            /* Default format without zero-padding. */
             written = sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len,
                                      base_name_start, frame_count + 1, ext ? ext : "");
         }
@@ -1382,6 +1382,543 @@ static sail_status_t decode(int argc, char* argv[])
     return SAIL_OK;
 }
 
+static enum SailScaling parse_resize_method(const char* str)
+{
+    if (strcmp(str, "nearest") == 0)
+    {
+        return SAIL_SCALING_NEAREST_NEIGHBOR;
+    }
+    else if (strcmp(str, "bilinear") == 0)
+    {
+        return SAIL_SCALING_BILINEAR;
+    }
+    else if (strcmp(str, "bicubic") == 0)
+    {
+        return SAIL_SCALING_BICUBIC;
+    }
+    else if (strcmp(str, "lanczos") == 0)
+    {
+        return SAIL_SCALING_LANCZOS;
+    }
+    else
+    {
+        return SAIL_SCALING_BILINEAR;
+    }
+}
+
+static sail_status_t resize_impl(const char* input,
+                                 const char* output,
+                                 unsigned new_width,
+                                 unsigned new_height,
+                                 enum SailScaling method,
+                                 bool in_place,
+                                 bool* auto_yes,
+                                 bool* auto_no)
+{
+    SAIL_CHECK_PTR(input);
+    SAIL_CHECK_PTR(output);
+
+    const struct sail_codec_info* input_codec_info;
+    void* load_state;
+    struct sail_image* image;
+
+    /* Load the image. */
+    SAIL_LOG_DEBUG("Input file: %s", input);
+    SAIL_TRY(sail_codec_info_from_path(input, &input_codec_info));
+    SAIL_LOG_DEBUG("Input codec: %s", input_codec_info->description);
+
+    struct sail_load_options* load_options;
+    SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
+    SAIL_TRY(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state));
+    sail_destroy_load_options(load_options);
+
+    /* Load first frame. */
+    SAIL_TRY_OR_CLEANUP(sail_load_next_frame(load_state, &image),
+                        /* cleanup */ sail_stop_loading(load_state));
+    SAIL_TRY(sail_stop_loading(load_state));
+
+    /* Resize the image. */
+    SAIL_LOG_DEBUG("Resizing from %ux%u to %ux%u using method %d", image->width, image->height, new_width, new_height,
+                   method);
+    struct sail_image* resized_image = NULL;
+    SAIL_TRY_OR_CLEANUP(sail_scale_image(image, new_width, new_height, method, &resized_image),
+                        /* cleanup */ sail_destroy_image(image));
+    sail_destroy_image(image);
+
+    /* Determine output path. */
+    const char* output_path = output;
+    char* temp_path         = NULL;
+
+    if (in_place)
+    {
+        /* Create temporary file path. */
+        size_t temp_path_len = strlen(input) + 8;
+        SAIL_TRY_OR_CLEANUP(sail_malloc(temp_path_len, (void**)&temp_path),
+                            /* cleanup */ sail_destroy_image(resized_image));
+
+        sail_snprintf(temp_path, temp_path_len, "%s.tmp", input);
+        output_path = temp_path;
+    }
+
+    /* Check if output file exists and ask for confirmation. */
+    if (!check_file_overwrite(output_path, auto_yes, auto_no))
+    {
+        sail_free(temp_path);
+        sail_destroy_image(resized_image);
+        return SAIL_OK;
+    }
+
+    /* Save the resized image. */
+    const struct sail_codec_info* output_codec_info;
+    SAIL_TRY_OR_CLEANUP(sail_codec_info_from_path(in_place ? input : output, &output_codec_info),
+                        /* cleanup */ sail_free(temp_path);
+                        sail_destroy_image(resized_image));
+    SAIL_LOG_DEBUG("Output codec: %s", output_codec_info->description);
+
+    struct sail_save_options* save_options;
+    SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options),
+                        /* cleanup */ sail_free(temp_path);
+                        sail_destroy_image(resized_image));
+
+    void* save_state = NULL;
+    SAIL_TRY_OR_CLEANUP(
+        sail_start_saving_into_file_with_options(output_path, output_codec_info, save_options, &save_state),
+        /* cleanup */ sail_free(temp_path);
+        sail_destroy_image(resized_image); sail_destroy_save_options(save_options));
+
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(save_state, resized_image),
+                        /* cleanup */ sail_free(temp_path);
+                        sail_destroy_image(resized_image); sail_stop_saving(save_state);
+                        sail_destroy_save_options(save_options));
+
+    SAIL_TRY_OR_CLEANUP(sail_stop_saving(save_state),
+                        /* cleanup */ sail_free(temp_path);
+                        sail_destroy_image(resized_image); sail_destroy_save_options(save_options));
+    sail_destroy_image(resized_image);
+    sail_destroy_save_options(save_options);
+
+    /* If in-place, replace original file with temporary file. */
+    if (in_place)
+    {
+#ifdef _WIN32
+        /* On Windows, remove original file first, then rename temp. */
+        if (remove(input) != 0)
+        {
+            sail_free(temp_path);
+            SAIL_LOG_ERROR("Failed to remove original file");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
+        }
+        if (rename(temp_path, input) != 0)
+        {
+            sail_free(temp_path);
+            SAIL_LOG_ERROR("Failed to replace file");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
+        }
+#else
+        /* On Unix, rename is atomic. */
+        if (rename(temp_path, input) != 0)
+        {
+            sail_free(temp_path);
+            SAIL_LOG_ERROR("Failed to replace file");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
+        }
+#endif
+        sail_free(temp_path);
+    }
+
+    return SAIL_OK;
+}
+
+enum DimensionValue
+{
+    DIMENSION_FIXED,
+    DIMENSION_INPUT,       /* Use input dimension (when dimension is omitted). */
+    DIMENSION_PROPORTIONAL /* 0: calculate proportionally. */
+};
+
+struct ParsedDimensions
+{
+    enum DimensionValue width_type;
+    enum DimensionValue height_type;
+    unsigned width_value;
+    unsigned height_value;
+};
+
+static sail_status_t parse_dimension_token(const char* token,
+                                           enum DimensionValue* type,
+                                           unsigned* value,
+                                           unsigned input_width,
+                                           unsigned input_height,
+                                           bool is_width)
+{
+    SAIL_CHECK_PTR(token);
+    SAIL_CHECK_PTR(type);
+    SAIL_CHECK_PTR(value);
+
+    /* Check for percentage (e.g., "25%"). */
+    size_t token_len = strlen(token);
+    if (token_len > 0 && token[token_len - 1] == '%')
+    {
+        char* percent_token;
+        SAIL_TRY(sail_strdup_length(token, token_len - 1, &percent_token));
+
+        int percent = atoi(percent_token);
+        sail_free(percent_token);
+
+        if (percent <= 0 || percent > 1000)
+        {
+            return SAIL_ERROR_INVALID_ARGUMENT;
+        }
+
+        unsigned input_dim = is_width ? input_width : input_height;
+        *type              = DIMENSION_FIXED;
+        *value             = (unsigned)((unsigned long long)input_dim * percent / 100);
+        if (*value == 0)
+        {
+            *value = 1;
+        }
+        return SAIL_OK;
+    }
+
+    /* Check for "0" (calculate proportionally). */
+    if (strcmp(token, "0") == 0)
+    {
+        *type  = DIMENSION_PROPORTIONAL;
+        *value = 0;
+        return SAIL_OK;
+    }
+
+    /* Fixed value. */
+    int parsed = atoi(token);
+    if (parsed <= 0)
+    {
+        return SAIL_ERROR_INVALID_ARGUMENT;
+    }
+    *type  = DIMENSION_FIXED;
+    *value = (unsigned)parsed;
+    return SAIL_OK;
+}
+
+static sail_status_t parse_dimensions(const char* str,
+                                      struct ParsedDimensions* dims,
+                                      unsigned input_width,
+                                      unsigned input_height)
+{
+    SAIL_CHECK_PTR(str);
+    SAIL_CHECK_PTR(dims);
+
+    /* Find separator (x or :). */
+    char* sep_pos = strchr(str, 'x');
+    if (sep_pos == NULL)
+    {
+        sep_pos = strchr(str, ':');
+    }
+
+    /* If no separator found, check if it's a single percentage (e.g., "50%"). */
+    if (sep_pos == NULL)
+    {
+        size_t str_len = strlen(str);
+        if (str_len > 0 && str[str_len - 1] == '%')
+        {
+            /* Parse as single percentage for both dimensions. */
+            sail_status_t status = parse_dimension_token(str, &dims->width_type, &dims->width_value, input_width,
+                                                         input_height, true);
+            if (status != SAIL_OK)
+            {
+                return status;
+            }
+            /* Apply same percentage to height. */
+            status = parse_dimension_token(str, &dims->height_type, &dims->height_value, input_width, input_height,
+                                           false);
+            return status;
+        }
+        return SAIL_ERROR_INVALID_ARGUMENT;
+    }
+
+    /* Parse width token. */
+    size_t width_len  = (size_t)(sep_pos - str);
+    const char* height_str = sep_pos + 1;
+
+    /* If width is empty (e.g., "x128" or "x50%"), use input dimension for width. */
+    if (width_len == 0)
+    {
+        dims->width_type  = DIMENSION_INPUT;
+        dims->width_value = input_width;
+
+        /* Parse height token. */
+        if (*height_str == '\0')
+        {
+            return SAIL_ERROR_INVALID_ARGUMENT;
+        }
+
+        char* height_token;
+        SAIL_TRY(sail_strdup(height_str, &height_token));
+
+        sail_status_t status =
+            parse_dimension_token(height_token, &dims->height_type, &dims->height_value, input_width, input_height, false);
+        sail_free(height_token);
+        return status;
+    }
+
+    char* width_token;
+    SAIL_TRY(sail_strdup_length(str, width_len, &width_token));
+
+    sail_status_t status =
+        parse_dimension_token(width_token, &dims->width_type, &dims->width_value, input_width, input_height, true);
+    sail_free(width_token);
+    if (status != SAIL_OK)
+    {
+        return status;
+    }
+
+    /* Parse height token - can be empty, "0", or a number. */
+    /* If height is empty (e.g., "800x"), use input dimension. */
+    if (*height_str == '\0')
+    {
+        dims->height_type  = DIMENSION_INPUT;
+        dims->height_value = input_height;
+        return SAIL_OK;
+    }
+
+    char* height_token;
+    SAIL_TRY(sail_strdup(height_str, &height_token));
+
+    status =
+        parse_dimension_token(height_token, &dims->height_type, &dims->height_value, input_width, input_height, false);
+    sail_free(height_token);
+    if (status != SAIL_OK)
+    {
+        return status;
+    }
+
+    return SAIL_OK;
+}
+
+static sail_status_t resolve_dimensions(struct ParsedDimensions* dims,
+                                        unsigned input_width,
+                                        unsigned input_height,
+                                        unsigned* output_width,
+                                        unsigned* output_height)
+{
+    SAIL_CHECK_PTR(dims);
+    SAIL_CHECK_PTR(output_width);
+    SAIL_CHECK_PTR(output_height);
+
+    unsigned width  = 0;
+    unsigned height = 0;
+
+    /* Resolve width. */
+    switch (dims->width_type)
+    {
+    case DIMENSION_FIXED:
+        width = dims->width_value;
+        break;
+    case DIMENSION_INPUT:
+        width = input_width;
+        break;
+    case DIMENSION_PROPORTIONAL:
+        width = 0;
+        break;
+    }
+
+    /* Resolve height. */
+    switch (dims->height_type)
+    {
+    case DIMENSION_FIXED:
+        height = dims->height_value;
+        break;
+    case DIMENSION_INPUT:
+        height = input_height;
+        break;
+    case DIMENSION_PROPORTIONAL:
+        height = 0;
+        break;
+    }
+
+    /* Calculate proportional dimensions. */
+    if (width == 0 && height == 0)
+    {
+        return SAIL_ERROR_INVALID_ARGUMENT;
+    }
+    else if (width == 0)
+    {
+        width = (unsigned)((size_t)input_width * height / input_height);
+        if (width == 0)
+        {
+            width = 1;
+        }
+    }
+    else if (height == 0)
+    {
+        height = (unsigned)((size_t)input_height * width / input_width);
+        if (height == 0)
+        {
+            height = 1;
+        }
+    }
+
+    *output_width  = width;
+    *output_height = height;
+
+    return SAIL_OK;
+}
+
+static sail_status_t resize(int argc, char* argv[])
+{
+    if (argc < 4)
+    {
+        print_invalid_argument();
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    enum SailScaling method = SAIL_SCALING_BILINEAR;
+    bool in_place            = false;
+    bool auto_yes            = false;
+    bool auto_no             = false;
+
+    /* Parse positional arguments: input, wxh, [output]. */
+    const char* input          = NULL;
+    const char* output         = NULL;
+    const char* dimensions_str = NULL;
+
+    /* Parse all arguments: collect positional args and parse options. */
+    int i = 2; /* Skip program name and "resize" command. */
+    int pos_arg_count = 0;
+
+    while (i < argc)
+    {
+        if (argv[i][0] == '-')
+        {
+            /* Parse option. */
+            if (strcmp(argv[i], "-m") == 0 || strcmp(argv[i], "--method") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    SAIL_LOG_ERROR("Missing method value");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                method  = parse_resize_method(argv[i + 1]);
+                i      += 2;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-i") == 0 || strcmp(argv[i], "--in-place") == 0)
+            {
+                in_place  = true;
+                i        += 1;
+                continue;
+            }
+
+            if (strcmp(argv[i], "-y") == 0 || strcmp(argv[i], "--yes") == 0)
+            {
+                auto_yes  = true;
+                i        += 1;
+                continue;
+            }
+
+            SAIL_LOG_ERROR("Unknown option '%s'", argv[i]);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
+        else
+        {
+            /* Positional argument. */
+            if (pos_arg_count == 0)
+            {
+                input = argv[i];
+            }
+            else if (pos_arg_count == 1)
+            {
+                dimensions_str = argv[i];
+            }
+            else if (pos_arg_count == 2 && !in_place)
+            {
+                output = argv[i];
+            }
+            else
+            {
+                SAIL_LOG_ERROR("Too many positional arguments");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+            }
+
+            pos_arg_count++;
+            i++;
+        }
+    }
+
+    /* Validate arguments. */
+    if (input == NULL)
+    {
+        SAIL_LOG_ERROR("Input file is required");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (dimensions_str == NULL)
+    {
+        SAIL_LOG_ERROR("Dimensions must be specified in format WxH (e.g., 800x600, 800x0, 50%%x50%%, 25%%x, x128, x50%%) or single percentage (e.g., 50%%)");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (in_place && output != NULL)
+    {
+        SAIL_LOG_ERROR("Cannot specify output file when using -i (in-place) option");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (!in_place && output == NULL)
+    {
+        SAIL_LOG_ERROR("Output file is required when not using -i (in-place) option");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    /* Use input as output if in-place. */
+    if (in_place)
+    {
+        output = input;
+    }
+
+    /* Load image first to get dimensions for parsing. */
+    const struct sail_codec_info* input_codec_info;
+    void* load_state;
+    struct sail_image* image;
+
+    SAIL_TRY(sail_codec_info_from_path(input, &input_codec_info));
+    struct sail_load_options* load_options;
+    SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
+    SAIL_TRY(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state));
+    sail_destroy_load_options(load_options);
+
+    SAIL_TRY_OR_CLEANUP(sail_load_next_frame(load_state, &image),
+                        /* cleanup */ sail_stop_loading(load_state));
+    SAIL_TRY(sail_stop_loading(load_state));
+
+    /* Parse dimensions with input image dimensions. */
+    struct ParsedDimensions parsed_dims;
+    sail_status_t parse_status = parse_dimensions(dimensions_str, &parsed_dims, image->width, image->height);
+    if (parse_status != SAIL_OK)
+    {
+        sail_destroy_image(image);
+        SAIL_LOG_ERROR("Invalid dimensions format '%s'. Expected format: WxH (e.g., 800x600, 800x0, 50%%x50%%, 25%%x, x128, x50%%) or single percentage (e.g., 50%%)",
+                       dimensions_str);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    /* Resolve dimensions. */
+    unsigned new_width  = 0;
+    unsigned new_height = 0;
+    sail_status_t resolve_status =
+        resolve_dimensions(&parsed_dims, image->width, image->height, &new_width, &new_height);
+    sail_destroy_image(image);
+    if (resolve_status != SAIL_OK)
+    {
+        SAIL_LOG_ERROR("Invalid dimensions specification");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    SAIL_TRY(resize_impl(input, output, new_width, new_height, method, in_place, &auto_yes, &auto_no));
+
+    return SAIL_OK;
+}
+
 static sail_status_t list_impl(bool verbose)
 {
     const struct sail_codec_bundle_node* codec_bundle_node = sail_codec_bundle_list();
@@ -1537,9 +2074,9 @@ static void help(const char* app)
 
     fprintf(stderr, "Commands:\n\n");
 
-    fprintf(stderr, "  list [-v]    List all supported image codecs with details\n\n");
+    fprintf(stderr, "  list [-v]  List all supported image codecs with details\n\n");
 
-    fprintf(stderr, "  convert - Convert, compose, and extract image files\n");
+    fprintf(stderr, "  convert  Convert, compose, and extract image files\n");
     fprintf(stderr, "      Options:\n");
     fprintf(stderr, "        -p, --pixel-format <format>  Force specific output pixel format\n");
     fprintf(stderr, "        -c, --compression <level>    Set compression quality level (codec-specific)\n");
@@ -1549,8 +2086,7 @@ static void help(const char* app)
     fprintf(stderr, "        -z, --suffix-digits <N>      Set number of digits in frame suffix (1-10, e.g., 3 for 001, 002, ...)\n");
     fprintf(stderr, "        -C, --colors <N>             Quantize image to N colors (2-256) using Wu algorithm\n");
     fprintf(stderr, "        -D, --dither                 Apply Floyd-Steinberg dithering for better gradients\n");
-    fprintf(stderr,
-            "        -b, --background <color>     Blend alpha channel with background (white, black, #RRGGBB)\n");
+    fprintf(stderr, "        -b, --background <color>     Blend alpha channel with background (white, black, #RRGGBB)\n");
     fprintf(stderr, "        -s, --strip                  Remove all metadata from output files\n");
     fprintf(stderr, "        -H, --flip-horizontal        Flip image horizontally (mirror left-right)\n");
     fprintf(stderr, "        -V, --flip-vertical          Flip image vertically (mirror top-bottom)\n");
@@ -1566,10 +2102,10 @@ static void help(const char* app)
     fprintf(stderr, "          %s convert animation.gif output.tiff\n\n", app);
     fprintf(stderr, "        Compose multiple images into single animation:\n");
     fprintf(stderr, "          %s convert frame1.png frame2.png frame3.png animation.gif -d 100\n\n", app);
-        fprintf(stderr, "        Extract all frames from animation into (frame-1.jpg, frame-2.jpg, ...):\n");
-        fprintf(stderr, "          %s convert animation.gif frame.jpg -e\n\n", app);
-        fprintf(stderr, "        Extract frames with 3-digit suffix (frame-001.jpg, frame-002.jpg, ...):\n");
-        fprintf(stderr, "          %s convert animation.gif frame.jpg -e -z 3\n\n", app);
+    fprintf(stderr, "        Extract all frames from animation into (frame-1.jpg, frame-2.jpg, ...):\n");
+    fprintf(stderr, "          %s convert animation.gif frame.jpg -e\n\n", app);
+    fprintf(stderr, "        Extract frames with 3-digit suffix (frame-001.jpg, frame-002.jpg, ...):\n");
+    fprintf(stderr, "          %s convert animation.gif frame.jpg -e -z 3\n\n", app);
     fprintf(stderr, "        Extract first 5 frames from animation:\n");
     fprintf(stderr, "          %s convert animation.webp frame.png -e -m 5\n\n", app);
     fprintf(stderr, "        Reduce colors to 16 with dithering for smaller file size:\n");
@@ -1583,8 +2119,28 @@ static void help(const char* app)
     fprintf(stderr, "        Extract frame #2 from animation\n");
     fprintf(stderr, "          %s convert animation.gif frame2.png -n 2\n\n", app);
 
-    fprintf(stderr, "  probe <path>     Display detailed information about image file\n");
-    fprintf(stderr, "  decode <path>    Decode file and show information for all frames\n\n");
+    fprintf(stderr, "  probe <path>   Display detailed information about image file\n");
+    fprintf(stderr, "  decode <path>  Decode file and show information for all frames\n");
+    fprintf(stderr, "  resize         Resize image to specified dimensions\n");
+    fprintf(stderr, "      Usage:\n");
+    fprintf(stderr, "        %s resize [OPTIONS] <input> <WxH> [output]\n\n", app);
+    fprintf(stderr, "      Options:\n");
+    fprintf(stderr, "        -m, --method <method>  Resizing method: nearest, bilinear (default), bicubic, lanczos\n");
+    fprintf(stderr, "        -i, --in-place         Overwrite input file safely (omit output file)\n");
+    fprintf(stderr, "        -y, --yes              Automatically overwrite existing files without prompting\n");
+    fprintf(stderr, "      Use cases:\n");
+    fprintf(stderr, "        Resize image to specific size:\n");
+    fprintf(stderr, "          %s resize input.jpg 800x600 output.jpg\n\n", app);
+    fprintf(stderr, "        Resize width only (height unchanged):\n");
+    fprintf(stderr, "          %s resize input.jpg 800x output.jpg\n\n", app);
+    fprintf(stderr, "        Resize width, calculate height proportionally:\n");
+    fprintf(stderr, "          %s resize input.jpg 800x0 output.jpg\n\n", app);
+    fprintf(stderr, "        Resize to percentage of original size:\n");
+    fprintf(stderr, "          %s resize input.jpg 50%%x75%% output.jpg\n\n", app);
+    fprintf(stderr, "        Resize to percentage (all dimensions):\n");
+    fprintf(stderr, "          %s resize input.jpg 50%% output.jpg\n\n", app);
+    fprintf(stderr, "        Resize width to percentage, keep height:\n");
+    fprintf(stderr, "          %s resize input.jpg 25%%x output.jpg\n\n", app);
 
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "  %s -h, --help                Display this help message and exit\n", app);
@@ -1671,6 +2227,10 @@ int main(int argc, char* argv[])
     else if (strcmp(argv[1], "decode") == 0)
     {
         SAIL_TRY(decode(argc, argv));
+    }
+    else if (strcmp(argv[1], "resize") == 0)
+    {
+        SAIL_TRY(resize(argc, argv));
     }
     else
     {

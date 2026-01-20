@@ -1,32 +1,30 @@
-set(SAIL_MANIP_SOURCES
-    cmyk.c
-    cmyk.h
-    conversion_options.c
-    conversion_options.h
-    convert.c
-    convert.h
-    fast_conversions.c
-    fast_conversions.h
-    manip_common.h
-    manip_utils.c
-    manip_utils.h
-    quantize.c
-    quantize.h
-    rotate.c
-    rotate.h
-    sail-manip.h
-    ycbcr.c
-    ycbcr.h
-    ycck.c
-    ycck.h)
-
-sail_find_swscale(${SAIL_MANIP_USE_SWSCALE})
-
-if (SAIL_MANIP_SWSCALE_ENABLED)
-    list(APPEND SAIL_MANIP_SOURCES swscale_conversions.c swscale_conversions.h)
-endif()
-
-add_library(sail-manip ${SAIL_MANIP_SOURCES})
+add_library(sail-manip
+            cmyk.c
+            cmyk.h
+            conversion_options.c
+            conversion_options.h
+            convert.c
+            convert.h
+            fast_conversions.c
+            fast_conversions.h
+            manip_common.h
+            manip_utils.c
+            manip_utils.h
+            quantize.c
+            quantize.h
+            rotate.c
+            rotate.h
+            sail-manip.h
+            swscale_conversions.c
+            swscale_conversions.h
+            scale.c
+            scale.h
+            scale_swscale.c
+            scale_swscale.h
+            ycbcr.c
+            ycbcr.h
+            ycck.c
+            ycck.h)
 
 # Build a list of public headers to install
 #
@@ -35,6 +33,7 @@ set(PUBLIC_HEADERS conversion_options.h
                    manip_common.h
                    quantize.h
                    rotate.h
+                   scale.h
                    sail-manip.h)
 
 set_target_properties(sail-manip PROPERTIES
@@ -61,6 +60,12 @@ if (SAIL_HAVE_OPENMP)
 endif()
 
 target_link_libraries(sail-manip PUBLIC sail-common)
+
+# sinf, fabsf, M_PI
+find_library(MATH_LIBRARY NAMES m)
+if (MATH_LIBRARY)
+    target_link_libraries(sail-manip PRIVATE ${MATH_LIBRARY})
+endif()
 
 if (SAIL_MANIP_SWSCALE_ENABLED)
     target_include_directories(sail-manip PRIVATE ${SAIL_SWSCALE_INCLUDE_DIR})

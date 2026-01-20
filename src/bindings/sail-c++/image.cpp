@@ -392,17 +392,21 @@ sail_status_t image::convert(SailPixelFormat pixel_format, const conversion_opti
     sail_conversion_options* sail_conversion_options = nullptr;
     sail_image* sail_img                             = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(if (sail_img != nullptr) {
-        if (sail_img->palette != nullptr)
+    SAIL_AT_SCOPE_EXIT
+    (
+        if (sail_img != nullptr)
         {
-            sail_img->palette->data = nullptr;
+            if (sail_img->palette != nullptr)
+            {
+                sail_img->palette->data = nullptr;
+            }
+
+            sail_img->pixels = nullptr;
+            sail_destroy_image(sail_img);
         }
 
-        sail_img->pixels = nullptr;
-        sail_destroy_image(sail_img);
-    }
-
-                       sail_destroy_conversion_options(sail_conversion_options););
+        sail_destroy_conversion_options(sail_conversion_options);
+    );
 
     SAIL_TRY(options.to_sail_conversion_options(&sail_conversion_options));
 
@@ -511,9 +515,13 @@ sail_status_t image::convert_to(SailPixelFormat pixel_format,
     sail_image* sail_img;
     SAIL_TRY(to_sail_image(&sail_img));
 
-    SAIL_AT_SCOPE_EXIT(sail_img->pixels = nullptr; sail_destroy_image(sail_img);
+    SAIL_AT_SCOPE_EXIT
+    (
+        sail_img->pixels = nullptr;
+        sail_destroy_image(sail_img);
 
-                       sail_destroy_conversion_options(sail_conversion_options););
+        sail_destroy_conversion_options(sail_conversion_options);
+    );
 
     SAIL_TRY(options.to_sail_conversion_options(&sail_conversion_options));
 
@@ -642,7 +650,11 @@ sail_status_t image::rotate_to(SailOrientation angle, sail::image* image) const
     sail_image* sail_img;
     SAIL_TRY(to_sail_image(&sail_img));
 
-    SAIL_AT_SCOPE_EXIT(sail_img->pixels = nullptr; sail_destroy_image(sail_img););
+    SAIL_AT_SCOPE_EXIT
+    (
+        sail_img->pixels = nullptr;
+        sail_destroy_image(sail_img);
+    );
 
     sail_image* sail_image_output = nullptr;
     SAIL_TRY(sail_rotate_image(sail_img, angle, &sail_image_output));
@@ -659,6 +671,56 @@ image image::rotate_to(SailOrientation angle) const
 {
     sail::image img;
     SAIL_TRY_OR_EXECUTE(rotate_to(angle, &img),
+                        /* on error */ return img);
+
+    return img;
+}
+
+sail_status_t image::scale(unsigned new_width, unsigned new_height, SailScaling algorithm)
+{
+    sail::image scaled_image;
+    SAIL_TRY(scale_to(new_width, new_height, algorithm, &scaled_image));
+
+    *this = std::move(scaled_image);
+
+    return SAIL_OK;
+}
+
+sail_status_t image::scale_to(unsigned new_width, unsigned new_height, SailScaling algorithm, sail::image* image) const
+{
+    SAIL_CHECK_PTR(image);
+
+    if (!is_valid())
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    sail_image* sail_img;
+    SAIL_TRY(to_sail_image(&sail_img));
+
+    SAIL_AT_SCOPE_EXIT
+    (
+        sail_img->pixels = nullptr;
+        sail_destroy_image(sail_img);
+    );
+
+    sail_image* sail_image_output = nullptr;
+    SAIL_TRY_OR_CLEANUP(sail_scale_image(sail_img, new_width, new_height, algorithm, &sail_image_output),
+                        /* cleanup */ sail_img->pixels = nullptr;
+                                      sail_destroy_image(sail_img););
+
+    *image = sail::image(sail_image_output);
+
+    sail_image_output->pixels = nullptr;
+    sail_destroy_image(sail_image_output);
+
+    return SAIL_OK;
+}
+
+image image::scale_to(unsigned new_width, unsigned new_height, SailScaling algorithm) const
+{
+    sail::image img;
+    SAIL_TRY_OR_EXECUTE(scale_to(new_width, new_height, algorithm, &img),
                         /* on error */ return img);
 
     return img;
@@ -818,11 +880,16 @@ sail_status_t image::to_sail_image(sail_image** image) const
 
     sail_image* image_local = nullptr;
 
-    SAIL_AT_SCOPE_EXIT(
+    SAIL_AT_SCOPE_EXIT
+    (
         // Pixels are shallow copied
-        if (image_local != nullptr) { image_local->pixels = nullptr; }
+        if (image_local != nullptr)
+        {
+            image_local->pixels = nullptr;
+        }
 
-        sail_destroy_image(image_local););
+        sail_destroy_image(image_local);
+    );
 
     SAIL_TRY(sail_alloc_image(&image_local));
 

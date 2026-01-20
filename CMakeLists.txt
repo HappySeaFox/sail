@@ -224,7 +224,7 @@ if (SAIL_BUILD_BINDINGS)
 endif()
 
 if (SAIL_BUILD_APPS)
-    add_subdirectory(examples/c/sail)
+    add_subdirectory(tools)
     add_subdirectory(man)
 endif()
 
