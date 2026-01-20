@@ -273,17 +273,22 @@ static MunitResult test_rotate_invalid_angle(const MunitParameter params[], void
     return MUNIT_OK;
 }
 
-/* Test suite */
+// clang-format off
 static MunitTest test_suite_tests[] = {
-    {(char*)"/rotate-90", test_rotate_90, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-    {(char*)"/rotate-180", test_rotate_180, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-    {(char*)"/rotate-270", test_rotate_270, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-    {(char*)"/rotate-180-inplace", test_rotate_180_inplace, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-    {(char*)"/rotate-with-palette", test_rotate_with_palette, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-    {(char*)"/rotate-invalid-angle", test_rotate_invalid_angle, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-    {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
+    { (char*)"/rotate-90",            test_rotate_90,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char*)"/rotate-180",           test_rotate_180,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char*)"/rotate-270",           test_rotate_270,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char*)"/rotate-180-inplace",   test_rotate_180_inplace,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char*)"/rotate-with-palette",  test_rotate_with_palette,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char*)"/rotate-invalid-angle", test_rotate_invalid_angle, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
-static const MunitSuite test_suite = {(char*)"/rotate", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};
+    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+};
+
+static const MunitSuite test_suite = {
+    (char*)"/rotate", test_suite_tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
+};
+// clang-format on
 
 int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)])
 {

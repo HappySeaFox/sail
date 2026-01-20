@@ -468,26 +468,25 @@ static MunitResult test_few_colors_bpp8_output(const MunitParameter params[], vo
 
 // clang-format off
 static MunitTest tests[] = {
-    { (char *)"/rgb-to-indexed",                  test_rgb_to_indexed_conversion,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-to-rgb",                  test_indexed_to_rgb_conversion,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-roundtrip",               test_indexed_roundtrip,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-color-counts",            test_indexed_color_counts,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/indexed-requantization",          test_indexed_requantization,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/floyd-steinberg-dithering",       test_floyd_steinberg_dithering,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/output-format-matches-request",   test_output_format_matches_request,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/few-colors-bpp8-output",          test_few_colors_bpp8_output,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { NULL,                                       NULL,                                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+    { (char *)"/rgb-to-indexed",                test_rgb_to_indexed_conversion,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-to-rgb",                test_indexed_to_rgb_conversion,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-roundtrip",             test_indexed_roundtrip,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-color-counts",          test_indexed_color_counts,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/indexed-requantization",        test_indexed_requantization,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/floyd-steinberg-dithering",     test_floyd_steinberg_dithering,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/output-format-matches-request", test_output_format_matches_request, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/few-colors-bpp8-output",        test_few_colors_bpp8_output,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+
+    { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
 
 static const MunitSuite suite = {
-    (char *)"/indexed-conversion",
-    tests,
-    NULL,
-    1,
-    MUNIT_SUITE_OPTION_NONE
+    (char *)"/indexed-conversion", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE
 };
+// clang-format on
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     return munit_suite_main(&suite, NULL, argc, argv);
 }
 
