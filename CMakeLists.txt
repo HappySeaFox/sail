@@ -318,6 +318,15 @@ if (NOT SAIL_COMMON_LINK_OPTIONS)
     set(SAIL_COMMON_LINK_OPTIONS "")
 endif()
 
+# Check for big endian platform
+#
+include(TestBigEndian)
+test_big_endian(SAIL_BIG_ENDIAN)
+
+if (SAIL_BIG_ENDIAN)
+    message(WARNING "SAIL does not officially support big endian platforms. Use at your own risk.")
+endif()
+
 message("")
 message("***************************************")
 message("*")
