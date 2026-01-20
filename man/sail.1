@@ -144,15 +144,23 @@ Flip image horizontally (mirror left-right).
 Flip image vertically (mirror top-bottom).
 
 .SS probe
-Display detailed information about image file.
+Display detailed information about image file without fully decoding it.
+This command reads only the image header/metadata, making it very fast.
 
 .B Usage:
 .RS
 sail probe \fIPATH\fR
 .RE
 
+.PP
+.B Note:
+Due to codec-specific limitations, \fBprobe\fR may decode pixels for some
+codecs, but SAIL makes every effort to avoid full decoding.
+
 .SS decode
-Decode file and show information for all frames.
+Decode file and show information for all frames. Unlike \fBprobe\fR, this command
+fully decodes all frames in the image, which provides more accurate information
+but takes longer, especially for large or animated images.
 
 .B Usage:
 .RS
