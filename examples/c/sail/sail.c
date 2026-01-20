@@ -1382,7 +1382,7 @@ static sail_status_t decode(int argc, char* argv[])
     return SAIL_OK;
 }
 
-static enum SailScaling parse_scaling_method(const char* str)
+static enum SailScaling parse_resize_method(const char* str)
 {
     if (strcmp(str, "nearest") == 0)
     {
@@ -1406,14 +1406,14 @@ static enum SailScaling parse_scaling_method(const char* str)
     }
 }
 
-static sail_status_t scale_impl(const char* input,
-                                const char* output,
-                                unsigned new_width,
-                                unsigned new_height,
-                                enum SailScaling method,
-                                bool in_place,
-                                bool* auto_yes,
-                                bool* auto_no)
+static sail_status_t resize_impl(const char* input,
+                                 const char* output,
+                                 unsigned new_width,
+                                 unsigned new_height,
+                                 enum SailScaling method,
+                                 bool in_place,
+                                 bool* auto_yes,
+                                 bool* auto_no)
 {
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output);
@@ -1437,11 +1437,11 @@ static sail_status_t scale_impl(const char* input,
                         /* cleanup */ sail_stop_loading(load_state));
     SAIL_TRY(sail_stop_loading(load_state));
 
-    /* Scale the image. */
-    SAIL_LOG_DEBUG("Scaling from %ux%u to %ux%u using method %d", image->width, image->height, new_width, new_height,
+    /* Resize the image. */
+    SAIL_LOG_DEBUG("Resizing from %ux%u to %ux%u using method %d", image->width, image->height, new_width, new_height,
                    method);
-    struct sail_image* scaled_image = NULL;
-    SAIL_TRY_OR_CLEANUP(sail_scale_image(image, new_width, new_height, method, &scaled_image),
+    struct sail_image* resized_image = NULL;
+    SAIL_TRY_OR_CLEANUP(sail_scale_image(image, new_width, new_height, method, &resized_image),
                         /* cleanup */ sail_destroy_image(image));
     sail_destroy_image(image);
 
@@ -1454,7 +1454,7 @@ static sail_status_t scale_impl(const char* input,
         /* Create temporary file path. */
         size_t temp_path_len = strlen(input) + 8;
         SAIL_TRY_OR_CLEANUP(sail_malloc(temp_path_len, (void**)&temp_path),
-                            /* cleanup */ sail_destroy_image(scaled_image));
+                            /* cleanup */ sail_destroy_image(resized_image));
 
         sail_snprintf(temp_path, temp_path_len, "%s.tmp", input);
         output_path = temp_path;
@@ -1464,37 +1464,37 @@ static sail_status_t scale_impl(const char* input,
     if (!check_file_overwrite(output_path, auto_yes, auto_no))
     {
         sail_free(temp_path);
-        sail_destroy_image(scaled_image);
+        sail_destroy_image(resized_image);
         return SAIL_OK;
     }
 
-    /* Save the scaled image. */
+    /* Save the resized image. */
     const struct sail_codec_info* output_codec_info;
     SAIL_TRY_OR_CLEANUP(sail_codec_info_from_path(in_place ? input : output, &output_codec_info),
                         /* cleanup */ sail_free(temp_path);
-                        sail_destroy_image(scaled_image));
+                        sail_destroy_image(resized_image));
     SAIL_LOG_DEBUG("Output codec: %s", output_codec_info->description);
 
     struct sail_save_options* save_options;
     SAIL_TRY_OR_CLEANUP(sail_alloc_save_options_from_features(output_codec_info->save_features, &save_options),
                         /* cleanup */ sail_free(temp_path);
-                        sail_destroy_image(scaled_image));
+                        sail_destroy_image(resized_image));
 
     void* save_state = NULL;
     SAIL_TRY_OR_CLEANUP(
         sail_start_saving_into_file_with_options(output_path, output_codec_info, save_options, &save_state),
         /* cleanup */ sail_free(temp_path);
-        sail_destroy_image(scaled_image); sail_destroy_save_options(save_options));
+        sail_destroy_image(resized_image); sail_destroy_save_options(save_options));
 
-    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(save_state, scaled_image),
+    SAIL_TRY_OR_CLEANUP(sail_write_next_frame(save_state, resized_image),
                         /* cleanup */ sail_free(temp_path);
-                        sail_destroy_image(scaled_image); sail_stop_saving(save_state);
+                        sail_destroy_image(resized_image); sail_stop_saving(save_state);
                         sail_destroy_save_options(save_options));
 
     SAIL_TRY_OR_CLEANUP(sail_stop_saving(save_state),
                         /* cleanup */ sail_free(temp_path);
-                        sail_destroy_image(scaled_image); sail_destroy_save_options(save_options));
-    sail_destroy_image(scaled_image);
+                        sail_destroy_image(resized_image); sail_destroy_save_options(save_options));
+    sail_destroy_image(resized_image);
     sail_destroy_save_options(save_options);
 
     /* If in-place, replace original file with temporary file. */
@@ -1763,7 +1763,7 @@ static sail_status_t resolve_dimensions(struct ParsedDimensions* dims,
     return SAIL_OK;
 }
 
-static sail_status_t scale(int argc, char* argv[])
+static sail_status_t resize(int argc, char* argv[])
 {
     if (argc < 4)
     {
@@ -1782,7 +1782,7 @@ static sail_status_t scale(int argc, char* argv[])
     const char* dimensions_str = NULL;
 
     /* Parse all arguments: collect positional args and parse options. */
-    int i = 2; /* Skip program name and "scale" command. */
+    int i = 2; /* Skip program name and "resize" command. */
     int pos_arg_count = 0;
 
     while (i < argc)
@@ -1797,7 +1797,7 @@ static sail_status_t scale(int argc, char* argv[])
                     SAIL_LOG_ERROR("Missing method value");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
                 }
-                method  = parse_scaling_method(argv[i + 1]);
+                method  = parse_resize_method(argv[i + 1]);
                 i      += 2;
                 continue;
             }
@@ -1914,7 +1914,7 @@ static sail_status_t scale(int argc, char* argv[])
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
-    SAIL_TRY(scale_impl(input, output, new_width, new_height, method, in_place, &auto_yes, &auto_no));
+    SAIL_TRY(resize_impl(input, output, new_width, new_height, method, in_place, &auto_yes, &auto_no));
 
     return SAIL_OK;
 }
@@ -2121,30 +2121,26 @@ static void help(const char* app)
 
     fprintf(stderr, "  probe <path>   Display detailed information about image file\n");
     fprintf(stderr, "  decode <path>  Decode file and show information for all frames\n");
-    fprintf(stderr, "  scale          Scale image to specified dimensions\n");
+    fprintf(stderr, "  resize         Resize image to specified dimensions\n");
     fprintf(stderr, "      Usage:\n");
-    fprintf(stderr, "        %s scale [OPTIONS] <input> <WxH> [output]\n\n", app);
+    fprintf(stderr, "        %s resize [OPTIONS] <input> <WxH> [output]\n\n", app);
     fprintf(stderr, "      Options:\n");
-    fprintf(stderr, "        -m, --method <method>  Scaling method: nearest, bilinear (default), bicubic, lanczos\n");
+    fprintf(stderr, "        -m, --method <method>  Resizing method: nearest, bilinear (default), bicubic, lanczos\n");
     fprintf(stderr, "        -i, --in-place         Overwrite input file safely (omit output file)\n");
     fprintf(stderr, "        -y, --yes              Automatically overwrite existing files without prompting\n");
     fprintf(stderr, "      Use cases:\n");
-    fprintf(stderr, "        Scale image to specific size:\n");
-    fprintf(stderr, "          %s scale input.jpg 800x600 output.jpg\n\n", app);
-    fprintf(stderr, "                Scale width only (height unchanged):\n");
-        fprintf(stderr, "          %s scale input.jpg 800x output.jpg\n\n", app);
-        fprintf(stderr, "        Scale height only (width unchanged):\n");
-        fprintf(stderr, "          %s scale input.jpg x600 output.jpg\n\n", app);
-        fprintf(stderr, "        Scale width, calculate height proportionally:\n");
-        fprintf(stderr, "          %s scale input.jpg 800x0 output.jpg\n\n", app);
-    fprintf(stderr, "        Scale to percentage of original size:\n");
-    fprintf(stderr, "          %s scale input.jpg 50%%x75%% output.jpg\n\n", app);
-    fprintf(stderr, "        Scale to percentage:\n");
-    fprintf(stderr, "          %s scale input.jpg 50%% output.jpg\n\n", app);
-    fprintf(stderr, "                Scale width to percentage, keep height:\n");
-        fprintf(stderr, "          %s scale input.jpg 25%%x output.jpg\n\n", app);
-        fprintf(stderr, "        Scale height to percentage, keep width:\n");
-        fprintf(stderr, "          %s scale input.jpg x50%% output.jpg\n\n", app);
+    fprintf(stderr, "        Resize image to specific size:\n");
+    fprintf(stderr, "          %s resize input.jpg 800x600 output.jpg\n\n", app);
+    fprintf(stderr, "        Resize width only (height unchanged):\n");
+    fprintf(stderr, "          %s resize input.jpg 800x output.jpg\n\n", app);
+    fprintf(stderr, "        Resize width, calculate height proportionally:\n");
+    fprintf(stderr, "          %s resize input.jpg 800x0 output.jpg\n\n", app);
+    fprintf(stderr, "        Resize to percentage of original size:\n");
+    fprintf(stderr, "          %s resize input.jpg 50%%x75%% output.jpg\n\n", app);
+    fprintf(stderr, "        Resize to percentage (all dimensions):\n");
+    fprintf(stderr, "          %s resize input.jpg 50%% output.jpg\n\n", app);
+    fprintf(stderr, "        Resize width to percentage, keep height:\n");
+    fprintf(stderr, "          %s resize input.jpg 25%%x output.jpg\n\n", app);
 
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "  %s -h, --help                Display this help message and exit\n", app);
@@ -2232,9 +2228,9 @@ int main(int argc, char* argv[])
     {
         SAIL_TRY(decode(argc, argv));
     }
-    else if (strcmp(argv[1], "scale") == 0)
+    else if (strcmp(argv[1], "resize") == 0)
     {
-        SAIL_TRY(scale(argc, argv));
+        SAIL_TRY(resize(argc, argv));
     }
     else
     {
