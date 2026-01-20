@@ -45,7 +45,7 @@ static sail_status_t create_test_image(unsigned width,
     image->pixel_format   = pixel_format;
     image->bytes_per_line = sail_bytes_per_line(width, pixel_format);
 
-    const size_t pixels_size = image->height * image->bytes_per_line;
+    const size_t pixels_size = (size_t)image->height * image->bytes_per_line;
     SAIL_TRY(sail_malloc(pixels_size, &image->pixels));
 
     /* Fill with a simple pattern: each pixel value is row * width + col. */
