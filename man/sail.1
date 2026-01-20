@@ -102,6 +102,10 @@ Set frame delay for animations in milliseconds.
 .BR \-e ", " \-\-extract-frames
 Extract each frame to separate file. Output filename will be in the format
 \fIBASE\fR-\fIN\fR.\fIEXT\fR where N is the frame number.
+.TP
+.BR \-z ", " \-\-suffix-digits " " \fIN\fR
+Set number of digits in frame suffix when extracting frames (1-10).
+For example, with \-z 3, frames will be named \fIBASE\fR-001.\fIEXT\fR, \fIBASE\fR-002.\fIEXT\fR, etc.
 
 .TP
 .BR \-C ", " \-\-colors " " \fIN\fR
@@ -154,6 +158,64 @@ Decode file and show information for all frames.
 .RS
 sail decode \fIPATH\fR
 .RE
+
+.SS resize
+Resize image to specified dimensions.
+
+.B Usage:
+.RS
+sail resize [\fIOPTIONS\fR] \fIINPUT\fR \fIWxH\fR [\fIOUTPUT\fR]
+.RE
+
+The dimensions can be specified in several formats:
+.RS
+.IP \(bu 2
+\fIWxH\fR - Fixed width and height (e.g., 800x600)
+.IP \(bu 2
+\fIWx\fR - Fixed width, keep original height (e.g., 800x)
+.IP \(bu 2
+\fIxH\fR - Fixed height, keep original width (e.g., x600)
+.IP \(bu 2
+\fIWx0\fR - Fixed width, calculate height proportionally (e.g., 800x0)
+.IP \(bu 2
+\fI0xH\fR - Fixed height, calculate width proportionally (e.g., 0x800)
+.IP \(bu 2
+\fIPERCENT%\fR - Scale both dimensions by percentage (e.g., 50%)
+.IP \(bu 2
+\fIW%xH%\fR - Scale width and height by different percentages (e.g., 50%x75%)
+.IP \(bu 2
+\fIW%x\fR - Scale width by percentage, keep height (e.g., 25%x)
+.IP \(bu 2
+\fIxH%\fR - Scale height by percentage, keep width (e.g., x50%)
+.RE
+
+.TP
+.BR \-m ", " \-\-method " " \fIMETHOD\fR
+Resizing method. Valid methods are:
+.RS
+.IP \(bu 2
+.B nearest
+\- Nearest neighbor (fastest, lowest quality)
+.IP \(bu 2
+.B bilinear
+\- Bilinear interpolation (default, good balance)
+.IP \(bu 2
+.B bicubic
+\- Bicubic interpolation (slower, higher quality)
+.IP \(bu 2
+.B lanczos
+\- Lanczos resampling (slowest, highest quality)
+.RE
+
+.TP
+.BR \-i ", " \-\-in-place
+Overwrite input file safely. When this option is used, the output file
+argument should be omitted. The operation creates a temporary file and
+atomically replaces the original file upon success.
+
+.TP
+.BR \-y ", " \-\-yes
+Automatically overwrite existing files without prompting.
 
 .SH EXAMPLES
 .PP
@@ -209,6 +271,11 @@ sail convert animation.webp frame.png \-e \-m 5
 .nf
 sail convert animation.gif frame2.png \-n 2
 .fi
+.PP
+# Extract frames with 3-digit suffix (frame-001.jpg, frame-002.jpg, ...):
+.nf
+sail convert animation.gif frame.jpg \-e \-z 3
+.fi
 .RE
 
 .PP
@@ -263,6 +330,51 @@ sail decode animation.gif
 # List all supported codecs:
 .nf
 sail list \-v
+.fi
+.RE
+
+.PP
+.B Image resizing:
+.RS
+.PP
+# Resize image to specific size:
+.nf
+sail resize input.jpg 800x600 output.jpg
+.fi
+.PP
+# Resize width only (height unchanged):
+.nf
+sail resize input.jpg 800x output.jpg
+.fi
+.PP
+# Resize width, calculate height proportionally:
+.nf
+sail resize input.jpg 800x0 output.jpg
+.fi
+.PP
+# Resize to percentage of original size:
+.nf
+sail resize input.jpg 50% output.jpg
+.fi
+.PP
+# Resize to different percentages for width and height:
+.nf
+sail resize input.jpg 50%x75% output.jpg
+.fi
+.PP
+# Resize width to percentage, keep height:
+.nf
+sail resize input.jpg 25%x output.jpg
+.fi
+.PP
+# Resize with bicubic method:
+.nf
+sail resize input.jpg 1920x1080 output.jpg \-m bicubic
+.fi
+.PP
+# Resize in-place (overwrite original file):
+.nf
+sail resize photo.jpg 800x600 \-i
 .fi
 .RE
 
