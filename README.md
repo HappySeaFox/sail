@@ -37,7 +37,7 @@ animated, and multi-paged images along with metadata and ICC profiles. :sailboat
 - [x] Versatile APIs: `junior`, `advanced`, `deep diver`, and `technical diver`
 - [x] Input/output: files, memory, custom I/O streams (see [custom-io.c](https://github.com/HappySeaFox/sail/blob/607de77843614e2ba873961d36a91256d6f9bf68/tests/sail/custom-io.c))
 - [x] Load by file extensions, paths, and [magic numbers](https://en.wikipedia.org/wiki/File_format#Magic_number)
-- [x] Format-specific tuning options (e.g., <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>). See [FORMATS](FORMATS.md)
+- [x] Format-specific tuning options (e.g., <a href="https://en.wikipedia.org/wiki/Portable_Network_Graphics#Filtering">PNG filters</a>) and read-only properties (e.g. RAW properties, video length etc.). See [FORMATS](FORMATS.md)
 - [x] Metadata support: text comments, EXIF, ICC profiles
 - [x] Access to image properties without decoding pixels (probing)
 - [x] Access to source image properties (source encoding, etc.)
