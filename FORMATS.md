@@ -792,7 +792,7 @@
         <br/>Key: <i>"video-seek-time"</i>. Description: Extract frames at specific timestamps or time ranges (milliseconds). Possible values: string (semicolon-separated list of timestamps or ranges, e.g., "1000;2000;3000-5000").
     </td>
     <td>
-        <b>Content:</b> Animated (only first frame extracted), Audio streams, Subtitles.
+        <b>Content:</b> Audio streams, Subtitles.
     </td>
     <td>Unsupported</td>
     <td>-</td>
