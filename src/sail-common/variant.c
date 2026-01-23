@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -259,67 +260,577 @@ sail_status_t sail_set_variant_shallow_data(struct sail_variant* variant, void* 
 
 bool sail_variant_to_bool(const struct sail_variant* variant)
 {
-    return *(bool*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return false;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_BOOL:
+        return *(bool*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return false;
+        }
+        if (strcmp(str, "true") == 0 || strcmp(str, "1") == 0 || strcmp(str, "yes") == 0
+            || strcmp(str, "TRUE") == 0 || strcmp(str, "YES") == 0)
+        {
+            return true;
+        }
+        return false;
+    }
+    default:
+        return false;
+    }
 }
 
 char sail_variant_to_char(const struct sail_variant* variant)
 {
-    return *(char*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_CHAR:
+        return *(char*)(variant->value);
+    case SAIL_VARIANT_TYPE_INT:
+        return (char)*(int*)(variant->value);
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (char)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+        return (char)*(float*)(variant->value);
+    case SAIL_VARIANT_TYPE_DOUBLE:
+        return (char)*(double*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL || str[0] == '\0')
+        {
+            return 0;
+        }
+        return str[0];
+    }
+    default:
+        return 0;
+    }
 }
 
 unsigned char sail_variant_to_unsigned_char(const struct sail_variant* variant)
 {
-    return *(unsigned char*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_UNSIGNED_CHAR:
+        return *(unsigned char*)(variant->value);
+    case SAIL_VARIANT_TYPE_CHAR:
+    {
+        char val = *(char*)(variant->value);
+        return (val < 0) ? 0 : (unsigned char)val;
+    }
+    case SAIL_VARIANT_TYPE_INT:
+    {
+        int val = *(int*)(variant->value);
+        return (val < 0) ? 0 : (val > 255) ? 255 : (unsigned char)val;
+    }
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+    {
+        unsigned int val = *(unsigned int*)(variant->value);
+        return (val > 255) ? 255 : (unsigned char)val;
+    }
+    case SAIL_VARIANT_TYPE_FLOAT:
+    {
+        float val = *(float*)(variant->value);
+        if (val < 0.0f)
+        {
+            return 0;
+        }
+        if (val > 255.0f)
+        {
+            return 255;
+        }
+        return (unsigned char)val;
+    }
+    case SAIL_VARIANT_TYPE_DOUBLE:
+    {
+        double val = *(double*)(variant->value);
+        if (val < 0.0)
+        {
+            return 0;
+        }
+        if (val > 255.0)
+        {
+            return 255;
+        }
+        return (unsigned char)val;
+    }
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL || str[0] == '\0')
+        {
+            return 0;
+        }
+        char* endptr;
+        unsigned long val = strtoul(str, &endptr, 10);
+        if (endptr != str && *endptr == '\0')
+        {
+            return (val > 255) ? 255 : (unsigned char)val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 short sail_variant_to_short(const struct sail_variant* variant)
 {
-    return *(short*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_SHORT:
+        return *(short*)(variant->value);
+    case SAIL_VARIANT_TYPE_INT:
+        return (short)*(int*)(variant->value);
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (short)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+        return (short)*(float*)(variant->value);
+    case SAIL_VARIANT_TYPE_DOUBLE:
+        return (short)*(double*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        long val = strtol(str, &endptr, 10);
+        if (endptr != str)
+        {
+            return (short)val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 unsigned short sail_variant_to_unsigned_short(const struct sail_variant* variant)
 {
-    return *(unsigned short*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_UNSIGNED_SHORT:
+        return *(unsigned short*)(variant->value);
+    case SAIL_VARIANT_TYPE_SHORT:
+    {
+        short val = *(short*)(variant->value);
+        return (val < 0) ? 0 : (unsigned short)val;
+    }
+    case SAIL_VARIANT_TYPE_INT:
+    {
+        int val = *(int*)(variant->value);
+        return (val < 0) ? 0 : (unsigned short)val;
+    }
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (unsigned short)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+    {
+        float val = *(float*)(variant->value);
+        return (val < 0.0f) ? 0 : (unsigned short)val;
+    }
+    case SAIL_VARIANT_TYPE_DOUBLE:
+    {
+        double val = *(double*)(variant->value);
+        return (val < 0.0) ? 0 : (unsigned short)val;
+    }
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        unsigned long val = strtoul(str, &endptr, 10);
+        if (endptr != str && *endptr == '\0')
+        {
+            return (unsigned short)val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 int sail_variant_to_int(const struct sail_variant* variant)
 {
-    return *(int*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_INT:
+        return *(int*)(variant->value);
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (int)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+        return (int)*(float*)(variant->value);
+    case SAIL_VARIANT_TYPE_DOUBLE:
+        return (int)*(double*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        long val = strtol(str, &endptr, 10);
+        if (endptr != str)
+        {
+            return (int)val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 unsigned int sail_variant_to_unsigned_int(const struct sail_variant* variant)
 {
-    return *(unsigned int*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_INT:
+    {
+        int val = *(int*)(variant->value);
+        return (val < 0) ? 0 : (unsigned int)val;
+    }
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return *(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+    {
+        float val = *(float*)(variant->value);
+        return (val < 0.0f) ? 0 : (unsigned int)val;
+    }
+    case SAIL_VARIANT_TYPE_DOUBLE:
+    {
+        double val = *(double*)(variant->value);
+        return (val < 0.0) ? 0 : (unsigned int)val;
+    }
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        unsigned long val = strtoul(str, &endptr, 10);
+        if (endptr != str && *endptr == '\0')
+        {
+            return (unsigned int)val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 long sail_variant_to_long(const struct sail_variant* variant)
 {
-    return *(long*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_LONG:
+        return *(long*)(variant->value);
+    case SAIL_VARIANT_TYPE_INT:
+        return (long)*(int*)(variant->value);
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (long)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+        return (long)*(float*)(variant->value);
+    case SAIL_VARIANT_TYPE_DOUBLE:
+        return (long)*(double*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        long val = strtol(str, &endptr, 10);
+        if (endptr != str)
+        {
+            return val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 unsigned long sail_variant_to_unsigned_long(const struct sail_variant* variant)
 {
-    return *(unsigned long*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG:
+        return *(unsigned long*)(variant->value);
+    case SAIL_VARIANT_TYPE_LONG:
+    {
+        long val = *(long*)(variant->value);
+        return (val < 0) ? 0 : (unsigned long)val;
+    }
+    case SAIL_VARIANT_TYPE_INT:
+    {
+        int val = *(int*)(variant->value);
+        return (val < 0) ? 0 : (unsigned long)val;
+    }
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (unsigned long)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+    {
+        float val = *(float*)(variant->value);
+        return (val < 0.0f) ? 0 : (unsigned long)val;
+    }
+    case SAIL_VARIANT_TYPE_DOUBLE:
+    {
+        double val = *(double*)(variant->value);
+        return (val < 0.0) ? 0 : (unsigned long)val;
+    }
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        unsigned long val = strtoul(str, &endptr, 10);
+        if (endptr != str && *endptr == '\0')
+        {
+            return val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 long long sail_variant_to_long_long(const struct sail_variant* variant)
 {
-    return *(long long*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_LONG_LONG:
+        return *(long long*)(variant->value);
+    case SAIL_VARIANT_TYPE_LONG:
+        return (long long)*(long*)(variant->value);
+    case SAIL_VARIANT_TYPE_INT:
+        return (long long)*(int*)(variant->value);
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (long long)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+        return (long long)*(float*)(variant->value);
+    case SAIL_VARIANT_TYPE_DOUBLE:
+        return (long long)*(double*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        long long val = strtoll(str, &endptr, 10);
+        if (endptr != str)
+        {
+            return val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 unsigned long long sail_variant_to_unsigned_long_long(const struct sail_variant* variant)
 {
-    return *(unsigned long long*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_UNSIGNED_LONG_LONG:
+        return *(unsigned long long*)(variant->value);
+    case SAIL_VARIANT_TYPE_LONG_LONG:
+    {
+        long long val = *(long long*)(variant->value);
+        return (val < 0) ? 0 : (unsigned long long)val;
+    }
+    case SAIL_VARIANT_TYPE_LONG:
+    {
+        long val = *(long*)(variant->value);
+        return (val < 0) ? 0 : (unsigned long long)val;
+    }
+    case SAIL_VARIANT_TYPE_INT:
+    {
+        int val = *(int*)(variant->value);
+        return (val < 0) ? 0 : (unsigned long long)val;
+    }
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (unsigned long long)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+    {
+        float val = *(float*)(variant->value);
+        return (val < 0.0f) ? 0 : (unsigned long long)val;
+    }
+    case SAIL_VARIANT_TYPE_DOUBLE:
+    {
+        double val = *(double*)(variant->value);
+        return (val < 0.0) ? 0 : (unsigned long long)val;
+    }
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0;
+        }
+        char* endptr;
+        unsigned long long val = strtoull(str, &endptr, 10);
+        if (endptr != str && *endptr == '\0')
+        {
+            return val;
+        }
+        return 0;
+    }
+    default:
+        return 0;
+    }
 }
 
 float sail_variant_to_float(const struct sail_variant* variant)
 {
-    return *(float*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0.0f;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_INT:
+        return (float)*(int*)(variant->value);
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (float)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+        return *(float*)(variant->value);
+    case SAIL_VARIANT_TYPE_DOUBLE:
+        return (float)*(double*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0.0f;
+        }
+        char* endptr;
+        double val = strtod(str, &endptr);
+        if (endptr != str && *endptr == '\0')
+        {
+            return (float)val;
+        }
+        return 0.0f;
+    }
+    default:
+        return 0.0f;
+    }
 }
 
 double sail_variant_to_double(const struct sail_variant* variant)
 {
-    return *(double*)(variant->value);
+    if (variant == NULL || variant->value == NULL)
+    {
+        return 0.0;
+    }
+
+    switch (variant->type)
+    {
+    case SAIL_VARIANT_TYPE_INT:
+        return (double)*(int*)(variant->value);
+    case SAIL_VARIANT_TYPE_UNSIGNED_INT:
+        return (double)*(unsigned int*)(variant->value);
+    case SAIL_VARIANT_TYPE_FLOAT:
+        return (double)*(float*)(variant->value);
+    case SAIL_VARIANT_TYPE_DOUBLE:
+        return *(double*)(variant->value);
+    case SAIL_VARIANT_TYPE_STRING:
+    {
+        const char* str = (char*)(variant->value);
+        if (str == NULL)
+        {
+            return 0.0;
+        }
+        char* endptr;
+        double val = strtod(str, &endptr);
+        if (endptr != str && *endptr == '\0')
+        {
+            return val;
+        }
+        return 0.0;
+    }
+    default:
+        return 0.0;
+    }
 }
 
 char* sail_variant_to_string(const struct sail_variant* variant)

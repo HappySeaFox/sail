@@ -748,17 +748,9 @@ bool hdr_private_tuning_key_value_callback(const char* key, const struct sail_va
 
     if (strcmp(key, "hdr-rle-compression") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val       = (value->type == SAIL_VARIANT_TYPE_INT) ? (unsigned)sail_variant_to_int(value)
-                                                                        : sail_variant_to_unsigned_int(value);
-            write_ctx->use_rle = (val != 0);
-            SAIL_LOG_TRACE("HDR: rle-compression=%d", write_ctx->use_rle);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("HDR: 'hdr-rle-compression' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        write_ctx->use_rle = (val != 0);
+        SAIL_LOG_TRACE("HDR: rle-compression=%d", write_ctx->use_rle);
     }
     else if (strcmp(key, "hdr-y-direction") == 0)
     {
@@ -802,31 +794,17 @@ bool hdr_private_tuning_key_value_callback(const char* key, const struct sail_va
     }
     else if (strcmp(key, "hdr-exposure") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            float val = sail_variant_to_float(value);
-            /* Range check: exposure should be positive. */
-            write_ctx->header->exposure = (val > 0.0f) ? val : 1.0f;
-            SAIL_LOG_TRACE("HDR: exposure=%f", write_ctx->header->exposure);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("HDR: 'hdr-exposure' must be a float or double");
-        }
+        float val = sail_variant_to_float(value);
+        /* Range check: exposure should be positive. */
+        write_ctx->header->exposure = (val > 0.0f) ? val : 1.0f;
+        SAIL_LOG_TRACE("HDR: exposure=%f", write_ctx->header->exposure);
     }
     else if (strcmp(key, "hdr-gamma") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            float val = sail_variant_to_float(value);
-            /* Range check: gamma should be positive. */
-            write_ctx->header->gamma = (val > 0.0f) ? val : 1.0f;
-            SAIL_LOG_TRACE("HDR: gamma=%f", write_ctx->header->gamma);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("HDR: 'hdr-gamma' must be a float or double");
-        }
+        float val = sail_variant_to_float(value);
+        /* Range check: gamma should be positive. */
+        write_ctx->header->gamma = (val > 0.0f) ? val : 1.0f;
+        SAIL_LOG_TRACE("HDR: gamma=%f", write_ctx->header->gamma);
     }
 
     return true;

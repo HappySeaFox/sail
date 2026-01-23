@@ -256,17 +256,6 @@ sail_status_t raw_private_store_special_properties(libraw_data_t* raw_data, stru
     return SAIL_OK;
 }
 
-static float raw_private_read_variant_float(const struct sail_variant* value)
-{
-    if (value->type == SAIL_VARIANT_TYPE_DOUBLE)
-    {
-        return static_cast<float>(sail_variant_to_double(value));
-    }
-    else
-    {
-        return sail_variant_to_float(value);
-    }
-}
 
 bool raw_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
@@ -274,37 +263,21 @@ bool raw_private_tuning_key_value_callback(const char* key, const struct sail_va
 
     if (strcmp(key, "raw-brightness") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            float brightness                     = raw_private_read_variant_float(value);
-            raw_processor->imgdata.params.bright = brightness;
-            SAIL_LOG_TRACE("RAW: brightness=%f", brightness);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-brightness' must be a float or double");
-        }
+        float brightness = sail_variant_to_float(value);
+        raw_processor->imgdata.params.bright = brightness;
+        SAIL_LOG_TRACE("RAW: brightness=%f", brightness);
     }
     else if (strcmp(key, "raw-highlight") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int highlight = sail_variant_to_int(value);
+        if (highlight >= 0 && highlight <= 9)
         {
-            int highlight = (value->type == SAIL_VARIANT_TYPE_INT)
-                                ? sail_variant_to_int(value)
-                                : static_cast<int>(sail_variant_to_unsigned_int(value));
-            if (highlight >= 0 && highlight <= 9)
-            {
-                raw_processor->imgdata.params.highlight = highlight;
-                SAIL_LOG_TRACE("RAW: highlight=%d", highlight);
-            }
-            else
-            {
-                SAIL_LOG_ERROR("RAW: 'raw-highlight' must be between 0 and 9");
-            }
+            raw_processor->imgdata.params.highlight = highlight;
+            SAIL_LOG_TRACE("RAW: highlight=%d", highlight);
         }
         else
         {
-            SAIL_LOG_ERROR("RAW: 'raw-highlight' must be an integer");
+            SAIL_LOG_ERROR("RAW: 'raw-highlight' must be in range [0, 9], got %d", highlight);
         }
     }
     else if (strcmp(key, "raw-output-color") == 0)
@@ -361,24 +334,15 @@ bool raw_private_tuning_key_value_callback(const char* key, const struct sail_va
     }
     else if (strcmp(key, "raw-output-bits-per-sample") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int output_bps = sail_variant_to_int(value);
+        if (output_bps == 8 || output_bps == 16)
         {
-            int output_bps = (value->type == SAIL_VARIANT_TYPE_INT)
-                                 ? sail_variant_to_int(value)
-                                 : static_cast<int>(sail_variant_to_unsigned_int(value));
-            if (output_bps == 8 || output_bps == 16)
-            {
-                raw_processor->imgdata.params.output_bps = output_bps;
-                SAIL_LOG_TRACE("RAW: output-bits-per-sample=%d", output_bps);
-            }
-            else
-            {
-                SAIL_LOG_ERROR("RAW: 'raw-output-bits-per-sample' must be 8 or 16");
-            }
+            raw_processor->imgdata.params.output_bps = output_bps;
+            SAIL_LOG_TRACE("RAW: output-bits-per-sample=%d", output_bps);
         }
         else
         {
-            SAIL_LOG_ERROR("RAW: 'raw-output-bits-per-sample' must be an integer");
+            SAIL_LOG_ERROR("RAW: 'raw-output-bits-per-sample' must be 8 or 16, got %d", output_bps);
         }
     }
     else if (strcmp(key, "raw-demosaic") == 0)
@@ -434,83 +398,44 @@ bool raw_private_tuning_key_value_callback(const char* key, const struct sail_va
     }
     else if (strcmp(key, "raw-four-color-rgb") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            raw_processor->imgdata.params.four_color_rgb = sail_variant_to_bool(value) ? 1 : 0;
-            SAIL_LOG_TRACE("RAW: four-color-rgb=%d", raw_processor->imgdata.params.four_color_rgb);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-four-color-rgb' must be a bool");
-        }
+        raw_processor->imgdata.params.four_color_rgb = sail_variant_to_bool(value) ? 1 : 0;
+        SAIL_LOG_TRACE("RAW: four-color-rgb=%d", raw_processor->imgdata.params.four_color_rgb);
     }
     else if (strcmp(key, "raw-dcb-iterations") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int dcb_iterations = sail_variant_to_int(value);
+        if (dcb_iterations >= 0 && dcb_iterations <= 100)
         {
-            int dcb_iterations = (value->type == SAIL_VARIANT_TYPE_INT)
-                                     ? sail_variant_to_int(value)
-                                     : static_cast<int>(sail_variant_to_unsigned_int(value));
-            if (dcb_iterations >= 0 && dcb_iterations <= 100)
-            {
-                raw_processor->imgdata.params.dcb_iterations = dcb_iterations;
-                SAIL_LOG_TRACE("RAW: dcb-iterations=%d", dcb_iterations);
-            }
-            else
-            {
-                SAIL_LOG_ERROR("RAW: 'raw-dcb-iterations' must be between 0 and 100");
-            }
+            raw_processor->imgdata.params.dcb_iterations = dcb_iterations;
+            SAIL_LOG_TRACE("RAW: dcb-iterations=%d", dcb_iterations);
         }
         else
         {
-            SAIL_LOG_ERROR("RAW: 'raw-dcb-iterations' must be an integer");
+            SAIL_LOG_ERROR("RAW: 'raw-dcb-iterations' must be in range [0, 100], got %d", dcb_iterations);
         }
     }
     else if (strcmp(key, "raw-dcb-enhance-focal-length") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int dcb_enhance_fl = sail_variant_to_int(value);
+        if (dcb_enhance_fl >= 0 && dcb_enhance_fl <= 100)
         {
-            int dcb_enhance_fl = (value->type == SAIL_VARIANT_TYPE_INT)
-                                     ? sail_variant_to_int(value)
-                                     : static_cast<int>(sail_variant_to_unsigned_int(value));
-            if (dcb_enhance_fl >= 0 && dcb_enhance_fl <= 100)
-            {
-                raw_processor->imgdata.params.dcb_enhance_fl = dcb_enhance_fl;
-                SAIL_LOG_TRACE("RAW: dcb-enhance-focal-length=%d", dcb_enhance_fl);
-            }
-            else
-            {
-                SAIL_LOG_ERROR("RAW: 'raw-dcb-enhance-focal-length' must be between 0 and 100");
-            }
+            raw_processor->imgdata.params.dcb_enhance_fl = dcb_enhance_fl;
+            SAIL_LOG_TRACE("RAW: dcb-enhance-focal-length=%d", dcb_enhance_fl);
         }
         else
         {
-            SAIL_LOG_ERROR("RAW: 'raw-dcb-enhance-focal-length' must be an integer");
+            SAIL_LOG_ERROR("RAW: 'raw-dcb-enhance-focal-length' must be in range [0, 100], got %d", dcb_enhance_fl);
         }
     }
     else if (strcmp(key, "raw-use-camera-white-balance") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            raw_processor->imgdata.params.use_camera_wb = sail_variant_to_bool(value) ? 1 : 0;
-            SAIL_LOG_TRACE("RAW: use-camera-white-balance=%d", raw_processor->imgdata.params.use_camera_wb);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-use-camera-white-balance' must be a bool");
-        }
+        raw_processor->imgdata.params.use_camera_wb = sail_variant_to_bool(value) ? 1 : 0;
+        SAIL_LOG_TRACE("RAW: use-camera-white-balance=%d", raw_processor->imgdata.params.use_camera_wb);
     }
     else if (strcmp(key, "raw-use-auto-white-balance") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            raw_processor->imgdata.params.use_auto_wb = sail_variant_to_bool(value) ? 1 : 0;
-            SAIL_LOG_TRACE("RAW: use-auto-white-balance=%d", raw_processor->imgdata.params.use_auto_wb);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-use-auto-white-balance' must be a bool");
-        }
+        raw_processor->imgdata.params.use_auto_wb = sail_variant_to_bool(value) ? 1 : 0;
+        SAIL_LOG_TRACE("RAW: use-auto-white-balance=%d", raw_processor->imgdata.params.use_auto_wb);
     }
     else if (strcmp(key, "raw-user-multiplier") == 0)
     {
@@ -540,72 +465,35 @@ bool raw_private_tuning_key_value_callback(const char* key, const struct sail_va
     }
     else if (strcmp(key, "raw-auto-brightness") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            raw_processor->imgdata.params.no_auto_bright = sail_variant_to_bool(value) ? 0 : 1;
-            SAIL_LOG_TRACE("RAW: auto-brightness=%d", raw_processor->imgdata.params.no_auto_bright == 0 ? 1 : 0);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-auto-brightness' must be a bool");
-        }
+        raw_processor->imgdata.params.no_auto_bright = sail_variant_to_bool(value) ? 0 : 1;
+        SAIL_LOG_TRACE("RAW: auto-brightness=%d", raw_processor->imgdata.params.no_auto_bright == 0 ? 1 : 0);
     }
     else if (strcmp(key, "raw-half-size") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            raw_processor->imgdata.params.half_size = sail_variant_to_bool(value) ? 1 : 0;
-            SAIL_LOG_TRACE("RAW: half-size=%d", raw_processor->imgdata.params.half_size);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-half-size' must be a bool");
-        }
+        raw_processor->imgdata.params.half_size = sail_variant_to_bool(value) ? 1 : 0;
+        SAIL_LOG_TRACE("RAW: half-size=%d", raw_processor->imgdata.params.half_size);
     }
     else if (strcmp(key, "raw-use-fuji-rotate") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            raw_processor->imgdata.params.use_fuji_rotate = sail_variant_to_bool(value) ? 1 : 0;
-            SAIL_LOG_TRACE("RAW: use-fuji-rotate=%d", raw_processor->imgdata.params.use_fuji_rotate);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-use-fuji-rotate' must be a bool");
-        }
+        raw_processor->imgdata.params.use_fuji_rotate = sail_variant_to_bool(value) ? 1 : 0;
+        SAIL_LOG_TRACE("RAW: use-fuji-rotate=%d", raw_processor->imgdata.params.use_fuji_rotate);
     }
     else if (strcmp(key, "raw-no-interpolation") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            raw_processor->imgdata.params.no_interpolation = sail_variant_to_bool(value) ? 1 : 0;
-            SAIL_LOG_TRACE("RAW: no-interpolation=%d", raw_processor->imgdata.params.no_interpolation);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("RAW: 'raw-no-interpolation' must be a bool");
-        }
+        raw_processor->imgdata.params.no_interpolation = sail_variant_to_bool(value) ? 1 : 0;
+        SAIL_LOG_TRACE("RAW: no-interpolation=%d", raw_processor->imgdata.params.no_interpolation);
     }
     else if (strcmp(key, "raw-median-passes") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int med_passes = sail_variant_to_int(value);
+        if (med_passes >= 0 && med_passes <= 100)
         {
-            int med_passes = (value->type == SAIL_VARIANT_TYPE_INT)
-                                 ? sail_variant_to_int(value)
-                                 : static_cast<int>(sail_variant_to_unsigned_int(value));
-            if (med_passes >= 0 && med_passes <= 100)
-            {
-                raw_processor->imgdata.params.med_passes = med_passes;
-                SAIL_LOG_TRACE("RAW: median-passes=%d", med_passes);
-            }
-            else
-            {
-                SAIL_LOG_ERROR("RAW: 'raw-median-passes' must be between 0 and 100");
-            }
+            raw_processor->imgdata.params.med_passes = med_passes;
+            SAIL_LOG_TRACE("RAW: median-passes=%d", med_passes);
         }
         else
         {
-            SAIL_LOG_ERROR("RAW: 'raw-median-passes' must be an integer");
+            SAIL_LOG_ERROR("RAW: 'raw-median-passes' must be in range [0, 100], got %d", med_passes);
         }
     }
     else if (strcmp(key, "raw-gamma") == 0)

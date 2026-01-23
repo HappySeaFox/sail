@@ -356,18 +356,6 @@ sail_status_t webp_private_import_pixels(struct WebPPicture* picture, const stru
     return SAIL_OK;
 }
 
-static unsigned webp_private_read_variant_uint(const struct sail_variant* value)
-{
-    if (value->type == SAIL_VARIANT_TYPE_INT)
-    {
-        int64_t int_val = sail_variant_to_int(value);
-        return (int_val < 0) ? 0 : (unsigned)int_val;
-    }
-    else
-    {
-        return sail_variant_to_unsigned_int(value);
-    }
-}
 
 bool webp_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
@@ -375,29 +363,15 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
 
     if (strcmp(key, "webp-lossless") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val     = webp_private_read_variant_uint(value);
-            config->lossless = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: lossless=%d", config->lossless);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-lossless' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->lossless = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: lossless=%d", config->lossless);
     }
     else if (strcmp(key, "webp-method") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val   = webp_private_read_variant_uint(value);
-            config->method = (val > 6) ? 6 : (int)val;
-            SAIL_LOG_TRACE("WEBP: method=%d", config->method);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-method' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->method = (val > 6) ? 6 : (int)val;
+        SAIL_LOG_TRACE("WEBP: method=%d", config->method);
     }
     else if (strcmp(key, "webp-image-hint") == 0)
     {
@@ -429,81 +403,38 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "webp-target-size") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            config->target_size = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                         : (int)sail_variant_to_unsigned_int(value);
-            SAIL_LOG_TRACE("WEBP: target-size=%d", config->target_size);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-target-size' must be an integer");
-        }
+        config->target_size = sail_variant_to_int(value);
+        SAIL_LOG_TRACE("WEBP: target-size=%d", config->target_size);
     }
     else if (strcmp(key, "webp-target-psnr") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            float val           = sail_variant_to_float(value);
-            config->target_PSNR = (val < 0.0f) ? 0.0f : val;
-            SAIL_LOG_TRACE("WEBP: target-psnr=%f", config->target_PSNR);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-target-psnr' must be a float or double");
-        }
+        float val           = sail_variant_to_float(value);
+        config->target_PSNR = (val < 0.0f) ? 0.0f : val;
+        SAIL_LOG_TRACE("WEBP: target-psnr=%f", config->target_PSNR);
     }
     else if (strcmp(key, "webp-segments") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val     = webp_private_read_variant_uint(value);
-            config->segments = (val < 1) ? 1 : (val > 4) ? 4 : (int)val;
-            SAIL_LOG_TRACE("WEBP: segments=%d", config->segments);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-segments' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->segments = (val < 1) ? 1 : (val > 4) ? 4 : (int)val;
+        SAIL_LOG_TRACE("WEBP: segments=%d", config->segments);
     }
     else if (strcmp(key, "webp-sns-strength") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val         = webp_private_read_variant_uint(value);
-            config->sns_strength = (val > 100) ? 100 : (int)val;
-            SAIL_LOG_TRACE("WEBP: sns-strength=%d", config->sns_strength);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-sns-strength' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->sns_strength = (val > 100) ? 100 : (int)val;
+        SAIL_LOG_TRACE("WEBP: sns-strength=%d", config->sns_strength);
     }
     else if (strcmp(key, "webp-filter-strength") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val            = webp_private_read_variant_uint(value);
-            config->filter_strength = (val > 100) ? 100 : (int)val;
-            SAIL_LOG_TRACE("WEBP: filter-strength=%d", config->filter_strength);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-filter-strength' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->filter_strength = (val > 100) ? 100 : (int)val;
+        SAIL_LOG_TRACE("WEBP: filter-strength=%d", config->filter_strength);
     }
     else if (strcmp(key, "webp-filter-sharpness") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val             = webp_private_read_variant_uint(value);
-            config->filter_sharpness = (val > 7) ? 7 : (int)val;
-            SAIL_LOG_TRACE("WEBP: filter-sharpness=%d", config->filter_sharpness);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-filter-sharpness' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->filter_sharpness = (val > 7) ? 7 : (int)val;
+        SAIL_LOG_TRACE("WEBP: filter-sharpness=%d", config->filter_sharpness);
     }
     else if (strcmp(key, "webp-filter-type") == 0)
     {
@@ -527,29 +458,15 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "webp-autofilter") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val       = webp_private_read_variant_uint(value);
-            config->autofilter = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: autofilter=%d", config->autofilter);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-autofilter' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->autofilter = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: autofilter=%d", config->autofilter);
     }
     else if (strcmp(key, "webp-alpha-compression") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val              = webp_private_read_variant_uint(value);
-            config->alpha_compression = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: alpha-compression=%d", config->alpha_compression);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-alpha-compression' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->alpha_compression = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: alpha-compression=%d", config->alpha_compression);
     }
     else if (strcmp(key, "webp-alpha-filtering") == 0)
     {
@@ -577,29 +494,15 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "webp-alpha-quality") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val          = webp_private_read_variant_uint(value);
-            config->alpha_quality = (val > 100) ? 100 : (int)val;
-            SAIL_LOG_TRACE("WEBP: alpha-quality=%d", config->alpha_quality);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-alpha-quality' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->alpha_quality = (val > 100) ? 100 : (int)val;
+        SAIL_LOG_TRACE("WEBP: alpha-quality=%d", config->alpha_quality);
     }
     else if (strcmp(key, "webp-pass") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val = webp_private_read_variant_uint(value);
-            config->pass = (val < 1) ? 1 : (val > 10) ? 10 : (int)val;
-            SAIL_LOG_TRACE("WEBP: pass=%d", config->pass);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-pass' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->pass = (val < 1) ? 1 : (val > 10) ? 10 : (int)val;
+        SAIL_LOG_TRACE("WEBP: pass=%d", config->pass);
     }
     else if (strcmp(key, "webp-preprocessing") == 0)
     {
@@ -627,120 +530,57 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "webp-partitions") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val       = webp_private_read_variant_uint(value);
-            config->partitions = (val > 3) ? 3 : (int)val;
-            SAIL_LOG_TRACE("WEBP: partitions=%d", config->partitions);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-partitions' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->partitions = (val > 3) ? 3 : (int)val;
+        SAIL_LOG_TRACE("WEBP: partitions=%d", config->partitions);
     }
     else if (strcmp(key, "webp-partition-limit") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val            = webp_private_read_variant_uint(value);
-            config->partition_limit = (val > 100) ? 100 : (int)val;
-            SAIL_LOG_TRACE("WEBP: partition-limit=%d", config->partition_limit);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-partition-limit' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->partition_limit = (val > 100) ? 100 : (int)val;
+        SAIL_LOG_TRACE("WEBP: partition-limit=%d", config->partition_limit);
     }
     else if (strcmp(key, "webp-emulate-jpeg-size") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val              = webp_private_read_variant_uint(value);
-            config->emulate_jpeg_size = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: emulate-jpeg-size=%d", config->emulate_jpeg_size);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-emulate-jpeg-size' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->emulate_jpeg_size = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: emulate-jpeg-size=%d", config->emulate_jpeg_size);
     }
     else if (strcmp(key, "webp-thread-level") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val         = webp_private_read_variant_uint(value);
-            config->thread_level = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: thread-level=%d", config->thread_level);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-thread-level' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->thread_level = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: thread-level=%d", config->thread_level);
     }
     else if (strcmp(key, "webp-low-memory") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val       = webp_private_read_variant_uint(value);
-            config->low_memory = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: low-memory=%d", config->low_memory);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-low-memory' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->low_memory = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: low-memory=%d", config->low_memory);
     }
     else if (strcmp(key, "webp-near-lossless") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val          = webp_private_read_variant_uint(value);
-            config->near_lossless = (val > 100) ? 100 : (int)val;
-            SAIL_LOG_TRACE("WEBP: near-lossless=%d", config->near_lossless);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-near-lossless' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->near_lossless = (val > 100) ? 100 : (int)val;
+        SAIL_LOG_TRACE("WEBP: near-lossless=%d", config->near_lossless);
     }
     else if (strcmp(key, "webp-exact") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val  = webp_private_read_variant_uint(value);
-            config->exact = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: exact=%d", config->exact);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-exact' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->exact = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: exact=%d", config->exact);
     }
     else if (strcmp(key, "webp-use-delta-palette") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val              = webp_private_read_variant_uint(value);
-            config->use_delta_palette = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: use-delta-palette=%d", config->use_delta_palette);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-use-delta-palette' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->use_delta_palette = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: use-delta-palette=%d", config->use_delta_palette);
     }
     else if (strcmp(key, "webp-use-sharp-yuv") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned val          = webp_private_read_variant_uint(value);
-            config->use_sharp_yuv = (val != 0) ? 1 : 0;
-            SAIL_LOG_TRACE("WEBP: use-sharp-yuv=%d", config->use_sharp_yuv);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("WEBP: 'webp-use-sharp-yuv' must be an integer");
-        }
+        unsigned val = sail_variant_to_unsigned_int(value);
+        config->use_sharp_yuv = (val != 0) ? 1 : 0;
+        SAIL_LOG_TRACE("WEBP: use-sharp-yuv=%d", config->use_sharp_yuv);
     }
 
     return true;

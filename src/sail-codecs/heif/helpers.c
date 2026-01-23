@@ -473,18 +473,6 @@ sail_status_t heif_private_fetch_premultiplied_alpha(const struct heif_image* he
     return SAIL_OK;
 }
 
-/* Helper function to read int/unsigned/float/double values from variant. */
-static int heif_private_variant_to_int(const struct sail_variant* value)
-{
-    switch (value->type)
-    {
-    case SAIL_VARIANT_TYPE_INT: return sail_variant_to_int(value);
-    case SAIL_VARIANT_TYPE_UNSIGNED_INT: return (int)sail_variant_to_unsigned_int(value);
-    case SAIL_VARIANT_TYPE_FLOAT: return (int)sail_variant_to_float(value);
-    case SAIL_VARIANT_TYPE_DOUBLE: return (int)sail_variant_to_double(value);
-    default: return 0;
-    }
-}
 
 /* Tuning options callback. */
 bool heif_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
@@ -570,23 +558,15 @@ bool heif_private_tuning_key_value_callback(const char* key, const struct sail_v
     /* heif-tu-intra-depth: Transform Unit intra depth (1-4) */
     else if (strcmp(key, "heif-tu-intra-depth") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT
-            || value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            int tu_depth = heif_private_variant_to_int(value);
+            int tu_depth = sail_variant_to_int(value);
 
-            if (tu_depth >= 1 && tu_depth <= 4)
-            {
-                heif_encoder_set_parameter_integer(tuning_state->encoder, "tu-intra-depth", tu_depth);
-            }
-            else
-            {
-                SAIL_LOG_ERROR("HEIF: 'heif-tu-intra-depth' must be in range [1, 4], got %d", tu_depth);
-            }
+        if (tu_depth >= 1 && tu_depth <= 4)
+        {
+            heif_encoder_set_parameter_integer(tuning_state->encoder, "tu-intra-depth", tu_depth);
         }
         else
         {
-            SAIL_LOG_ERROR("HEIF: 'heif-tu-intra-depth' must be a number");
+            SAIL_LOG_ERROR("HEIF: 'heif-tu-intra-depth' must be in range [1, 4], got %d", tu_depth);
         }
         return true;
     }
@@ -594,23 +574,15 @@ bool heif_private_tuning_key_value_callback(const char* key, const struct sail_v
     /* heif-complexity: encoding complexity (0-100) */
     else if (strcmp(key, "heif-complexity") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT
-            || value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            int complexity = heif_private_variant_to_int(value);
+            int complexity = sail_variant_to_int(value);
 
-            if (complexity >= 0 && complexity <= 100)
-            {
-                heif_encoder_set_parameter_integer(tuning_state->encoder, "complexity", complexity);
-            }
-            else
-            {
-                SAIL_LOG_ERROR("HEIF: 'heif-complexity' must be in range [0, 100], got %d", complexity);
-            }
+        if (complexity >= 0 && complexity <= 100)
+        {
+            heif_encoder_set_parameter_integer(tuning_state->encoder, "complexity", complexity);
         }
         else
         {
-            SAIL_LOG_ERROR("HEIF: 'heif-complexity' must be a number");
+            SAIL_LOG_ERROR("HEIF: 'heif-complexity' must be in range [0, 100], got %d", complexity);
         }
         return true;
     }
@@ -654,23 +626,15 @@ bool heif_private_tuning_key_value_callback(const char* key, const struct sail_v
     /* heif-threads: number of decoding/encoding threads */
     else if (strcmp(key, "heif-threads") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT
-            || value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            int threads = heif_private_variant_to_int(value);
+            int threads = sail_variant_to_int(value);
 
-            if (threads >= 1 && threads <= 256)
-            {
-                *(tuning_state->threads) = threads;
-            }
-            else
-            {
-                SAIL_LOG_ERROR("HEIF: 'heif-threads' must be in range [1, 256], got %d", threads);
-            }
+        if (threads >= 1 && threads <= 256)
+        {
+            *(tuning_state->threads) = threads;
         }
         else
         {
-            SAIL_LOG_ERROR("HEIF: 'heif-threads' must be a number");
+            SAIL_LOG_ERROR("HEIF: 'heif-threads' must be in range [1, 256], got %d", threads);
         }
         return true;
     }

@@ -279,34 +279,17 @@ static bool jbig_private_tuning_key_value_callback(const char* key, const struct
 
     if (strcmp(key, "jbig-stripe-height") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned long val        = (value->type == SAIL_VARIANT_TYPE_INT)
-                                           ? (unsigned long)sail_variant_to_int(value)
-                                           : (unsigned long)sail_variant_to_unsigned_int(value);
-            write_ctx->stripe_height = val;
-            SAIL_LOG_TRACE("JBIG: stripe-height=%lu", write_ctx->stripe_height);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JBIG: 'jbig-stripe-height' must be an integer");
-        }
+        unsigned long val = (unsigned long)sail_variant_to_unsigned_int(value);
+        write_ctx->stripe_height = val;
+        SAIL_LOG_TRACE("JBIG: stripe-height=%lu", write_ctx->stripe_height);
     }
     else if (strcmp(key, "jbig-typical-prediction") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        unsigned val = sail_variant_to_unsigned_int(value);
+        if (val != 0)
         {
-            unsigned val = (value->type == SAIL_VARIANT_TYPE_INT) ? (unsigned)sail_variant_to_int(value)
-                                                                  : sail_variant_to_unsigned_int(value);
-            if (val != 0)
-            {
-                write_ctx->options |= JBG_TPDON;
-                SAIL_LOG_TRACE("JBIG: typical-prediction enabled");
-            }
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JBIG: 'jbig-typical-prediction' must be an integer");
+            write_ctx->options |= JBG_TPDON;
+            SAIL_LOG_TRACE("JBIG: typical-prediction enabled");
         }
     }
 

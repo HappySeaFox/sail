@@ -277,36 +277,25 @@ bool jpeg_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "jpeg-optimize-coding") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            const bool optimize_coding = sail_variant_to_bool(value);
+        bool optimize_coding = sail_variant_to_bool(value);
 
-            if (optimize_coding)
-            {
-                SAIL_LOG_TRACE("JPEG: Optimizing coding");
-                compress_context->optimize_coding = optimize_coding;
-            }
-        }
-        else
+        if (optimize_coding)
         {
-            SAIL_LOG_ERROR("JPEG: 'jpeg-optimize-coding' must be a bool");
+            SAIL_LOG_TRACE("JPEG: Optimizing coding");
+            compress_context->optimize_coding = optimize_coding;
         }
     }
     else if (strcmp(key, "jpeg-smoothing-factor") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int smoothing_factor = sail_variant_to_int(value);
+        if (smoothing_factor >= 0 && smoothing_factor <= 100)
         {
-            int smoothing_factor = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                          : (int)sail_variant_to_unsigned_int(value);
-            if (smoothing_factor >= 0 && smoothing_factor <= 100)
-            {
-                compress_context->smoothing_factor = smoothing_factor;
-                SAIL_LOG_TRACE("JPEG: Smoothing the image with factor %d", smoothing_factor);
-            }
+            compress_context->smoothing_factor = smoothing_factor;
+            SAIL_LOG_TRACE("JPEG: Smoothing the image with factor %d", smoothing_factor);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEG: 'jpeg-smoothing-factor' must be an integer");
+            SAIL_LOG_ERROR("JPEG: 'jpeg-smoothing-factor' must be in range [0, 100], got %d", smoothing_factor);
         }
     }
 

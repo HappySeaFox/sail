@@ -517,204 +517,152 @@ bool jpegxl_private_encoder_tuning_key_value_callback(const char* key,
 
     if (strcmp(key, "jpegxl-effort") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int effort = sail_variant_to_int(value);
+        if (effort >= 1 && effort <= 9)
         {
-            int64_t effort = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                    : (int64_t)sail_variant_to_unsigned_int(value);
-            if (effort >= 1 && effort <= 9)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting effort to %lld", (long long)effort);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, effort);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting effort to %d", effort);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EFFORT, effort);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-effort' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-effort' must be in range [1, 9], got %d", effort);
         }
     }
     else if (strcmp(key, "jpegxl-decoding-speed") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int speed = sail_variant_to_int(value);
+        if (speed >= 0 && speed <= 4)
         {
-            int64_t speed = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                   : (int64_t)sail_variant_to_unsigned_int(value);
-            if (speed >= 0 && speed <= 4)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting decoding speed to %lld", (long long)speed);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_DECODING_SPEED, speed);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting decoding speed to %d", speed);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_DECODING_SPEED, speed);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-decoding-speed' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-decoding-speed' must be in range [0, 4], got %d", speed);
         }
     }
     else if (strcmp(key, "jpegxl-modular") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int modular = sail_variant_to_int(value);
+        if (modular >= -1 && modular <= 1)
         {
-            int64_t modular = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                     : (int64_t)sail_variant_to_unsigned_int(value);
-            if (modular >= -1 && modular <= 1)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting modular to %lld", (long long)modular);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_MODULAR, modular);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting modular to %d", modular);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_MODULAR, modular);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-modular' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-modular' must be in range [-1, 1], got %d", modular);
         }
     }
     else if (strcmp(key, "jpegxl-progressive-ac") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int progressive = sail_variant_to_int(value);
+        if (progressive >= -1 && progressive <= 1)
         {
-            int64_t progressive = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                         : (int64_t)sail_variant_to_unsigned_int(value);
-            if (progressive >= -1 && progressive <= 1)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting progressive-ac to %lld", (long long)progressive);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PROGRESSIVE_AC, progressive);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting progressive-ac to %d", progressive);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PROGRESSIVE_AC, progressive);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-progressive-ac' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-progressive-ac' must be in range [-1, 1], got %d", progressive);
         }
     }
     else if (strcmp(key, "jpegxl-progressive-dc") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int progressive = sail_variant_to_int(value);
+        if (progressive >= -1 && progressive <= 2)
         {
-            int64_t progressive = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                         : (int64_t)sail_variant_to_unsigned_int(value);
-            if (progressive >= -1 && progressive <= 2)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting progressive-dc to %lld", (long long)progressive);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PROGRESSIVE_DC, progressive);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting progressive-dc to %d", progressive);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PROGRESSIVE_DC, progressive);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-progressive-dc' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-progressive-dc' must be in range [-1, 2], got %d", progressive);
         }
     }
     else if (strcmp(key, "jpegxl-responsive") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int responsive = sail_variant_to_int(value);
+        if (responsive >= -1 && responsive <= 1)
         {
-            int64_t responsive = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                        : (int64_t)sail_variant_to_unsigned_int(value);
-            if (responsive >= -1 && responsive <= 1)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting responsive to %lld", (long long)responsive);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_RESPONSIVE, responsive);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting responsive to %d", responsive);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_RESPONSIVE, responsive);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-responsive' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-responsive' must be in range [-1, 1], got %d", responsive);
         }
     }
     else if (strcmp(key, "jpegxl-epf") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int epf = sail_variant_to_int(value);
+        if (epf >= -1 && epf <= 3)
         {
-            int64_t epf = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                 : (int64_t)sail_variant_to_unsigned_int(value);
-            if (epf >= -1 && epf <= 3)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting EPF to %lld", (long long)epf);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EPF, epf);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting EPF to %d", epf);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_EPF, epf);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-epf' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-epf' must be in range [-1, 3], got %d", epf);
         }
     }
     else if (strcmp(key, "jpegxl-gaborish") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int gaborish = sail_variant_to_int(value);
+        if (gaborish >= -1 && gaborish <= 1)
         {
-            int64_t gaborish = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                      : (int64_t)sail_variant_to_unsigned_int(value);
-            if (gaborish >= -1 && gaborish <= 1)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting gaborish to %lld", (long long)gaborish);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_GABORISH, gaborish);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting gaborish to %d", gaborish);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_GABORISH, gaborish);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-gaborish' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-gaborish' must be in range [-1, 1], got %d", gaborish);
         }
     }
     else if (strcmp(key, "jpegxl-photon-noise") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int noise = sail_variant_to_int(value);
+        if (noise >= 0)
         {
-            int64_t noise = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                   : (int64_t)sail_variant_to_unsigned_int(value);
-            if (noise >= 0)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting photon noise to %lld", (long long)noise);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PHOTON_NOISE, noise);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting photon noise to %d", noise);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PHOTON_NOISE, noise);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-photon-noise' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-photon-noise' must be >= 0, got %d", noise);
         }
     }
     else if (strcmp(key, "jpegxl-modular-predictor") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int predictor = sail_variant_to_int(value);
+        if (predictor >= -1 && predictor <= 15)
         {
-            int64_t predictor = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                       : (int64_t)sail_variant_to_unsigned_int(value);
-            if (predictor >= -1 && predictor <= 15)
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting modular predictor to %lld", (long long)predictor);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_MODULAR_PREDICTOR, predictor);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting modular predictor to %d", predictor);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_MODULAR_PREDICTOR, predictor);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-modular-predictor' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-modular-predictor' must be in range [-1, 15], got %d", predictor);
         }
     }
     else if (strcmp(key, "jpegxl-palette-colors") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            int64_t colors = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                    : (int64_t)sail_variant_to_unsigned_int(value);
-            SAIL_LOG_TRACE("JPEGXL: Setting palette colors to %lld", (long long)colors);
-            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PALETTE_COLORS, colors);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-palette-colors' must be an integer");
-        }
+        int colors = sail_variant_to_int(value);
+        SAIL_LOG_TRACE("JPEGXL: Setting palette colors to %d", colors);
+        JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_PALETTE_COLORS, colors);
     }
     else if (strcmp(key, "jpegxl-resampling") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int resampling = sail_variant_to_int(value);
+        if (resampling >= -1
+            && (resampling == -1 || resampling == 1 || resampling == 2 || resampling == 4 || resampling == 8))
         {
-            int64_t resampling = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                        : (int64_t)sail_variant_to_unsigned_int(value);
-            if (resampling >= -1
-                && (resampling == -1 || resampling == 1 || resampling == 2 || resampling == 4 || resampling == 8))
-            {
-                SAIL_LOG_TRACE("JPEGXL: Setting resampling to %lld", (long long)resampling);
-                JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_RESAMPLING, resampling);
-            }
+            SAIL_LOG_TRACE("JPEGXL: Setting resampling to %d", resampling);
+            JxlEncoderFrameSettingsSetOption(frame_settings, JXL_ENC_FRAME_SETTING_RESAMPLING, resampling);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-resampling' must be an integer");
+            SAIL_LOG_ERROR("JPEGXL: Invalid 'jpegxl-resampling' value");
         }
     }
 
@@ -729,30 +677,15 @@ bool jpegxl_private_decoder_tuning_key_value_callback(const char* key,
 
     if (strcmp(key, "jpegxl-desired-intensity-target") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_FLOAT || value->type == SAIL_VARIANT_TYPE_DOUBLE)
-        {
-            float intensity = (value->type == SAIL_VARIANT_TYPE_FLOAT) ? sail_variant_to_float(value)
-                                                                       : (float)sail_variant_to_double(value);
-            SAIL_LOG_TRACE("JPEGXL: Setting desired intensity target to %.1f", intensity);
-            JxlDecoderSetDesiredIntensityTarget(decoder, intensity);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-desired-intensity-target' must be a float or double");
-        }
+        float intensity = sail_variant_to_float(value);
+        SAIL_LOG_TRACE("JPEGXL: Setting desired intensity target to %.1f", intensity);
+        JxlDecoderSetDesiredIntensityTarget(decoder, intensity);
     }
     else if (strcmp(key, "jpegxl-render-spotcolors") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            bool render = sail_variant_to_bool(value);
-            SAIL_LOG_TRACE("JPEGXL: Setting render spotcolors to %s", render ? "true" : "false");
-            JxlDecoderSetRenderSpotcolors(decoder, render ? JXL_TRUE : JXL_FALSE);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEGXL: 'jpegxl-render-spotcolors' must be a bool");
-        }
+        bool render = sail_variant_to_bool(value);
+        SAIL_LOG_TRACE("JPEGXL: Setting render spotcolors to %s", render ? "true" : "false");
+        JxlDecoderSetRenderSpotcolors(decoder, render ? JXL_TRUE : JXL_FALSE);
     }
 
     return true;

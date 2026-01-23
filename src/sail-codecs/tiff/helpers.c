@@ -1018,46 +1018,30 @@ bool tiff_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "tiff-jpeg-quality") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            int quality = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                 : (int)sail_variant_to_unsigned_int(value);
+        int quality = sail_variant_to_int(value);
 
-            if (quality >= 1 && quality <= 100)
-            {
-                TIFFSetField(tiff, TIFFTAG_JPEGQUALITY, quality);
-                SAIL_LOG_TRACE("TIFF: Setting JPEG quality to %d", quality);
-            }
-            else
-            {
-                SAIL_LOG_WARNING("TIFF: JPEG quality must be 1-100, got %d", quality);
-            }
+        if (quality >= 1 && quality <= 100)
+        {
+            TIFFSetField(tiff, TIFFTAG_JPEGQUALITY, quality);
+            SAIL_LOG_TRACE("TIFF: Setting JPEG quality to %d", quality);
         }
         else
         {
-            SAIL_LOG_ERROR("TIFF: 'tiff-jpeg-quality' must be an integer");
+            SAIL_LOG_WARNING("TIFF: JPEG quality must be 1-100, got %d", quality);
         }
     }
     else if (strcmp(key, "tiff-zip-quality") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            int quality = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                 : (int)sail_variant_to_unsigned_int(value);
+        int quality = sail_variant_to_int(value);
 
-            if (quality >= 1 && quality <= 9)
-            {
-                TIFFSetField(tiff, TIFFTAG_ZIPQUALITY, quality);
-                SAIL_LOG_TRACE("TIFF: Setting ZIP/DEFLATE quality to %d", quality);
-            }
-            else
-            {
-                SAIL_LOG_WARNING("TIFF: ZIP quality must be 1-9, got %d", quality);
-            }
+        if (quality >= 1 && quality <= 9)
+        {
+            TIFFSetField(tiff, TIFFTAG_ZIPQUALITY, quality);
+            SAIL_LOG_TRACE("TIFF: Setting ZIP/DEFLATE quality to %d", quality);
         }
         else
         {
-            SAIL_LOG_ERROR("TIFF: 'tiff-zip-quality' must be an integer");
+            SAIL_LOG_WARNING("TIFF: ZIP quality must be 1-9, got %d", quality);
         }
     }
 

@@ -260,80 +260,99 @@ SAIL_EXPORT sail_status_t sail_set_variant_shallow_data(struct sail_variant* var
     )(variant, value)
 
 /*
- * Returns the variant value as a boolean. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to bool*, and then dereferences the resulting pointer.
+ * Returns the variant value as a boolean. Supports conversion from bool and string types.
+ * For string type, parses "true", "1", "yes" (case-insensitive) as true,
+ * and "false", "0", "no" (case-insensitive) as false.
+ * Returns false if conversion fails or variant is invalid.
  */
 SAIL_EXPORT bool sail_variant_to_bool(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as a char. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to char*, and then dereferences the resulting pointer.
+ * Returns the variant value as a char. Supports conversion from char, int, unsigned int,
+ * float, double, and string types. For string type, returns the first character.
+ * Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT char sail_variant_to_char(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as an unsigned char. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to unsigned char*, and then dereferences the resulting pointer.
+ * Returns the variant value as an unsigned char. Supports conversion from char, unsigned char,
+ * int, unsigned int, float, double, and string types. For string type, parses the string as a decimal number
+ * using strtoul(). Negative numeric values are clamped to 0. For string type, negative values are parsed
+ * as unsigned (may result in large numbers). Values are clamped to [0, 255]. Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT unsigned char sail_variant_to_unsigned_char(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as a short. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to short*, and then dereferences the resulting pointer.
+ * Returns the variant value as a short. Supports conversion from short, int, unsigned int,
+ * float, double, and string types. For string type, parses the string as a decimal number.
+ * Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT short sail_variant_to_short(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as an unsigned short. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to unsigned short*, and then dereferences the resulting pointer.
+ * Returns the variant value as an unsigned short. Supports conversion from short, unsigned short,
+ * int, unsigned int, float, double, and string types. For string type, parses the string as a decimal number
+ * using strtoul(). Negative numeric values are clamped to 0. For string type, negative values are parsed
+ * as unsigned (may result in large numbers). Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT unsigned short sail_variant_to_unsigned_short(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as an integer. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to int*, and then dereferences the resulting pointer.
+ * Returns the variant value as an integer. Supports conversion from int, unsigned int,
+ * float, double, and string types. For string type, parses the string as a decimal number.
+ * Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT int sail_variant_to_int(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as an unsigned int. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to unsigned int*, and then dereferences the resulting pointer.
+ * Returns the variant value as an unsigned int. Supports conversion from int, unsigned int,
+ * float, double, and string types. For string type, parses the string as a decimal number
+ * using strtoul(). Negative numeric values are clamped to 0. For string type, negative values are parsed
+ * as unsigned (may result in large numbers). Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT unsigned int sail_variant_to_unsigned_int(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as a long. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to long*, and then dereferences the resulting pointer.
+ * Returns the variant value as a long. Supports conversion from long, int, unsigned int,
+ * float, double, and string types. For string type, parses the string as a decimal number.
+ * Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT long sail_variant_to_long(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as an unsigned long. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to unsigned long*, and then dereferences the resulting pointer.
+ * Returns the variant value as an unsigned long. Supports conversion from long, unsigned long,
+ * int, unsigned int, float, double, and string types. For string type, parses the string as a decimal number
+ * using strtoul(). Negative numeric values are clamped to 0. For string type, negative values are parsed
+ * as unsigned (may result in large numbers). Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT unsigned long sail_variant_to_unsigned_long(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as a long long. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to long long*, and then dereferences the resulting pointer.
+ * Returns the variant value as a long long. Supports conversion from long long, long, int, unsigned int,
+ * float, double, and string types. For string type, parses the string as a decimal number.
+ * Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT long long sail_variant_to_long_long(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as an unsigned long long. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to unsigned long long*, and then dereferences the resulting pointer.
+ * Returns the variant value as an unsigned long long. Supports conversion from unsigned long long, long long,
+ * long, int, unsigned int, float, double, and string types. For string type, parses the string as a decimal number
+ * using strtoull(). Negative numeric values are clamped to 0. For string type, negative values are parsed
+ * as unsigned (may result in large numbers). Returns 0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT unsigned long long sail_variant_to_unsigned_long_long(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as a float. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to float*, and then dereferences the resulting pointer.
+ * Returns the variant value as a float. Supports conversion from int, unsigned int,
+ * float, double, and string types. For string type, parses the string as a floating-point number.
+ * Returns 0.0f if conversion fails or variant is invalid.
  */
 SAIL_EXPORT float sail_variant_to_float(const struct sail_variant* variant);
 
 /*
- * Returns the variant value as a double. Behavior is undefined if the variant is invalid.
- * Effectively, it casts the value pointer to double*, and then dereferences the resulting pointer.
+ * Returns the variant value as a double. Supports conversion from int, unsigned int,
+ * float, double, and string types. For string type, parses the string as a floating-point number.
+ * Returns 0.0 if conversion fails or variant is invalid.
  */
 SAIL_EXPORT double sail_variant_to_double(const struct sail_variant* variant);
 

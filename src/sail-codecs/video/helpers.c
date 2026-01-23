@@ -562,18 +562,6 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     return SAIL_OK;
 }
 
-static unsigned video_private_read_variant_uint(const struct sail_variant* value)
-{
-    if (value->type == SAIL_VARIANT_TYPE_INT)
-    {
-        int64_t int_val = sail_variant_to_int(value);
-        return (int_val < 0) ? 0 : (unsigned)int_val;
-    }
-    else
-    {
-        return sail_variant_to_unsigned_int(value);
-    }
-}
 
 static int video_private_parse_skip_frame(const char* str_value)
 {
@@ -668,18 +656,15 @@ bool video_private_load_tuning_key_value_callback(const char* key, const struct 
 
     if (strcmp(key, "video-threads") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        unsigned threads = sail_variant_to_unsigned_int(value);
+        if (threads > 0 && threads <= 64)
         {
-            unsigned threads = video_private_read_variant_uint(value);
-            if (threads > 0 && threads <= 64)
-            {
-                av_opt_set_int(codec_ctx, "threads", (int64_t)threads, 0);
-                SAIL_LOG_TRACE("VIDEO: Set decoder threads to %u", threads);
-            }
+            av_opt_set_int(codec_ctx, "threads", (int64_t)threads, 0);
+            SAIL_LOG_TRACE("VIDEO: Set decoder threads to %u", threads);
         }
         else
         {
-            SAIL_LOG_ERROR("VIDEO: 'video-threads' must be an integer");
+            SAIL_LOG_ERROR("VIDEO: 'video-threads' must be in range [1, 64], got %u", threads);
         }
     }
     else if (strcmp(key, "video-low-resolution") == 0)

@@ -287,59 +287,27 @@ bool jpeg2000_private_tuning_key_value_callback_load(const char* key, const stru
 
     if (strcmp(key, "jpeg2000-reduce") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned reduce       = (value->type == SAIL_VARIANT_TYPE_INT) ? (unsigned)sail_variant_to_int(value)
-                                                                           : sail_variant_to_unsigned_int(value);
-            parameters->cp_reduce = (OPJ_UINT32)reduce;
-            SAIL_LOG_TRACE("JPEG2000: Set reduce to %u", parameters->cp_reduce);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-reduce' must be an integer");
-        }
+        unsigned reduce = sail_variant_to_unsigned_int(value);
+        parameters->cp_reduce = (OPJ_UINT32)reduce;
+        SAIL_LOG_TRACE("JPEG2000: Set reduce to %u", parameters->cp_reduce);
     }
     else if (strcmp(key, "jpeg2000-layer") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned layer       = (value->type == SAIL_VARIANT_TYPE_INT) ? (unsigned)sail_variant_to_int(value)
-                                                                          : sail_variant_to_unsigned_int(value);
-            parameters->cp_layer = (OPJ_UINT32)layer;
-            SAIL_LOG_TRACE("JPEG2000: Set layer to %u", parameters->cp_layer);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-layer' must be an integer");
-        }
+        unsigned layer = sail_variant_to_unsigned_int(value);
+        parameters->cp_layer = (OPJ_UINT32)layer;
+        SAIL_LOG_TRACE("JPEG2000: Set layer to %u", parameters->cp_layer);
     }
     else if (strcmp(key, "jpeg2000-tile-index") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned tile_index    = (value->type == SAIL_VARIANT_TYPE_INT) ? (unsigned)sail_variant_to_int(value)
-                                                                            : sail_variant_to_unsigned_int(value);
-            parameters->tile_index = (OPJ_UINT32)tile_index;
-            SAIL_LOG_TRACE("JPEG2000: Set tile-index to %u", parameters->tile_index);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-tile-index' must be an integer");
-        }
+        unsigned tile_index = sail_variant_to_unsigned_int(value);
+        parameters->tile_index = (OPJ_UINT32)tile_index;
+        SAIL_LOG_TRACE("JPEG2000: Set tile-index to %u", parameters->tile_index);
     }
     else if (strcmp(key, "jpeg2000-num-tiles") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
-        {
-            unsigned num_tiles = (value->type == SAIL_VARIANT_TYPE_INT) ? (unsigned)sail_variant_to_int(value)
-                                                                        : sail_variant_to_unsigned_int(value);
-            parameters->nb_tile_to_decode = (OPJ_UINT32)num_tiles;
-            SAIL_LOG_TRACE("JPEG2000: Set num-tiles to %u", parameters->nb_tile_to_decode);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-num-tiles' must be an integer");
-        }
+        unsigned num_tiles = sail_variant_to_unsigned_int(value);
+        parameters->nb_tile_to_decode = (OPJ_UINT32)num_tiles;
+        SAIL_LOG_TRACE("JPEG2000: Set num-tiles to %u", parameters->nb_tile_to_decode);
     }
 
     return true;
@@ -351,31 +319,20 @@ bool jpeg2000_private_tuning_key_value_callback_save(const char* key, const stru
 
     if (strcmp(key, "jpeg2000-irreversible") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_BOOL)
-        {
-            parameters->irreversible = sail_variant_to_bool(value) ? 1 : 0;
-            SAIL_LOG_TRACE("JPEG2000: Set irreversible to %d", parameters->irreversible);
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-irreversible' must be a bool");
-        }
+        parameters->irreversible = sail_variant_to_bool(value) ? 1 : 0;
+        SAIL_LOG_TRACE("JPEG2000: Set irreversible to %d", parameters->irreversible);
     }
     else if (strcmp(key, "jpeg2000-numresolution") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int numresolution = sail_variant_to_int(value);
+        if (numresolution >= 1 && numresolution <= 32)
         {
-            int numresolution = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                       : (int)sail_variant_to_unsigned_int(value);
-            if (numresolution >= 1 && numresolution <= 32)
-            {
-                parameters->numresolution = numresolution;
-                SAIL_LOG_TRACE("JPEG2000: Set numresolution to %d", parameters->numresolution);
-            }
+            parameters->numresolution = numresolution;
+            SAIL_LOG_TRACE("JPEG2000: Set numresolution to %d", parameters->numresolution);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-numresolution' must be an integer");
+            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-numresolution' must be in range [1, 32], got %d", numresolution);
         }
     }
     else if (strcmp(key, "jpeg2000-prog-order") == 0)
@@ -414,38 +371,30 @@ bool jpeg2000_private_tuning_key_value_callback_save(const char* key, const stru
     }
     else if (strcmp(key, "jpeg2000-codeblock-width") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int cblockw = sail_variant_to_int(value);
+        /* Must be power of 2 between 4 and 1024 */
+        if (cblockw >= 4 && cblockw <= 1024 && (cblockw & (cblockw - 1)) == 0)
         {
-            int cblockw = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                 : (int)sail_variant_to_unsigned_int(value);
-            /* Must be power of 2 between 4 and 1024 */
-            if (cblockw >= 4 && cblockw <= 1024 && (cblockw & (cblockw - 1)) == 0)
-            {
-                parameters->cblockw_init = cblockw;
-                SAIL_LOG_TRACE("JPEG2000: Set codeblock-width to %d", parameters->cblockw_init);
-            }
+            parameters->cblockw_init = cblockw;
+            SAIL_LOG_TRACE("JPEG2000: Set codeblock-width to %d", parameters->cblockw_init);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-codeblock-width' must be an integer");
+            SAIL_LOG_ERROR("JPEG2000: Invalid 'jpeg2000-codeblock-width' value");
         }
     }
     else if (strcmp(key, "jpeg2000-codeblock-height") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_INT || value->type == SAIL_VARIANT_TYPE_UNSIGNED_INT)
+        int cblockh = sail_variant_to_int(value);
+        /* Must be power of 2 between 4 and 1024 */
+        if (cblockh >= 4 && cblockh <= 1024 && (cblockh & (cblockh - 1)) == 0)
         {
-            int cblockh = (value->type == SAIL_VARIANT_TYPE_INT) ? sail_variant_to_int(value)
-                                                                 : (int)sail_variant_to_unsigned_int(value);
-            /* Must be power of 2 between 4 and 1024 */
-            if (cblockh >= 4 && cblockh <= 1024 && (cblockh & (cblockh - 1)) == 0)
-            {
-                parameters->cblockh_init = cblockh;
-                SAIL_LOG_TRACE("JPEG2000: Set codeblock-height to %d", parameters->cblockh_init);
-            }
+            parameters->cblockh_init = cblockh;
+            SAIL_LOG_TRACE("JPEG2000: Set codeblock-height to %d", parameters->cblockh_init);
         }
         else
         {
-            SAIL_LOG_ERROR("JPEG2000: 'jpeg2000-codeblock-height' must be an integer");
+            SAIL_LOG_ERROR("JPEG2000: Invalid 'jpeg2000-codeblock-height' value");
         }
     }
 

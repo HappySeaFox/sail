@@ -371,16 +371,161 @@ static MunitResult test_snprintf(const MunitParameter params[], void* user_data)
     return MUNIT_OK;
 }
 
+static MunitResult test_from_string_to_numeric(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    struct sail_variant* variant;
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
+
+    /* Test int conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "42") == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == 42);
+    munit_assert(sail_variant_to_unsigned_int(variant) == 42);
+    munit_assert(sail_variant_to_long(variant) == 42L);
+    munit_assert(sail_variant_to_unsigned_long(variant) == 42UL);
+    munit_assert(sail_variant_to_long_long(variant) == 42LL);
+    munit_assert(sail_variant_to_unsigned_long_long(variant) == 42ULL);
+    munit_assert(sail_variant_to_short(variant) == 42);
+    munit_assert(sail_variant_to_unsigned_short(variant) == 42);
+    munit_assert(sail_variant_to_char(variant) == '4');
+    munit_assert(sail_variant_to_unsigned_char(variant) == 42);
+    munit_assert(sail_variant_to_float(variant) == 42.0f);
+    munit_assert(sail_variant_to_double(variant) == 42.0);
+
+    /* Test negative int conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "-10") == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == -10);
+    munit_assert(sail_variant_to_long(variant) == -10L);
+    munit_assert(sail_variant_to_long_long(variant) == -10LL);
+    munit_assert(sail_variant_to_short(variant) == -10);
+    munit_assert(sail_variant_to_float(variant) == -10.0f);
+
+    /* Test float conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "3.14") == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == 3);
+    munit_assert(sail_variant_to_long(variant) == 3L);
+    munit_assert(sail_variant_to_long_long(variant) == 3LL);
+    munit_assert(sail_variant_to_short(variant) == 3);
+    munit_assert(sail_variant_to_float(variant) == 3.14f);
+    munit_assert(sail_variant_to_double(variant) == 3.14);
+
+    /* Test bool conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "true") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == true);
+
+    munit_assert(sail_set_variant_string(variant, "false") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == false);
+
+    munit_assert(sail_set_variant_string(variant, "1") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == true);
+
+    munit_assert(sail_set_variant_string(variant, "0") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == false);
+
+    munit_assert(sail_set_variant_string(variant, "yes") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == true);
+
+    munit_assert(sail_set_variant_string(variant, "no") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == false);
+
+    munit_assert(sail_set_variant_string(variant, "TRUE") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == true);
+
+    munit_assert(sail_set_variant_string(variant, "FALSE") == SAIL_OK);
+    munit_assert(sail_variant_to_bool(variant) == false);
+
+    sail_destroy_variant(variant);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_from_numeric_types(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    struct sail_variant* variant;
+    munit_assert(sail_alloc_variant(&variant) == SAIL_OK);
+
+    /* Test int conversion from unsigned int. */
+    munit_assert(sail_set_variant_unsigned_int(variant, 100) == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == 100);
+    munit_assert(sail_variant_to_unsigned_int(variant) == 100);
+    munit_assert(sail_variant_to_long(variant) == 100L);
+    munit_assert(sail_variant_to_unsigned_long(variant) == 100UL);
+    munit_assert(sail_variant_to_long_long(variant) == 100LL);
+    munit_assert(sail_variant_to_unsigned_long_long(variant) == 100ULL);
+    munit_assert(sail_variant_to_short(variant) == 100);
+    munit_assert(sail_variant_to_unsigned_short(variant) == 100);
+    munit_assert(sail_variant_to_float(variant) == 100.0f);
+    munit_assert(sail_variant_to_double(variant) == 100.0);
+
+    /* Test int conversion from float. */
+    munit_assert(sail_set_variant_float(variant, 42.5f) == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == 42);
+    munit_assert(sail_variant_to_unsigned_int(variant) == 42);
+    munit_assert(sail_variant_to_long(variant) == 42L);
+    munit_assert(sail_variant_to_long_long(variant) == 42LL);
+    munit_assert(sail_variant_to_short(variant) == 42);
+    munit_assert(sail_variant_to_float(variant) == 42.5f);
+    munit_assert(sail_variant_to_double(variant) == 42.5);
+
+    /* Test int conversion from double. */
+    munit_assert(sail_set_variant_double(variant, 123.456) == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == 123);
+    munit_assert(sail_variant_to_unsigned_int(variant) == 123);
+    munit_assert(sail_variant_to_long(variant) == 123L);
+    munit_assert(sail_variant_to_long_long(variant) == 123LL);
+    munit_assert(sail_variant_to_short(variant) == 123);
+    munit_assert(sail_variant_to_float(variant) == 123.456f);
+    munit_assert(sail_variant_to_double(variant) == 123.456);
+
+    /* Test negative float conversion. */
+    munit_assert(sail_set_variant_float(variant, -5.5f) == SAIL_OK);
+    munit_assert(sail_variant_to_int(variant) == -5);
+    munit_assert(sail_variant_to_long(variant) == -5L);
+    munit_assert(sail_variant_to_long_long(variant) == -5LL);
+    munit_assert(sail_variant_to_short(variant) == -5);
+    munit_assert(sail_variant_to_float(variant) == -5.5f);
+
+    /* Test long conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "9223372036854775807") == SAIL_OK);
+    munit_assert(sail_variant_to_long_long(variant) == 9223372036854775807LL);
+
+    /* Test unsigned long long conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "18446744073709551615") == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_long_long(variant) == 18446744073709551615ULL);
+
+    /* Test char conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "ABC") == SAIL_OK);
+    munit_assert(sail_variant_to_char(variant) == 'A');
+
+    /* Test unsigned char conversion from string. */
+    munit_assert(sail_set_variant_string(variant, "255") == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_char(variant) == 255);
+
+    munit_assert(sail_set_variant_string(variant, "256") == SAIL_OK);
+    munit_assert(sail_variant_to_unsigned_char(variant) == 255); /* Clamped to 255 */
+
+    sail_destroy_variant(variant);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/alloc",       test_alloc,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/copy",        test_copy,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/from-value",  test_from_value,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/from-string", test_from_string, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/from-data",   test_from_data,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/set",         test_set,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/set-value",   test_set_value,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/snprintf",    test_snprintf,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/alloc",                   test_alloc,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",                    test_copy,                   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/from-value",              test_from_value,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/from-string",             test_from_string,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/from-data",               test_from_data,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/set",                     test_set,                    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/set-value",               test_set_value,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/snprintf",                test_snprintf,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/from-string-to-numeric",  test_from_string_to_numeric, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/from-numeric-types",      test_from_numeric_types,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
