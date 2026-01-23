@@ -142,6 +142,21 @@ image = sailpy.Image.from_file(path)
 
 See also [FAQ](FAQ.md) for more information.
 
+## Command-line utility
+
+SAIL comes with a powerful command-line utility `sail` for image conversion, composition, and manipulation. Convert between formats, extract frames from animations, resize images, and fine-tune codec-specific options—all from the command line.
+
+```bash
+# Convert with custom quality and pixel format
+sail convert input.png output.jpg -c 90 -p BPP24-RGB
+
+# Extract frame #2 from animation with PNG UP filter
+sail convert animation.gif frame2.png -n 2 --save-tuning png-filter=up
+
+# Compose multiple images into animated GIF
+sail convert frame1.png frame2.png frame3.png animation.gif -d 100
+```
+
 ## Programming languages
 
 **Programming language:** C11<br/>
