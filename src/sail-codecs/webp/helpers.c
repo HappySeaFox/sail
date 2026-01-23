@@ -363,8 +363,8 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
 
     if (strcmp(key, "webp-lossless") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->lossless = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->lossless = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: lossless=%d", config->lossless);
     }
     else if (strcmp(key, "webp-method") == 0)
@@ -458,14 +458,14 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "webp-autofilter") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->autofilter = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->autofilter = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: autofilter=%d", config->autofilter);
     }
     else if (strcmp(key, "webp-alpha-compression") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->alpha_compression = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->alpha_compression = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: alpha-compression=%d", config->alpha_compression);
     }
     else if (strcmp(key, "webp-alpha-filtering") == 0)
@@ -542,20 +542,20 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "webp-emulate-jpeg-size") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->emulate_jpeg_size = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->emulate_jpeg_size = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: emulate-jpeg-size=%d", config->emulate_jpeg_size);
     }
     else if (strcmp(key, "webp-thread-level") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->thread_level = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->thread_level = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: thread-level=%d", config->thread_level);
     }
     else if (strcmp(key, "webp-low-memory") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->low_memory = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->low_memory = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: low-memory=%d", config->low_memory);
     }
     else if (strcmp(key, "webp-near-lossless") == 0)
@@ -566,20 +566,20 @@ bool webp_private_tuning_key_value_callback(const char* key, const struct sail_v
     }
     else if (strcmp(key, "webp-exact") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->exact = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->exact = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: exact=%d", config->exact);
     }
     else if (strcmp(key, "webp-use-delta-palette") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->use_delta_palette = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->use_delta_palette = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: use-delta-palette=%d", config->use_delta_palette);
     }
     else if (strcmp(key, "webp-use-sharp-yuv") == 0)
     {
-        unsigned val = sail_variant_to_unsigned_int(value);
-        config->use_sharp_yuv = (val != 0) ? 1 : 0;
+        bool val = sail_variant_to_bool(value);
+        config->use_sharp_yuv = val ? 1 : 0;
         SAIL_LOG_TRACE("WEBP: use-sharp-yuv=%d", config->use_sharp_yuv);
     }
 

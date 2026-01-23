@@ -882,8 +882,8 @@
         <br/><br/>
         <b>Content:</b> Static, Animated.
         <br/><br/>
-        <b>Tuning:</b> Key: <i>"webp-lossless"</i>. Description: Lossless encoding (0=lossy, 1=lossless).
-        Possible values: int/unsigned int 0 or 1 (default: 0).
+        <b>Tuning:</b> Key: <i>"webp-lossless"</i>. Description: Lossless encoding.
+        Possible values: bool (default: false).
         <br/>Key: <i>"webp-method"</i>. Description: Quality/speed trade-off (0=fast, 6=slower-better).
         Possible values: int/unsigned int 0-6 (default: 4).
         <br/>Key: <i>"webp-image-hint"</i>. Description: Image type hint.
@@ -903,9 +903,9 @@
         <br/>Key: <i>"webp-filter-type"</i>. Description: Filtering type.
         Possible values: "simple", "strong" (default: "strong").
         <br/>Key: <i>"webp-autofilter"</i>. Description: Auto adjust filter strength.
-        Possible values: int/unsigned int 0 or 1 (default: 0).
-        <br/>Key: <i>"webp-alpha-compression"</i>. Description: Alpha plane compression (0=none, 1=compressed).
-        Possible values: int/unsigned int 0 or 1 (default: 1).
+        Possible values: bool (default: false).
+        <br/>Key: <i>"webp-alpha-compression"</i>. Description: Alpha plane compression.
+        Possible values: bool (default: true).
         <br/>Key: <i>"webp-alpha-filtering"</i>. Description: Alpha predictive filtering.
         Possible values: "none", "fast", "best" (default: "fast").
         <br/>Key: <i>"webp-alpha-quality"</i>. Description: Alpha quality (0=smallest, 100=lossless).
@@ -919,19 +919,19 @@
         <br/>Key: <i>"webp-partition-limit"</i>. Description: Quality degradation for 512k limit (0=none, 100=max).
         Possible values: int/unsigned int 0-100 (default: 0).
         <br/>Key: <i>"webp-emulate-jpeg-size"</i>. Description: Remap parameters to match JPEG size.
-        Possible values: int/unsigned int 0 or 1 (default: 0).
+        Possible values: bool (default: false).
         <br/>Key: <i>"webp-thread-level"</i>. Description: Use multi-threaded encoding.
-        Possible values: int/unsigned int 0 or 1 (default: 0).
+        Possible values: bool (default: false).
         <br/>Key: <i>"webp-low-memory"</i>. Description: Reduce memory usage (increases CPU).
-        Possible values: int/unsigned int 0 or 1 (default: 0).
+        Possible values: bool (default: false).
         <br/>Key: <i>"webp-near-lossless"</i>. Description: Near lossless encoding (0=max loss, 100=off).
         Possible values: int/unsigned int 0-100 (default: 100).
         <br/>Key: <i>"webp-exact"</i>. Description: Preserve exact RGB under transparent areas.
-        Possible values: int/unsigned int 0 or 1 (default: 0).
+        Possible values: bool (default: false).
         <br/>Key: <i>"webp-use-delta-palette"</i>. Description: Use delta palette (reserved for future).
-        Possible values: int/unsigned int 0 or 1 (default: 0).
+        Possible values: bool (default: false).
         <br/>Key: <i>"webp-use-sharp-yuv"</i>. Description: Use sharp RGB→YUV conversion.
-        Possible values: int/unsigned int 0 or 1 (default: 0).
+        Possible values: bool (default: false).
     </td>
     <td>-</td>
     <td>libwebp</td>
