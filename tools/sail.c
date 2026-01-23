@@ -64,6 +64,58 @@ static void print_invalid_argument(void)
     fprintf(stderr, "Error: Invalid arguments. Run with -h to see command arguments.\n");
 }
 
+static sail_status_t parse_tuning_options(const char* tuning_str, struct sail_hash_map* tuning_map)
+{
+    SAIL_CHECK_PTR(tuning_str);
+    SAIL_CHECK_PTR(tuning_map);
+
+    /* Parse format: "key1=value1,key2=value2" or "key1:value1,key2:value2". */
+    char* tuning_copy;
+    SAIL_TRY(sail_strdup(tuning_str, &tuning_copy));
+
+#ifdef _WIN32
+    char* save_ptr = NULL;
+    char* token    = strtok_s(tuning_copy, ",", &save_ptr);
+#else
+    char* save_ptr = NULL;
+    char* token    = strtok_r(tuning_copy, ",", &save_ptr);
+#endif
+
+    while (token != NULL)
+    {
+        /* Find separator (= or :). */
+        char* sep = strchr(token, '=');
+        if (sep == NULL)
+        {
+            sep = strchr(token, ':');
+        }
+
+        if (sep == NULL || sep == token || *(sep + 1) == '\0')
+        {
+            sail_free(tuning_copy);
+            SAIL_LOG_ERROR("Invalid tuning option format: '%s'. Expected format: key=value or key:value", token);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
+
+        /* Split key and value. */
+        *sep              = '\0';
+        const char* key   = token;
+        const char* value = sep + 1;
+
+        /* Add to hash map as string. */
+        SAIL_TRY_OR_CLEANUP(sail_put_hash_map_string(tuning_map, key, value), sail_free(tuning_copy));
+
+#ifdef _WIN32
+        token = strtok_s(NULL, ",", &save_ptr);
+#else
+        token = strtok_r(NULL, ",", &save_ptr);
+#endif
+    }
+
+    sail_free(tuning_copy);
+    return SAIL_OK;
+}
+
 static void consume_input_line(void)
 {
     int next = getchar();
@@ -172,7 +224,9 @@ static sail_status_t convert_impl(const char** inputs,
                                   bool flip_horizontal,
                                   bool flip_vertical,
                                   bool* auto_yes,
-                                  bool* auto_no)
+                                  bool* auto_no,
+                                  const char* load_tuning,
+                                  const char* save_tuning)
 {
     SAIL_CHECK_PTR(inputs);
     SAIL_CHECK_PTR(output);
@@ -205,6 +259,17 @@ static sail_status_t convert_impl(const char** inputs,
     /* Apply our tuning. */
     SAIL_LOG_DEBUG("Compression: %d%s", compression, compression == -1 ? " (default)" : "");
     save_options->compression_level = compression;
+
+    /* Apply save tuning options. */
+    if (save_tuning != NULL)
+    {
+        if (save_options->tuning == NULL)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&save_options->tuning), sail_destroy_save_options(save_options));
+        }
+        SAIL_TRY_OR_CLEANUP(parse_tuning_options(save_tuning, save_options->tuning),
+                            sail_destroy_save_options(save_options));
+    }
 
     /* Determine output mode based on delay parameter and format capabilities. */
     bool output_supports_animated = (output_codec_info->save_features->features & SAIL_CODEC_FEATURE_ANIMATED) != 0;
@@ -281,6 +346,19 @@ static sail_status_t convert_impl(const char** inputs,
         SAIL_TRY_OR_CLEANUP(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options),
                             sail_stop_saving(save_state);
                             sail_destroy_save_options(save_options));
+
+        /* Apply load tuning options. */
+        if (load_tuning != NULL)
+        {
+            if (load_options->tuning == NULL)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&load_options->tuning), sail_destroy_load_options(load_options);
+                                    sail_stop_saving(save_state); sail_destroy_save_options(save_options));
+            }
+            SAIL_TRY_OR_CLEANUP(parse_tuning_options(load_tuning, load_options->tuning),
+                                sail_destroy_load_options(load_options);
+                                sail_stop_saving(save_state); sail_destroy_save_options(save_options));
+        }
 
         SAIL_TRY_OR_CLEANUP(
             sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
@@ -596,7 +674,9 @@ static sail_status_t extract_frames_impl(const char* input,
                                          bool flip_vertical,
                                          bool* auto_yes,
                                          bool* auto_no,
-                                         int suffix_digits)
+                                         int suffix_digits,
+                                         const char* load_tuning,
+                                         const char* save_tuning)
 {
     SAIL_CHECK_PTR(input);
     SAIL_CHECK_PTR(output_template);
@@ -615,6 +695,17 @@ static sail_status_t extract_frames_impl(const char* input,
     /* Use SOURCE_IMAGE option to preserve original pixel format when possible. */
     struct sail_load_options* load_options;
     SAIL_TRY(sail_alloc_load_options_from_features(input_codec_info->load_features, &load_options));
+
+    /* Apply load tuning options. */
+    if (load_tuning != NULL)
+    {
+        if (load_options->tuning == NULL)
+        {
+            SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&load_options->tuning), sail_destroy_load_options(load_options));
+        }
+        SAIL_TRY_OR_CLEANUP(parse_tuning_options(load_tuning, load_options->tuning),
+                            sail_destroy_load_options(load_options));
+    }
 
     SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file_with_options(input, input_codec_info, load_options, &load_state),
                         sail_destroy_load_options(load_options));
@@ -676,13 +767,13 @@ static sail_status_t extract_frames_impl(const char* input,
             char format_str[32];
             sail_snprintf(format_str, sizeof(format_str), "%%.*s-%%0%dd%%s", suffix_digits);
             written = sail_snprintf(output_filename, sizeof(output_filename), format_str, (int)safe_base_name_len,
-                                     base_name_start, frame_count + 1, ext ? ext : "");
+                                    base_name_start, frame_count + 1, ext ? ext : "");
         }
         else
         {
             /* Default format without zero-padding. */
             written = sail_snprintf(output_filename, sizeof(output_filename), "%.*s-%d%s", (int)safe_base_name_len,
-                                     base_name_start, frame_count + 1, ext ? ext : "");
+                                    base_name_start, frame_count + 1, ext ? ext : "");
         }
         if (written < 0 || written >= (long)sizeof(output_filename))
         {
@@ -907,6 +998,18 @@ static sail_status_t extract_frames_impl(const char* input,
 
         save_options->compression_level = compression;
 
+        /* Apply save tuning options. */
+        if (save_tuning != NULL)
+        {
+            if (save_options->tuning == NULL)
+            {
+                SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&save_options->tuning), sail_destroy_image(image);
+                                    sail_destroy_save_options(save_options); sail_stop_loading(load_state));
+            }
+            SAIL_TRY_OR_CLEANUP(parse_tuning_options(save_tuning, save_options->tuning), sail_destroy_image(image);
+                                sail_destroy_save_options(save_options); sail_stop_loading(load_state));
+        }
+
         /* Save single frame. */
         void* save_state;
         SAIL_TRY_OR_CLEANUP(
@@ -984,6 +1087,10 @@ static sail_status_t convert(int argc, char* argv[])
     bool auto_yes = false;
     /* false: ask for confirmation (default), true: auto-skip all. */
     bool auto_no = false;
+    /* NULL: no load tuning options (default). */
+    const char* load_tuning = NULL;
+    /* NULL: no save tuning options (default). */
+    const char* save_tuning = NULL;
 
     /* Collect positional arguments (file paths). */
     const char* files[256];
@@ -1162,6 +1269,30 @@ static sail_status_t convert(int argc, char* argv[])
                 continue;
             }
 
+            if (strcmp(argv[i], "--load-tuning") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing load-tuning value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                load_tuning  = argv[i + 1];
+                i           += 2;
+                continue;
+            }
+
+            if (strcmp(argv[i], "--save-tuning") == 0)
+            {
+                if (i == argc - 1)
+                {
+                    fprintf(stderr, "Error: Missing save-tuning value.\n");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+                }
+                save_tuning  = argv[i + 1];
+                i           += 2;
+                continue;
+            }
+
             fprintf(stderr, "Error: Unrecognized option '%s'.\n", argv[i]);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
         }
@@ -1207,13 +1338,13 @@ static sail_status_t convert(int argc, char* argv[])
 
         SAIL_TRY(extract_frames_impl(files[0], output, pixel_format, compression, max_frames, target_frame, colors,
                                      dither, background, strip_metadata, flip_horizontal, flip_vertical, &auto_yes,
-                                     &auto_no, suffix_digits));
+                                     &auto_no, suffix_digits, load_tuning, save_tuning));
     }
     else
     {
         SAIL_TRY(convert_impl(files, input_count, output, pixel_format, compression, max_frames, target_frame, delay,
                               colors, dither, background, strip_metadata, flip_horizontal, flip_vertical, &auto_yes,
-                              &auto_no));
+                              &auto_no, load_tuning, save_tuning));
     }
 
     return SAIL_OK;
@@ -1621,22 +1752,22 @@ static sail_status_t parse_dimensions(const char* str,
         if (str_len > 0 && str[str_len - 1] == '%')
         {
             /* Parse as single percentage for both dimensions. */
-            sail_status_t status = parse_dimension_token(str, &dims->width_type, &dims->width_value, input_width,
-                                                         input_height, true);
+            sail_status_t status =
+                parse_dimension_token(str, &dims->width_type, &dims->width_value, input_width, input_height, true);
             if (status != SAIL_OK)
             {
                 return status;
             }
             /* Apply same percentage to height. */
-            status = parse_dimension_token(str, &dims->height_type, &dims->height_value, input_width, input_height,
-                                           false);
+            status =
+                parse_dimension_token(str, &dims->height_type, &dims->height_value, input_width, input_height, false);
             return status;
         }
         return SAIL_ERROR_INVALID_ARGUMENT;
     }
 
     /* Parse width token. */
-    size_t width_len  = (size_t)(sep_pos - str);
+    size_t width_len       = (size_t)(sep_pos - str);
     const char* height_str = sep_pos + 1;
 
     /* If width is empty (e.g., "x128" or "x50%"), use input dimension for width. */
@@ -1654,8 +1785,8 @@ static sail_status_t parse_dimensions(const char* str,
         char* height_token;
         SAIL_TRY(sail_strdup(height_str, &height_token));
 
-        sail_status_t status =
-            parse_dimension_token(height_token, &dims->height_type, &dims->height_value, input_width, input_height, false);
+        sail_status_t status = parse_dimension_token(height_token, &dims->height_type, &dims->height_value, input_width,
+                                                     input_height, false);
         sail_free(height_token);
         return status;
     }
@@ -1772,9 +1903,9 @@ static sail_status_t resize(int argc, char* argv[])
     }
 
     enum SailScaling method = SAIL_SCALING_BILINEAR;
-    bool in_place            = false;
-    bool auto_yes            = false;
-    bool auto_no             = false;
+    bool in_place           = false;
+    bool auto_yes           = false;
+    bool auto_no            = false;
 
     /* Parse positional arguments: input, wxh, [output]. */
     const char* input          = NULL;
@@ -1782,7 +1913,7 @@ static sail_status_t resize(int argc, char* argv[])
     const char* dimensions_str = NULL;
 
     /* Parse all arguments: collect positional args and parse options. */
-    int i = 2; /* Skip program name and "resize" command. */
+    int i             = 2; /* Skip program name and "resize" command. */
     int pos_arg_count = 0;
 
     while (i < argc)
@@ -1854,7 +1985,8 @@ static sail_status_t resize(int argc, char* argv[])
 
     if (dimensions_str == NULL)
     {
-        SAIL_LOG_ERROR("Dimensions must be specified in format WxH (e.g., 800x600, 800x0, 50%%x50%%, 25%%x, x128, x50%%) or single percentage (e.g., 50%%)");
+        SAIL_LOG_ERROR("Dimensions must be specified in format WxH (e.g., 800x600, 800x0, 50%%x50%%, 25%%x, x128, "
+                       "x50%%) or single percentage (e.g., 50%%)");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
 
@@ -1897,7 +2029,8 @@ static sail_status_t resize(int argc, char* argv[])
     if (parse_status != SAIL_OK)
     {
         sail_destroy_image(image);
-        SAIL_LOG_ERROR("Invalid dimensions format '%s'. Expected format: WxH (e.g., 800x600, 800x0, 50%%x50%%, 25%%x, x128, x50%%) or single percentage (e.g., 50%%)",
+        SAIL_LOG_ERROR("Invalid dimensions format '%s'. Expected format: WxH (e.g., 800x600, 800x0, 50%%x50%%, 25%%x, "
+                       "x128, x50%%) or single percentage (e.g., 50%%)",
                        dimensions_str);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
     }
@@ -2083,14 +2216,21 @@ static void help(const char* app)
     fprintf(stderr, "        -m, --max-frames <count>     Limit number of frames to process\n");
     fprintf(stderr, "        -d, --delay <ms>             Set frame delay for animations in milliseconds\n");
     fprintf(stderr, "        -e, --extract-frames         Extract each frame to separate file\n");
-    fprintf(stderr, "        -z, --suffix-digits <N>      Set number of digits in frame suffix (1-10, e.g., 3 for 001, 002, ...)\n");
+    fprintf(stderr, "        -z, --suffix-digits <N>      Set number of digits in frame suffix (1-10, e.g., 3 for 001, "
+                    "002, ...)\n");
     fprintf(stderr, "        -C, --colors <N>             Quantize image to N colors (2-256) using Wu algorithm\n");
     fprintf(stderr, "        -D, --dither                 Apply Floyd-Steinberg dithering for better gradients\n");
-    fprintf(stderr, "        -b, --background <color>     Blend alpha channel with background (white, black, #RRGGBB)\n");
+    fprintf(stderr,
+            "        -b, --background <color>     Blend alpha channel with background (white, black, #RRGGBB)\n");
     fprintf(stderr, "        -s, --strip                  Remove all metadata from output files\n");
     fprintf(stderr, "        -H, --flip-horizontal        Flip image horizontally (mirror left-right)\n");
     fprintf(stderr, "        -V, --flip-vertical          Flip image vertically (mirror top-bottom)\n");
-    fprintf(stderr, "        -n, --frame-number <N>       Extract specific frame number N (1-based)\n\n");
+    fprintf(stderr, "        -n, --frame-number <N>       Extract specific frame number N (1-based)\n");
+    fprintf(stderr,
+            "        --load-tuning <options>     Codec-specific load tuning options (format: key=value,key2=value2)\n");
+    fprintf(
+        stderr,
+        "        --save-tuning <options>     Codec-specific save tuning options (format: key=value,key2=value2)\n\n");
     fprintf(stderr, "      Use cases:\n");
     fprintf(stderr, "        Simple format conversion between codecs:\n");
     fprintf(stderr, "          %s convert input.jpg output.png\n\n", app);
@@ -2118,6 +2258,8 @@ static void help(const char* app)
     fprintf(stderr, "          %s convert photo.jpg flipped.jpg -H -V\n\n", app);
     fprintf(stderr, "        Extract frame #2 from animation\n");
     fprintf(stderr, "          %s convert animation.gif frame2.png -n 2\n\n", app);
+    fprintf(stderr, "        Extract frame #2 and convert to PNG with UP filter:\n");
+    fprintf(stderr, "          %s convert animation.gif frame2.png -n 2 --save-tuning png-filter=up\n\n", app);
 
     fprintf(stderr, "  probe <path>   Display detailed information about image file\n");
     fprintf(stderr, "  decode <path>  Decode file and show information for all frames\n");
