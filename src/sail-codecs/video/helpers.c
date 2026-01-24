@@ -26,6 +26,7 @@
 #include <libavcodec/avcodec.h>
 #include <libavcodec/defs.h>
 #include <libavformat/avformat.h>
+#include <libavutil/channel_layout.h>
 #include <libavutil/dict.h>
 #include <libavutil/opt.h>
 #include <libavutil/pixdesc.h>
@@ -555,8 +556,157 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     /* Number of frames. */
     if (video_stream->nb_frames > 0)
     {
-        SAIL_TRY(sail_put_hash_map_unsigned_long_long(special_properties, "video-nb-frames",
+        SAIL_TRY(sail_put_hash_map_unsigned_long_long(special_properties, "video-frames",
                                                        (unsigned long long)video_stream->nb_frames));
+    }
+
+    /* Collect audio and subtitle track information. */
+    if (format_ctx != NULL && format_ctx->nb_streams > 0)
+    {
+        unsigned audio_track_count = 0;
+        unsigned subtitle_track_count = 0;
+
+        /* First pass: count tracks. */
+        for (unsigned i = 0; i < format_ctx->nb_streams; i++)
+        {
+            AVStream* stream = format_ctx->streams[i];
+            if (stream == NULL || stream->codecpar == NULL)
+            {
+                continue;
+            }
+
+            if (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
+            {
+                audio_track_count++;
+            }
+            else if (stream->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE)
+            {
+                subtitle_track_count++;
+            }
+        }
+
+        /* Store track counts. */
+        if (audio_track_count > 0)
+        {
+            SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "video-audio-tracks-count", audio_track_count));
+        }
+
+        if (subtitle_track_count > 0)
+        {
+            SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, "video-subtitle-tracks-count", subtitle_track_count));
+        }
+
+        /* Second pass: store detailed information for each track. */
+        unsigned audio_index = 1;
+        unsigned subtitle_index = 1;
+
+        for (unsigned i = 0; i < format_ctx->nb_streams; i++)
+        {
+            AVStream* stream = format_ctx->streams[i];
+            if (stream == NULL || stream->codecpar == NULL)
+            {
+                continue;
+            }
+
+            AVCodecParameters* stream_codecpar = stream->codecpar;
+
+            if (stream_codecpar->codec_type == AVMEDIA_TYPE_AUDIO)
+            {
+                char key[64];
+
+                /* Codec name. */
+                if (stream_codecpar->codec_id != AV_CODEC_ID_NONE)
+                {
+                    const char* codec_name = avcodec_get_name(stream_codecpar->codec_id);
+                    if (codec_name != NULL)
+                    {
+                        snprintf(key, sizeof(key), "video-audio-track-%u-codec", audio_index);
+                        SAIL_TRY(sail_put_hash_map_string(special_properties, key, codec_name));
+                    }
+                }
+
+                /* Bitrate. */
+                if (stream_codecpar->bit_rate > 0)
+                {
+                    snprintf(key, sizeof(key), "video-audio-track-%u-bitrate", audio_index);
+                    SAIL_TRY(sail_put_hash_map_unsigned_long_long(special_properties, key, (unsigned long long)stream_codecpar->bit_rate));
+                }
+
+                /* Sample rate. */
+                if (stream_codecpar->sample_rate > 0)
+                {
+                    snprintf(key, sizeof(key), "video-audio-track-%u-sample-rate", audio_index);
+                    SAIL_TRY(sail_put_hash_map_int(special_properties, key, stream_codecpar->sample_rate));
+                }
+
+                /* Number of channels. */
+                if (stream_codecpar->ch_layout.nb_channels > 0)
+                {
+                    snprintf(key, sizeof(key), "video-audio-track-%u-channels", audio_index);
+                    SAIL_TRY(sail_put_hash_map_unsigned_int(special_properties, key, stream_codecpar->ch_layout.nb_channels));
+                }
+
+                /* Channel layout (as string if available). */
+                if (stream_codecpar->ch_layout.nb_channels > 0)
+                {
+                    char channel_layout_str[64];
+                    if (av_channel_layout_describe(&stream_codecpar->ch_layout, channel_layout_str, sizeof(channel_layout_str)) == 0)
+                    {
+                        snprintf(key, sizeof(key), "video-audio-track-%u-channel-layout", audio_index);
+                        SAIL_TRY(sail_put_hash_map_string(special_properties, key, channel_layout_str));
+                    }
+                }
+
+                /* Stream index. */
+                snprintf(key, sizeof(key), "video-audio-track-%u-stream-index", audio_index);
+                SAIL_TRY(sail_put_hash_map_int(special_properties, key, (int)i));
+
+                /* Language from metadata if available. */
+                if (stream->metadata != NULL)
+                {
+                    AVDictionaryEntry* lang_entry = av_dict_get(stream->metadata, "language", NULL, 0);
+                    if (lang_entry != NULL && lang_entry->value != NULL)
+                    {
+                        snprintf(key, sizeof(key), "video-audio-track-%u-language", audio_index);
+                        SAIL_TRY(sail_put_hash_map_string(special_properties, key, lang_entry->value));
+                    }
+                }
+
+                audio_index++;
+            }
+            else if (stream_codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE)
+            {
+                char key[64];
+
+                /* Codec name. */
+                if (stream_codecpar->codec_id != AV_CODEC_ID_NONE)
+                {
+                    const char* codec_name = avcodec_get_name(stream_codecpar->codec_id);
+                    if (codec_name != NULL)
+                    {
+                        snprintf(key, sizeof(key), "video-subtitle-track-%u-codec", subtitle_index);
+                        SAIL_TRY(sail_put_hash_map_string(special_properties, key, codec_name));
+                    }
+                }
+
+                /* Stream index. */
+                snprintf(key, sizeof(key), "video-subtitle-track-%u-stream-index", subtitle_index);
+                SAIL_TRY(sail_put_hash_map_int(special_properties, key, (int)i));
+
+                /* Language from metadata if available. */
+                if (stream->metadata != NULL)
+                {
+                    AVDictionaryEntry* lang_entry = av_dict_get(stream->metadata, "language", NULL, 0);
+                    if (lang_entry != NULL && lang_entry->value != NULL)
+                    {
+                        snprintf(key, sizeof(key), "video-subtitle-track-%u-language", subtitle_index);
+                        SAIL_TRY(sail_put_hash_map_string(special_properties, key, lang_entry->value));
+                    }
+                }
+
+                subtitle_index++;
+            }
+        }
     }
 
     return SAIL_OK;

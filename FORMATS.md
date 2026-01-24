@@ -776,11 +776,28 @@
         Key: <i>"video-codec"</i>. Description: Video codec name. Possible values: string.
         Key: <i>"video-profile"</i>. Description: Codec profile name. Possible values: string.
         Key: <i>"video-level"</i>. Description: Codec level. Possible values: string.
-        Key: <i>"video-bitrate"</i>. Description: Video bitrate in bits per second. Possible values: unsigned long.
-        Key: <i>"video-framerate-num"</i>. Description: Frame rate numerator. Possible values: int.
-        Key: <i>"video-framerate-den"</i>. Description: Frame rate denominator. Possible values: int.
-        Key: <i>"video-width"</i>. Description: Video width in pixels. Possible values: int.
-        Key: <i>"video-height"</i>. Description: Video height in pixels. Possible values: int.
+        Key: <i>"video-bitrate"</i>. Description: Video bitrate in bits per second. Possible values: unsigned long long.
+        Key: <i>"video-framerate"</i>. Description: Frame rate (constant framerate from codecpar). Possible values: double.
+        Key: <i>"video-estimated-framerate"</i>. Description: Estimated frame rate from stream. Possible values: double.
+        Key: <i>"video-time-base"</i>. Description: Time base for timestamps. Possible values: double.
+        Key: <i>"video-color-space"</i>. Description: Color space name. Possible values: string.
+        Key: <i>"video-color-range"</i>. Description: Color range name. Possible values: string.
+        Key: <i>"video-color-primaries"</i>. Description: Color primaries name. Possible values: string.
+        Key: <i>"video-color-transfer"</i>. Description: Color transfer characteristics name. Possible values: string.
+        Key: <i>"video-duration"</i>. Description: Video duration in milliseconds. Possible values: unsigned long long.
+        Key: <i>"video-frames"</i>. Description: Number of frames. Possible values: unsigned long long.
+        Key: <i>"video-audio-tracks-count"</i>. Description: Number of audio tracks. Possible values: unsigned int.
+        Key: <i>"video-audio-track-{N}-codec"</i>. Description: Audio codec name for track N (N starts from 1). Possible values: string.
+        Key: <i>"video-audio-track-{N}-bitrate"</i>. Description: Audio bitrate in bits per second for track N. Possible values: unsigned long long.
+        Key: <i>"video-audio-track-{N}-sample-rate"</i>. Description: Audio sample rate in Hz for track N. Possible values: int.
+        Key: <i>"video-audio-track-{N}-channels"</i>. Description: Number of audio channels for track N. Possible values: unsigned int.
+        Key: <i>"video-audio-track-{N}-channel-layout"</i>. Description: Channel layout description for track N. Possible values: string.
+        Key: <i>"video-audio-track-{N}-stream-index"</i>. Description: Stream index in the file for track N. Possible values: int.
+        Key: <i>"video-audio-track-{N}-language"</i>. Description: Language code for track N (if available). Possible values: string.
+        Key: <i>"video-subtitle-tracks-count"</i>. Description: Number of subtitle tracks. Possible values: unsigned int.
+        Key: <i>"video-subtitle-track-{N}-codec"</i>. Description: Subtitle codec name for track N (N starts from 1). Possible values: string.
+        Key: <i>"video-subtitle-track-{N}-stream-index"</i>. Description: Stream index in the file for track N. Possible values: int.
+        Key: <i>"video-subtitle-track-{N}-language"</i>. Description: Language code for track N (if available). Possible values: string.
         <br/><br/>
         <b>Tuning:</b>
         Key: <i>"video-threads"</i>. Description: Number of decoder threads. Possible values: int/unsigned int (default: 0 = auto).
