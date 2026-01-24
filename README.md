@@ -144,7 +144,7 @@ See also [FAQ](FAQ.md) for more information.
 
 ## Command-line utility
 
-SAIL comes with a powerful command-line utility `sail` for image conversion, composition, and manipulation. Convert between formats, extract frames from animations, resize images, and fine-tune codec-specific options—all from the command line.
+SAIL comes with a powerful command-line utility `sail` for image conversion, composition, and manipulation. Convert between formats, extract frames from animations, resize images, and fine-tune codec-specific options.
 
 ```bash
 # Convert with custom quality and pixel format
