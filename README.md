@@ -147,14 +147,11 @@ See also [FAQ](FAQ.md) for more information.
 SAIL comes with a powerful command-line utility `sail` for image conversion, composition, and manipulation. Convert between formats, extract frames from animations, resize images, and fine-tune codec-specific options.
 
 ```bash
-# Convert with custom quality and pixel format
-sail convert input.png output.jpg -c 90 -p BPP24-RGB
+# Extract frame from video at specific timestamp and convert with PNG UP filter
+sail convert video.mp4 frame.png --load-tuning video-seek-time=5000 --save-tuning png-filter=up
 
-# Extract frame #2 from animation with PNG UP filter
-sail convert animation.gif frame2.png -n 2 --save-tuning png-filter=up
-
-# Compose multiple images into animated GIF
-sail convert frame1.png frame2.png frame3.png animation.gif -d 100
+# Resize image to 800x600 with Lanczos scaling
+sail resize photo.jpg 800x600 resized.jpg -m lanczos
 ```
 
 ## Programming languages

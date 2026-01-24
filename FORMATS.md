@@ -789,7 +789,7 @@
         <br/>Key: <i>"video-skip-idct"</i>. Description: Skip IDCT step. Possible values: int/unsigned int (0=none, 1=skip B-frames, 2=skip all).
         <br/>Key: <i>"video-skip-loop-filter"</i>. Description: Skip loop filtering. Possible values: int/unsigned int (0=none, 1=skip non-reference, 2=skip bidir, 4=skip non-keyframes, 8=skip all).
         <br/>Key: <i>"video-error-concealment"</i>. Description: Error concealment strategy. Possible values: int/unsigned int (bitmask: 1=frame, 2=partitions, 4=drift, 8=merge).
-        <br/>Key: <i>"video-seek-time"</i>. Description: Extract frames at specific timestamps or time ranges (milliseconds). Possible values: string (semicolon-separated list of timestamps or ranges, e.g., "1000;2000;3000-5000").
+        <br/>Key: <i>"video-seek-time"</i>. Description: Extract frames at specific timestamps or time ranges (milliseconds). If not specified, all frames are read sequentially (like GIF). Possible values: string (semicolon-separated list of timestamps or ranges, e.g., "1000;2000;3000-5000"). Format: single timestamps like "1000" or ranges like "1000-5000" (start-end in milliseconds).
     </td>
     <td>
         <b>Content:</b> Audio streams, Subtitles.

@@ -2240,11 +2240,8 @@ static void help(const char* app)
     fprintf(stderr, "        -H, --flip-horizontal        Flip image horizontally (mirror left-right)\n");
     fprintf(stderr, "        -V, --flip-vertical          Flip image vertically (mirror top-bottom)\n");
     fprintf(stderr, "        -n, --frame-number <N>       Extract specific frame number N (1-based)\n");
-    fprintf(stderr,
-            "        --load-tuning <options>     Codec-specific load tuning options (format: key=value,key2=value2)\n");
-    fprintf(
-        stderr,
-        "        --save-tuning <options>     Codec-specific save tuning options (format: key=value,key2=value2)\n\n");
+    fprintf(stderr, "        --load-tuning <options>      Codec-specific load tuning options (format: key=value,key2=value2)\n");
+    fprintf(stderr, "        --save-tuning <options>      Codec-specific save tuning options (format: key=value,key2=value2)\n\n");
     fprintf(stderr, "      Use cases:\n");
     fprintf(stderr, "        Simple format conversion between codecs:\n");
     fprintf(stderr, "          %s convert input.jpg output.png\n\n", app);

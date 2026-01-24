@@ -74,13 +74,14 @@ struct video_state
     enum AVPixelFormat target_av_pix_fmt;
     AVFrame* converted_frame;
 
-    /* Time-based frame extraction */
+    /* Time-based frame extraction. */
     struct video_time_range* time_ranges;
     unsigned time_ranges_count;
     unsigned current_time_range_index;
     int64_t current_seek_time_ms;
     bool seeking_mode;
-    bool seek_performed; /* Track if seek was performed for current range */
+    bool seek_performed; /* Track if seek was performed for current range. */
+    bool eof_reached;    /* Track if we've reached end of file. */
 };
 
 static sail_status_t alloc_video_state(const struct sail_load_options* load_options,
@@ -113,6 +114,7 @@ static sail_status_t alloc_video_state(const struct sail_load_options* load_opti
         .current_seek_time_ms     = -1,
         .seeking_mode             = false,
         .seek_performed           = false,
+        .eof_reached              = false,
     };
 
     return SAIL_OK;
@@ -494,11 +496,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_video(void* state, 
     }
     else
     {
-        /* By default, read first frame only. */
-        if (video_state->current_frame_index > 0)
+        /* By default, read all frames sequentially (like GIF). */
+        if (video_state->eof_reached)
         {
             return SAIL_ERROR_NO_MORE_FRAMES;
         }
+        /* Reset frame_decoded flag so load_frame will read the next frame. */
+        video_state->frame_decoded = false;
     }
 
     /* Allocate image. */
@@ -719,33 +723,46 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
             }
             else
             {
-                ret = avcodec_send_packet(video_state->codec_ctx, NULL);
-                if (ret < 0 && ret != AVERROR_EOF)
+                /* Check if we reached EOF (end of file). */
+                if (ret == AVERROR_EOF || ret < 0)
                 {
-                    SAIL_LOG_ERROR("VIDEO: Error flushing decoder: %s", av_err2str(ret));
-                    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-                }
-
-                while (true)
-                {
-                    ret = avcodec_receive_frame(video_state->codec_ctx, video_state->frame);
-                    if (ret == 0)
+                    /* Try flushing decoder to get any remaining frames. */
+                    ret = avcodec_send_packet(video_state->codec_ctx, NULL);
+                    if (ret < 0 && ret != AVERROR_EOF)
                     {
-                        video_state->frame_decoded = true;
-                        break;
-                    }
-                    else if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        SAIL_LOG_ERROR("VIDEO: Error receiving frame during flush: %s", av_err2str(ret));
+                        SAIL_LOG_ERROR("VIDEO: Error flushing decoder: %s", av_err2str(ret));
                         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
                     }
-                }
 
-                if (!video_state->frame_decoded)
+                    while (true)
+                    {
+                        ret = avcodec_receive_frame(video_state->codec_ctx, video_state->frame);
+                        if (ret == 0)
+                        {
+                            video_state->frame_decoded = true;
+                            break;
+                        }
+                        else if (ret == AVERROR_EOF || ret == AVERROR(EAGAIN))
+                        {
+                            /* No more frames available. */
+                            break;
+                        }
+                        else
+                        {
+                            SAIL_LOG_ERROR("VIDEO: Error receiving frame during flush: %s", av_err2str(ret));
+                            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+                        }
+                    }
+
+                    /* If still no frame decoded after flush, we've reached EOF. */
+                    if (!video_state->frame_decoded)
+                    {
+                        /* Mark EOF so load_seek_next_frame will return SAIL_ERROR_NO_MORE_FRAMES on next call. */
+                        video_state->eof_reached = true;
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+                    }
+                }
+                else
                 {
                     SAIL_LOG_ERROR("VIDEO: Failed to decode frame");
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -764,11 +781,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
                     &video_state->time_ranges[video_state->current_time_range_index];
                 if (current_range->end_ms >= 0)
                 {
-                    /* Reached end of range. */
                     return SAIL_ERROR_NO_MORE_FRAMES;
                 }
             }
         }
+        /* For non-seeking mode, EOF is handled above. */
         SAIL_LOG_ERROR("VIDEO: Failed to decode frame");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
