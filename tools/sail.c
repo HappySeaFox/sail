@@ -326,6 +326,7 @@ static sail_status_t convert_impl(const char** inputs,
 
     /* Process all input files. */
     int total_frame_count = 0;
+    int frames_written = 0;
 
     for (int file_idx = 0; file_idx < input_count; file_idx++)
     {
@@ -622,6 +623,7 @@ static sail_status_t convert_impl(const char** inputs,
             sail_destroy_image(image);
             total_frame_count++;
             file_frame_count++;
+            frames_written++;
 
             /* If we're extracting a specific frame, stop after processing it. */
             if (target_frame > 0 && total_frame_count >= target_frame)
@@ -647,6 +649,18 @@ static sail_status_t convert_impl(const char** inputs,
     if (total_frame_count == 0)
     {
         SAIL_LOG_ERROR("No frames found in input files");
+        sail_destroy_save_options(save_options);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
+    }
+
+    /* Check if we actually wrote any frames. */
+    if (frames_written == 0)
+    {
+        SAIL_LOG_ERROR("No frames were written (target frame may be beyond available frames)");
+        if (save_state != NULL)
+        {
+            sail_stop_saving(save_state);
+        }
         sail_destroy_save_options(save_options);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_NO_MORE_FRAMES);
     }
