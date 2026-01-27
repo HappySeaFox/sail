@@ -80,11 +80,25 @@ def test_image_properties():
     assert rgb_image.is_rgb_family
     assert not rgb_image.is_grayscale
     assert not rgb_image.is_indexed
+    assert not rgb_image.has_alpha
+
+    rgba_image = sailpy.Image(sailpy.PixelFormat.BPP32_RGBA, 10, 10)
+    assert rgba_image.is_rgb_family
+    assert not rgba_image.is_grayscale
+    assert not rgba_image.is_indexed
+    assert rgba_image.has_alpha
 
     gray_image = sailpy.Image(sailpy.PixelFormat.BPP8_GRAYSCALE, 10, 10)
     assert not gray_image.is_rgb_family
     assert gray_image.is_grayscale
     assert not gray_image.is_indexed
+    assert not gray_image.has_alpha
+
+    gray_alpha_image = sailpy.Image(sailpy.PixelFormat.BPP8_GRAYSCALE_ALPHA, 10, 10)
+    assert not gray_alpha_image.is_rgb_family
+    assert gray_alpha_image.is_grayscale
+    assert not gray_alpha_image.is_indexed
+    assert gray_alpha_image.has_alpha
 
 
 def test_static_methods():

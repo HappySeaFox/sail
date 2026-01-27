@@ -144,6 +144,11 @@ public:
     bool is_rgb_family() const;
 
     /*
+     * Returns true if the image pixel format contains an alpha channel.
+     */
+    bool has_alpha() const;
+
+    /*
      * Returns the image width.
      *
      * LOAD: Set by SAIL to a positive image width in pixels.
@@ -751,6 +756,11 @@ public:
      * Returns true if the specified pixel format is RGB-like (RGBA, BGR, etc.).
      */
     static bool is_rgb_family(SailPixelFormat pixel_format);
+
+    /*
+     * Returns true if the specified pixel format contains an alpha channel.
+     */
+    static bool has_alpha(SailPixelFormat pixel_format);
 
     /*
      * Returns true if the specified pixel format uses floating point representation

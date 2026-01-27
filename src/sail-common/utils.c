@@ -725,6 +725,67 @@ bool sail_is_rgb_family(enum SailPixelFormat pixel_format)
     }
 }
 
+bool sail_has_alpha(enum SailPixelFormat pixel_format)
+{
+    switch (pixel_format)
+    {
+    /* Grayscale with alpha */
+    case SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA:
+    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA:
+    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
+    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF:
+    case SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT:
+
+    /* RGB with alpha */
+    case SAIL_PIXEL_FORMAT_BPP16_RGBA:
+    case SAIL_PIXEL_FORMAT_BPP16_BGRA:
+    case SAIL_PIXEL_FORMAT_BPP16_ARGB:
+    case SAIL_PIXEL_FORMAT_BPP16_ABGR:
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+    case SAIL_PIXEL_FORMAT_BPP32_BGRA:
+    case SAIL_PIXEL_FORMAT_BPP32_ARGB:
+    case SAIL_PIXEL_FORMAT_BPP32_ABGR:
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA:
+    case SAIL_PIXEL_FORMAT_BPP64_BGRA:
+    case SAIL_PIXEL_FORMAT_BPP64_ARGB:
+    case SAIL_PIXEL_FORMAT_BPP64_ABGR:
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA_1010102:
+    case SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102:
+    case SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF:
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT:
+    case SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT:
+
+    /* CMYK with alpha */
+    case SAIL_PIXEL_FORMAT_BPP40_CMYKA:
+    case SAIL_PIXEL_FORMAT_BPP80_CMYKA:
+
+    /* YUV with alpha */
+    case SAIL_PIXEL_FORMAT_BPP32_YUVA:
+    case SAIL_PIXEL_FORMAT_BPP40_YUVA:
+    case SAIL_PIXEL_FORMAT_BPP48_YUVA:
+    case SAIL_PIXEL_FORMAT_BPP64_YUVA:
+    case SAIL_PIXEL_FORMAT_BPP32_AYUV:
+    case SAIL_PIXEL_FORMAT_BPP64_AYUV:
+
+    /* CIE LAB with alpha */
+    case SAIL_PIXEL_FORMAT_BPP32_CIE_LABA:
+    case SAIL_PIXEL_FORMAT_BPP64_CIE_LABA:
+
+    /* CIE XYZ with alpha */
+    case SAIL_PIXEL_FORMAT_BPP32_CIE_XYZA:
+    case SAIL_PIXEL_FORMAT_BPP64_CIE_XYZA:
+    {
+        return true;
+    }
+    default:
+    {
+        return false;
+    }
+    }
+}
+
 bool sail_is_cmyk(enum SailPixelFormat pixel_format)
 {
     switch (pixel_format)

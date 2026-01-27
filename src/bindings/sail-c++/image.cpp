@@ -196,6 +196,11 @@ bool image::is_rgb_family() const
     return is_rgb_family(d->sail_image->pixel_format);
 }
 
+bool image::has_alpha() const
+{
+    return has_alpha(d->sail_image->pixel_format);
+}
+
 unsigned image::width() const
 {
     return d->sail_image->width;
@@ -772,6 +777,11 @@ bool image::is_grayscale(SailPixelFormat pixel_format)
 bool image::is_rgb_family(SailPixelFormat pixel_format)
 {
     return sail_is_rgb_family(pixel_format);
+}
+
+bool image::has_alpha(SailPixelFormat pixel_format)
+{
+    return sail_has_alpha(pixel_format);
 }
 
 bool image::is_floating_point(SailPixelFormat pixel_format)

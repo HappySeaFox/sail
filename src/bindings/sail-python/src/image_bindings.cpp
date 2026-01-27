@@ -272,6 +272,8 @@ void init_image(py::module_& m)
                                "Check if pixel format is grayscale")
         .def_property_readonly("is_rgb_family", static_cast<bool (sail::image::*)() const>(&sail::image::is_rgb_family),
                                "Check if pixel format is RGB-like")
+        .def_property_readonly("has_alpha", static_cast<bool (sail::image::*)() const>(&sail::image::has_alpha),
+                               "Check if pixel format contains an alpha channel")
 
         // Properties (read-write)
         .def_property("gamma", &sail::image::gamma, &sail::image::set_gamma, "Image gamma value")
@@ -583,6 +585,8 @@ void init_image(py::module_& m)
                     py::arg("pixel_format"), "Check if format is grayscale")
         .def_static("check_rgb_family", static_cast<bool (*)(SailPixelFormat)>(&sail::image::is_rgb_family),
                     py::arg("pixel_format"), "Check if format is RGB-like")
+        .def_static("check_has_alpha", static_cast<bool (*)(SailPixelFormat)>(&sail::image::has_alpha),
+                    py::arg("pixel_format"), "Check if format contains an alpha channel")
         .def_static("check_floating_point", static_cast<bool (*)(SailPixelFormat)>(&sail::image::is_floating_point),
                     py::arg("pixel_format"), "Check if format uses floating point representation")
 

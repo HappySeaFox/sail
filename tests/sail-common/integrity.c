@@ -889,6 +889,79 @@ static MunitResult test_is_rgb_family_with_float(const MunitParameter params[], 
     return MUNIT_OK;
 }
 
+static MunitResult test_has_alpha(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* Grayscale with alpha should return true */
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP4_GRAYSCALE_ALPHA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE_ALPHA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA_HALF));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_FLOAT));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT));
+
+    /* RGB with alpha should return true */
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP16_RGBA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP16_BGRA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP16_ARGB));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP16_ABGR));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_RGBA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_BGRA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_ARGB));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_ABGR));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_RGBA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_BGRA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_ARGB));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_ABGR));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_RGBA_1010102));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_BGRA_1010102));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_RGBA_HALF));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP128_RGBA_FLOAT));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT));
+
+    /* CMYK with alpha should return true */
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP40_CMYKA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP80_CMYKA));
+
+    /* YUV with alpha should return true */
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_YUVA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP40_YUVA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP48_YUVA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_YUVA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_AYUV));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_AYUV));
+
+    /* CIE LAB with alpha should return true */
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_CIE_LABA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_CIE_LABA));
+
+    /* CIE XYZ with alpha should return true */
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_CIE_XYZA));
+    munit_assert_true(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP64_CIE_XYZA));
+
+    /* Formats without alpha should return false */
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP24_RGB));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP24_BGR));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_RGBX));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_BGRX));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_XRGB));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_XBGR));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP48_RGB));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP48_RGB_HALF));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP32_CMYK));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP24_YCBCR));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_BPP8_INDEXED));
+    munit_assert_false(sail_has_alpha(SAIL_PIXEL_FORMAT_UNKNOWN));
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
     { (char *)"/error-macros", test_error_macros, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
@@ -900,6 +973,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/is-floating-point",        test_is_floating_point,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/is-grayscale-with-float",  test_is_grayscale_with_float,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/is-rgb-family-with-float", test_is_rgb_family_with_float,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/has-alpha",                test_has_alpha,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { (char *)"/chroma-subsampling-to-string",   test_chroma_subsampling_to_string,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/chroma-subsampling-from-string", test_chroma_subsampling_from_string,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },

@@ -100,6 +100,34 @@ def test_grayscale_detection():
         assert img.is_grayscale
 
 
+def test_has_alpha_detection():
+    """Test alpha channel detection"""
+    alpha_formats = [
+        sailpy.PixelFormat.BPP32_RGBA,
+        sailpy.PixelFormat.BPP32_BGRA,
+        sailpy.PixelFormat.BPP64_RGBA,
+        sailpy.PixelFormat.BPP64_BGRA,
+        sailpy.PixelFormat.BPP8_GRAYSCALE_ALPHA,
+        sailpy.PixelFormat.BPP16_GRAYSCALE_ALPHA,
+    ]
+
+    for pf in alpha_formats:
+        img = sailpy.Image(pf, 16, 16)
+        assert img.has_alpha
+
+    # Formats without alpha
+    no_alpha_formats = [
+        sailpy.PixelFormat.BPP24_RGB,
+        sailpy.PixelFormat.BPP24_BGR,
+        sailpy.PixelFormat.BPP8_GRAYSCALE,
+        sailpy.PixelFormat.BPP16_GRAYSCALE,
+    ]
+
+    for pf in no_alpha_formats:
+        img = sailpy.Image(pf, 16, 16)
+        assert not img.has_alpha
+
+
 def test_bits_per_pixel_calculation():
     """Test bits per pixel for various formats"""
     test_cases = [
@@ -133,16 +161,31 @@ def test_pixel_format_properties():
     assert sailpy.Image.check_rgb_family(sailpy.PixelFormat.BPP24_RGB)
     assert not sailpy.Image.check_grayscale(sailpy.PixelFormat.BPP24_RGB)
     assert not sailpy.Image.check_indexed(sailpy.PixelFormat.BPP24_RGB)
+    assert not sailpy.Image.check_has_alpha(sailpy.PixelFormat.BPP24_RGB)
+
+    # RGBA (RGB with alpha)
+    assert sailpy.Image.check_rgb_family(sailpy.PixelFormat.BPP32_RGBA)
+    assert not sailpy.Image.check_grayscale(sailpy.PixelFormat.BPP32_RGBA)
+    assert not sailpy.Image.check_indexed(sailpy.PixelFormat.BPP32_RGBA)
+    assert sailpy.Image.check_has_alpha(sailpy.PixelFormat.BPP32_RGBA)
 
     # Grayscale
     assert not sailpy.Image.check_rgb_family(sailpy.PixelFormat.BPP8_GRAYSCALE)
     assert sailpy.Image.check_grayscale(sailpy.PixelFormat.BPP8_GRAYSCALE)
     assert not sailpy.Image.check_indexed(sailpy.PixelFormat.BPP8_GRAYSCALE)
+    assert not sailpy.Image.check_has_alpha(sailpy.PixelFormat.BPP8_GRAYSCALE)
+
+    # Grayscale with alpha
+    assert not sailpy.Image.check_rgb_family(sailpy.PixelFormat.BPP8_GRAYSCALE_ALPHA)
+    assert sailpy.Image.check_grayscale(sailpy.PixelFormat.BPP8_GRAYSCALE_ALPHA)
+    assert not sailpy.Image.check_indexed(sailpy.PixelFormat.BPP8_GRAYSCALE_ALPHA)
+    assert sailpy.Image.check_has_alpha(sailpy.PixelFormat.BPP8_GRAYSCALE_ALPHA)
 
     # Indexed
     assert not sailpy.Image.check_rgb_family(sailpy.PixelFormat.BPP8_INDEXED)
     assert not sailpy.Image.check_grayscale(sailpy.PixelFormat.BPP8_INDEXED)
     assert sailpy.Image.check_indexed(sailpy.PixelFormat.BPP8_INDEXED)
+    assert not sailpy.Image.check_has_alpha(sailpy.PixelFormat.BPP8_INDEXED)
 
 
 def test_pixel_format_string_conversion():
