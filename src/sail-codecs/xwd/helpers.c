@@ -336,14 +336,32 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
     SAIL_CHECK_PTR(header);
     SAIL_CHECK_PTR(image);
 
+    /*
+     * Validate bytes_per_line from the file header. The header value may include row padding,
+     * but must never be less than the minimum bytes required to store a full scanline.
+     */
+    if (header->bytes_per_line < image->bytes_per_line)
+    {
+        SAIL_LOG_ERROR("XWD: bytes_per_line in header (%u) is less than the expected minimum (%u)",
+                       header->bytes_per_line, image->bytes_per_line);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    const uint32_t row_padding = header->bytes_per_line - image->bytes_per_line;
+
     bool byte_swap = !xwd_private_is_native_byte_order(header->byte_order);
 
     /* Read scanlines. */
     for (uint32_t y = 0; y < header->pixmap_height; y++)
     {
-        unsigned char* scan = (unsigned char*)image->pixels + y * image->bytes_per_line;
+        unsigned char* scan = sail_scan_line(image, y);
 
-        SAIL_TRY(io->strict_read(io->stream, scan, header->bytes_per_line));
+        SAIL_TRY(io->strict_read(io->stream, scan, image->bytes_per_line));
+
+        if (row_padding > 0)
+        {
+            SAIL_TRY(io->seek(io->stream, row_padding, SEEK_CUR));
+        }
 
         /* Handle byte swapping for multi-byte pixels. */
         if (byte_swap)

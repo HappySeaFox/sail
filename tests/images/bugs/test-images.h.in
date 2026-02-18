@@ -1,6 +1,8 @@
 #ifndef SAIL_TEST_IMAGES_H
 #define SAIL_TEST_IMAGES_H
 
+#include <stddef.h>
+
 #include <sail-common/config.h>
 
 static const char * const SAIL_TEST_IMAGES_MUST_FAIL[] = {
@@ -37,6 +39,10 @@ static const char * const SAIL_TEST_IMAGES_MUST_SUCCEED[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_TGA
     "@SAIL_TEST_IMAGES_PATH@/tga/TALOS-2025-2220.tga",
+#endif
+
+#ifdef SAIL_HAVE_BUILTIN_XWD
+    "@SAIL_TEST_IMAGES_PATH@/xwd/GHSA-3g38-x2pj-mv55.xwd",
 #endif
 
     NULL,
