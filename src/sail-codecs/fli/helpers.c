@@ -406,6 +406,11 @@ sail_status_t fli_private_decode_lc(struct sail_io* io, unsigned char* pixels, u
             SAIL_TRY(io->strict_read(io->stream, &skip, sizeof(skip)));
             x += skip;
 
+            if (x >= width)
+            {
+                break;
+            }
+
             int8_t packet;
             SAIL_TRY(io->strict_read(io->stream, &packet, sizeof(packet)));
 
@@ -474,6 +479,11 @@ sail_status_t fli_private_decode_ss2(struct sail_io* io, unsigned char* pixels, 
             uint8_t skip;
             SAIL_TRY(io->strict_read(io->stream, &skip, sizeof(skip)));
             x += skip * 2; /* Word-aligned. */
+
+            if (x >= width)
+            {
+                break;
+            }
 
             int8_t packet;
             SAIL_TRY(io->strict_read(io->stream, &packet, sizeof(packet)));
