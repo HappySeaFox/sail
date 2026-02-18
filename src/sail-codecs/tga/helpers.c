@@ -430,6 +430,13 @@ sail_status_t tga_private_fetch_palette(struct sail_io* io,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
+    if (file_header->first_color_map_entry_index >= file_header->color_map_elements)
+    {
+        SAIL_LOG_ERROR("TGA: first_color_map_entry_index(%u) exceeds color_map_elements(%u)",
+                       file_header->first_color_map_entry_index, file_header->color_map_elements);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     unsigned palette_elements = (unsigned)file_header->color_map_elements - file_header->first_color_map_entry_index;
     struct sail_palette* palette_local;
 
