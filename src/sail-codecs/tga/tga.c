@@ -284,7 +284,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_
             unsigned char marker;
             SAIL_TRY(tga_state->io->strict_read(tga_state->io->stream, &marker, 1));
 
-            unsigned count = (marker & 0x7F) + 1;
+            const unsigned packet_count = (marker & 0x7F) + 1;
+            const unsigned remaining    = pixels_num - i;
 
             /* 7th bit set = RLE packet. */
             if (marker & 0x80)
@@ -293,8 +294,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_
 
                 SAIL_TRY(tga_state->io->strict_read(tga_state->io->stream, pixel, pixel_size));
 
-                /* Round to the buffer size. */
-                count = (i + count) <= pixels_num ? count : (pixels_num - i);
+                const unsigned count = packet_count <= remaining ? packet_count : remaining;
 
                 for (unsigned j = 0; j < count; j++, i++)
                 {
@@ -304,10 +304,18 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_
             }
             else
             {
+                const unsigned count = packet_count <= remaining ? packet_count : remaining;
+
                 for (unsigned j = 0; j < count; j++, i++)
                 {
                     SAIL_TRY(tga_state->io->strict_read(tga_state->io->stream, pixels, pixel_size));
                     pixels += pixel_size;
+                }
+
+                if (count < packet_count)
+                {
+                    SAIL_TRY(tga_state->io->seek(tga_state->io->stream,
+                                                 (long)((packet_count - count) * pixel_size), SEEK_CUR));
                 }
             }
         }
