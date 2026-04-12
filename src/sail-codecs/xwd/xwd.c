@@ -140,6 +140,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xwd(void* state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
+    const unsigned resolved_bpp = sail_bits_per_pixel(image_local->pixel_format);
+    if (resolved_bpp != xwd_state->header.bits_per_pixel)
+    {
+        sail_destroy_image(image_local);
+        SAIL_LOG_ERROR("XWD: bits_per_pixel=%u in header does not match resolved pixel format: %u bpp",
+                       xwd_state->header.bits_per_pixel, resolved_bpp);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
     /* Create palette for indexed formats. */

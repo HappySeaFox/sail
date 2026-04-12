@@ -366,7 +366,9 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
         /* Handle byte swapping for multi-byte pixels. */
         if (byte_swap)
         {
-            if (header->bits_per_pixel == 32)
+            const unsigned resolved_bpp = sail_bits_per_pixel(image->pixel_format);
+
+            if (resolved_bpp == 32)
             {
                 uint32_t* pixels = (uint32_t*)scan;
                 for (uint32_t x = 0; x < header->pixmap_width; x++)
@@ -374,7 +376,7 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
                     pixels[x] = sail_reverse_uint32(pixels[x]);
                 }
             }
-            else if (header->bits_per_pixel == 24)
+            else if (resolved_bpp == 24)
             {
                 /* 24-bit BGR/RGB - swap each pixel. */
                 for (uint32_t x = 0; x < header->pixmap_width; x++)
@@ -384,7 +386,7 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
                     scan[x * 3 + 2]   = tmp;
                 }
             }
-            else if (header->bits_per_pixel == 16)
+            else if (resolved_bpp == 16)
             {
                 uint16_t* pixels = (uint16_t*)scan;
                 for (uint32_t x = 0; x < header->pixmap_width; x++)
