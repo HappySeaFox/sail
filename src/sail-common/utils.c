@@ -369,7 +369,8 @@ unsigned sail_pixel_format_channels(enum SailPixelFormat pixel_format)
     case SAIL_PIXEL_FORMAT_BPP32_YCCK: return 4;
 
     case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB:
-    case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB: return 3;
+    case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB:
+    case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB: return 3;
 
     case SAIL_PIXEL_FORMAT_BPP32_CIE_LABA:
     case SAIL_PIXEL_FORMAT_BPP64_CIE_LABA: return 4;
@@ -491,6 +492,7 @@ unsigned sail_bits_per_pixel(enum SailPixelFormat pixel_format)
 
     case SAIL_PIXEL_FORMAT_BPP24_CIE_LAB: return 24;
     case SAIL_PIXEL_FORMAT_BPP40_CIE_LAB: return 40;
+    case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB: return 48;
 
     case SAIL_PIXEL_FORMAT_BPP32_CIE_LABA: return 32;
     case SAIL_PIXEL_FORMAT_BPP64_CIE_LABA: return 64;

@@ -267,7 +267,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
 {
     const struct psd_state* psd_state = state;
 
-    const unsigned bpp = (psd_state->channels * psd_state->depth + 7) / 8;
+    const unsigned bytes_per_pixel = (sail_bits_per_pixel(image->pixel_format) + 7) / 8;
 
     if (psd_state->compression == SAIL_PSD_COMPRESSION_RLE)
     {
@@ -295,7 +295,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
 
                         for (unsigned i = count; i < count + c; i++)
                         {
-                            unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + i * bpp;
+                            unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + i * bytes_per_pixel;
                             for (unsigned b = 0; b < bytes_per_sample; b++)
                             {
                                 *(scan + channel * bytes_per_sample + b) = value[b];
@@ -316,7 +316,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                             unsigned char value[2];
                             SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
 
-                            unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + (count + i) * bpp;
+                            unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + (count + i) * bytes_per_pixel;
                             for (unsigned b = 0; b < bytes_per_sample; b++)
                             {
                                 *(scan + channel * bytes_per_sample + b) = value[b];
@@ -350,7 +350,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                 {
                     for (unsigned pixel = 0; pixel < image->width; pixel++)
                     {
-                        unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + pixel * bpp;
+                        unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + pixel * bytes_per_pixel;
                         *(scan + channel)   = *(psd_state->scan_buffer + pixel);
                     }
                 }
@@ -358,7 +358,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                 {
                     for (unsigned pixel = 0; pixel < image->width; pixel++)
                     {
-                        unsigned char* scan       = (unsigned char*)sail_scan_line(image, row) + pixel * bpp;
+                        unsigned char* scan       = (unsigned char*)sail_scan_line(image, row) + pixel * bytes_per_pixel;
                         *(scan + channel * 2)     = *(psd_state->scan_buffer + pixel * 2);
                         *(scan + channel * 2 + 1) = *(psd_state->scan_buffer + pixel * 2 + 1);
                     }

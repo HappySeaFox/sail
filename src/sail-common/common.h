@@ -204,6 +204,8 @@ enum SailPixelFormat
     SAIL_PIXEL_FORMAT_BPP64_GRAYSCALE_ALPHA_UINT, /* 32-bit unsigned int grayscale + alpha */
     SAIL_PIXEL_FORMAT_BPP96_RGB_UINT,             /* 32-bit unsigned int RGB */
     SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT,           /* 32-bit unsigned int RGBA */
+
+    SAIL_PIXEL_FORMAT_BPP48_CIE_LAB, /* 16/16/16 (e.g. PSD 16-bit Lab) */
 };
 
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */

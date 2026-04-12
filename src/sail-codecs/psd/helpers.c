@@ -152,7 +152,7 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
             switch (depth)
             {
             case 8: *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB; return SAIL_OK;
-            case 16: *result = SAIL_PIXEL_FORMAT_BPP40_CIE_LAB; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP48_CIE_LAB; return SAIL_OK;
             }
             break;
         }

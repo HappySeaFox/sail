@@ -71,6 +71,7 @@ static MunitResult test_pixel_format_binary_compatibility(const MunitParameter p
     /* Version = 1.0.0 */
     munit_assert_int(SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_HALF, ==, 93);
     munit_assert_int(SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT, ==, 104);
+    munit_assert_int(SAIL_PIXEL_FORMAT_BPP48_CIE_LAB, ==, 105);
 
     return MUNIT_OK;
 }

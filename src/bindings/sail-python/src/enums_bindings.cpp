@@ -115,6 +115,7 @@ void init_enums(py::module_& m)
         // CIE LAB
         .value("BPP24_CIE_LAB", SAIL_PIXEL_FORMAT_BPP24_CIE_LAB)
         .value("BPP40_CIE_LAB", SAIL_PIXEL_FORMAT_BPP40_CIE_LAB)
+        .value("BPP48_CIE_LAB", SAIL_PIXEL_FORMAT_BPP48_CIE_LAB)
         .value("BPP32_CIE_LABA", SAIL_PIXEL_FORMAT_BPP32_CIE_LABA)
         .value("BPP64_CIE_LABA", SAIL_PIXEL_FORMAT_BPP64_CIE_LABA)
         // CIE LUV

@@ -229,6 +229,10 @@ static MunitResult test_cie_lab(const MunitParameter params[], void* user_data)
     munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB) == 50);
     munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP40_CIE_LAB) == 55);
 
+    /* 48-bit CIE-LAB. */
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP48_CIE_LAB) == 60);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP48_CIE_LAB) == 66);
+
     return MUNIT_OK;
 }
 
