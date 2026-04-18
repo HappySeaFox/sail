@@ -160,6 +160,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, st
     uint16_t mode;
     SAIL_TRY(psd_private_get_big_endian_uint16_t(psd_state->io, &mode));
 
+    /* PSD spec: width/height up to 30000, channels 1-56, depth 1/8/16/32. */
+    if (width == 0 || width > 30000 || height == 0 || height > 30000)
+    {
+        SAIL_LOG_ERROR("PSD: Invalid dimensions %ux%u", width, height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+    if (psd_state->channels == 0 || psd_state->channels > 56)
+    {
+        SAIL_LOG_ERROR("PSD: Invalid number of channels %u", psd_state->channels);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+    if (psd_state->depth != 1 && psd_state->depth != 8 && psd_state->depth != 16 && psd_state->depth != 32)
+    {
+        SAIL_LOG_ERROR("PSD: Invalid bit depth %u", psd_state->depth);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     uint32_t data_size;
     SAIL_TRY(psd_private_get_big_endian_uint32_t(psd_state->io, &data_size));
 
@@ -290,7 +307,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                         unsigned char value[2];
                         SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
 
-                        /* Round to the buffer size. */
+                        /* Clamp to the buffer size. */
                         c = (count + c) <= image->width ? c : (unsigned char)(image->width - count);
 
                         for (unsigned i = count; i < count + c; i++)
@@ -308,7 +325,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                     {
                         c++;
 
-                        /* Round to the buffer size. */
+                        /* Clamp to the buffer size. */
                         unsigned actual_count = (count + c) <= image->width ? c : (image->width - count);
 
                         for (unsigned i = 0; i < actual_count; i++)
