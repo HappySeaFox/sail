@@ -331,7 +331,13 @@ static sail_status_t read_old_rle_scanline(struct sail_io* io, int width, uint8_
 
         if (rgbe[0] == 1 && rgbe[1] == 1 && rgbe[2] == 1)
         {
-            /* Run length encoded. */
+            /* Run length encoded. Requires at least one previous pixel to replicate. */
+            if (pos == 0)
+            {
+                SAIL_LOG_ERROR("HDR: RLE run with no previous pixel");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+            }
+
             int count = ((int)rgbe[3]) << rshift;
             if (pos + count > width)
             {
