@@ -894,6 +894,13 @@ sail_status_t xpm_private_parse_xpm_header(struct sail_io* io,
 
             if (scanned >= 4)
             {
+                /* Validate. */
+                if (w <= 0 || h <= 0 || nc <= 0 || c <= 0)
+                {
+                    SAIL_LOG_ERROR("XPM: Non-positive header values w=%d h=%d nc=%d c=%d", w, h, nc, c);
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+                }
+
                 *width       = w;
                 *height      = h;
                 *num_colors  = nc;
@@ -1086,6 +1093,20 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
         line++;
+
+        /* Validate. */
+        const char* line_end = strchr(line, '"');
+        if (line_end == NULL)
+        {
+            SAIL_LOG_ERROR("XPM: Unterminated pixel data on line %u", y);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+        if ((size_t)(line_end - line) < (size_t)width * cpp)
+        {
+            SAIL_LOG_ERROR("XPM: Pixel data on line %u is too short (%zu, expected %u)", y, (size_t)(line_end - line),
+                           width * cpp);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
 
         for (unsigned x = 0; x < width; x++)
         {
