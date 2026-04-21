@@ -116,6 +116,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pcx(struct sail_io* io,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
+    /* Validate. */
+    if (pcx_state->pcx_header.xmax < pcx_state->pcx_header.xmin
+        || pcx_state->pcx_header.ymax < pcx_state->pcx_header.ymin)
+    {
+        SAIL_LOG_ERROR("PCX: Invalid dimensions xmin(%u), xmax(%u), ymin(%u), ymax(%u)",
+                        pcx_state->pcx_header.xmin, pcx_state->pcx_header.xmax,
+                        pcx_state->pcx_header.ymin, pcx_state->pcx_header.ymax);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+    if (pcx_state->pcx_header.planes == 0 || pcx_state->pcx_header.planes > 4)
+    {
+        SAIL_LOG_ERROR("PCX: Unsupported number of planes %u", pcx_state->pcx_header.planes);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     SAIL_LOG_TRACE("PCX: planes(%u), bytes per line(%u), compressed(%s)", pcx_state->pcx_header.planes,
                    pcx_state->pcx_header.bytes_per_line,
                    (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING) ? "no" : "yes");
@@ -216,7 +231,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
                     value = marker;
                 }
 
-                /* Round to the buffer size. */
+                /* Clamp to the buffer size. */
                 count = (bytes + count) <= image->bytes_per_line ? count : (uint8_t)(image->bytes_per_line - bytes);
 
                 bytes += count;
