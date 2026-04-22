@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -160,6 +161,14 @@ sail_status_t xwd_private_read_colormap(struct sail_io* io,
         *colormap = NULL;
         return SAIL_OK;
     }
+
+#if SIZE_MAX <= UINT32_MAX
+    if (ncolors > (SIZE_MAX / sizeof(struct XWDColor)))
+    {
+        SAIL_LOG_ERROR("XWD: Too many colormap entries (%u)", ncolors);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+#endif
 
     void* ptr;
     SAIL_TRY(sail_malloc(ncolors * sizeof(struct XWDColor), &ptr));
