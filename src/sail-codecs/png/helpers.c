@@ -49,10 +49,10 @@ static sail_status_t skip_raw_profile_header(const char* data, const char** star
 
     /* Skip "\nexif\n    1234 " before the actual HEX-encoded data. */
 #ifdef _MSC_VER
-    if (sscanf_s(data, "%s %d %c %n", key, (unsigned)sizeof(key), &n, &c, 1, &bytes_consumed) != 3)
+    if (sscanf_s(data, "%15s %d %c %n", key, (unsigned)sizeof(key), &n, &c, 1, &bytes_consumed) != 3)
     {
 #else
-    if (sscanf(data, "%s %d %c %n", key, &n, &c, &bytes_consumed) != 3)
+    if (sscanf(data, "%15s %d %c %n", key, &n, &c, &bytes_consumed) != 3)
     {
 #endif
         SAIL_LOG_ERROR("PNG: Failed to parse raw profile header");
