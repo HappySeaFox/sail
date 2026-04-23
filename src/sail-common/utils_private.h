@@ -1,6 +1,6 @@
 /*  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 
-    Copyright (c) 2020 Dmitry Baryshev
+    Copyright (c) 2026 Dmitry Baryshev
 
     The MIT License
 
@@ -25,39 +25,21 @@
 
 #pragma once
 
-/* Universal sail-common include. */
-
-#include <sail-common/config.h>
-
-#include <sail-common/common.h>
-#include <sail-common/common_serialize.h>
-#include <sail-common/compiler_specifics.h>
-#include <sail-common/compression_level.h>
 #include <sail-common/export.h>
-#include <sail-common/hash_map.h>
-#include <sail-common/iccp.h>
-#include <sail-common/image.h>
-#include <sail-common/io_common.h>
-#include <sail-common/load_features.h>
-#include <sail-common/load_options.h>
-#include <sail-common/log.h>
-#include <sail-common/memory.h>
-#include <sail-common/meta_data.h>
-#include <sail-common/meta_data_node.h>
-#include <sail-common/palette.h>
-#include <sail-common/pixel.h>
-#include <sail-common/resolution.h>
-#include <sail-common/save_features.h>
-#include <sail-common/save_options.h>
-#include <sail-common/source_image.h>
-#include <sail-common/status.h>
-#include <sail-common/string_node.h>
-#include <sail-common/utils.h>
-#include <sail-common/variant.h>
-#include <sail-common/variant_node.h>
 
-#ifdef SAIL_BUILD
-#include <sail-common/hash_map_private.h>
-#include <sail-common/linked_list_node.h>
-#include <sail-common/utils_private.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * Returns true if a * b would exceed UINT32_MAX (unsigned 32-bit wrap).
+ * When b == 0 the product is always 0 — no overflow.
+ */
+SAIL_EXPORT bool sail_private_uint32_mul_overflows(uint32_t a, uint32_t b);
+
+#ifdef __cplusplus
+}
 #endif

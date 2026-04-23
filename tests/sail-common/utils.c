@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <stdint.h>
+
 #include <sail-common/sail-common.h>
 
 #include "munit.h"
@@ -66,11 +68,40 @@ static MunitResult test_reverse_uint64(const MunitParameter params[], void* user
     return MUNIT_OK;
 }
 
+static MunitResult test_uint32_mul_overflows(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    /* b == 0: never overflow */
+    munit_assert_false(sail_private_uint32_mul_overflows(0u, 0u));
+    munit_assert_false(sail_private_uint32_mul_overflows(UINT32_MAX, 0u));
+
+    /* Small products */
+    munit_assert_false(sail_private_uint32_mul_overflows(10u, 10u));
+    munit_assert_false(sail_private_uint32_mul_overflows(1u, UINT32_MAX));
+
+    /* Largest non-overflowing pair with b == 2 */
+    munit_assert_false(sail_private_uint32_mul_overflows(UINT32_MAX / 2u, 2u));
+
+    /* One past: (UINT32_MAX/2 + 1) * 2 overflows */
+    munit_assert_true(sail_private_uint32_mul_overflows(UINT32_MAX / 2u + 1u, 2u));
+
+    /* Symmetric overflow */
+    munit_assert_true(sail_private_uint32_mul_overflows(2u, UINT32_MAX / 2u + 1u));
+
+    /* 65536 * 65536 == 2^32 > UINT32_MAX */
+    munit_assert_true(sail_private_uint32_mul_overflows(65536u, 65536u));
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/reverse-uint16", test_reverse_uint16, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/reverse-uint32", test_reverse_uint32, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/reverse-uint64", test_reverse_uint64, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint16",       test_reverse_uint16,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint32",       test_reverse_uint32,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/reverse-uint64",       test_reverse_uint64,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/uint32-mul-overflows", test_uint32_mul_overflows, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

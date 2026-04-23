@@ -50,6 +50,16 @@
  * Private functions.
  */
 
+bool sail_private_uint32_mul_overflows(uint32_t a, uint32_t b)
+{
+    if (b == 0)
+    {
+        return false;
+    }
+
+    return a > UINT32_MAX / b;
+}
+
 static sail_status_t hex_string_into_data(const char* str, size_t str_length, void* data, size_t* data_saved)
 {
     unsigned char* data_local = data;

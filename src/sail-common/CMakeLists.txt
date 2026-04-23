@@ -55,6 +55,7 @@ add_library(sail-common
                 string_node.h
                 utils.c
                 utils.h
+                utils_private.h
                 variant.c
                 variant.h
                 variant_node.c
