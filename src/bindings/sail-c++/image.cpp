@@ -710,9 +710,7 @@ sail_status_t image::scale_to(unsigned new_width, unsigned new_height, SailScali
     );
 
     sail_image* sail_image_output = nullptr;
-    SAIL_TRY_OR_CLEANUP(sail_scale_image(sail_img, new_width, new_height, algorithm, &sail_image_output),
-                        /* cleanup */ sail_img->pixels = nullptr;
-                                      sail_destroy_image(sail_img););
+    SAIL_TRY(sail_scale_image(sail_img, new_width, new_height, algorithm, &sail_image_output));
 
     *image = sail::image(sail_image_output);
 
