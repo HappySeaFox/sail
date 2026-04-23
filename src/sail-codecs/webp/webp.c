@@ -159,10 +159,29 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io* io,
     SAIL_TRY(alloc_webp_state(io, load_options, NULL, &webp_state));
     *state = webp_state;
 
-    /* Read the entire image. */
-    SAIL_ALIGNAS(uint32_t) char signature_and_size[8];
+    /* Read and validate the RIFF header. */
+    unsigned char signature_and_size[8];
     SAIL_TRY(io->strict_read(io->stream, signature_and_size, sizeof(signature_and_size)));
-    webp_state->image_data_size = *(uint32_t*)(signature_and_size + 4) + sizeof(signature_and_size);
+
+    if (memcmp(signature_and_size, "RIFF", 4) != 0)
+    {
+        SAIL_LOG_ERROR("WEBP: Not a RIFF container");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    uint32_t riff_size;
+    memcpy(&riff_size, signature_and_size + 4, sizeof(riff_size));
+
+    /* Overflow check. */
+#if SIZE_MAX < UINT64_MAX
+    if ((size_t)riff_size > SIZE_MAX - sizeof(signature_and_size))
+    {
+        SAIL_LOG_ERROR("WEBP: RIFF size %u would overflow size_t", (unsigned)riff_size);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+#endif
+
+    webp_state->image_data_size = riff_size + sizeof(signature_and_size);
 
     SAIL_TRY(io->seek(io->stream, 0, SEEK_SET));
 
