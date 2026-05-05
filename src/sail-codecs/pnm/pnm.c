@@ -224,7 +224,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pnm(void* state, st
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
-            if (max_color <= 255)
+            if (max_color == 0)
+            {
+                SAIL_LOG_ERROR("PNM: Invalid maximum color value: %u", max_color);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+            }
+            else if (max_color <= 255)
             {
                 pnm_state->bpc                      = 8;
                 pnm_state->multiplier_to_full_range = 255.0 / max_color;
