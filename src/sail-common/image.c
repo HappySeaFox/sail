@@ -81,6 +81,13 @@ sail_status_t sail_copy_image(const struct sail_image* source, struct sail_image
     /* Pixels. */
     if (source->pixels != NULL)
     {
+        if (sail_private_uint32_mul_overflows(source->height, source->bytes_per_line))
+        {
+            sail_destroy_image(image_local);
+            SAIL_LOG_ERROR("Image: Pixel buffer size overflow for %ux%u", source->height, source->bytes_per_line);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+        }
+
         const unsigned pixels_size = source->height * source->bytes_per_line;
 
         SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
