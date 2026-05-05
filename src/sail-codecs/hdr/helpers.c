@@ -416,6 +416,11 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
             {
                 /* Run length. */
                 int count = code & 0x7F;
+                if (count == 0)
+                {
+                    SAIL_LOG_ERROR("HDR: Invalid RLE run length 0");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+                }
                 uint8_t value;
                 SAIL_TRY(io->tolerant_read(io->stream, &value, 1, &bytes_read));
 
@@ -438,6 +443,11 @@ static sail_status_t read_new_rle_scanline(struct sail_io* io, int width, uint8_
             {
                 /* Literal run. */
                 int count = code;
+                if (count == 0)
+                {
+                    SAIL_LOG_ERROR("HDR: Invalid RLE literal length 0");
+                    SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+                }
                 for (int i = 0; i < count; i++)
                 {
                     if (pos >= width)
