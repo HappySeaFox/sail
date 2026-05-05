@@ -222,6 +222,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
                 if ((marker & SAIL_PCX_RLE_MARKER) == SAIL_PCX_RLE_MARKER)
                 {
                     count = marker & SAIL_PCX_RLE_COUNT_MASK;
+                    if (count == 0)
+                    {
+                        SAIL_LOG_ERROR("PCX: Invalid RLE run length 0");
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+                    }
                     SAIL_TRY(pcx_state->io->strict_read(pcx_state->io->stream, &value, sizeof(value)));
                 }
                 else
