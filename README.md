@@ -247,7 +247,7 @@ Dzmitry Baryshau
 Released under the MIT license.
 
 ```
-Copyright (c) 2020-2025 Dmitry Baryshev
+Copyright (c) 2020-2026 Dmitry Baryshev
 
 The MIT License
 
