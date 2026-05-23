@@ -105,7 +105,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries. When disabled, automatically s
 cmake_dependent_option(SAIL_COMBINE_CODECS "Combine all codecs into a single library. When disabled, all codecs are implemented as \
 dynamically loaded plugins." OFF "BUILD_SHARED_LIBS" ON)
 option(SAIL_THIRD_PARTY_CODECS_PATH "Enable loading custom codecs from ';'-separated paths specified in \
-the SAIL_THIRD_PARTY_CODECS_PATH environment variable." ON)
+the SAIL_THIRD_PARTY_CODECS_PATH environment variable." OFF)
 option(SAIL_THREAD_SAFE "Enable thread-safe operations by locking the internal context with a mutex." ON)
 if (WIN32)
     option(SAIL_WINDOWS_UTF8_PATHS "Convert file paths to UTF-8 on Windows." ON)
