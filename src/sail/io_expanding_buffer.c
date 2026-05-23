@@ -155,25 +155,25 @@ static sail_status_t io_expanding_buffer_seek(void* stream, long offset, int whe
 
     struct expanding_buffer_stream* expanding_buffer_stream = stream;
 
-    size_t new_pos;
+    size_t origin;
 
     switch (whence)
     {
     case SEEK_SET:
     {
-        new_pos = offset;
+        origin = 0;
         break;
     }
 
     case SEEK_CUR:
     {
-        new_pos = expanding_buffer_stream->pos + offset;
+        origin = expanding_buffer_stream->pos;
         break;
     }
 
     case SEEK_END:
     {
-        new_pos = expanding_buffer_stream->size + offset;
+        origin = expanding_buffer_stream->size;
         break;
     }
 
@@ -182,6 +182,9 @@ static sail_status_t io_expanding_buffer_seek(void* stream, long offset, int whe
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE);
     }
     }
+
+    size_t new_pos;
+    SAIL_TRY(sail_io_compute_seek_position(origin, offset, &new_pos));
 
     /* Allow seeking beyond the current size (it's valid for writing). */
     expanding_buffer_stream->pos = new_pos;

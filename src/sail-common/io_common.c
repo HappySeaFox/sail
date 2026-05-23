@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -97,6 +98,52 @@ sail_status_t sail_io_size(struct sail_io* io, size_t* size)
     size_t size_local;
     SAIL_TRY(io->size(io->stream, &size_local));
     *size = size_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_io_compute_seek_position(size_t origin, long offset, size_t* new_position)
+{
+    SAIL_CHECK_PTR(new_position);
+
+    if (offset >= 0)
+    {
+        const size_t offset_unsigned = (size_t)offset;
+
+        if (offset_unsigned > SIZE_MAX - origin)
+        {
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_SEEK_IO);
+        }
+
+        *new_position = origin + offset_unsigned;
+    }
+    else
+    {
+        size_t offset_unsigned;
+
+        if (offset == LONG_MIN)
+        {
+            const size_t long_min_magnitude = (size_t)LONG_MAX + 1;
+
+            if (long_min_magnitude > origin)
+            {
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_SEEK_IO);
+            }
+
+            *new_position = origin - long_min_magnitude;
+        }
+        else
+        {
+            offset_unsigned = (size_t)(-offset);
+
+            if (offset_unsigned > origin)
+            {
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_SEEK_IO);
+            }
+
+            *new_position = origin - offset_unsigned;
+        }
+    }
 
     return SAIL_OK;
 }

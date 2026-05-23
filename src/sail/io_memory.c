@@ -166,25 +166,25 @@ static sail_status_t io_memory_seek(void* stream, long offset, int whence)
 
     struct mem_io_buffer_info* mem_io_buffer_info = stream;
 
-    size_t new_pos;
+    size_t origin;
 
     switch (whence)
     {
     case SEEK_SET:
     {
-        new_pos = offset;
+        origin = 0;
         break;
     }
 
     case SEEK_CUR:
     {
-        new_pos = mem_io_buffer_info->pos + offset;
+        origin = mem_io_buffer_info->pos;
         break;
     }
 
     case SEEK_END:
     {
-        new_pos = mem_io_buffer_info->accessible_length + offset;
+        origin = mem_io_buffer_info->accessible_length;
         break;
     }
 
@@ -193,6 +193,9 @@ static sail_status_t io_memory_seek(void* stream, long offset, int whence)
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_SEEK_WHENCE);
     }
     }
+
+    size_t new_pos;
+    SAIL_TRY(sail_io_compute_seek_position(origin, offset, &new_pos));
 
     /* Correct the value. */
     if (new_pos >= mem_io_buffer_info->length)

@@ -236,6 +236,13 @@ SAIL_EXPORT sail_status_t sail_check_io_valid(const struct sail_io* io);
 SAIL_EXPORT sail_status_t sail_io_size(struct sail_io* io, size_t* size);
 
 /*
+ * Computes origin + offset for seek operations without signed/unsigned wraparound.
+ *
+ * Returns SAIL_ERROR_SEEK_IO when the result is negative or exceeds SIZE_MAX.
+ */
+SAIL_EXPORT sail_status_t sail_io_compute_seek_position(size_t origin, long offset, size_t* new_position);
+
+/*
  * Reads the specified I/O stream until EOF into the memory buffer. Reads the stream
  * from the current position. The buffer must be large enough.
  *

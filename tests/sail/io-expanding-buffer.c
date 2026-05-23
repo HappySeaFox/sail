@@ -242,6 +242,10 @@ static MunitResult test_expanding_buffer_seek_tell(const MunitParameter params[]
     munit_assert(io->tell(io->stream, &offset) == SAIL_OK);
     munit_assert(offset == 7);
 
+    /* Seek before the beginning must fail. */
+    munit_assert(io->seek(io->stream, -100, SEEK_CUR) == SAIL_ERROR_SEEK_IO);
+    munit_assert(io->seek(io->stream, -1, SEEK_SET) == SAIL_ERROR_SEEK_IO);
+
     sail_destroy_io(io);
 
     return MUNIT_OK;
