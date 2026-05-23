@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdint.h>
 
 #include <sail-common/sail-common.h>
@@ -68,30 +69,49 @@ static MunitResult test_reverse_uint64(const MunitParameter params[], void* user
     return MUNIT_OK;
 }
 
-static MunitResult test_uint32_mul_overflows(const MunitParameter params[], void* user_data)
+static MunitResult test_size_mul(const MunitParameter params[], void* user_data)
 {
     (void)params;
     (void)user_data;
 
-    /* b == 0: never overflow */
-    munit_assert_false(sail_private_uint32_mul_overflows(0u, 0u));
-    munit_assert_false(sail_private_uint32_mul_overflows(UINT32_MAX, 0u));
+    size_t result;
 
-    /* Small products */
-    munit_assert_false(sail_private_uint32_mul_overflows(10u, 10u));
-    munit_assert_false(sail_private_uint32_mul_overflows(1u, UINT32_MAX));
+    munit_assert_int(sail_size_mul(100u, 200u, &result), ==, SAIL_OK);
+    munit_assert_size(result, ==, 20000u);
 
-    /* Largest non-overflowing pair with b == 2 */
-    munit_assert_false(sail_private_uint32_mul_overflows(UINT32_MAX / 2u, 2u));
+    munit_assert_int(sail_size_mul(0u, 100u, &result), ==, SAIL_OK);
+    munit_assert_size(result, ==, 0u);
 
-    /* One past: (UINT32_MAX/2 + 1) * 2 overflows */
-    munit_assert_true(sail_private_uint32_mul_overflows(UINT32_MAX / 2u + 1u, 2u));
+    if (SIZE_MAX / 2 >= (size_t)UINT32_MAX)
+    {
+        /* 64-bit size_t: product of two max unsigned values still fits. */
+        munit_assert_int(sail_size_mul(UINT32_MAX, UINT32_MAX, &result), ==, SAIL_OK);
+    }
+    else
+    {
+        /* 32-bit size_t: 65536 * 65536 exceeds SIZE_MAX. */
+        munit_assert_int(sail_size_mul(65536u, 65536u, &result), ==, SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
 
-    /* Symmetric overflow */
-    munit_assert_true(sail_private_uint32_mul_overflows(2u, UINT32_MAX / 2u + 1u));
+    return MUNIT_OK;
+}
 
-    /* 65536 * 65536 == 2^32 > UINT32_MAX */
-    munit_assert_true(sail_private_uint32_mul_overflows(65536u, 65536u));
+static MunitResult test_pixels_buffer_size(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+    size_t pixels_size;
+
+    munit_assert_int(sail_pixels_buffer_size(100u, 300u, &pixels_size), ==, SAIL_OK);
+    munit_assert_size(pixels_size, ==, 30000u);
+
+    munit_assert_int(sail_pixels_buffer_size(100u, 0u, &pixels_size), ==, SAIL_ERROR_INVALID_BYTES_PER_LINE);
+
+    if (SIZE_MAX / 2 < (size_t)UINT32_MAX)
+    {
+        munit_assert_int(sail_pixels_buffer_size(65536u, 65536u, &pixels_size), ==, SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
 
     return MUNIT_OK;
 }
@@ -101,7 +121,8 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/reverse-uint16",       test_reverse_uint16,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/reverse-uint32",       test_reverse_uint32,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/reverse-uint64",       test_reverse_uint64,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/uint32-mul-overflows", test_uint32_mul_overflows, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/size-mul",             test_size_mul,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/pixels-buffer-size",   test_pixels_buffer_size,   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

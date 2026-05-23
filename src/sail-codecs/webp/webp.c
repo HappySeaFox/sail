@@ -318,7 +318,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void* state, s
         }
 
         /* Allocate a canvas frame to apply disposal later. */
-        size_t image_size = (size_t)webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height;
+        size_t image_size;
+        SAIL_TRY(sail_pixels_buffer_size(webp_state->canvas_image->height, webp_state->canvas_image->bytes_per_line,
+                                        &image_size));
 
         void* ptr;
         SAIL_TRY(sail_malloc(image_size, &ptr));
@@ -389,6 +391,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void* state, s
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void* state, struct sail_image* image)
 {
     struct webp_state* webp_state = state;
+    size_t canvas_pixels_size;
+    size_t frame_pixels_size;
+
+    SAIL_TRY(sail_pixels_buffer_size(webp_state->canvas_image->height, webp_state->canvas_image->bytes_per_line,
+                                     &canvas_pixels_size));
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &frame_pixels_size));
 
     switch (webp_state->frame_blend_method)
     {
@@ -398,7 +406,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void* state, struct sail
                                (uint8_t*)webp_state->canvas_image->pixels
                                    + webp_state->canvas_image->bytes_per_line * webp_state->frame_y
                                    + webp_state->frame_x * webp_state->bytes_per_pixel,
-                               (size_t)webp_state->canvas_image->bytes_per_line * webp_state->canvas_image->height,
+                               canvas_pixels_size,
                                webp_state->canvas_image->bytes_per_line)
             == NULL)
         {
@@ -410,7 +418,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void* state, struct sail
     case WEBP_MUX_BLEND:
     {
         if (WebPDecodeRGBAInto(webp_state->webp_iterator->fragment.bytes, webp_state->webp_iterator->fragment.size,
-                               image->pixels, (size_t)image->bytes_per_line * image->height,
+                               image->pixels, frame_pixels_size,
                                webp_state->frame_width * webp_state->bytes_per_pixel)
             == NULL)
         {
@@ -438,7 +446,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void* state, struct sail
     }
     }
 
-    memcpy(image->pixels, webp_state->canvas_image->pixels, (size_t)image->bytes_per_line * image->height);
+    memcpy(image->pixels, webp_state->canvas_image->pixels, frame_pixels_size);
 
     return SAIL_OK;
 }

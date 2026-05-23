@@ -214,7 +214,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_svg(void* state, struct sail_
 {
     const struct svg_state* svg_state = state;
 
-    memset(image->pixels, 0, (size_t)image->bytes_per_line * image->height);
+    size_t pixels_size;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &pixels_size));
+
+    memset(image->pixels, 0, pixels_size);
 
 #ifdef SAIL_RESVG
 #ifdef SAIL_HAVE_RESVG_FIT_TO

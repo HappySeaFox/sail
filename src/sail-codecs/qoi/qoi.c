@@ -180,7 +180,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_qoi(void* state, struct sail_
 {
     const struct qoi_state* qoi_state = state;
 
-    const size_t pixels_size = (size_t)image->bytes_per_line * image->height;
+    size_t pixels_size;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &pixels_size));
 
     memcpy(image->pixels, qoi_state->pixels, pixels_size);
 

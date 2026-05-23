@@ -337,7 +337,13 @@ static bool fast_convert_rgb565_bgr565(const struct sail_image* image_input, str
 /* Identical format: direct memcpy */
 static bool fast_convert_identical(const struct sail_image* image_input, struct sail_image* image_output)
 {
-    const size_t total_size = (size_t)image_input->height * image_input->bytes_per_line;
+    size_t total_size;
+
+    if (sail_pixels_buffer_size(image_input->height, image_input->bytes_per_line, &total_size) != SAIL_OK)
+    {
+        return false;
+    }
+
     memcpy(image_output->pixels, image_input->pixels, total_size);
 
     return true;

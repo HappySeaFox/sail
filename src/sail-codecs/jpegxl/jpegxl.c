@@ -386,13 +386,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void* state, struct sa
 {
     struct jpegxl_state* jpegxl_state = state;
 
+    size_t buffer_size;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &buffer_size));
+
     JxlPixelFormat format = {.num_channels = jpegxl_private_pixel_format_to_num_channels(image->pixel_format),
                              .data_type    = jpegxl_private_pixel_format_to_jxl_data_type(image->pixel_format),
                              .endianness   = JXL_NATIVE_ENDIAN,
                              .align        = 0};
 
-    JxlDecoderStatus status = JxlDecoderSetImageOutBuffer(jpegxl_state->decoder, &format, image->pixels,
-                                                          (size_t)image->bytes_per_line * image->height);
+    JxlDecoderStatus status =
+        JxlDecoderSetImageOutBuffer(jpegxl_state->decoder, &format, image->pixels, buffer_size);
 
     if (status != JXL_DEC_SUCCESS)
     {
@@ -650,7 +653,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpegxl(void* state, const str
     SAIL_TRY(jpegxl_private_pixel_format_to_jxl_basic_info(image->pixel_format, &basic_info, &pixel_format));
 
     /* Add image frame. */
-    const size_t buffer_size = (size_t)image->bytes_per_line * image->height;
+    size_t buffer_size;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &buffer_size));
 
     if (JxlEncoderAddImageFrame(jpegxl_state->frame_settings, &pixel_format, image->pixels, buffer_size)
         != JXL_ENC_SUCCESS)

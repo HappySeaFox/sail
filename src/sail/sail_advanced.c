@@ -122,16 +122,11 @@ sail_status_t sail_load_next_frame(void* state, struct sail_image** image)
     }
 
     /* Validate and allocate pixels. */
-    const size_t max_height = SIZE_MAX / image_local->bytes_per_line;
+    size_t pixels_size;
 
-    if (image_local->height > max_height)
-    {
-        SAIL_LOG_ERROR("Image height is too long");
-        sail_destroy_image(image_local);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
-    }
+    SAIL_TRY_OR_CLEANUP(sail_pixels_buffer_size(image_local->height, image_local->bytes_per_line, &pixels_size),
+                        /* cleanup */ sail_destroy_image(image_local));
 
-    const size_t pixels_size = (size_t)image_local->height * image_local->bytes_per_line;
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 

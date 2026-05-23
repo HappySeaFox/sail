@@ -152,6 +152,21 @@ SAIL_EXPORT bool sail_greater_bits_per_pixel(enum SailPixelFormat pixel_format1,
 SAIL_EXPORT unsigned sail_bytes_per_line(unsigned width, enum SailPixelFormat pixel_format);
 
 /*
+ * Multiplies a and b into *result when the product fits in size_t.
+ *
+ * Returns SAIL_ERROR_INVALID_IMAGE_DIMENSIONS on overflow.
+ */
+SAIL_EXPORT sail_status_t sail_size_mul(unsigned a, unsigned b, size_t* result);
+
+/*
+ * Computes the pixel buffer size height * bytes_per_line.
+ *
+ * Returns SAIL_ERROR_INVALID_BYTES_PER_LINE when bytes_per_line is 0.
+ * Returns SAIL_ERROR_INVALID_IMAGE_DIMENSIONS on overflow.
+ */
+SAIL_EXPORT sail_status_t sail_pixels_buffer_size(unsigned height, unsigned bytes_per_line, size_t* pixels_size);
+
+/*
  * Returns true if the given pixel format is indexed and assumes having a palette.
  */
 SAIL_EXPORT bool sail_is_indexed(enum SailPixelFormat pixel_format);

@@ -199,7 +199,9 @@ sail_status_t sail_rotate_image(const struct sail_image* image,
     output->bytes_per_line = sail_bytes_per_line(new_width, image->pixel_format);
 
     /* Allocate pixels */
-    const size_t pixels_size = (size_t)output->height * output->bytes_per_line;
+    size_t pixels_size;
+
+    SAIL_TRY(sail_pixels_buffer_size(output->height, output->bytes_per_line, &pixels_size));
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &output->pixels),
                        /* cleanup */ sail_destroy_image(output));
 
@@ -274,10 +276,14 @@ sail_status_t sail_rotate_image_180_inplace(struct sail_image* image)
     }
 
     const unsigned bytes_per_pixel = bits_per_pixel / 8;
-    const unsigned width = image->width;
-    const unsigned height = image->height;
-    const unsigned total_pixels = width * height;
-    const unsigned half_pixels = total_pixels / 2;
+    const unsigned width           = image->width;
+    const unsigned height          = image->height;
+    size_t total_pixels;
+    size_t half_pixels;
+
+    SAIL_TRY(sail_size_mul(width, height, &total_pixels));
+
+    half_pixels = total_pixels / 2;
 
     uint8_t* pixels = (uint8_t*)image->pixels;
 
@@ -286,9 +292,9 @@ sail_status_t sail_rotate_image_180_inplace(struct sail_image* image)
     SAIL_TRY(sail_malloc(bytes_per_pixel, &temp_pixel));
 
     /* Swap pixels from opposite ends moving toward center */
-    for (unsigned i = 0; i < half_pixels; i++)
+    for (size_t i = 0; i < half_pixels; i++)
     {
-        const unsigned opposite_i = total_pixels - 1 - i;
+        const size_t opposite_i = total_pixels - 1 - i;
 
         uint8_t* pixel1 = pixels + i * bytes_per_pixel;
         uint8_t* pixel2 = pixels + opposite_i * bytes_per_pixel;

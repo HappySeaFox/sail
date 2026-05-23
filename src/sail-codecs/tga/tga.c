@@ -252,14 +252,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_
 {
     struct tga_state* tga_state = state;
 
+    size_t pixels_size;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &pixels_size));
+
     switch (tga_state->file_header.image_type)
     {
     case TGA_INDEXED:
     case TGA_TRUE_COLOR:
     case TGA_GRAY:
     {
-        SAIL_TRY(tga_state->io->strict_read(tga_state->io->stream, image->pixels,
-                                            (size_t)image->bytes_per_line * image->height));
+        SAIL_TRY(tga_state->io->strict_read(tga_state->io->stream, image->pixels, pixels_size));
         break;
     }
     case TGA_INDEXED_RLE:
@@ -484,6 +486,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tga(void* state, const struct
 {
     struct tga_state* tga_state = state;
 
+    size_t pixels_size;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &pixels_size));
+
     const unsigned pixel_size = (tga_state->file_header.bpp + 7) / 8;
 
     switch (tga_state->file_header.image_type)
@@ -493,8 +498,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tga(void* state, const struct
     case TGA_GRAY:
     {
         /* Write uncompressed pixel data. */
-        SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, image->pixels,
-                                             (size_t)image->bytes_per_line * image->height));
+        SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, image->pixels, pixels_size));
         break;
     }
     case TGA_INDEXED_RLE:

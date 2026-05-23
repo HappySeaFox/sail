@@ -188,7 +188,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_wal(void* state, struct sail_
 {
     struct wal_state* wal_state = state;
 
-    const size_t bytes_to_read = (size_t)image->bytes_per_line * image->height;
+    size_t bytes_to_read;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &bytes_to_read));
 
     if (bytes_to_read == 0)
     {

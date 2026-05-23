@@ -1078,7 +1078,10 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
     char buf[8192];
     char pixel_chars[8];
 
-    unsigned pixel_size = sail_bytes_per_line(width, pixel_format) * height;
+    unsigned bytes_per_line = sail_bytes_per_line(width, pixel_format);
+    size_t pixel_size;
+
+    SAIL_TRY(sail_pixels_buffer_size(height, bytes_per_line, &pixel_size));
     memset(pixels, 0, pixel_size);
 
     for (unsigned y = 0; y < height; y++)

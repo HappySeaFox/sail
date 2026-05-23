@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h> /* SIZE_MAX */
 #include <stdlib.h>
 
 #include "sail-common.h"
@@ -82,6 +83,11 @@ void* sail_realloc_std_signature(void* ptr, size_t size)
 sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr)
 {
     SAIL_CHECK_PTR(ptr);
+
+    if (nmemb != 0 && size > SIZE_MAX / nmemb)
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
+    }
 
     void* ptr_local = calloc(nmemb, size);
 

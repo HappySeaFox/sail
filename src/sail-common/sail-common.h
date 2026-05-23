@@ -59,5 +59,4 @@
 #ifdef SAIL_BUILD
 #include <sail-common/hash_map_private.h>
 #include <sail-common/linked_list_node.h>
-#include <sail-common/utils_private.h>
 #endif

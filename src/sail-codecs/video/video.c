@@ -24,6 +24,7 @@
 */
 
 #include <inttypes.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -801,6 +802,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
+    size_t pixels_size;
+    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &pixels_size));
+
+    if (pixels_size > (size_t)INT_MAX)
+    {
+        SAIL_LOG_ERROR("VIDEO: Pixel buffer size exceeds INT_MAX");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
     int ret;
 
     /* If pixel format conversion is needed, use swscale. */
@@ -862,7 +872,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
         }
 
         /* Copy converted frame data to image buffer. */
-        ret = av_image_copy_to_buffer((uint8_t*)image->pixels, (int)(image->bytes_per_line * image->height),
+        ret = av_image_copy_to_buffer((uint8_t*)image->pixels, (int)pixels_size,
                                       (const uint8_t* const*)video_state->converted_frame->data,
                                       video_state->converted_frame->linesize, target_av_pix_fmt, image->width,
                                       image->height, 1);
@@ -870,7 +880,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
     else
     {
         /* No conversion needed, copy directly. */
-        ret = av_image_copy_to_buffer((uint8_t*)image->pixels, (int)(image->bytes_per_line * image->height),
+        ret = av_image_copy_to_buffer((uint8_t*)image->pixels, (int)pixels_size,
                                       (const uint8_t* const*)video_state->frame->data, video_state->frame->linesize,
                                       source_av_pix_fmt, image->width, image->height, 1);
     }

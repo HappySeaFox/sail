@@ -477,8 +477,16 @@ sail_status_t hdr_private_read_scanline(struct sail_io* io, int width, float* sc
 {
     uint8_t* rgbe_scanline = NULL;
     void* ptr;
+    size_t rgbe_scanline_size;
 
-    SAIL_TRY(sail_malloc(width * 4, &ptr));
+    if (width <= 0)
+    {
+        SAIL_LOG_ERROR("HDR: Invalid scanline width %d", width);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    SAIL_TRY(sail_size_mul((unsigned)width, 4, &rgbe_scanline_size));
+    SAIL_TRY(sail_malloc(rgbe_scanline_size, &ptr));
     rgbe_scanline = ptr;
 
     sail_status_t status = read_new_rle_scanline(io, width, rgbe_scanline);
@@ -586,8 +594,16 @@ sail_status_t hdr_private_write_scanline(struct sail_io* io, int width, const fl
 {
     uint8_t* rgbe_scanline = NULL;
     void* ptr;
+    size_t rgbe_scanline_size;
 
-    SAIL_TRY(sail_malloc(width * 4, &ptr));
+    if (width <= 0)
+    {
+        SAIL_LOG_ERROR("HDR: Invalid scanline width %d", width);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    SAIL_TRY(sail_size_mul((unsigned)width, 4, &rgbe_scanline_size));
+    SAIL_TRY(sail_malloc(rgbe_scanline_size, &ptr));
     rgbe_scanline = ptr;
 
     /* Convert float RGB to RGBE. */
@@ -605,7 +621,7 @@ sail_status_t hdr_private_write_scanline(struct sail_io* io, int width, const fl
     else
     {
         /* Write uncompressed. */
-        status = io->strict_write(io->stream, rgbe_scanline, width * 4);
+        status = io->strict_write(io->stream, rgbe_scanline, rgbe_scanline_size);
     }
 
     sail_free(rgbe_scanline);

@@ -26,7 +26,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>  /* _O_RDWR, _O_CREAT, etc. */
-#include <limits.h> /* UINT_MAX */
+#include <limits.h> /* SIZE_MAX, UINT_MAX */
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,14 +50,36 @@
  * Private functions.
  */
 
-bool sail_private_uint32_mul_overflows(uint32_t a, uint32_t b)
+sail_status_t sail_size_mul(unsigned a, unsigned b, size_t* result)
 {
-    if (b == 0)
+    SAIL_CHECK_PTR(result);
+
+    const size_t sa = a;
+    const size_t sb = b;
+
+    if (sa != 0 && sb > SIZE_MAX / sa)
     {
-        return false;
+        SAIL_LOG_ERROR("Multiplication overflow: %u * %u", a, b);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
     }
 
-    return a > UINT32_MAX / b;
+    *result = sa * sb;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_pixels_buffer_size(unsigned height, unsigned bytes_per_line, size_t* pixels_size)
+{
+    SAIL_CHECK_PTR(pixels_size);
+
+    if (bytes_per_line == 0)
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_BYTES_PER_LINE);
+    }
+
+    SAIL_TRY(sail_size_mul(height, bytes_per_line, pixels_size));
+
+    return SAIL_OK;
 }
 
 static sail_status_t hex_string_into_data(const char* str, size_t str_length, void* data, size_t* data_saved)

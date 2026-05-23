@@ -194,8 +194,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_hdr(void* state, struct sail_
 
     float* scanline = NULL;
     void* ptr;
+    size_t scanline_bytes;
 
-    SAIL_TRY(sail_malloc(hdr_codec_state->header.width * 3 * sizeof(float), &ptr));
+    if (hdr_codec_state->header.width <= 0)
+    {
+        SAIL_LOG_ERROR("HDR: Invalid image width %d", hdr_codec_state->header.width);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    SAIL_TRY(sail_size_mul((unsigned)hdr_codec_state->header.width, 3 * (unsigned)sizeof(float), &scanline_bytes));
+    SAIL_TRY(sail_malloc(scanline_bytes, &ptr));
     scanline = ptr;
 
     /* Read scanlines. */
@@ -220,7 +228,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_hdr(void* state, struct sail_
 
         if (hdr_codec_state->header.x_increasing)
         {
-            memcpy(dest, scanline, hdr_codec_state->header.width * 3 * sizeof(float));
+            memcpy(dest, scanline, scanline_bytes);
         }
         else
         {

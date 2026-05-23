@@ -889,9 +889,13 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     indexed_image->pixel_format = output_pixel_format;
     indexed_image->bytes_per_line = sail_bytes_per_line(indexed_image->width, indexed_image->pixel_format);
 
+    size_t indexed_pixels_size;
+
     SAIL_TRY_OR_CLEANUP(
-        sail_malloc((size_t)indexed_image->bytes_per_line * indexed_image->height, &indexed_image->pixels),
+        sail_pixels_buffer_size(indexed_image->height, indexed_image->bytes_per_line, &indexed_pixels_size),
         /* cleanup */ sail_destroy_image(indexed_image), sail_free(state->Qadd), sail_free(state));
+    SAIL_TRY_OR_CLEANUP(sail_malloc(indexed_pixels_size, &indexed_image->pixels),
+                        /* cleanup */ sail_destroy_image(indexed_image), sail_free(state->Qadd), sail_free(state));
 
     /* Copy indexed pixels. */
     if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
@@ -909,7 +913,7 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     else
     {
         unsigned char* dest = (unsigned char*)indexed_image->pixels;
-        memset(dest, 0, (size_t)indexed_image->bytes_per_line * indexed_image->height);
+        memset(dest, 0, indexed_pixels_size);
 
         for (unsigned int y = 0; y < source_image->height; y++)
         {

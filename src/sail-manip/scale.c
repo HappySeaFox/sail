@@ -107,7 +107,9 @@ sail_status_t sail_scale_image(const struct sail_image* image,
     }
 
     /* Allocate pixels. */
-    const size_t pixels_size = (size_t)output->height * output->bytes_per_line;
+    size_t pixels_size;
+
+    SAIL_TRY(sail_pixels_buffer_size(output->height, output->bytes_per_line, &pixels_size));
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &output->pixels),
                         /* cleanup */ sail_destroy_image(output);
                         sail_destroy_image(rgba_image));
@@ -169,6 +171,7 @@ sail_status_t sail_scale_image(const struct sail_image* image,
     }
 
     /* Allocate pixels */
+    SAIL_TRY(sail_pixels_buffer_size(output->height, output->bytes_per_line, &pixels_size));
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &output->pixels),
                         /* cleanup */ sail_destroy_image(output);
                         sail_destroy_image(rgba_image));
@@ -1305,8 +1308,17 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
         }
     }
 
-    const size_t rgba_pixels_size = (size_t)rgba_output->height * rgba_output->bytes_per_line;
-    status                        = sail_malloc(rgba_pixels_size, &rgba_output->pixels);
+    size_t rgba_pixels_size;
+
+    status = sail_pixels_buffer_size(rgba_output->height, rgba_output->bytes_per_line, &rgba_pixels_size);
+    if (status != SAIL_OK)
+    {
+        sail_destroy_image(rgba_output);
+        sail_destroy_image(rgba_image);
+        return status;
+    }
+
+    status = sail_malloc(rgba_pixels_size, &rgba_output->pixels);
     if (status != SAIL_OK)
     {
         sail_destroy_image(rgba_output);
@@ -1372,7 +1384,10 @@ static sail_status_t scale_with_manual(const struct sail_image* src_image,
     }
 
     /* Copy result to destination. */
-    memcpy(dst_image->pixels, rgba_output->pixels, (size_t)dst_image->height * dst_image->bytes_per_line);
+    size_t dst_pixels_size;
+
+    SAIL_TRY(sail_pixels_buffer_size(dst_image->height, dst_image->bytes_per_line, &dst_pixels_size));
+    memcpy(dst_image->pixels, rgba_output->pixels, dst_pixels_size);
     sail_destroy_image(rgba_output);
 
     return SAIL_OK;
