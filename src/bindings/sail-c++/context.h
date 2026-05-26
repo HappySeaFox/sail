@@ -91,8 +91,6 @@ public:
      *    1. SAIL_CODECS_PATH environment variable
      *    2. Hardcoded SAIL_CODECS_PATH in config.h
      *
-     *    <FOUND PATH>/lib is added to LD_LIBRARY_PATH.
-     *
      * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable with a list of ';'-separated paths
      * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake (the default), so you can load
      * your own codecs from there.

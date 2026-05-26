@@ -206,19 +206,13 @@ Codecs are combined into a dynamically linked library, so no search is required.
 1. `SAIL_CODECS_PATH` environment variable
 2. Hardcoded `SAIL_CODECS_PATH` in config.h
 
-`<FOUND PATH>/lib` is added to `LD_LIBRARY_PATH`.
-
-Additionally, if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), the `SAIL_THIRD_PARTY_CODECS_PATH`
+On all platforms, if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), the `SAIL_THIRD_PARTY_CODECS_PATH`
 environment variable is searched for a list of ';'-separated paths containing third-party codecs.
 
 ## How can I point SAIL to my custom codecs?
 
 If `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), set the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable
 to a list of ';'-separated paths containing your custom SAIL codecs.
-
-On Windows, only the `sail.dll` location and `SAIL_THIRD_PARTY_CODECS_PATH/lib` are searched for codec DLL dependencies.
-Use the WIN32 API `AddDllDirectory()` to add custom DLL dependency search paths.
-On other platforms, `SAIL_THIRD_PARTY_CODECS_PATH/lib` is added to `LD_LIBRARY_PATH`.
 
 If `SAIL_THIRD_PARTY_CODECS_PATH` is `OFF`, custom codec loading is disabled.
 

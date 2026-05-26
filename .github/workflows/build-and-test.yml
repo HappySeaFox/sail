@@ -152,14 +152,10 @@ jobs:
       run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Run tests
-      run: |
-        $env:PATH = "C:/SAIL/lib/sail/codecs/lib;$env:PATH"
-        ctest --test-dir build/tests -C Debug --output-on-failure "-j$env:NUMBER_OF_PROCESSORS"
+      run: ctest --test-dir build/tests -C Debug --output-on-failure "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Test SAIL binary
-      run: |
-        $env:PATH = "C:/SAIL/lib/sail/codecs/lib;$env:PATH"
-        C:/SAIL/bin/sail.exe --version
+      run: C:/SAIL/bin/sail.exe --version
 
     - name: Test external C API link
       working-directory: tests/external/link/c

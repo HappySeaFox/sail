@@ -363,66 +363,6 @@ static sail_status_t print_enumerated_codecs(struct sail_context* context)
 }
 
 #if !defined SAIL_COMBINE_CODECS || defined SAIL_THIRD_PARTY_CODECS_PATH
-/* Add codecs_path/lib to the DLL/SO search path. */
-static sail_status_t add_lib_subdir_to_dll_search_path(const char* codecs_path)
-{
-
-#ifdef SAIL_WIN32
-    char* full_path_to_lib;
-    SAIL_TRY(sail_concat(&full_path_to_lib, 2, codecs_path, "\\lib"));
-
-    if (!sail_is_dir(full_path_to_lib))
-    {
-        SAIL_LOG_DEBUG("Optional DLL directory '%s' doesn't exist, so not loading DLLs from it", full_path_to_lib);
-        sail_free(full_path_to_lib);
-        return SAIL_OK;
-    }
-
-    SAIL_TRY_OR_CLEANUP(add_dll_directory(full_path_to_lib),
-                        /* cleanup */ sail_free(full_path_to_lib));
-
-    sail_free(full_path_to_lib);
-#else
-    char* full_path_to_lib;
-    SAIL_TRY(sail_concat(&full_path_to_lib, 2, codecs_path, "/lib"));
-
-    if (!sail_is_dir(full_path_to_lib))
-    {
-        SAIL_LOG_DEBUG("Optional LIB directory '%s' doesn't exist, so not updating LD_LIBRARY_PATH with it",
-                       full_path_to_lib);
-        sail_free(full_path_to_lib);
-        return SAIL_OK;
-    }
-
-    char* combined_ld_library_path;
-    char* env = getenv("LD_LIBRARY_PATH");
-
-    if (env == NULL)
-    {
-        SAIL_TRY_OR_CLEANUP(sail_strdup(full_path_to_lib, &combined_ld_library_path), sail_free(full_path_to_lib));
-    }
-    else
-    {
-        SAIL_TRY_OR_CLEANUP(sail_concat(&combined_ld_library_path, 3, env, ":", full_path_to_lib),
-                            sail_free(full_path_to_lib));
-    }
-
-    sail_free(full_path_to_lib);
-    SAIL_LOG_DEBUG("Set LD_LIBRARY_PATH to '%s'", combined_ld_library_path);
-
-    if (setenv("LD_LIBRARY_PATH", combined_ld_library_path, true) != 0)
-    {
-        SAIL_LOG_ERROR("Failed to update library search path: %s", strerror(errno));
-        sail_free(combined_ld_library_path);
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_ENV_UPDATE);
-    }
-
-    sail_free(combined_ld_library_path);
-#endif
-
-    return SAIL_OK;
-}
-
 static sail_status_t build_full_path(const char* sail_codecs_path, const char* name, char** full_path)
 {
 
@@ -501,8 +441,6 @@ static sail_status_t enumerate_codecs_in_paths(struct sail_context* context, con
     for (; string_node != NULL; string_node = string_node->next)
     {
         const char* codecs_path = string_node->string;
-
-        SAIL_TRY(add_lib_subdir_to_dll_search_path(codecs_path));
 
         SAIL_LOG_DEBUG("Enumerating codecs in '%s'", codecs_path);
 

@@ -249,35 +249,6 @@ if (NOT ENABLED_CODECS AND NOT SAIL_THIRD_PARTY_CODECS_PATH)
     message(FATAL_ERROR "No codecs are enabled and SAIL_THIRD_PARTY_CODECS_PATH is disabled.\nThis particular build of SAIL cannot load any image.")
 endif()
 
-# Install VCPKG libs on Windows only. On Unix platforms vcpkg uses rpath
-#
-if (SAIL_VCPKG AND WIN32)
-    # When SAIL_COMBINE_CODECS is ON, sail-codecs.dll directly depends on extra libs.
-    # Copy them into the bin directory. Otherwise, client applications will fail to run.
-    #
-    # When SAIL_COMBINE_CODECS is OFF, SAIL loads codecs in runtime. In this case we can put
-    # extra libs in a separate directory and update the DLL search path.
-    #
-    if (SAIL_COMBINE_CODECS)
-        set(SAIL_EXTRA_LIBS_INSTALL_PATH "bin")
-    else()
-        set(SAIL_EXTRA_LIBS_INSTALL_PATH "lib/sail/codecs/lib")
-    endif()
-
-    if (NOT CMAKE_BUILD_TYPE)
-        message(FATAL_ERROR "CMAKE_BUILD_TYPE is required for VCPKG build")
-    endif()
-
-    if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        set(SAIL_VCPKG_BIN_PATH "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/bin")
-    else()
-        set(SAIL_VCPKG_BIN_PATH "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/bin")
-    endif()
-    get_filename_component(SAIL_VCPKG_BIN_PATH "${SAIL_VCPKG_BIN_PATH}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-    message(STATUS "Install VCPKG libs '${SAIL_VCPKG_BIN_PATH}/' to '${SAIL_EXTRA_LIBS_INSTALL_PATH}'")
-    install(DIRECTORY "${SAIL_VCPKG_BIN_PATH}/" DESTINATION ${SAIL_EXTRA_LIBS_INSTALL_PATH} OPTIONAL)
-endif()
-
 if (ENABLED_CODECS)
     string(TOUPPER "${ENABLED_CODECS}" ENABLED_CODECS)
 
