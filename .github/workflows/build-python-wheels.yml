@@ -13,6 +13,8 @@ jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }} - Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    env:
+      VCPKG_TARGET_TRIPLET: x64-windows
     strategy:
       fail-fast: false
       matrix:
@@ -49,7 +51,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: vcpkg
-        key: vcpkg-x64-windows-${{ hashFiles('vcpkg.json') }}
+        key: vcpkg-${{ env.VCPKG_TARGET_TRIPLET }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -112,7 +114,7 @@ jobs:
         # VCPKG will try to search for vcpkg.json there. Redirect vcpkg to the project root.
         #
         CMAKE_ARGS: -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake
-                        -DVCPKG_TARGET_TRIPLET=x64-windows
+                        -DVCPKG_TARGET_TRIPLET=${{ env.VCPKG_TARGET_TRIPLET }}
                         -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
                         -DVCPKG_INSTALL_OPTIONS=--clean-buildtrees-after-build
                         -DCMAKE_C_FLAGS=-MP
