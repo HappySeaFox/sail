@@ -105,6 +105,7 @@ jobs:
       VCPKG_ROOT: ${{ github.workspace }}/vcpkg
       VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkg-binary-cache
       VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/.vcpkg-binary-cache,readwrite
+      SAIL_INSTALL_BIN: C:/SAIL/bin
     strategy:
       fail-fast: false
       matrix:
@@ -163,14 +164,19 @@ jobs:
     - name: Build
       run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"
 
+    - name: Copy VCPKG runtime DLLs to install bin
+      run: |
+        $vcpkgBin = "$env:GITHUB_WORKSPACE\build\vcpkg_installed\${{ matrix.config.triplet }}\debug\bin"
+        Copy-Item -Path "$vcpkgBin\*" -Destination "$env:SAIL_INSTALL_BIN\" -Force
+
     - name: Run tests
       run: |
-        $env:PATH = "$env:GITHUB_WORKSPACE/build/vcpkg_installed/${{ matrix.config.triplet }}/debug/bin;$env:PATH"
+        $env:PATH = "$env:SAIL_INSTALL_BIN;$env:PATH"
         ctest --test-dir build/tests -C Debug --output-on-failure "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Test SAIL binary
       run: |
-        $env:PATH = "$env:GITHUB_WORKSPACE/build/vcpkg_installed/${{ matrix.config.triplet }}/debug/bin;$env:PATH"
+        $env:PATH = "$env:SAIL_INSTALL_BIN;$env:PATH"
         C:/SAIL/bin/sail.exe --version
 
     - name: Test external C API link
