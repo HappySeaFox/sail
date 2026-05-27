@@ -44,23 +44,12 @@ jobs:
       run: |
         brew install ffmpeg giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libraw libtiff openexr openjpeg resvg webp
 
-    - name: Cache vcpkg tool (Windows)
+    - name: Cache vcpkg (Windows)
       if: runner.os == 'Windows'
       uses: actions/cache@v4
       with:
         path: vcpkg
-        key: vcpkg-tool-${{ hashFiles('vcpkg.json') }}
-        restore-keys: |
-          vcpkg-tool-
-
-    - name: Cache vcpkg binary packages (Windows)
-      if: runner.os == 'Windows'
-      uses: actions/cache@v4
-      with:
-        path: .vcpkg-binary-cache
-        key: vcpkg-binary-cache-x64-windows-${{ hashFiles('vcpkg.json') }}
-        restore-keys: |
-          vcpkg-binary-cache-x64-windows-
+        key: vcpkg-x64-windows-${{ hashFiles('vcpkg.json') }}
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -117,8 +106,7 @@ jobs:
       working-directory: src/bindings/sail-python
       env:
         VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-        VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkg-binary-cache
-        VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/.vcpkg-binary-cache,readwrite
+        VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg/archives
 
         # When we build Python wheels, CMAKE_SOURCE_DIR is src/bindings/sail-python.
         # VCPKG will try to search for vcpkg.json there. Redirect vcpkg to the project root.

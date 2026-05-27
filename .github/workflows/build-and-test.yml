@@ -103,8 +103,7 @@ jobs:
     runs-on: windows-latest
     env:
       VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkg-binary-cache
-      VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/.vcpkg-binary-cache,readwrite
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg/archives
       SAIL_INSTALL_BIN: C:/SAIL/bin
     strategy:
       fail-fast: false
@@ -120,21 +119,11 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Cache vcpkg tool
+    - name: Cache vcpkg
       uses: actions/cache@v4
       with:
         path: vcpkg
-        key: vcpkg-tool-${{ hashFiles('vcpkg.json') }}
-        restore-keys: |
-          vcpkg-tool-
-
-    - name: Cache vcpkg binary packages
-      uses: actions/cache@v4
-      with:
-        path: .vcpkg-binary-cache
-        key: vcpkg-binary-cache-${{ matrix.config.triplet }}-${{ hashFiles('vcpkg.json') }}
-        restore-keys: |
-          vcpkg-binary-cache-${{ matrix.config.triplet }}-
+        key: vcpkg-${{ matrix.config.triplet }}-${{ hashFiles('vcpkg.json') }}
 
     - name: Set up vcpkg
       shell: bash
