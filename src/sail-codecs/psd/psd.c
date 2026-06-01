@@ -304,7 +304,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
                         c ^= 0xFF;
                         c += 2;
 
-                        unsigned char value[2];
+                        unsigned char value[4]; // To support 32-bit depth.
                         SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
 
                         /* Clamp to the buffer size. */
@@ -330,7 +330,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
 
                         for (unsigned i = 0; i < actual_count; i++)
                         {
-                            unsigned char value[2];
+                            unsigned char value[4]; // To support 32-bit depth.
                             SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
 
                             unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + (count + i) * bytes_per_pixel;
