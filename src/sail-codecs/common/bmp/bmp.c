@@ -336,11 +336,12 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
         }
 
         /* Validate and allocate palette. */
-        size_t max_palette_count = SIZE_MAX / sizeof(sail_rgba32_t);
+        const unsigned max_palette_for_bpp = 1U << bmp_state->v2.bit_count;
 
-        if (bmp_state->palette_count > max_palette_count)
+        if (bmp_state->palette_count > max_palette_for_bpp)
         {
-            SAIL_LOG_ERROR("BMP: Indexed image has too large palette");
+            SAIL_LOG_ERROR("BMP: Palette size %u exceeds maximum %u for %u bpp", bmp_state->palette_count,
+                           max_palette_for_bpp, bmp_state->v2.bit_count);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
