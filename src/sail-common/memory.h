@@ -76,8 +76,6 @@ SAIL_EXPORT sail_status_t sail_calloc(size_t nmemb, size_t size, void** ptr);
 
 /*
  * Interface to free().
- *
- * Returns SAIL_OK on success.
  */
 SAIL_EXPORT void sail_free(void* ptr);
 
