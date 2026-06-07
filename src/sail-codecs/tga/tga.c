@@ -140,6 +140,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
+    const unsigned resolved_bpp = sail_bits_per_pixel(pixel_format);
+    if (resolved_bpp != (unsigned)tga_state->file_header.bpp)
+    {
+        SAIL_LOG_ERROR("TGA: bpp=%d in header does not match resolved pixel format: %u bpp",
+                       tga_state->file_header.bpp, resolved_bpp);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     struct sail_image* image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
 
@@ -268,15 +276,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_tga(void* state, struct sail_
     case TGA_TRUE_COLOR_RLE:
     case TGA_GRAY_RLE:
     {
-        const unsigned pixel_size = (tga_state->file_header.bpp + 7) / 8;
-
-        /* Validate pixel size to prevent buffer overflow. */
-        if (pixel_size > 16 || pixel_size == 0)
-        {
-            SAIL_LOG_ERROR("TGA: Invalid pixel size %u (bpp=%d), must be 1-16 bytes", pixel_size,
-                           tga_state->file_header.bpp);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
-        }
+        const unsigned pixel_size = (sail_bits_per_pixel(image->pixel_format) + 7) / 8;
         const unsigned pixels_num = image->width * image->height;
 
         unsigned char* pixels = image->pixels;
