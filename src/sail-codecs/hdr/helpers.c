@@ -126,11 +126,16 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
         }
         else if (strncmp(line, "VIEW=", 5) == 0)
         {
+            sail_free(header->view);
+            header->view = NULL;
             SAIL_TRY(sail_strdup(line + 5, &header->view));
         }
         else if (strncmp(line, "PRIMARIES=", 10) == 0)
         {
-            SAIL_TRY(sail_strdup(line + 10, &header->primaries));
+            if (header->primaries == NULL)
+            {
+                SAIL_TRY(sail_strdup(line + 10, &header->primaries));
+            }
         }
         else if (strncmp(line, "COLORCORR=", 10) == 0)
         {
@@ -721,12 +726,14 @@ sail_status_t hdr_private_fetch_properties(const struct sail_hash_map* special_p
     variant = sail_hash_map_value(special_properties, "hdr-view");
     if (variant != NULL && variant->type == SAIL_VARIANT_TYPE_STRING)
     {
+        sail_free(header->view);
+        header->view = NULL;
         SAIL_TRY(sail_strdup(sail_variant_to_string(variant), &header->view));
     }
 
     /* Get primaries. */
     variant = sail_hash_map_value(special_properties, "hdr-primaries");
-    if (variant != NULL && variant->type == SAIL_VARIANT_TYPE_STRING)
+    if (variant != NULL && variant->type == SAIL_VARIANT_TYPE_STRING && header->primaries == NULL)
     {
         SAIL_TRY(sail_strdup(sail_variant_to_string(variant), &header->primaries));
     }
