@@ -232,6 +232,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, st
 
     psd_state->compression = compression;
 
+    SAIL_LOG_TRACE("PSD: mode(%u), channels(%u), depth(%u)", mode, psd_state->channels, psd_state->depth);
+
+    enum SailPixelFormat pixel_format;
+    SAIL_TRY(psd_private_sail_pixel_format(mode, psd_state->channels, psd_state->depth, &pixel_format));
+
     /* Skip byte counts for all the scan lines. */
     if (psd_state->compression == SAIL_PSD_COMPRESSION_RLE)
     {
@@ -247,11 +252,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, st
         SAIL_TRY(sail_malloc(psd_state->bytes_per_channel, &ptr));
         psd_state->scan_buffer = ptr;
     }
-
-    SAIL_LOG_TRACE("PSD: mode(%u), channels(%u), depth(%u)", mode, psd_state->channels, psd_state->depth);
-
-    enum SailPixelFormat pixel_format;
-    SAIL_TRY(psd_private_sail_pixel_format(mode, psd_state->channels, psd_state->depth, &pixel_format));
 
     /* Allocate image. */
     struct sail_image* image_local;

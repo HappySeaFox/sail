@@ -56,7 +56,14 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
     {
         switch (channels)
         {
-        case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
+        case 1:
+        {
+            switch (depth)
+            {
+            case 1: *result = SAIL_PIXEL_FORMAT_BPP1_INDEXED; return SAIL_OK;
+            }
+            break;
+        }
         }
         break;
     }
@@ -64,7 +71,14 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
     {
         switch (channels)
         {
-        case 1: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
+        case 1:
+        {
+            switch (depth)
+            {
+            case 8: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
+            }
+            break;
+        }
         }
         break;
     }
