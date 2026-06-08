@@ -1,0 +1,6 @@
+#define bpp1_indexed_odd_width 17
+#define bpp1_indexed_odd_height 2
+static unsigned short bpp1_indexed_odd_bits[] = {
+   0x0000, 0x0000,
+   0x0000, 0x0000
+};

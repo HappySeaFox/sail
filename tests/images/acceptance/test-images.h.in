@@ -206,6 +206,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_XBM
     "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x10.xbm",
     "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed.x11.xbm",
+    "@SAIL_TEST_IMAGES_PATH@/xbm/bpp1-indexed-odd-width.x10.xbm",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_XPM

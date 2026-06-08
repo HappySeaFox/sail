@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -37,6 +38,71 @@ static const unsigned char reverse_lookup_4bits[] = {
 unsigned char xbm_private_reverse_byte(unsigned char byte)
 {
     return (reverse_lookup_4bits[byte & 0xF] << 4) | reverse_lookup_4bits[byte >> 4];
+}
+
+sail_status_t xbm_private_read_hex_literal(struct sail_io* io, unsigned* holder)
+{
+    char ch;
+
+    do
+    {
+        SAIL_TRY(io->strict_read(io->stream, &ch, 1));
+    } while (isspace(ch) || ch == ',');
+
+    if (ch != '0')
+    {
+        SAIL_LOG_ERROR("XBM: Expected '0' from '0x', got '%c'", ch);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    SAIL_TRY(io->strict_read(io->stream, &ch, 1));
+
+    if (ch != 'x' && ch != 'X')
+    {
+        SAIL_LOG_ERROR("XBM: Expected 'x' in hex literal, got '%c'", ch);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    *holder        = 0;
+    int hex_digits = 0;
+
+    while (hex_digits < 4)
+    {
+        SAIL_TRY(io->strict_read(io->stream, &ch, 1));
+
+        if ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))
+        {
+            unsigned digit;
+            if (ch >= '0' && ch <= '9')
+            {
+                digit = ch - '0';
+            }
+            else if (ch >= 'a' && ch <= 'f')
+            {
+                digit = ch - 'a' + 10;
+            }
+            else
+            {
+                digit = ch - 'A' + 10;
+            }
+
+            *holder = (*holder << 4) | digit;
+            hex_digits++;
+        }
+        else
+        {
+            SAIL_TRY(io->seek(io->stream, -1, SEEK_CUR));
+            break;
+        }
+    }
+
+    if (hex_digits == 0)
+    {
+        SAIL_LOG_ERROR("XBM: No hex digits found");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    return SAIL_OK;
 }
 
 sail_status_t xbm_private_write_header(
@@ -83,6 +149,8 @@ sail_status_t xbm_private_write_pixels(
         total_units = pixel_buffer_size;
     }
 
+    const unsigned shorts_per_row = (bytes_per_line + 1) / 2;
+
     for (unsigned i = 0; i < total_units; i++)
     {
         char hex_str[16];
@@ -91,12 +159,15 @@ sail_status_t xbm_private_write_pixels(
 
         if (version == SAIL_XBM_VERSION_10)
         {
-            /* X10: Write as shorts (2 bytes). */
-            const unsigned byte_idx = i * 2;
+            /* X10: Write as shorts (2 bytes), padded to an even number of bytes per row. */
+            const unsigned row           = i / shorts_per_row;
+            const unsigned short_in_row  = i % shorts_per_row;
+            const unsigned row_start     = row * bytes_per_line;
+            const unsigned byte_idx      = row_start + short_in_row * 2;
             const unsigned char byte1 =
                 (byte_idx < pixel_buffer_size) ? xbm_private_reverse_byte(pixels[byte_idx]) : 0;
             const unsigned char byte2 =
-                (byte_idx + 1 < pixel_buffer_size) ? xbm_private_reverse_byte(pixels[byte_idx + 1]) : 0;
+                (byte_idx + 1 < row_start + bytes_per_line) ? xbm_private_reverse_byte(pixels[byte_idx + 1]) : 0;
             value = byte1 | (byte2 << 8);
 
             if (i == total_units - 1)
