@@ -14,15 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-latest, name: "Shared ASAN",          build_shared: "ON",  combine_codecs: "OFF", sail_asan: "ON",  sail_tsan: "OFF" }
-          - { os: ubuntu-latest, name: "Shared TSAN",          build_shared: "ON",  combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "ON"  }
-          - { os: ubuntu-latest, name: "Shared Combined ASAN", build_shared: "ON",  combine_codecs: "ON",  sail_asan: "ON",  sail_tsan: "OFF" }
-          - { os: ubuntu-latest, name: "Shared Combined TSAN", build_shared: "ON",  combine_codecs: "ON",  sail_asan: "OFF", sail_tsan: "ON"  }
-          - { os: ubuntu-latest, name: "Static ASAN",          build_shared: "OFF", combine_codecs: "OFF", sail_asan: "ON",  sail_tsan: "OFF" }
-          - { os: ubuntu-latest, name: "Static TSAN",          build_shared: "OFF", combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "ON"  }
-          - { os: macos-latest,  name: "Shared",               build_shared: "ON",  combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "OFF" }
-          - { os: macos-latest,  name: "Shared Combined",      build_shared: "ON",  combine_codecs: "ON",  sail_asan: "OFF", sail_tsan: "OFF" }
-          - { os: macos-latest,  name: "Static",               build_shared: "OFF", combine_codecs: "OFF", sail_asan: "OFF", sail_tsan: "OFF" }
+          - { os: ubuntu-latest, name: "Shared ASAN",          build_shared: "ON",  combine_codecs: "OFF", asan: "ON",  tsan: "OFF" }
+          - { os: ubuntu-latest, name: "Shared Combined ASAN", build_shared: "ON",  combine_codecs: "ON",  asan: "ON",  tsan: "OFF" }
+          - { os: ubuntu-latest, name: "Static ASAN",          build_shared: "OFF", combine_codecs: "OFF", asan: "ON",  tsan: "OFF" }
+          - { os: ubuntu-latest, name: "Shared TSAN",          build_shared: "ON",  combine_codecs: "OFF", asan: "OFF", tsan: "ON"  }
+          - { os: ubuntu-latest, name: "Shared Combined TSAN", build_shared: "ON",  combine_codecs: "ON",  asan: "OFF", tsan: "ON"  }
+          - { os: ubuntu-latest, name: "Static TSAN",          build_shared: "OFF", combine_codecs: "OFF", asan: "OFF", tsan: "ON"  }
+          - { os: macos-latest,  name: "Shared ASAN",          build_shared: "ON",  combine_codecs: "OFF", asan: "ON",  tsan: "OFF" }
+          - { os: macos-latest,  name: "Shared Combined ASAN", build_shared: "ON",  combine_codecs: "ON",  asan: "ON",  tsan: "OFF" }
+          - { os: macos-latest,  name: "Static ASAN",          build_shared: "OFF", combine_codecs: "OFF", asan: "ON",  tsan: "OFF" }
 
     steps:
     - uses: actions/checkout@v4
@@ -51,8 +51,8 @@ jobs:
           -DCMAKE_INSTALL_PREFIX=/usr/local \
           -DBUILD_SHARED_LIBS=${{ matrix.build_shared }} \
           -DSAIL_COMBINE_CODECS=${{ matrix.combine_codecs }} \
-          -DSAIL_ASAN=${{ matrix.sail_asan }} \
-          -DSAIL_TSAN=${{ matrix.sail_tsan }}
+          -DSAIL_ASAN=${{ matrix.asan }} \
+          -DSAIL_TSAN=${{ matrix.tsan }}
 
     - name: Build
       run: cmake --build build -j$(nproc)
@@ -84,8 +84,8 @@ jobs:
         mkdir tests/external/link/c/build
         cmake -S tests/external/link/c -B tests/external/link/c/build \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DSAIL_ASAN=${{ matrix.sail_asan }} \
-          -DSAIL_TSAN=${{ matrix.sail_tsan }}
+          -DSAIL_ASAN=${{ matrix.asan }} \
+          -DSAIL_TSAN=${{ matrix.tsan }}
         cmake --build tests/external/link/c/build -j$(nproc)
         tests/external/link/c/build/external-c-api-link
 
@@ -95,8 +95,8 @@ jobs:
         mkdir tests/external/link/c++/build
         cmake -S tests/external/link/c++ -B tests/external/link/c++/build \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DSAIL_ASAN=${{ matrix.sail_asan }} \
-          -DSAIL_TSAN=${{ matrix.sail_tsan }}
+          -DSAIL_ASAN=${{ matrix.asan }} \
+          -DSAIL_TSAN=${{ matrix.tsan }}
         cmake --build tests/external/link/c++/build -j$(nproc)
         tests/external/link/c++/build/external-c++-api-link
 
