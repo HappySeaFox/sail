@@ -25,7 +25,7 @@ jobs:
           - { os: macos-latest,  name: "Static ASAN",          build_shared: "OFF", combine_codecs: "OFF", asan: "ON",  tsan: "OFF" }
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -117,7 +117,7 @@ jobs:
           - { name: "Static /MD",      build_shared: "OFF", combine_codecs: "OFF", static_crt: "OFF", triplet: "x64-windows-static-md", appflags: "/MDd" }
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
 
