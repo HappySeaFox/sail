@@ -9,7 +9,7 @@ macro(sail_test)
 
     target_link_libraries(${SAIL_TEST_TARGET} PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
-    if (WIN32)
+    if (WIN32 AND BUILD_SHARED_LIBS)
         add_test(NAME "${SAIL_TEST_TARGET}" WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin COMMAND ${SAIL_TEST_TARGET})
     else()
         add_test(NAME "${SAIL_TEST_TARGET}" COMMAND ${SAIL_TEST_TARGET})
