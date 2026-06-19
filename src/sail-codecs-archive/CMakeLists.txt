@@ -62,11 +62,10 @@ foreach(CODEC ${ENABLED_CODECS})
     target_link_libraries(sail-codecs PRIVATE $<BUILD_INTERFACE:sail-codec-${CODEC}>)
 endforeach()
 
-# For static Windows builds, FFmpeg requires additional system libraries
-# These need to be propagated to final executables
+# Extra link libraries required by static codec dependencies (see SAIL_CODECS_FIND_DEPENDENCIES)
 #
-if (WIN32 AND NOT BUILD_SHARED_LIBS AND "video" IN_LIST ENABLED_CODECS)
-    target_link_libraries(sail-codecs INTERFACE secur32 ncrypt crypt32 bcrypt mfuuid strmiids)
+if (SAIL_CODECS_INTERFACE_LINK_LIBRARIES)
+    target_link_libraries(sail-codecs INTERFACE ${SAIL_CODECS_INTERFACE_LINK_LIBRARIES})
 endif()
 
 target_include_directories(sail-codecs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../sail)

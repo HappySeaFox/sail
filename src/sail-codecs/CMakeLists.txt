@@ -120,6 +120,8 @@ endforeach()
 
 # Export extra dependencies like giflib for static builds to the parent scope
 #
+set(SAIL_CODECS_INTERFACE_LINK_LIBRARIES)
+
 if (NOT BUILD_SHARED_LIBS)
     foreach (dependency IN LISTS SAIL_CODECS_FIND_DEPENDENCIES)
         string(REPLACE "," ";" dependency ${dependency})
@@ -160,6 +162,41 @@ endif()
 
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \$<\$<CONFIG:Release>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:RelWithDebInfo>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:Debug>:\${${dependency_name}_DEBUG_LIBRARY}>)
 ")
+        elseif(dependency_search_mechanism STREQUAL "link_libraries" OR dependency_search_mechanism STREQUAL "link_frameworks")
+            if (dependency_search_mechanism STREQUAL "link_frameworks")
+                list(GET dependency 1 dependency_libraries)
+                string(REGEX REPLACE " +" ";" dependency_libraries "${dependency_libraries}")
+
+                set(_resolved_libraries "")
+                foreach (_name IN LISTS dependency_libraries)
+                    list(APPEND _resolved_libraries "-framework ${_name}")
+                endforeach()
+                set(dependency_libraries ${_resolved_libraries})
+            else()
+                list(LENGTH dependency dependency_length)
+
+                if (dependency_length GREATER 2)
+                    list(REMOVE_AT dependency 0)
+                    set(dependency_libraries ${dependency})
+                else()
+                    list(GET dependency 1 dependency_libraries)
+                    string(REGEX REPLACE " +" ";" dependency_libraries "${dependency_libraries}")
+                endif()
+            endif()
+
+            foreach (_lib IN LISTS dependency_libraries)
+                list(APPEND SAIL_CODECS_INTERFACE_LINK_LIBRARIES ${_lib})
+            endforeach()
+
+            set(_link_config "")
+            foreach (_lib IN LISTS dependency_libraries)
+                set(_link_config "${_link_config} \"${_lib}\"")
+            endforeach()
+
+            set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+# link_libraries
+set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES${_link_config})
+")
         else()
             message(FATAL_ERROR "Unsupported dependencies search mechanism '${dependency_search_mechanism}'")
         endif()
@@ -170,5 +207,6 @@ endif()
 
 # Export the list of codecs to the parent CMake file to print statistics
 #
+set(SAIL_CODECS_INTERFACE_LINK_LIBRARIES ${SAIL_CODECS_INTERFACE_LINK_LIBRARIES} PARENT_SCOPE)
 set(ENABLED_CODECS ${ENABLED_CODECS} PARENT_SCOPE)
 set(DISABLED_CODECS ${DISABLED_CODECS} PARENT_SCOPE)
