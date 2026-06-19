@@ -122,7 +122,7 @@ jobs:
         submodules: recursive
 
     - name: Cache vcpkg
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: vcpkg
         key: vcpkg-${{ matrix.config.triplet }}-${{ hashFiles('vcpkg.json') }}

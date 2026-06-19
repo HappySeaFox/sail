@@ -27,7 +27,7 @@ jobs:
         submodules: recursive
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -48,7 +48,7 @@ jobs:
 
     - name: Cache vcpkg (Windows)
       if: runner.os == 'Windows'
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: vcpkg
         key: vcpkg-${{ env.VCPKG_TARGET_TRIPLET }}-${{ hashFiles('vcpkg.json') }}
@@ -162,7 +162,7 @@ jobs:
         python -m sailpy.examples.11_advanced_saving
 
     - name: Upload wheels as artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
         path: src/bindings/sail-python/wheelhouse/*.whl
@@ -178,7 +178,7 @@ jobs:
         submodules: recursive
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
 
     - name: Install Python build tools
       run: |
@@ -190,7 +190,7 @@ jobs:
       run: python -m build --sdist
 
     - name: Upload sdist as artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: sdist
         path: src/bindings/sail-python/dist/*.tar.gz
@@ -209,14 +209,14 @@ jobs:
 
     steps:
     - name: Download all wheels
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         pattern: wheels-*
         path: dist
         merge-multiple: true
 
     - name: Download sdist
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: sdist
         path: dist
