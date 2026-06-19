@@ -68,8 +68,8 @@ if (MATH_LIBRARY)
 endif()
 
 if (SAIL_MANIP_SWSCALE_ENABLED)
-    target_include_directories(sail-manip PRIVATE ${SAIL_SWSCALE_INCLUDE_DIR})
-    target_link_libraries(sail-manip PRIVATE ${SAIL_SWSCALE_LIBS})
+    target_include_directories(sail-manip PRIVATE ${SAIL_SWSCALE_INCLUDE_DIR} ${SAIL_AVUTIL_INCLUDE_DIR})
+    target_link_libraries(sail-manip PRIVATE ${SAIL_SWSCALE_LIBS} ${SAIL_AVUTIL_LIBS})
     target_compile_definitions(sail-manip PRIVATE SAIL_MANIP_SWSCALE_ENABLED)
 endif()
 

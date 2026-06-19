@@ -25,15 +25,15 @@
 
 #include <stdint.h>
 
-#include <libavutil/pixfmt.h>
-#include <libswscale/swscale.h>
-
 #include <sail-common/export.h>
 #include <sail-common/sail-common.h>
 
 #include "scale_swscale.h"
 
 #ifdef SAIL_MANIP_SWSCALE_ENABLED
+
+#include <libavutil/pixfmt.h>
+#include <libswscale/swscale.h>
 
 /* Convert SailScaling enum to swscale flags. */
 int sail_scaling_to_swscale_flags(enum SailScaling algorithm)
