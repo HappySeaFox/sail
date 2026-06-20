@@ -140,6 +140,216 @@ jobs:
       run: |
         pip install wheelhouse/*.whl
         mv sailpy sailpy.backup
+
+        echo "=== Installed sailpy location ==="
+        python -c "import importlib.util; s=importlib.util.find_spec('sailpy'); print(list(s.submodule_search_locations))"
+
+        echo "=== Bundled native libraries ==="
+        python <<'PY'
+        import pathlib
+        import site
+
+        for sp in site.getsitepackages():
+            pkg = pathlib.Path(sp) / "sailpy"
+            if not pkg.is_dir():
+                continue
+            pyds = sorted(p.name for p in pkg.glob("_libsail*"))
+            dlls = sorted(p.name for p in pkg.glob("*.dll"))
+            sos = sorted(p.name for p in pkg.glob("*.so*"))
+            print(f"package dir: {pkg}")
+            print(f"extension modules: {pyds}")
+            print(f"dll count: {len(dlls)}")
+            for name in dlls:
+                print(f"  {name}")
+            print(f"shared libs: {sos}")
+            break
+        else:
+            raise SystemExit("sailpy package not found in site-packages")
+        PY
+
+        echo "=== per-DLL load (isolated) ==="
+        python <<'PY' || true
+        import ctypes
+        import os
+        import pathlib
+        import site
+        import sys
+
+        if sys.platform != "win32":
+            print("skipped (not Windows)")
+            raise SystemExit(0)
+
+        for sp in site.getsitepackages():
+            pkg = pathlib.Path(sp) / "sailpy"
+            if not pkg.is_dir():
+                continue
+            os.add_dll_directory(str(pkg))
+            print(f"package dir: {pkg}")
+            for dll in sorted(pkg.glob("*.dll")):
+                try:
+                    ctypes.WinDLL(str(dll))
+                    print(f"OK  {dll.name}")
+                except OSError as exc:
+                    winerror = getattr(exc, "winerror", None)
+                    print(f"FAIL {dll.name}: winerror={winerror} {exc}")
+            break
+        else:
+            print("sailpy package not found in site-packages")
+        PY
+
+        echo "=== heif.dll load (libde265 and libx265 preloaded) ==="
+        python <<'PY' || true
+        import ctypes
+        import os
+        import pathlib
+        import site
+        import sys
+
+        if sys.platform != "win32":
+            print("skipped (not Windows)")
+            raise SystemExit(0)
+
+        preload = ["libde265.dll", "libx265.dll"]
+
+        for sp in site.getsitepackages():
+            pkg = pathlib.Path(sp) / "sailpy"
+            if not pkg.is_dir():
+                continue
+            os.add_dll_directory(str(pkg))
+            by_name = {p.name: p for p in pkg.glob("*.dll")}
+            print(f"package dir: {pkg}")
+            for name in preload:
+                dll = by_name.get(name)
+                if dll is None:
+                    print(f"MISSING {name}")
+                    continue
+                try:
+                    ctypes.WinDLL(str(dll))
+                    print(f"OK  preload {name}")
+                except OSError as exc:
+                    winerror = getattr(exc, "winerror", None)
+                    print(f"FAIL preload {name}: winerror={winerror} {exc}")
+            heif = by_name.get("heif.dll")
+            if heif is None:
+                print("MISSING heif.dll")
+            else:
+                try:
+                    ctypes.WinDLL(str(heif))
+                    print("OK  heif.dll (after libde265 and libx265)")
+                except OSError as exc:
+                    winerror = getattr(exc, "winerror", None)
+                    print(f"FAIL heif.dll: winerror={winerror} {exc}")
+            break
+        else:
+            print("sailpy package not found in site-packages")
+        PY
+
+        echo "=== per-DLL load (cumulative, sail libs first) ==="
+        python <<'PY' || true
+        import ctypes
+        import os
+        import pathlib
+        import site
+        import sys
+
+        if sys.platform != "win32":
+            print("skipped (not Windows)")
+            raise SystemExit(0)
+
+        sail_first = [
+            "sail-common.dll",
+            "sail-manip.dll",
+            "sail-codecs.dll",
+            "sail.dll",
+            "sail-c++.dll",
+        ]
+
+        for sp in site.getsitepackages():
+            pkg = pathlib.Path(sp) / "sailpy"
+            if not pkg.is_dir():
+                continue
+            os.add_dll_directory(str(pkg))
+            by_name = {p.name: p for p in pkg.glob("*.dll")}
+            order = [by_name[n] for n in sail_first if n in by_name]
+            order += sorted(p for name, p in by_name.items() if name not in sail_first)
+            print(f"package dir: {pkg}")
+            loaded = 0
+            for dll in order:
+                try:
+                    ctypes.WinDLL(str(dll))
+                    loaded += 1
+                    print(f"OK  {dll.name} ({loaded}/{len(order)})")
+                except OSError as exc:
+                    winerror = getattr(exc, "winerror", None)
+                    print(f"FAIL {dll.name}: winerror={winerror} {exc}")
+                    print(f"stopped after {loaded} successful loads")
+                    break
+            break
+        else:
+            print("sailpy package not found in site-packages")
+        PY
+
+        echo "=== _libsail.pyd load (ctypes, skip sailpy __init__) ==="
+        python <<'PY' || true
+        import ctypes
+        import os
+        import pathlib
+        import site
+        import sys
+
+        if sys.platform != "win32":
+            print("skipped (not Windows)")
+            raise SystemExit(0)
+
+        for sp in site.getsitepackages():
+            pkg = pathlib.Path(sp) / "sailpy"
+            if not pkg.is_dir():
+                continue
+            os.add_dll_directory(str(pkg))
+            pyds = sorted(pkg.glob("_libsail*"))
+            if not pyds:
+                print("no _libsail extension found")
+                break
+            for pyd in pyds:
+                try:
+                    ctypes.WinDLL(str(pyd))
+                    print(f"OK  {pyd.name} (ctypes WinDLL)")
+                except OSError as exc:
+                    winerror = getattr(exc, "winerror", None)
+                    print(f"FAIL {pyd.name}: winerror={winerror} {exc}")
+            break
+        else:
+            print("sailpy package not found in site-packages")
+        PY
+
+        echo "=== _libsail direct load (ExtensionFileLoader, skip sailpy __init__) ==="
+        python <<'PY' || true
+        import importlib.machinery
+        import importlib.util
+        import pathlib
+        import site
+        import sys
+
+        for sp in site.getsitepackages():
+            pkg = pathlib.Path(sp) / "sailpy"
+            pyds = list(pkg.glob("_libsail*"))
+            if not pyds:
+                continue
+            pyd = pyds[0]
+            loader = importlib.machinery.ExtensionFileLoader("_libsail", str(pyd))
+            spec = importlib.util.spec_from_loader("_libsail", loader)
+            mod = importlib.util.module_from_spec(spec)
+            loader.exec_module(mod)
+            print("_libsail direct load OK")
+            print("version attr:", getattr(mod, "__version__", "n/a"))
+            sys.exit(0)
+
+        print("sailpy._libsail not found in site-packages")
+        PY
+
+        echo "=== full sailpy import (verbose tail) ==="
+        python -v -c "import sailpy; print('sailpy version:', sailpy.__version__)" 2>&1 | tail -80 || true
+
         python -c "import sailpy; print('sailpy version:', sailpy.__version__)"
 
     - name: Install test dependencies

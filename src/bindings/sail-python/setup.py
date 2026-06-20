@@ -68,6 +68,124 @@ def sail_version():
     _, version = find_sail_root()
     return version
 
+def _find_dumpbin():
+    """Locate dumpbin.exe from the latest MSVC installation."""
+    if not sys.platform.startswith('win'):
+        return None
+
+    pf_x86 = os.environ.get('ProgramFiles(x86)')
+    if not pf_x86:
+        pf_x86 = os.path.join(os.environ.get('SystemDrive', 'C:'), 'Program Files (x86)')
+
+    vswhere = os.path.join(pf_x86, 'Microsoft Visual Studio', 'Installer', 'vswhere.exe')
+    if not os.path.isfile(vswhere):
+        return None
+
+    try:
+        output = subprocess.check_output(
+            [
+                vswhere,
+                '-latest',
+                '-requires', 'Microsoft.VisualStudio.Component.VC.Tools.x86.x64',
+                '-find', r'**\dumpbin.exe',
+            ],
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        return None
+
+    for line in output.splitlines():
+        line = line.strip()
+        if line:
+            return line
+
+    return None
+
+def _debug_windows_dlls(directories):
+    """Print dumpbin and ctypes diagnostics for HEIF related DLLs on Windows CI."""
+    if not sys.platform.startswith('win') or not os.environ.get('CI'):
+        return
+
+    import ctypes
+
+    names = {'heif.dll', 'libde265.dll', 'libx265.dll'}
+    dll_paths = []
+    seen = set()
+
+    for directory in directories:
+        directory = Path(directory)
+        if not directory.is_dir():
+            continue
+        for dll_path in sorted(directory.glob('*.dll')):
+            if dll_path.name.lower() not in names:
+                continue
+            key = str(dll_path.resolve()).lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            dll_paths.append(dll_path)
+
+    if not dll_paths:
+        print('Windows DLL debug: no HEIF related DLLs found')
+        return
+
+    print('=== Windows HEIF DLL debug (setup.py) ===')
+    for dll_path in dll_paths:
+        print(f'found {dll_path}')
+
+    dumpbin = _find_dumpbin()
+    if dumpbin:
+        for dll_path in dll_paths:
+            print('=' * 80)
+            print(dll_path)
+            print('=' * 80)
+            for flag in ['/headers', '/dependents', '/imports']:
+                print(f'dumpbin {flag}')
+                print('-' * 40)
+                try:
+                    output = subprocess.check_output(
+                        [dumpbin, flag, str(dll_path)],
+                        text=True,
+                        stderr=subprocess.STDOUT,
+                    )
+                    print(output)
+                except subprocess.CalledProcessError as exc:
+                    print(exc.output if exc.output else exc)
+    else:
+        print('dumpbin not found, skipping dumpbin analysis')
+
+    print('=== HEIF DLL load (ctypes, libde265 and libx265 preloaded) ===')
+    for directory in directories:
+        directory = Path(directory)
+        if not directory.is_dir():
+            continue
+        os.add_dll_directory(str(directory))
+        by_name = {p.name.lower(): p for p in directory.glob('*.dll')}
+        for preload_name in ['libde265.dll', 'libx265.dll']:
+            preload = by_name.get(preload_name)
+            if preload is None:
+                print(f'MISSING {preload_name}')
+                continue
+            try:
+                ctypes.WinDLL(str(preload))
+                print(f'OK  preload {preload_name}')
+            except OSError as exc:
+                winerror = getattr(exc, 'winerror', None)
+                print(f'FAIL preload {preload_name}: winerror={winerror} {exc}')
+
+        heif = by_name.get('heif.dll')
+        if heif is None:
+            print('MISSING heif.dll')
+        else:
+            try:
+                ctypes.WinDLL(str(heif))
+                print('OK  heif.dll (after libde265 and libx265)')
+            except OSError as exc:
+                winerror = getattr(exc, 'winerror', None)
+                print(f'FAIL heif.dll: winerror={winerror} {exc}')
+        break
+
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
@@ -213,6 +331,9 @@ class CMakeBuild(build_ext):
                         copied_count += 1
 
         print(f"Copied {copied_count} library files to {sailpy_dir} and {extdir}")
+
+        if is_windows:
+            _debug_windows_dlls([extdir, sailpy_dir] + search_dirs)
 
 
 class CustomSDist(sdist):
