@@ -533,6 +533,7 @@ void init_image(py::module_& m)
         // Buffer protocol support
         .def_buffer([](sail::image& img) -> py::buffer_info {
             bool use_uint16 = is_16bit_per_channel(img.pixel_format());
+            py::buffer_info info;
 
             if (use_uint16)
             {
@@ -544,7 +545,7 @@ void init_image(py::module_& m)
                     static_cast<py::ssize_t>(img.bytes_per_line()),
                     2 // 2 bytes per uint16
                 };
-                return py::buffer_info(img.pixels(), sizeof(uint16_t), py::format_descriptor<uint16_t>::format(), 2,
+                info = py::buffer_info(img.pixels(), sizeof(uint16_t), py::format_descriptor<uint16_t>::format(), 2,
                                        shape, strides);
             }
             else
@@ -552,9 +553,11 @@ void init_image(py::module_& m)
                 std::vector<py::ssize_t> shape   = {static_cast<py::ssize_t>(img.height()),
                                                     static_cast<py::ssize_t>(img.bytes_per_line())};
                 std::vector<py::ssize_t> strides = {static_cast<py::ssize_t>(img.bytes_per_line()), 1};
-                return py::buffer_info(img.pixels(), sizeof(uint8_t), py::format_descriptor<uint8_t>::format(), 2,
+                info = py::buffer_info(img.pixels(), sizeof(uint8_t), py::format_descriptor<uint8_t>::format(), 2,
                                        shape, strides);
             }
+
+            return info;
         })
 
         .def("__repr__",
@@ -640,14 +643,15 @@ void init_image(py::module_& m)
     // ============================================================================
 
     py::class_<sail::image_input>(m, "ImageInput", "Load images with support for animations and multi-page formats")
-        .def(py::init([](const std::string& path) {
+        .def(py::init([](py::str path) {
                  try
                  {
-                     return new sail::image_input(path);
+                     return new sail::image_input(path.cast<std::string>());
                  }
                  catch (const std::exception& e)
                  {
-                     throw std::runtime_error("Failed to open image file '" + path + "' for loading: " + e.what());
+                     throw std::runtime_error("Failed to open image file '" + path.cast<std::string>()
+                                              + "' for loading: " + e.what());
                  }
              }),
              py::arg("path"), "Open image file for loading")
@@ -660,7 +664,7 @@ void init_image(py::module_& m)
                  }
                  return new sail::image_input(buf_ptr, static_cast<std::size_t>(buf_size));
              }),
-             py::arg("data"), "Open image from bytes for loading")
+             py::arg("data"), py::keep_alive<1, 2>(), "Open image from bytes for loading")
 
         // Iterator protocol
         .def("__iter__", [](sail::image_input& input) -> sail::image_input& { return input; })

@@ -53,6 +53,30 @@ def test_image_from_bytes(test_jpeg):
     assert img.height == 32
 
 
+def test_image_input_from_bytes(test_jpeg):
+    """Test ImageInput(bytes) keeps source bytes alive"""
+    with open(test_jpeg, "rb") as f:
+        data = f.read()
+
+    input = sailpy.ImageInput(data)
+    del data
+
+    img = input.load()
+    assert img.is_valid
+    assert img.width == 32
+    assert img.height == 32
+
+
+def test_image_input_from_bytes_temporary(test_jpeg):
+    """Test ImageInput(bytes) with temporary bytes object"""
+    input = sailpy.ImageInput(open(test_jpeg, "rb").read())
+
+    img = input.load()
+    assert img.is_valid
+    assert img.width == 32
+    assert img.height == 32
+
+
 def test_image_input_single_frame(test_jpeg):
     """Test ImageInput for single frame image"""
     input = sailpy.ImageInput(str(test_jpeg))
