@@ -115,6 +115,10 @@ if (WIN32)
     endif()
 endif()
 
+if (WIN32 AND MSVC)
+    sail_windows_set_crt(STATIC_CRT ${SAIL_WINDOWS_STATIC_CRT})
+endif()
+
 if (SAIL_TSAN AND SAIL_ENABLE_OPENMP)
     message(STATUS "ThreadSanitizer is enabled, disabling OpenMP to avoid false positives")
     set(SAIL_ENABLE_OPENMP OFF CACHE BOOL "Disabled because ThreadSanitizer is enabled" FORCE)
@@ -168,8 +172,6 @@ target_compile_definitions(sail-common-flags INTERFACE SAIL_BUILD)
 # Windows CRT selection for static builds
 #
 if (WIN32 AND MSVC)
-    sail_windows_set_crt(INTERFACE_LIB sail-common-flags STATIC_CRT ${SAIL_WINDOWS_STATIC_CRT})
-
     if (BUILD_SHARED_LIBS)
         set(SAIL_WINDOWS_STATIC_CRT_DISPLAY "Dynamic (/MD) - shared build")
     else()

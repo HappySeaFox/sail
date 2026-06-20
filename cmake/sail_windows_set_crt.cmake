@@ -1,27 +1,22 @@
-# Intended to set CRT options for Windows MSVC builds on an interface library.
+# Intended to set CRT options for Windows MSVC builds.
+#
+# Must be called after SAIL_WINDOWS_STATIC_CRT and BUILD_SHARED_LIBS are known,
+# but before add_subdirectory() creates compiled targets.
 #
 # Usage:
-#   sail_windows_set_crt(INTERFACE_LIB sail-common-flags STATIC_CRT ON)  # Use /MT or /MTd
-#   sail_windows_set_crt(INTERFACE_LIB sail-common-flags STATIC_CRT OFF) # Use /MD or /MDd
+#   sail_windows_set_crt(STATIC_CRT ON)   # Use /MT or /MTd for static builds
+#   sail_windows_set_crt(STATIC_CRT OFF)  # Use /MD or /MDd
 #
 macro(sail_windows_set_crt)
-    cmake_parse_arguments(SAIL_CRT "" "INTERFACE_LIB;STATIC_CRT" "" ${ARGN})
-
-    if (NOT TARGET ${SAIL_CRT_INTERFACE_LIB})
-        message(FATAL_ERROR "sail_windows_set_crt: Interface library '${SAIL_CRT_INTERFACE_LIB}' not found.")
-    endif()
+    cmake_parse_arguments(SAIL_CRT "" "STATIC_CRT" "" ${ARGN})
 
     if (WIN32 AND MSVC)
-        if (SAIL_CRT_STATIC_CRT)
-            target_compile_options(${SAIL_CRT_INTERFACE_LIB} INTERFACE
-                $<$<CONFIG:Debug>:/MTd>
-                $<$<NOT:$<CONFIG:Debug>>:/MT>
-            )
+        # Shared DLLs must use the dynamic CRT (/MD). Static builds honor STATIC_CRT.
+        #
+        if (BUILD_SHARED_LIBS OR NOT SAIL_CRT_STATIC_CRT)
+            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL" CACHE STRING "MSVC runtime library" FORCE)
         else()
-            target_compile_options(${SAIL_CRT_INTERFACE_LIB} INTERFACE
-                $<$<CONFIG:Debug>:/MDd>
-                $<$<NOT:$<CONFIG:Debug>>:/MD>
-            )
+            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "MSVC runtime library" FORCE)
         endif()
     endif()
 endmacro()
