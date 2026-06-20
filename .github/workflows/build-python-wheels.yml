@@ -46,12 +46,14 @@ jobs:
       run: |
         brew install ffmpeg giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libraw libtiff openexr openjpeg resvg webp
 
-    - name: Cache vcpkg (Windows)
+    - name: Restore vcpkg cache (Windows)
       if: runner.os == 'Windows'
-      uses: actions/cache@v5
+      id: vcpkg-cache
+      uses: actions/cache/restore@v5
       with:
         path: vcpkg
-        key: vcpkg-${{ env.VCPKG_TARGET_TRIPLET }}-${{ hashFiles('vcpkg.json') }}
+        key: vcpkg-${{ env.VCPKG_TARGET_TRIPLET }}-${{ hashFiles('vcpkg.json') }}-${{ github.run_id }}
+        restore-keys: vcpkg-${{ env.VCPKG_TARGET_TRIPLET }}-${{ hashFiles('vcpkg.json') }}-
 
     - name: Set up vcpkg (Windows)
       if: runner.os == 'Windows'
@@ -160,6 +162,13 @@ jobs:
         python -m sailpy.examples.09_image_transformations
         python -m sailpy.examples.10_enum_usage
         python -m sailpy.examples.11_advanced_saving
+
+    - name: Save vcpkg cache (Windows)
+      if: success() && runner.os == 'Windows'
+      uses: actions/cache/save@v5
+      with:
+        path: vcpkg
+        key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
 
     - name: Upload wheels as artifacts
       uses: actions/upload-artifact@v6

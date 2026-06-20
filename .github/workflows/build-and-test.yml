@@ -121,11 +121,13 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Cache vcpkg
-      uses: actions/cache@v5
+    - name: Restore vcpkg cache
+      id: vcpkg-cache
+      uses: actions/cache/restore@v5
       with:
         path: vcpkg
-        key: vcpkg-${{ matrix.config.triplet }}-${{ hashFiles('vcpkg.json') }}
+        key: vcpkg-${{ matrix.config.triplet }}-${{ hashFiles('vcpkg.json') }}-${{ github.run_id }}
+        restore-keys: vcpkg-${{ matrix.config.triplet }}-${{ hashFiles('vcpkg.json') }}-
 
     - name: Set up vcpkg
       shell: bash
@@ -196,3 +198,10 @@ jobs:
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
         cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
+
+    - name: Save vcpkg cache
+      if: success()
+      uses: actions/cache/save@v5
+      with:
+        path: vcpkg
+        key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
