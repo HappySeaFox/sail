@@ -196,6 +196,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io* io,
 
     webp_state->webp_demux = WebPDemux(&data);
 
+    if (webp_state->webp_demux == NULL)
+    {
+        SAIL_LOG_ERROR("WEBP: Failed to create demuxer");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     SAIL_TRY(sail_malloc(sizeof(WebPIterator), &ptr));
     webp_state->webp_iterator = ptr;
 
@@ -266,12 +272,20 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io* io,
         image_local->source_image->compression = SAIL_COMPRESSION_WEBP;
     }
 
-    image_local->width          = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
-    image_local->height         = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);
+    image_local->width  = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_WIDTH);
+    image_local->height = WebPDemuxGetI(webp_state->webp_demux, WEBP_FF_CANVAS_HEIGHT);
+
+    if (image_local->width == 0 || image_local->height == 0)
+    {
+        SAIL_LOG_ERROR("WEBP: Invalid canvas dimensions %ux%u", image_local->width, image_local->height);
+        sail_destroy_image(image_local);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
     image_local->pixel_format   = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
-    webp_state->bytes_per_pixel = image_local->bytes_per_line / image_local->width;
+    webp_state->bytes_per_pixel = sail_bits_per_pixel(image_local->pixel_format) / 8;
 
     /* Fetch ICCP. */
     if (webp_state->load_options->options & SAIL_OPTION_ICCP)

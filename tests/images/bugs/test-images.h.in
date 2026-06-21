@@ -17,6 +17,7 @@ static const char * const SAIL_TEST_IMAGES_MUST_FAIL[] = {
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_WEBP
+    "@SAIL_TEST_IMAGES_PATH@/webp/GHSA-5g8g-g347-84m8.webp",
     "@SAIL_TEST_IMAGES_PATH@/webp/TALOS-2025-2224.webp",
 #endif
 
