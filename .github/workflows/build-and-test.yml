@@ -78,27 +78,27 @@ jobs:
         export DYLD_LIBRARY_PATH=/usr/local/lib:$DYLD_LIBRARY_PATH
         /usr/local/bin/sail --version
 
-    - name: Test external C API link
+    - name: Test external C API link (CMake)
+      working-directory: tests/external/link/c
       run: |
-        rm -rf tests/external/link/c/build
-        mkdir tests/external/link/c/build
-        cmake -S tests/external/link/c -B tests/external/link/c/build \
-          -DCMAKE_BUILD_TYPE=Debug \
+        mkdir build-cmake
+        cmake -S . -B build-cmake        \
+          -DCMAKE_BUILD_TYPE=Debug       \
           -DSAIL_ASAN=${{ matrix.asan }} \
           -DSAIL_TSAN=${{ matrix.tsan }}
-        cmake --build tests/external/link/c/build -j$(nproc)
-        tests/external/link/c/build/external-c-api-link
+        cmake --build build-cmake -j$(nproc)
+        build-cmake/external-c-api-link
 
-    - name: Test external C++ API link
+    - name: Test external C++ API link (CMake)
+      working-directory: tests/external/link/c++
       run: |
-        rm -rf tests/external/link/c++/build
-        mkdir tests/external/link/c++/build
-        cmake -S tests/external/link/c++ -B tests/external/link/c++/build \
-          -DCMAKE_BUILD_TYPE=Debug \
+        mkdir build-cmake
+        cmake -S . -B build-cmake        \
+          -DCMAKE_BUILD_TYPE=Debug       \
           -DSAIL_ASAN=${{ matrix.asan }} \
           -DSAIL_TSAN=${{ matrix.tsan }}
-        cmake --build tests/external/link/c++/build -j$(nproc)
-        tests/external/link/c++/build/external-c++-api-link
+        cmake --build build-cmake -j$(nproc)
+        build-cmake/external-c++-api-link
 
   build-windows:
     name: Build and Test on Windows - ${{ matrix.config.name }}
@@ -173,31 +173,31 @@ jobs:
         $env:PATH = "$env:SAIL_INSTALL_BIN;$env:PATH"
         C:/SAIL/bin/sail.exe --version
 
-    - name: Test external C API link
+    - name: Test external C API link (CMake)
       working-directory: tests/external/link/c
       run: |
-        mkdir build
-        cmake -S . -B build `
+        mkdir build-cmake
+        cmake -S . -B build-cmake `
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
           -DCMAKE_C_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
-        cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
+        cmake --build build-cmake --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
-    - name: Test external C++ API link
+    - name: Test external C++ API link (CMake)
       working-directory: tests/external/link/c++
       run: |
-        mkdir build
-        cmake -S . -B build `
+        mkdir build-cmake
+        cmake -S . -B build-cmake `
           -DCMAKE_BUILD_TYPE=Debug `
           -DCMAKE_PREFIX_PATH=C:/SAIL/lib/cmake `
           -DCMAKE_CXX_FLAGS_DEBUG=${{ matrix.config.appflags }} `
           -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake `
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} `
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
-        cmake --build build --config Debug "-j$env:NUMBER_OF_PROCESSORS"
+        cmake --build build-cmake --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
     - name: Save vcpkg cache
       if: success()
