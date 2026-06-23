@@ -98,8 +98,9 @@ set(PUBLIC_HEADERS abstract_io.h
                    utils.h
                    variant.h)
 
+set(VERSION ${PROJECT_VERSION})
 set_target_properties(sail-c++ PROPERTIES
-                               VERSION ${PROJECT_VERSION}
+                               VERSION ${VERSION}
                                SOVERSION ${PROJECT_VERSION_MAJOR}
                                PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
@@ -119,7 +120,6 @@ target_link_libraries(sail-c++ PUBLIC sail-common sail sail-manip)
 
 # pkg-config integration
 #
-get_target_property(VERSION sail-c++ VERSION)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail-c++.pc.in"
                 "${CMAKE_CURRENT_BINARY_DIR}/sail-c++.pc" @ONLY)
 

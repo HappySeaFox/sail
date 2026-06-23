@@ -67,8 +67,9 @@ set(PUBLIC_HEADERS codec_bundle.h
                    sail_junior.h
                    sail_technical_diver.h)
 
+set(VERSION ${PROJECT_VERSION})
 set_target_properties(sail PROPERTIES
-                           VERSION ${PROJECT_VERSION}
+                           VERSION ${VERSION}
                            SOVERSION ${PROJECT_VERSION_MAJOR}
                            PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
@@ -114,7 +115,9 @@ endif()
 
 # pkg-config integration
 #
-get_target_property(VERSION sail VERSION)
+if (SAIL_COMBINE_CODECS)
+    set(SAIL_CODECS_DEPENDENCY_FOR_PKG_CONFIG "sail-codecs")
+endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail.pc.in"
                 "${CMAKE_CURRENT_BINARY_DIR}/sail.pc" @ONLY)
 

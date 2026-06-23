@@ -6,6 +6,6 @@ includedir=@SAIL_INCLUDEDIR_FOR_PKG_CONFIG@/sail
 Name: sail
 Description: SAIL client library
 Version: @VERSION@
-Requires: sail-common
+Requires: sail-common @SAIL_CODECS_DEPENDENCY_FOR_PKG_CONFIG@
 Libs: -L${libdir} -lsail
 Cflags: -I${includedir}

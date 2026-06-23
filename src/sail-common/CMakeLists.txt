@@ -90,8 +90,9 @@ set(PUBLIC_HEADERS common.h
                    variant.h
                    variant_node.h)
 
+set(VERSION ${PROJECT_VERSION})
 set_target_properties(sail-common PROPERTIES
-                                  VERSION ${PROJECT_VERSION}
+                                  VERSION ${VERSION}
                                   SOVERSION ${PROJECT_VERSION_MAJOR}
                                   PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
@@ -119,7 +120,6 @@ target_include_directories(sail-common
 
 # pkg-config integration
 #
-get_target_property(VERSION sail-common VERSION)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail-common.pc.in"
                 "${CMAKE_CURRENT_BINARY_DIR}/sail-common.pc" @ONLY)
 
