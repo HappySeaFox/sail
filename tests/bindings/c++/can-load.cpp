@@ -221,7 +221,9 @@ static MunitResult test_can_probe_then_load(const MunitParameter params[], void*
 
     sail::image_input input(path);
 
-    auto [probed, codec_info] = input.probe();
+    const auto probe_result           = input.probe();
+    const sail::image probed          = std::get<0>(probe_result);
+    const sail::codec_info codec_info = std::get<1>(probe_result);
 
     /* Some acceptance images such as VIDEO are detected by path, not by magic. */
     if (!codec_info.is_valid())
