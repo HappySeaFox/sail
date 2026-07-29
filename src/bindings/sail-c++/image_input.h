@@ -123,7 +123,11 @@ public:
      *
      * This method is pretty fast because it doesn't decode the whole image data for most image formats.
      *
-     * Returns an invalid image on error.
+     * On success, the returned image has valid dimensions and other properties, but no pixel
+     * data. Therefore image::is_valid() always returns false for a probed image. Check success
+     * with codec_info::is_valid() instead.
+     *
+     * Returns an invalid codec info on error.
      */
     std::tuple<image, codec_info> probe();
 
