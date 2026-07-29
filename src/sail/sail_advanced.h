@@ -46,6 +46,9 @@ struct sail_image;
  *
  * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
+ * On success, the I/O position is restored to where it was before probing, so subsequent loading
+ * from the same I/O source can continue from the original position. The I/O source must be seekable.
+ *
  * Typical usage: This is a standalone function that could be called at any time.
  *
  * Returns SAIL_OK on success.

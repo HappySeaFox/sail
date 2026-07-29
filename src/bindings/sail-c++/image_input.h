@@ -123,6 +123,9 @@ public:
      *
      * This method is pretty fast because it doesn't decode the whole image data for most image formats.
      *
+     * On success, the I/O position is restored to where it was before probing, so next_frame() can
+     * be called on the same image_input. The I/O source must be seekable.
+     *
      * On success, the returned image has valid dimensions and other properties, but no pixel
      * data. Therefore image::is_valid() always returns false for a probed image. Check success
      * with codec_info::is_valid() instead.

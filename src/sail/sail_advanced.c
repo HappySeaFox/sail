@@ -25,6 +25,7 @@
 
 #include <stddef.h>
 #include <stdint.h> /* SIZE_MAX */
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <sail/sail.h>
@@ -32,6 +33,9 @@
 sail_status_t sail_probe_io(struct sail_io* io, struct sail_image** image, const struct sail_codec_info** codec_info)
 {
     SAIL_CHECK_PTR(io);
+
+    size_t saved_offset;
+    SAIL_TRY(io->tell(io->stream, &saved_offset));
 
     const struct sail_codec_info* codec_info_noop;
     const struct sail_codec_info** codec_info_local = codec_info == NULL ? &codec_info_noop : codec_info;
@@ -53,9 +57,12 @@ sail_status_t sail_probe_io(struct sail_io* io, struct sail_image** image, const
     SAIL_TRY_OR_CLEANUP(codec->v8->load_seek_next_frame(state, &image_local),
                         /* cleanup */ codec->v8->load_finish(&state), sail_destroy_load_options(load_options_local));
     SAIL_TRY_OR_CLEANUP(codec->v8->load_finish(&state),
-                        /* ceanup */ sail_destroy_image(image_local), sail_destroy_load_options(load_options_local));
+                        /* cleanup */ sail_destroy_image(image_local), sail_destroy_load_options(load_options_local));
 
     sail_destroy_load_options(load_options_local);
+
+    SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)saved_offset, SEEK_SET),
+                        /* cleanup */ sail_destroy_image(image_local));
 
     *image = image_local;
 

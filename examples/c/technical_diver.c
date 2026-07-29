@@ -264,10 +264,7 @@ int main(int argc, char* argv[])
     printf("Detected codec: %s [%s]\n", codec_info->name, codec_info->description);
     sail_destroy_image(probed_image);
 
-    /* Reset I/O position to beginning. */
-    io->seek(io->stream, 0, SEEK_SET);
-
-    /* Start loading from custom I/O. */
+    /* Start loading from custom I/O. sail_probe_io() restored the I/O position. */
     void* load_state = NULL;
     SAIL_TRY_OR_EXECUTE(sail_start_loading_from_io(io, codec_info, &load_state),
                         /* on error */ sail_destroy_io(io);

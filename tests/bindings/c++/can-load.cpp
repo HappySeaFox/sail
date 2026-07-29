@@ -213,6 +213,38 @@ static MunitResult test_can_load_io_memory5(const MunitParameter params[], void*
     return MUNIT_OK;
 }
 
+static MunitResult test_can_probe_then_load(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    sail::image_input input(path);
+
+    auto [probed, codec_info] = input.probe();
+
+    /* Some acceptance images such as VIDEO are detected by path, not by magic. */
+    if (!codec_info.is_valid())
+    {
+        return MUNIT_SKIP;
+    }
+
+    munit_assert(probed.width() > 0);
+    munit_assert(probed.height() > 0);
+    munit_assert_false(probed.is_valid());
+
+    const unsigned probed_width  = probed.width();
+    const unsigned probed_height = probed.height();
+
+    sail::image image;
+    munit_assert(input.next_frame(&image) == SAIL_OK);
+    munit_assert(image.is_valid());
+    munit_assert(image.width() == probed_width);
+    munit_assert(image.height() == probed_height);
+
+    return MUNIT_OK;
+}
+
 static MunitParameterEnum test_params[] = {
     {(char*)"path", (char**)SAIL_TEST_IMAGES},
     {NULL, NULL},
@@ -228,6 +260,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/can-load-io-memory3", test_can_load_io_memory3, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-load-io-memory4", test_can_load_io_memory4, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-load-io-memory5", test_can_load_io_memory5, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-probe-then-load", test_can_probe_then_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
