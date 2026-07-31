@@ -507,6 +507,53 @@ static MunitResult test_advanced_probe_then_load_from_io(const MunitParameter pa
     return MUNIT_OK;
 }
 
+/* Test that sail_probe_io_with_options uses an explicitly selected codec. */
+static MunitResult test_advanced_probe_io_with_options(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    const struct sail_codec_info* codec_info = NULL;
+    munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
+    munit_assert_not_null(codec_info);
+
+    struct sail_io* io = NULL;
+    munit_assert(sail_alloc_io_read_file(path, &io) == SAIL_OK);
+
+    struct sail_image* probed_image  = NULL;
+    const sail_status_t probe_status = sail_probe_io_with_options(io, codec_info, NULL, &probed_image);
+
+    if (probe_status != SAIL_OK)
+    {
+        sail_destroy_io(io);
+        return MUNIT_SKIP;
+    }
+
+    munit_assert_not_null(probed_image);
+    munit_assert(sail_check_image_skeleton_valid(probed_image) == SAIL_OK);
+    munit_assert_null(probed_image->pixels);
+
+    const unsigned probed_width  = probed_image->width;
+    const unsigned probed_height = probed_image->height;
+    sail_destroy_image(probed_image);
+
+    void* state = NULL;
+    munit_assert(sail_start_loading_from_io(io, codec_info, &state) == SAIL_OK);
+
+    struct sail_image* image = NULL;
+    munit_assert(sail_load_next_frame(state, &image) == SAIL_OK);
+    munit_assert(sail_check_image_valid(image) == SAIL_OK);
+    munit_assert(image->width == probed_width);
+    munit_assert(image->height == probed_height);
+
+    sail_destroy_image(image);
+    munit_assert(sail_stop_loading(state) == SAIL_OK);
+    sail_destroy_io(io);
+
+    return MUNIT_OK;
+}
+
 // clang-format off
 static MunitParameterEnum test_params[] = {
     { (char *)"path", (char **)SAIL_TEST_IMAGES },
@@ -526,6 +573,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/stop-saving-null",            test_advanced_stop_saving_null,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/roundtrip",                   test_advanced_roundtrip,                   NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/probe-then-load-from-io",     test_advanced_probe_then_load_from_io,     NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/probe-io-with-options",       test_advanced_probe_io_with_options,       NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

@@ -60,6 +60,7 @@ public:
     }
 
     sail_status_t start();
+    std::tuple<image, sail::codec_info> probe();
 
 private:
     std::unique_ptr<sail::abstract_io> abstract_io;
@@ -115,6 +116,38 @@ sail_status_t image_input::pimpl::start()
                                                      sail_load_options, &state));
 
     return SAIL_OK;
+}
+
+std::tuple<image, sail::codec_info> image_input::pimpl::probe()
+{
+    if (!override_codec_info)
+    {
+        codec_info = abstract_io_ref.codec_info();
+    }
+
+    if (!codec_info.is_valid())
+    {
+        return {};
+    }
+
+    const sail_codec_info* sail_codec_info = codec_info.sail_codec_info_c();
+
+    sail_load_options* sail_load_options = nullptr;
+    sail_image* sail_image               = nullptr;
+
+    SAIL_AT_SCOPE_EXIT(sail_destroy_load_options(sail_load_options); sail_destroy_image(sail_image););
+
+    if (override_load_options)
+    {
+        SAIL_TRY_OR_EXECUTE(load_options.to_sail_load_options(&sail_load_options),
+                            /* on error */ return {});
+    }
+
+    SAIL_TRY_OR_EXECUTE(
+        sail_probe_io_with_options(&abstract_io_adapter->sail_io_c(), sail_codec_info, sail_load_options, &sail_image),
+        /* on error */ return {});
+
+    return std::tuple<image, sail::codec_info>{image(sail_image), codec_info};
 }
 
 image_input::image_input(const std::string& path)
@@ -228,18 +261,7 @@ sail_status_t image_input::finish()
 
 std::tuple<image, codec_info> image_input::probe()
 {
-    const sail_codec_info* sail_codec_info;
-    sail_image* sail_image = nullptr;
-
-
-    SAIL_AT_SCOPE_EXIT(
-        sail_destroy_image(sail_image);
-    );
-
-    SAIL_TRY_OR_EXECUTE(sail_probe_io(&d->abstract_io_adapter->sail_io_c(), &sail_image, &sail_codec_info),
-                        /* on error */ return {});
-
-    return std::tuple<image, codec_info>{image(sail_image), codec_info(sail_codec_info)};
+    return d->probe();
 }
 
 } // namespace sail

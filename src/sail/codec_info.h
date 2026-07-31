@@ -119,6 +119,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char* path, const stru
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *
+ * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
+ * codec may be incorrect. Prefer sail_codec_info_from_path() when the file path is known.
+ *
  * Typical usage: sail_codec_info_by_magic_number_from_path() ->
  *                sail_start_loading_from_file()              ->
  *                sail_load_next_frame()                      ->
@@ -134,6 +137,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char* 
  * The comparison algorithm is case insensitive.
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ *
+ * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
+ * codec may be incorrect. Prefer sail_codec_info_from_path() when the file path is known.
  *
  * Typical usage: sail_codec_info_by_magic_number_from_memory() ->
  *                sail_start_loading_from_file()                ->
@@ -153,6 +159,9 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void
  *
  * Not all codecs support magic numbers. That's why it's not guaranteed that this function
  * returns a valid codec info object.
+ *
+ * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
+ * codec may be incorrect. Prefer sail_codec_info_from_path() when the file path is known.
  *
  * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
  *

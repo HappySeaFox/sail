@@ -59,6 +59,10 @@ public:
      * Not all codecs support magic numbers. That's why it's not guaranteed that this method
      * returns a valid codec info object.
      *
+     * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
+     * codec may be incorrect. Prefer codec_info::from_path() or an explicit codec when the
+     * format is known.
+     *
      * Returns an invalid codec info object on error.
      */
     sail::codec_info codec_info() override;

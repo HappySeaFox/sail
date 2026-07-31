@@ -36,9 +36,34 @@ extern "C"
 #endif
 
 struct sail_codec_info;
+struct sail_image;
 struct sail_io;
 struct sail_load_options;
 struct sail_save_options;
+
+/*
+ * Loads an image from the specified I/O source and returns its properties without pixels.
+ * Pass codec info if you would like to probe with a specific codec. If not, just pass NULL,
+ * and SAIL will detect it by magic number. If you do not need specific load options, just
+ * pass NULL. Codec-specific defaults will be used in this case.
+ *
+ * This function is pretty fast because it doesn't decode the whole image data for most image formats.
+ *
+ * When codec info is NULL, the codec is selected by magic number. Some formats share the same
+ * magic numbers (for example TIFF and DNG), so the selected codec may be incorrect. Prefer an
+ * explicit codec info or sail_probe_file() when the format is known.
+ *
+ * On success, the I/O position is restored to where it was before probing, so subsequent loading
+ * from the same I/O source can continue from the original position. The I/O source must be seekable.
+ *
+ * Typical usage: This is a standalone function that could be called at any time.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_probe_io_with_options(struct sail_io* io,
+                                                     const struct sail_codec_info* codec_info,
+                                                     const struct sail_load_options* load_options,
+                                                     struct sail_image** image);
 
 /*
  * Starts loading the specified image file with the specified load options. Pass codec info if you would like

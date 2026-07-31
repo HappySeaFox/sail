@@ -149,6 +149,9 @@ public:
      * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case insensitive.
      *
+     * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
+     * codec may be incorrect. Prefer from_path() when the file path is known.
+     *
      * Typical usage: codec_info::from_magic_number() ->
      *                image_input::start()            ->
      *                image_input::next_frame()       ->
@@ -161,6 +164,9 @@ public:
      * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case insensitive.
      *
+     * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
+     * codec may be incorrect. Prefer from_path() when the file path is known.
+     *
      * Typical usage: codec_info::from_magic_number() ->
      *                image_input::start()            ->
      *                image_input::next_frame()       ->
@@ -172,6 +178,9 @@ public:
      * Returns a first codec info object that supports the magic number read from the specified I/O source.
      * Returns an invalid codec info object if no suitable codec was found.
      * The comparison algorithm is case insensitive.
+     *
+     * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
+     * codec may be incorrect. Prefer from_path() when the file path is known.
      *
      * Typical usage: codec_info::from_magic_number() ->
      *                image_input::start()            ->

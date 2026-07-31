@@ -60,35 +60,13 @@ sail_status_t sail_probe_file(const char* path, struct sail_image** image, const
     SAIL_TRY_OR_EXECUTE(sail_codec_info_from_path(path, codec_info_local),
                         /* cleanup */ SAIL_TRY(probe_file_with_io(path, image, codec_info)));
 
-    const struct sail_codec* codec;
-    SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
-
-    struct sail_load_options* load_options_local;
-    SAIL_TRY(sail_alloc_load_options_from_features((*codec_info_local)->load_features, &load_options_local));
-
     struct sail_io* io;
-    SAIL_TRY_OR_CLEANUP(sail_alloc_io_read_file(path, &io),
-                        /* cleanup */ sail_destroy_load_options(load_options_local));
+    SAIL_TRY(sail_alloc_io_read_file(path, &io));
 
-    void* state = NULL;
-    SAIL_TRY_OR_CLEANUP(codec->v8->load_init(io, load_options_local, &state),
-                        /* cleanup */ codec->v8->load_finish(&state), sail_destroy_io(io),
-                        sail_destroy_load_options(load_options_local));
+    SAIL_TRY_OR_CLEANUP(sail_probe_io_with_options(io, *codec_info_local, NULL, image),
+                        /* cleanup */ sail_destroy_io(io));
 
-    struct sail_image* image_local;
-
-    SAIL_TRY_OR_CLEANUP(codec->v8->load_seek_next_frame(state, &image_local),
-                        /* cleanup */ codec->v8->load_finish(&state), sail_destroy_load_options(load_options_local),
-                        sail_destroy_io(io));
-
-    SAIL_TRY_OR_CLEANUP(codec->v8->load_finish(&state),
-                        /* cleanup */ sail_destroy_image(image_local), sail_destroy_load_options(load_options_local),
-                        sail_destroy_io(io));
-
-    sail_destroy_load_options(load_options_local);
     sail_destroy_io(io);
-
-    *image = image_local;
 
     return SAIL_OK;
 }

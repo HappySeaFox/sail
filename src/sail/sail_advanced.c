@@ -34,37 +34,11 @@ sail_status_t sail_probe_io(struct sail_io* io, struct sail_image** image, const
 {
     SAIL_CHECK_PTR(io);
 
-    size_t saved_offset;
-    SAIL_TRY(io->tell(io->stream, &saved_offset));
-
     const struct sail_codec_info* codec_info_noop;
     const struct sail_codec_info** codec_info_local = codec_info == NULL ? &codec_info_noop : codec_info;
 
     SAIL_TRY(sail_codec_info_by_magic_number_from_io(io, codec_info_local));
-
-    const struct sail_codec* codec;
-    SAIL_TRY(load_codec_by_codec_info(*codec_info_local, &codec));
-
-    struct sail_load_options* load_options_local;
-    SAIL_TRY(sail_alloc_load_options_from_features((*codec_info_local)->load_features, &load_options_local));
-
-    void* state = NULL;
-    SAIL_TRY_OR_CLEANUP(codec->v8->load_init(io, load_options_local, &state),
-                        /* cleanup */ codec->v8->load_finish(&state), sail_destroy_load_options(load_options_local));
-
-    struct sail_image* image_local;
-
-    SAIL_TRY_OR_CLEANUP(codec->v8->load_seek_next_frame(state, &image_local),
-                        /* cleanup */ codec->v8->load_finish(&state), sail_destroy_load_options(load_options_local));
-    SAIL_TRY_OR_CLEANUP(codec->v8->load_finish(&state),
-                        /* cleanup */ sail_destroy_image(image_local), sail_destroy_load_options(load_options_local));
-
-    sail_destroy_load_options(load_options_local);
-
-    SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)saved_offset, SEEK_SET),
-                        /* cleanup */ sail_destroy_image(image_local));
-
-    *image = image_local;
+    SAIL_TRY(sail_probe_io_with_options(io, *codec_info_local, NULL, image));
 
     return SAIL_OK;
 }

@@ -121,6 +121,14 @@ public:
      * Loads the image and returns its properties without pixels and the corresponding
      * codec info.
      *
+     * Codec selection matches next_frame(): path based image_input uses the file extension,
+     * memory based image_input uses the magic number, and custom I/O uses abstract_io::codec_info().
+     * Overrides from with(codec_info) and with(load_options) are honored.
+     *
+     * Some formats share the same magic numbers (for example TIFF and DNG), so memory based
+     * probing may select an incorrect codec. Prefer path based probing or with(codec_info)
+     * when the format is known.
+     *
      * This method is pretty fast because it doesn't decode the whole image data for most image formats.
      *
      * On success, the I/O position is restored to where it was before probing, so next_frame() can

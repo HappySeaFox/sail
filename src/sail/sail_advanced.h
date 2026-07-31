@@ -46,6 +46,11 @@ struct sail_image;
  *
  * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
+ * The codec is selected by magic number. Some formats share the same magic numbers
+ * (for example TIFF and DNG), so the selected codec may be incorrect. Prefer
+ * sail_probe_file() or sail_probe_io_with_options() with an explicit codec when the
+ * format is known.
+ *
  * On success, the I/O position is restored to where it was before probing, so subsequent loading
  * from the same I/O source can continue from the original position. The I/O source must be seekable.
  *
@@ -63,6 +68,11 @@ SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io* io,
  * data structure. If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode the whole image data for most image formats.
+ *
+ * The codec is selected by magic number. Some formats share the same magic numbers
+ * (for example TIFF and DNG), so the selected codec may be incorrect. Prefer
+ * sail_probe_file() or sail_probe_io_with_options() with an explicit codec when the
+ * format is known.
  *
  * Typical usage: This is a standalone function that could be called at any time.
  *

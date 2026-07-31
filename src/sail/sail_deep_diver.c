@@ -27,6 +27,63 @@
 
 #include <sail/sail.h>
 
+sail_status_t sail_probe_io_with_options(struct sail_io* io,
+                                         const struct sail_codec_info* codec_info,
+                                         const struct sail_load_options* load_options,
+                                         struct sail_image** image)
+{
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(image);
+
+    size_t saved_offset;
+    SAIL_TRY(io->tell(io->stream, &saved_offset));
+
+    const struct sail_codec_info* codec_info_local;
+
+    if (codec_info == NULL)
+    {
+        SAIL_TRY(sail_codec_info_by_magic_number_from_io(io, &codec_info_local));
+    }
+    else
+    {
+        codec_info_local = codec_info;
+    }
+
+    const struct sail_codec* codec;
+    SAIL_TRY(load_codec_by_codec_info(codec_info_local, &codec));
+
+    struct sail_load_options* load_options_local;
+
+    if (load_options == NULL)
+    {
+        SAIL_TRY(sail_alloc_load_options_from_features(codec_info_local->load_features, &load_options_local));
+    }
+    else
+    {
+        SAIL_TRY(sail_copy_load_options(load_options, &load_options_local));
+    }
+
+    void* state = NULL;
+    SAIL_TRY_OR_CLEANUP(codec->v8->load_init(io, load_options_local, &state),
+                        /* cleanup */ codec->v8->load_finish(&state), sail_destroy_load_options(load_options_local));
+
+    struct sail_image* image_local;
+
+    SAIL_TRY_OR_CLEANUP(codec->v8->load_seek_next_frame(state, &image_local),
+                        /* cleanup */ codec->v8->load_finish(&state), sail_destroy_load_options(load_options_local));
+    SAIL_TRY_OR_CLEANUP(codec->v8->load_finish(&state),
+                        /* cleanup */ sail_destroy_image(image_local), sail_destroy_load_options(load_options_local));
+
+    sail_destroy_load_options(load_options_local);
+
+    SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)saved_offset, SEEK_SET),
+                        /* cleanup */ sail_destroy_image(image_local));
+
+    *image = image_local;
+
+    return SAIL_OK;
+}
+
 sail_status_t sail_start_loading_from_file_with_options(const char* path,
                                                         const struct sail_codec_info* codec_info,
                                                         const struct sail_load_options* load_options,

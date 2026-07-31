@@ -225,7 +225,44 @@ static MunitResult test_can_probe_then_load(const MunitParameter params[], void*
     const sail::image probed          = std::get<0>(probe_result);
     const sail::codec_info codec_info = std::get<1>(probe_result);
 
-    /* Some acceptance images such as VIDEO are detected by path, not by magic. */
+    /* Some acceptance images cannot be probed (for example unknown codecs). */
+    if (!codec_info.is_valid())
+    {
+        return MUNIT_SKIP;
+    }
+
+    munit_assert(probed.width() > 0);
+    munit_assert(probed.height() > 0);
+    munit_assert_false(probed.is_valid());
+
+    const unsigned probed_width  = probed.width();
+    const unsigned probed_height = probed.height();
+
+    sail::image image;
+    munit_assert(input.next_frame(&image) == SAIL_OK);
+    munit_assert(image.is_valid());
+    munit_assert(image.width() == probed_width);
+    munit_assert(image.height() == probed_height);
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_can_probe_memory_then_load(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    sail::arbitrary_data contents;
+    munit_assert(sail::read_file_contents(path, &contents) == SAIL_OK);
+
+    sail::image_input input(contents);
+
+    const auto probe_result           = input.probe();
+    const sail::image probed          = std::get<0>(probe_result);
+    const sail::codec_info codec_info = std::get<1>(probe_result);
+
+    /* Memory probe uses magic numbers, so path only formats such as VIDEO are skipped. */
     if (!codec_info.is_valid())
     {
         return MUNIT_SKIP;
@@ -254,15 +291,16 @@ static MunitParameterEnum test_params[] = {
 
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/can-load-path",       test_can_load_path,       NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-load-memory",     test_can_load_memory,     NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-load-io-file",    test_can_load_io_file,    NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-load-io-memory1", test_can_load_io_memory1, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-load-io-memory2", test_can_load_io_memory2, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-load-io-memory3", test_can_load_io_memory3, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-load-io-memory4", test_can_load_io_memory4, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-load-io-memory5", test_can_load_io_memory5, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/can-probe-then-load", test_can_probe_then_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-path",              test_can_load_path,              NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-memory",            test_can_load_memory,            NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-io-file",           test_can_load_io_file,           NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-io-memory1",        test_can_load_io_memory1,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-io-memory2",        test_can_load_io_memory2,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-io-memory3",        test_can_load_io_memory3,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-io-memory4",        test_can_load_io_memory4,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-load-io-memory5",        test_can_load_io_memory5,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-probe-then-load",        test_can_probe_then_load,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/can-probe-memory-then-load", test_can_probe_memory_then_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };
