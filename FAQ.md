@@ -29,7 +29,7 @@ Table of Contents
   * [Describe the memory management techniques implemented in SAIL](#describe-the-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
     * [Loading and saving state in the C API](#loading-and-saving-state-in-the-c-api)
-    * [Borrowed vs owned pointers](#borrowed-vs-owned-pointers)
+    * [Codec info lifetime](#codec-info-lifetime)
     * [Error recovery during loading and saving](#error-recovery-during-loading-and-saving)
     * [Context modification during loading and saving](#context-modification-during-loading-and-saving)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
@@ -263,14 +263,7 @@ to `NULL` after `sail_stop_loading()`.
 **Junior API:** Functions like `sail_load_from_file()` call `sail_start_*()` and `sail_stop_*()`
 internally. The caller never sees `state`. They load only the first frame of multi-frame files.
 
-### Borrowed vs owned pointers
-
-| Pointer | Owner | Valid until | Caller must |
-|---------|-------|-------------|-------------|
-| `struct sail_image*` after load | Caller | Until `sail_destroy_image()` | Free with `sail_destroy_image()` |
-| `void* state` during load/save | SAIL | Until `sail_stop_loading()` / `sail_stop_saving()` | Call stop. Set local pointer to NULL |
-| `const struct sail_codec_info*` from `sail_codec_info_from_*()` | SAIL context | Until `sail_finish()` | Never free. Copy strings if needed longer |
-| `struct sail_image** image` on error | Untouched | N/A | No cleanup if still NULL |
+### Codec info lifetime
 
 **Keeping codec info after `sail_finish()`:** There is no public copy API in C. Copy the fields
 you need (name, version, extensions) into your own buffers before calling `sail_finish()`.
