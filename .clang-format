@@ -1,22 +1,15 @@
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments:
-  Enabled: true
+  AcrossComments:   false
   AcrossEmptyLines: false
-  AcrossComments: false
-  AlignCompound: true
-  PadOperators: true
+  AlignCompound:    true
+  Enabled:          true
+  PadOperators:     true
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
 AlwaysBreakAfterReturnType: None
 BinPackParameters: false
-BreakConstructorInitializers: BeforeComma
-PenaltyReturnTypeOnItsOwnLine: 10000
-ConstructorInitializerIndentWidth: 4
-IndentWidth: 4
-IndentExternBlock: NoIndent
-TabWidth: 4
-UseTab: Never
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeBraces: Custom
 BraceWrapping:
@@ -32,11 +25,18 @@ BraceWrapping:
   BeforeCatch:           true
   BeforeElse:            true
   SplitEmptyFunction:    true
-  SplitEmptyRecord:      true
   SplitEmptyNamespace:   true
+  SplitEmptyRecord:      true
+BreakConstructorInitializers: BeforeComma
 ColumnLimit: 120
+ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4
+IncludeBlocks: Preserve
+IndentExternBlock: NoIndent
+IndentWidth: 4
+PenaltyReturnTypeOnItsOwnLine: 10000
 PointerAlignment: Left
 ReferenceAlignment: Left
 SortIncludes: true
-IncludeBlocks: Preserve
+TabWidth: 4
+UseTab: Never
