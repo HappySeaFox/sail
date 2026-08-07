@@ -33,7 +33,11 @@
 #define QOI_FREE sail_free
 #define QOI_IMPLEMENTATION
 #define QOI_NO_STDIO
+#ifdef SAIL_HAVE_SYSTEM_QOI
+#include <qoi.h>
+#else
 #include "qoi.h"
+#endif
 
 /*
  * Codec-specific state.
