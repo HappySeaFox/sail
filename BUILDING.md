@@ -35,7 +35,7 @@ brew install libsail
 - `SAIL_MANIP_USE_SWSCALE=AUTO|ON|OFF` - Use libswscale (FFmpeg) for faster pixel format conversion in sail-manip. Provides SIMD-optimized conversions for RGB/BGR, RGBA variants, and YUV formats. `AUTO` (default): use if available, otherwise disable. `ON`: require libswscale. `OFF`: do not use. Default: `AUTO`
 - `SAIL_ONLY_CODECS="a;b;c"` - Force-enable only the codecs specified in this ';'-separated list and disable all others. Configuration fails if an enabled codec cannot find its dependencies. Supports individual codecs and codec groups by priority (e.g., `highest-priority;xbm`). Default: empty list
 - `SAIL_OPENMP_SCHEDULE="dynamic"` - OpenMP scheduling algorithm. Default: `dynamic`
-- `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `ON`
+- `SAIL_THIRD_PARTY_CODECS_PATH=ON|OFF` - Enable loading custom codecs from ';'-separated paths specified in the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable. Default: `OFF`
 - `SAIL_THREAD_SAFE=ON|OFF` - Enable thread-safe operation by locking the internal context with a mutex. Default: `ON`
 - `SAIL_TSAN=ON|OFF` - Enable ThreadSanitizer if available. Default: `OFF`
 - `SAIL_WINDOWS_INSTALL_PDB=ON|OFF` - Install PDB debug files along with libraries (MSVC only). Default: `ON`

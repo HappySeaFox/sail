@@ -92,7 +92,7 @@ public:
      *    2. Hardcoded SAIL_CODECS_PATH in config.h
      *
      * Additionally, SAIL_THIRD_PARTY_CODECS_PATH environment variable with a list of ';'-separated paths
-     * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake (the default), so you can load
+     * is searched if SAIL_THIRD_PARTY_CODECS_PATH is enabled in CMake (OFF by default), so you can load
      * your own codecs from there.
      *
      * Returns SAIL_OK on success.
