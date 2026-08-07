@@ -35,14 +35,20 @@ extern "C"
 {
 #endif
 
+/*
+ * One shot load and save functions. They call sail_start_*() and sail_stop_*() internally.
+ * The caller does not manage state. Multi frame files load only the first frame. Use the advanced
+ * API to read all frames.
+ */
+
 struct sail_image;
 struct sail_io;
 struct sail_codec_info;
 
 /*
  * Loads the specified image file and returns its properties without pixels.
- * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
- * data structure. If you don't need it, just pass NULL.
+ * The assigned codec info is a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish(). If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
@@ -57,7 +63,8 @@ SAIL_EXPORT sail_status_t sail_probe_file(const char* path,
 /*
  * Loads the specified image file and returns its properties and pixels.
  *
- * Typical usage: This is a standalone function that could be called at any time.
+ * Calls sail_start_loading_from_file() and sail_stop_loading() internally. Only the first frame
+ * is loaded for multi frame files. Use sail_start_loading_from_file() to read all frames.
  *
  * Returns SAIL_OK on success.
  */
@@ -66,7 +73,8 @@ SAIL_EXPORT sail_status_t sail_load_from_file(const char* path, struct sail_imag
 /*
  * Loads an image from the specified memory buffer and returns its properties and pixels.
  *
- * Typical usage: This is a standalone function that could be called at any time.
+ * Calls sail_start_loading_from_memory() and sail_stop_loading() internally. Only the first frame
+ * is loaded for multi frame files.
  *
  * Returns SAIL_OK on success.
  */

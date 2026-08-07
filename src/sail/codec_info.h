@@ -43,7 +43,12 @@ struct sail_save_features;
 struct sail_string_node;
 
 /*
- * A structure representing codec information.
+ * Codec metadata. Objects returned by sail_codec_info_from_*() are owned by the SAIL context.
+ *
+ * Lifetime: borrowed pointers remain valid until sail_finish() destroys the context.
+ * sail_unload_codecs() does not invalidate them. Do not free or modify these structures.
+ * To keep codec metadata after sail_finish(), copy the strings and feature data you need
+ * into your own buffers before calling sail_finish().
  */
 struct sail_codec_info
 {
@@ -97,7 +102,8 @@ typedef struct sail_codec_info sail_codec_info_t;
  * Finds a first codec info object that supports loading or saving the specified file path by its file extension.
  * For example: "/test.jpg". The path might not exist.
  *
- * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ * Returns a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish().
  *
  * Typical usage: sail_codec_info_from_path()    ->
  *                sail_start_loading_from_file() ->
@@ -117,7 +123,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_path(const char* path, const stru
  * Finds a first codec info object that supports the magic number read from the specified file.
  * The comparison algorithm is case insensitive.
  *
- * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ * Returns a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish().
  *
  * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
  * codec may be incorrect. Prefer sail_codec_info_from_path() when the file path is known.
@@ -136,7 +143,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_path(const char* 
  * Finds a first codec info object that supports the magic number read from the specified memory buffer.
  * The comparison algorithm is case insensitive.
  *
- * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ * Returns a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish().
  *
  * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
  * codec may be incorrect. Prefer sail_codec_info_from_path() when the file path is known.
@@ -163,7 +171,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_memory(const void
  * Some formats share the same magic numbers (for example TIFF and DNG), so the selected
  * codec may be incorrect. Prefer sail_codec_info_from_path() when the file path is known.
  *
- * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ * Returns a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish().
  *
  * Typical usage: sail_codec_info_by_magic_number_from_io() ->
  *                sail_start_loading_from_file()            ->
@@ -179,7 +188,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io
  * Finds a first codec info object that supports the specified file extension.
  * The comparison algorithm is case insensitive. For example: ".jpg" or "jpg".
  *
- * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ * Returns a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish().
  *
  * Typical usage: sail_codec_info_from_extension() ->
  *                sail_start_loading_from_file()   ->
@@ -200,7 +210,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_extension(const char* extension,
  * Finds a first codec info object that supports the specified mime type.
  * The comparison algorithm is case insensitive. For example: "image/jpeg".
  *
- * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ * Returns a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish().
  *
  * Typical usage: sail_codec_info_from_mime_type() ->
  *                sail_start_loading_from_file()   ->
@@ -221,7 +232,8 @@ SAIL_EXPORT sail_status_t sail_codec_info_from_mime_type(const char* mime_type,
  * Finds a first codec info object by the specified codec name.
  * The comparison algorithm is case insensitive. For example: "JPEG" or "jpeg".
  *
- * The assigned codec info MUST NOT be destroyed. It is a pointer to an internal data structure.
+ * Returns a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish().
  *
  * Typical usage: sail_codec_info_from_name()     ->
  *                sail_start_loading_from_file()  ->

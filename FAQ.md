@@ -28,6 +28,10 @@ Table of Contents
   * [I'd like to reorganize the standard SAIL folder layout on Windows](#id-like-to-reorganize-the-standard-sail-folder-layout-on-windows)
   * [Describe the memory management techniques implemented in SAIL](#describe-the-memory-management-techniques-implemented-in-sail)
     * [The memory management technique implemented in SAIL](#the-memory-management-technique-implemented-in-sail)
+    * [Loading and saving state in the C API](#loading-and-saving-state-in-the-c-api)
+    * [Borrowed vs owned pointers](#borrowed-vs-owned-pointers)
+    * [Error recovery during loading and saving](#error-recovery-during-loading-and-saving)
+    * [Context modification during loading and saving](#context-modification-during-loading-and-saving)
     * [Convention to call SAIL functions](#convention-to-call-sail-functions)
     * [External pointers stay untouched on error](#external-pointers-stay-untouched-on-error)
     * [Always set a pointer to state to NULL (C only)](#always-set-a-pointer-to-state-to-null-c-only)
@@ -234,6 +238,87 @@ in the underlying codec. Failure to call these functions will result in memory l
 
 **C++ only:** The C++ binding automatically performs cleanup in `~image_input()` or `~image_output()` destructors.
 
+### Loading and saving state in the C API
+
+Advanced and deeper APIs use a local `void* state` handle:
+
+```
+sail_start_loading_from_file(path, codec_info, &state)
+        |
+        v
+sail_load_next_frame(state, &image)   <-- may repeat for animations
+        |
+        v
+sail_stop_loading(state)              <-- always call this
+```
+
+**Ownership:** SAIL stores opaque loading state on start and frees it in `sail_stop_loading()`.
+The caller holds the `state` pointer but must not `free()` it.
+
+**After stop:** The `state` pointer becomes invalid. Do not pass it to any SAIL function. Set it
+to `NULL` after `sail_stop_loading()`.
+
+**One state per source:** Do not reuse the same `state` for two concurrent load or save operations.
+
+**Junior API:** Functions like `sail_load_from_file()` call `sail_start_*()` and `sail_stop_*()`
+internally. The caller never sees `state`. They load only the first frame of multi-frame files.
+
+### Borrowed vs owned pointers
+
+| Pointer | Owner | Valid until | Caller must |
+|---------|-------|-------------|-------------|
+| `struct sail_image*` after load | Caller | Until `sail_destroy_image()` | Free with `sail_destroy_image()` |
+| `void* state` during load/save | SAIL | Until `sail_stop_loading()` / `sail_stop_saving()` | Call stop. Set local pointer to NULL |
+| `const struct sail_codec_info*` from `sail_codec_info_from_*()` | SAIL context | Until `sail_finish()` | Never free. Copy strings if needed longer |
+| `struct sail_image** image` on error | Untouched | N/A | No cleanup if still NULL |
+
+**Keeping codec info after `sail_finish()`:** There is no public copy API in C. Copy the fields
+you need (name, version, extensions) into your own buffers before calling `sail_finish()`.
+The C++ `sail::codec_info` class copies metadata into its own storage.
+
+**`sail_unload_codecs()` vs `sail_finish()`:** `sail_unload_codecs()` frees loaded codec plugins
+but keeps codec info metadata valid. `sail_finish()` destroys everything including all codec info.
+
+### Error recovery during loading and saving
+
+**`SAIL_ERROR_NO_MORE_FRAMES`:** Normal end of an animation or multi-paged sequence. Always call
+`sail_stop_loading()` when you are done.
+
+**Any other error from `sail_load_next_frame()` or `sail_write_next_frame()`:** Always call the
+matching stop function. The result of calling load or save again with the same `state` after an
+error is unspecified.
+
+**Output pointers on error:** If `image` was `NULL` before `sail_load_next_frame()`, it stays
+`NULL` on error.
+
+Example:
+
+```C
+void *state = NULL;
+struct sail_image *image = NULL;
+
+SAIL_TRY(sail_start_loading_from_file(path, NULL, &state));
+
+SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
+                    /* cleanup */ sail_stop_loading(state),
+                                  state = NULL);
+
+/* use image */
+
+sail_destroy_image(image);
+sail_stop_loading(state);
+state = NULL;
+```
+
+### Context modification during loading and saving
+
+Do not call `sail_finish()` or `sail_unload_codecs()` between `sail_start_loading_*()` and
+`sail_stop_loading()`, or between `sail_start_saving_*()` and `sail_stop_saving()`. Doing so may
+crash because loaded codecs can be unloaded while loading or saving is in progress.
+
+The junior API is safe to combine with `sail_finish()` because each call stops loading or saving
+before returning.
+
 ### Convention to call SAIL functions
 
 Use the `SAIL_TRY()` macro when calling SAIL functions. For cleanup on error,
@@ -275,8 +360,11 @@ SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, &image),
 
 ### Always set a pointer to state to NULL (C only)
 
-C loading and saving functions require a local void pointer to state. Always initialize it to NULL before
-loading or saving. For example:
+C loading and saving functions require a local void pointer to state. Always initialize it to NULL
+before loading or saving. After `sail_stop_loading()` or `sail_stop_saving()`, set it to NULL again.
+The handle is invalid after stop. A non-NULL value makes accidental reuse easier.
+
+For example:
 
 ```C
 void *state = NULL;
@@ -284,7 +372,11 @@ void *state = NULL;
 SAIL_TRY(sail_start_loading_from_file(..., &state));
 
 SAIL_TRY_OR_CLEANUP(sail_load_next_frame(state, ...),
-                    /* cleanup */ sail_stop_loading(state));
+                    /* cleanup */ sail_stop_loading(state),
+                                  state = NULL);
+
+sail_stop_loading(state);
+state = NULL;
 ```
 
 ## Can I implement an image codec in C++?

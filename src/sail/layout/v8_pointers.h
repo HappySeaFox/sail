@@ -28,6 +28,11 @@
 #include <sail-common/sail-common.h>
 
 /*
+ * Function pointer types for codec layout V8. Each type matches one exported codec function described
+ * in layout/v8.h. libsail stores resolved pointers in struct sail_codec_layout_v8.
+ */
+
+/*
  * Decoding functions.
  */
 

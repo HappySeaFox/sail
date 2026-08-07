@@ -32,6 +32,11 @@
  */
 #define SAIL_CODEC_LAYOUT_V8 8
 
+/*
+ * Resolved function pointer table for one layout V8 codec. libsail fills this structure when loading
+ * a dynamic codec plugin or when using the combined sail-codecs library. Every pointer must be non NULL.
+ * See layout/v8.h for the contract each function must follow.
+ */
 struct sail_codec_layout_v8
 {
     sail_codec_load_init_v8_t load_init;

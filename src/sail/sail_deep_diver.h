@@ -81,9 +81,11 @@ SAIL_EXPORT sail_status_t sail_probe_io_with_options(struct sail_io* io,
  *                sail_load_next_frame()                      ->
  *                sail_stop_loading().
  *
- * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_loading(). States must be used per image. DO NOT use the same state
- * to start loading multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * loading state in it. Do not free state. Always call sail_stop_loading() when done, including
+ * on error. After sail_stop_loading() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image source. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_loading_from_file_with_options() and sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -103,9 +105,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_file_with_options(const char* 
  *                sail_load_next_frame()                        ->
  *                sail_stop_loading().
  *
- * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_loading(). States must be used per image. DO NOT use the same state
- * to start loading multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * loading state in it. Do not free state. Always call sail_stop_loading() when done, including
+ * on error. After sail_stop_loading() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image source. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_loading_from_file_with_options() and sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -131,9 +135,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_memory_with_options(const void
  *                sail_write_next_frame()                    ->
  *                sail_stop_saving().
  *
- * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_saving(). States must be used per image. DO NOT use the same state
- * to start saving multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * saving state in it. Do not free state. Always call sail_stop_saving() when done, including
+ * on error. After sail_stop_saving() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image target. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_saving_into_file_with_options() and sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -153,9 +159,11 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_file_with_options(const char* p
  *                sail_write_next_frame()                      ->
  *                sail_stop_saving().
  *
- * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
- * to start saving multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * saving state in it. Do not free state. Always call sail_stop_saving() when done, including
+ * on error. After sail_stop_saving() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image target. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_saving_into_file_with_options() and sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -167,10 +175,11 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_memory_with_options(void* buffe
 
 /*
  * Stops saving started by sail_start_saving_into_file() and brothers. Closes the underlying I/O target.
- * Assigns the number of bytes written to the 'written' argument. Does nothing if the state is NULL.
+ * Assigns the number of bytes written to the 'written' argument. Does nothing if state is NULL.
  *
- * It is essential to always stop saving to free memory and I/O resources. Failure to do so
- * will lead to memory leaks.
+ * Always call sail_stop_saving() after sail_start_saving_*(), including on error. Frees internal
+ * resources allocated by the matching start function. After this call the state handle is invalid.
+ * Set your local void* to NULL.
  *
  * Returns SAIL_OK on success.
  */

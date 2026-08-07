@@ -43,6 +43,15 @@ extern "C"
  *
  * SAIL context modification (creating, destroying, loading and unloading codecs) is guarded with a mutex
  * to avoid unpredictable errors in a multi-threaded environment.
+ *
+ * Codec info lifetime:
+ *   Pointers returned by sail_codec_info_from_*() refer to data owned by the context. They remain
+ *   valid until sail_finish() destroys the context. Do not use them after sail_finish().
+ *   sail_unload_codecs() unloads codec plugins but keeps codec info metadata valid.
+ *
+ * Do not call sail_finish() or sail_unload_codecs() between sail_start_loading_*() and
+ * sail_stop_loading(), or between sail_start_saving_*() and sail_stop_saving(). Doing so may
+ * crash because loaded codecs can be unloaded while loading or saving is in progress.
  */
 
 /*
@@ -112,10 +121,10 @@ SAIL_EXPORT sail_status_t sail_init_with_flags(int flags);
  * with sail_finish(). Subsequent attempts to load or save images will reload necessary SAIL codecs
  * from disk.
  *
- * Warning: Make sure no loading or saving operations are in progress before calling sail_unload_codecs().
- *          Failure to do so may lead to a crash.
+ * Codec info pointers returned by sail_codec_info_from_*() stay valid after this call.
  *
- * Typical usage: This is a standalone function that can be called at any time (with the restriction above).
+ * Do not call this function between sail_start_loading_*() and sail_stop_loading(), or between
+ * sail_start_saving_*() and sail_stop_saving(). Doing so may crash.
  *
  * Returns SAIL_OK on success.
  */
@@ -125,15 +134,14 @@ SAIL_EXPORT sail_status_t sail_unload_codecs(void);
  * Destroys the global static context that was implicitly or explicitly allocated by
  * loading or saving functions.
  *
- * Unloads all codecs. All pointers to codec info objects, load and save features, and codecs
- * get invalidated. Using them after calling sail_finish() may lead to a crash.
+ * Unloads all codecs and destroys all codec info objects. Every pointer previously returned by
+ * sail_codec_info_from_*(), and every pointer to load or save features inside those objects,
+ * becomes invalid. Do not dereference them after this call.
  *
  * It's possible to initialize a new global static context afterwards, implicitly or explicitly.
  *
- * Warning: Make sure no loading or saving operations are in progress before calling sail_finish().
- *          Failure to do so may lead to a crash.
- *
- * Typical usage: This is a standalone function that can be called at any time (with the restriction above).
+ * Do not call this function between sail_start_loading_*() and sail_stop_loading(), or between
+ * sail_start_saving_*() and sail_stop_saving(). Doing so may crash.
  */
 SAIL_EXPORT void sail_finish(void);
 

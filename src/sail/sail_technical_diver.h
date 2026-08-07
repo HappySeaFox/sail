@@ -49,9 +49,11 @@ struct sail_save_options;
  *                sail_stop_loading()              ->
  *                sail_destroy_io().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
- * to load multiple images from different sources at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * loading state in it. Do not free state. Always call sail_stop_loading() when done, including
+ * on error. After sail_stop_loading() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per I/O source. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_loading_from_io() and sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -71,9 +73,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_io(struct sail_io* io,
  *                sail_stop_loading()                       ->
  *                sail_destroy_io().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
- * to load multiple images from different sources at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * loading state in it. Do not free state. Always call sail_stop_loading() when done, including
+ * on error. After sail_stop_loading() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per I/O source. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_loading_from_io() and sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -93,9 +97,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_io_with_options(struct sail_io
  *                sail_stop_saving()               ->
  *                sail_destroy_io().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
- * to save multiple images to different targets at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * saving state in it. Do not free state. Always call sail_stop_saving() when done, including
+ * on error. After sail_stop_saving() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per I/O target. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_saving_into_io() and sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -115,9 +121,11 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_io(struct sail_io* io,
  *                sail_stop_saving()                       ->
  *                sail_destroy_io().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
- * to save multiple images to different targets at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * saving state in it. Do not free state. Always call sail_stop_saving() when done, including
+ * on error. After sail_stop_saving() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per I/O target. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_saving_into_io() and sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */

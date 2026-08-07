@@ -41,8 +41,8 @@ struct sail_image;
 
 /*
  * Loads an image from the specified I/O source and returns its properties without pixels.
- * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
- * data structure. If you don't need it, just pass NULL.
+ * The assigned codec info is a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish(). If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
@@ -64,8 +64,8 @@ SAIL_EXPORT sail_status_t sail_probe_io(struct sail_io* io,
 
 /*
  * Loads an image from the specified memory buffer and returns its properties without pixels.
- * The assigned codec info MUST NOT be destroyed because it is a pointer to an internal
- * data structure. If you don't need it, just pass NULL.
+ * The assigned codec info is a borrowed pointer to internal context data. Do not free or modify it.
+ * Remains valid until sail_finish(). If you don't need it, just pass NULL.
  *
  * This function is pretty fast because it doesn't decode the whole image data for most image formats.
  *
@@ -96,9 +96,11 @@ SAIL_EXPORT sail_status_t sail_probe_memory(const void* buffer,
  *                sail_load_next_frame()           ->
  *                sail_stop_loading().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_loading. States must be used per image. DO NOT use the same state
- * to start loading multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * loading state in it. Do not free state. Always call sail_stop_loading() when done, including
+ * on error. After sail_stop_loading() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image source. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_loading_from_file() and sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -114,9 +116,11 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_file(const char* path,
  *                sail_load_next_frame()           ->
  *                sail_stop_loading().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_loading(). States must be used per image. DO NOT use the same state
- * to start loading multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * loading state in it. Do not free state. Always call sail_stop_loading() when done, including
+ * on error. After sail_stop_loading() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image source. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_loading_from_file() and sail_stop_loading().
  *
  * Returns SAIL_OK on success.
  */
@@ -126,19 +130,24 @@ SAIL_EXPORT sail_status_t sail_start_loading_from_memory(const void* buffer,
                                                          void** state);
 
 /*
- * Continues loading the file started by sail_start_loading_from_file() and brothers.
+ * Continues loading started by sail_start_loading_from_file() and brothers.
  *
  * Returns SAIL_OK on success.
  * Returns SAIL_ERROR_NO_MORE_FRAMES when no more frames are available.
+ *
+ * Always call sail_stop_loading() when you are done, including after SAIL_ERROR_NO_MORE_FRAMES
+ * and after any other error. The result of calling sail_load_next_frame() again after an error
+ * is unspecified.
  */
 SAIL_EXPORT sail_status_t sail_load_next_frame(void* state, struct sail_image** image);
 
 /*
- * Stops loading the file started by sail_start_loading_from_file() and brothers.
- * Does nothing if the state is NULL.
+ * Stops loading started by sail_start_loading_from_file() and brothers.
+ * Does nothing if state is NULL.
  *
- * It is essential to always stop saving to free memory and I/O resources. Failure to do so
- * will lead to memory leaks.
+ * Always call sail_stop_loading() after sail_start_loading_*(), including on error. Frees internal
+ * resources allocated by the matching start function. After this call the state handle is invalid.
+ * Set your local void* to NULL.
  *
  * Returns SAIL_OK on success.
  */
@@ -157,9 +166,11 @@ SAIL_EXPORT sail_status_t sail_stop_loading(void* state);
  *                sail_write_next_frame()          ->
  *                sail_stop_saving().
  *
- * STATE explanation: Pass the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
- * to start saving multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * saving state in it. Do not free state. Always call sail_stop_saving() when done, including
+ * on error. After sail_stop_saving() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image target. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_saving_into_file() and sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -175,9 +186,11 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_file(const char* path,
  *                sail_write_next_frame()          ->
  *                sail_stop_saving().
  *
- * STATE explanation: Passes the address of a local void* pointer. SAIL will store an internal state
- * in it and destroy it in sail_stop_saving. States must be used per image. DO NOT use the same state
- * to start saving multiple images at the same time.
+ * STATE: Pass the address of a local void* initialized to NULL. On success, SAIL stores opaque
+ * saving state in it. Do not free state. Always call sail_stop_saving() when done, including
+ * on error. After sail_stop_saving() the state handle is invalid. Set your local void* to NULL.
+ * Use one state per image target. Do not call sail_finish() or sail_unload_codecs() between
+ * sail_start_saving_into_file() and sail_stop_saving().
  *
  * Returns SAIL_OK on success.
  */
@@ -194,16 +207,20 @@ SAIL_EXPORT sail_status_t sail_start_saving_into_memory(void* buffer,
  * Consider converting the image into a supported image format beforehand with functions
  * from sail-manip.
  *
+ * On error always call sail_stop_saving(). The result of calling sail_write_next_frame() again
+ * after an error is unspecified.
+ *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_write_next_frame(void* state, const struct sail_image* image);
 
 /*
  * Stops saving started by sail_start_saving_into_file() and brothers. Closes the underlying I/O target.
- * Does nothing if the state is NULL.
+ * Does nothing if state is NULL.
  *
- * It is essential to always stop saving to free memory and I/O resources. Failure to do so
- * will lead to memory leaks.
+ * Always call sail_stop_saving() after sail_start_saving_*(), including on error. Frees internal
+ * resources allocated by the matching start function. After this call the state handle is invalid.
+ * Set your local void* to NULL.
  *
  * Returns SAIL_OK on success.
  */

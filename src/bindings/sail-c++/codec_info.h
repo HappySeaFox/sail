@@ -265,8 +265,9 @@ public:
 
 private:
     /*
-     * Makes a deep copy of the specified codec info and stores the pointer for further use.
-     * When the SAIL context gets uninitialized, the pointer becomes dangling.
+     * Makes a deep copy of the specified codec metadata fields for further use.
+     * sail_codec_info_c() returns the original borrowed pointer which becomes invalid after
+     * sail_finish(). Prefer the accessor methods (name(), extensions(), etc.) to read copied data.
      */
     explicit codec_info(const sail_codec_info* ci);
 
