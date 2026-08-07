@@ -210,15 +210,15 @@ Codecs are combined into a dynamically linked library, so no search is required.
 1. `SAIL_CODECS_PATH` environment variable
 2. Hardcoded `SAIL_CODECS_PATH` in config.h
 
-On all platforms, if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), the `SAIL_THIRD_PARTY_CODECS_PATH`
+On all platforms, if `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (`OFF` by default), the `SAIL_THIRD_PARTY_CODECS_PATH`
 environment variable is searched for a list of ';'-separated paths containing third-party codecs.
 
 ## How can I point SAIL to my custom codecs?
 
-If `SAIL_THIRD_PARTY_CODECS_PATH` is enabled in CMake (the default), set the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable
+Compile SAIL with `-DSAIL_THIRD_PARTY_CODECS_PATH=ON`, then set the `SAIL_THIRD_PARTY_CODECS_PATH` environment variable
 to a list of ';'-separated paths containing your custom SAIL codecs.
 
-If `SAIL_THIRD_PARTY_CODECS_PATH` is `OFF`, custom codec loading is disabled.
+By default (`SAIL_THIRD_PARTY_CODECS_PATH=OFF`), custom codec loading is disabled.
 
 ## I'd like to reorganize the standard SAIL folder layout on Windows
 
