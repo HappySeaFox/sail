@@ -141,7 +141,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_hdr(void* state, st
     image_local->height = hdr_state->header.height;
 
     /* HDR uses 32-bit float RGB (96 bits total). */
-    image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP96;
+    image_local->pixel_format = SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT;
 
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
@@ -301,7 +301,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_hdr(void* state, co
     }
 
     /* HDR only supports BPP96 (32-bit float RGB). */
-    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP96)
+    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT)
     {
         SAIL_LOG_ERROR("HDR: Only BPP96 (32-bit float RGB) pixel format is supported for writing");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
@@ -336,7 +336,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_hdr(void* state, const struct
     struct hdr_codec_state* hdr_codec_state = state;
 
     /* HDR only supports BPP96 (32-bit float RGB). */
-    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP96)
+    if (image->pixel_format != SAIL_PIXEL_FORMAT_BPP96_RGB_FLOAT)
     {
         SAIL_LOG_ERROR("HDR: Only BPP96 (32-bit float RGB) pixel format is supported for writing");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
