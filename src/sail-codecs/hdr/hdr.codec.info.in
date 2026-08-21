@@ -16,7 +16,7 @@ tuning=
 
 [save-features]
 features=STATIC;META-DATA
-pixel-formats=BPP96
+pixel-formats=BPP96-RGB-FLOAT
 compressions=RLE
 default-compression=RLE
 compression-level-min=0
