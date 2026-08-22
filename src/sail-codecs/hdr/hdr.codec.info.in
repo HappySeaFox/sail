@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=0.4.0
+version=0.5.0
 priority=LOW
 name=HDR
 description=Radiance High Dynamic Range
