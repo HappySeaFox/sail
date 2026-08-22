@@ -146,6 +146,13 @@ static sail_status_t read_bmp_headers(struct sail_io* io, struct bmp_state* bmp_
     /* If the height is negative, the bitmap is top-to-bottom. */
     if (bmp_state->v2.height < 0)
     {
+        /* Negating INT32_MIN overflows int32_t as the range is asymmetric. */
+        if (bmp_state->v2.height == INT32_MIN)
+        {
+            SAIL_LOG_ERROR("BMP: Negative height %d cannot be negated as it equals INT32_MIN", bmp_state->v2.height);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+        }
+
         bmp_state->v2.height = -bmp_state->v2.height;
         bmp_state->flipped   = false;
     }
