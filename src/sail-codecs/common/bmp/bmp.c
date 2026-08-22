@@ -161,6 +161,13 @@ static sail_status_t read_bmp_headers(struct sail_io* io, struct bmp_state* bmp_
         bmp_state->flipped = true;
     }
 
+    /* A negative width is invalid and would wrap around when passed as unsigned. */
+    if (bmp_state->v2.width < 0)
+    {
+        SAIL_LOG_ERROR("BMP: Width %d must not be negative", bmp_state->v2.width);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
     switch (bmp_state->v2.size)
     {
     case SAIL_BITMAP_DIB_HEADER_V2_SIZE:
