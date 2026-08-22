@@ -395,6 +395,15 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
     if (bmp_state->version == SAIL_BMP_V1)
     {
         SAIL_TRY(bmp_private_bytes_in_row(bmp_state->v1.width, bmp_state->v1.bit_count, &bmp_state->bytes_in_row));
+
+        /* byte_width comes from the file, guard against unsigned underflow. */
+        if (bmp_state->v1.byte_width < bmp_state->bytes_in_row)
+        {
+            SAIL_LOG_ERROR("BMP: DDB byte width %u is smaller than the required row size %u", bmp_state->v1.byte_width,
+                           bmp_state->bytes_in_row);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
         bmp_state->pad_bytes = bmp_state->v1.byte_width - bmp_state->bytes_in_row;
     }
     else
