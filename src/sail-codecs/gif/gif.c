@@ -170,7 +170,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_gif(struct sail_io* io,
     }
 
     /* Initialize internal structs. */
-    if (gif_state->gif->SColorMap != NULL)
+    if (gif_state->gif->SColorMap != NULL && gif_state->gif->SBackGroundColor < gif_state->gif->SColorMap->ColorCount)
     {
         gif_state->background[0] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Red;
         gif_state->background[1] = gif_state->gif->SColorMap->Colors[gif_state->gif->SBackGroundColor].Green;
