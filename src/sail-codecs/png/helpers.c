@@ -128,9 +128,18 @@ static sail_status_t hex_string_to_meta_data_node(const char* hex_str,
 
 void png_private_my_error_fn(png_structp png_ptr, png_const_charp text)
 {
-    (void)png_ptr;
-
     SAIL_LOG_ERROR("PNG: %s", text);
+
+    /*
+     * The libpng contract requires an error callback to never return. Jump explicitly instead of
+     * relying on png_default_error() doing it for us after we return, which is an implementation detail.
+     */
+#ifdef PNG_SETJMP_SUPPORTED
+    png_longjmp(png_ptr, 1);
+#else
+    (void)png_ptr;
+    abort();
+#endif
 }
 
 void png_private_my_warning_fn(png_structp png_ptr, png_const_charp text)
