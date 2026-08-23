@@ -403,8 +403,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, st
             png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
         }
 
-        if (png_state->next_frame_width + png_state->next_frame_x_offset > image_local->width
-            || png_state->next_frame_height + png_state->next_frame_y_offset > image_local->height)
+        /*
+         * Written as subtractions to avoid png_uint_32 overflow: the offset is checked first, so the
+         * remaining canvas space (width - offset) never underflows. Do not turn this back into an
+         * addition, the sum wraps around and this is the actual bounds check, not libpng's.
+         */
+        if (png_state->next_frame_x_offset > image_local->width
+            || png_state->next_frame_width > image_local->width - png_state->next_frame_x_offset
+            || png_state->next_frame_y_offset > image_local->height
+            || png_state->next_frame_height > image_local->height - png_state->next_frame_y_offset)
         {
             sail_destroy_image(image_local);
             SAIL_LOG_ERROR("PNG: Frame %u,%u %ux%u doesn't fit into the canvas image %ux%u",
