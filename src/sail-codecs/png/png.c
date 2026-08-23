@@ -132,8 +132,8 @@ static sail_status_t alloc_png_state(const struct sail_load_options* load_option
         .next_frame_y_offset   = 0,
         .next_frame_delay_num  = 0,
         .next_frame_delay_den  = 0,
-        .next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND,
-        .next_frame_blend_op   = PNG_BLEND_OP_SOURCE,
+        .next_frame_dispose_op = SAIL_PNG_DISPOSE_OP_BACKGROUND,
+        .next_frame_blend_op   = SAIL_PNG_BLEND_OP_SOURCE,
 
         .skipped_hidden        = false,
         .prev                  = NULL,
@@ -399,8 +399,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, st
             png_state->next_frame_height     = image_local->height;
             png_state->next_frame_x_offset   = 0;
             png_state->next_frame_y_offset   = 0;
-            png_state->next_frame_dispose_op = PNG_DISPOSE_OP_BACKGROUND;
-            png_state->next_frame_blend_op   = PNG_BLEND_OP_SOURCE;
+            png_state->next_frame_dispose_op = SAIL_PNG_DISPOSE_OP_BACKGROUND;
+            png_state->next_frame_blend_op   = SAIL_PNG_BLEND_OP_SOURCE;
         }
 
         /*
@@ -472,14 +472,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void* state, struct sail_
                     png_read_row(png_state->png_ptr, (png_bytep)png_state->temp_scanline, NULL);
 
                     /* Copy all pixel values including alpha. */
-                    if (png_state->current_frame == 1 || png_state->next_frame_blend_op == PNG_BLEND_OP_SOURCE)
+                    if (png_state->current_frame == 1 || png_state->next_frame_blend_op == SAIL_PNG_BLEND_OP_SOURCE)
                     {
                         SAIL_TRY(png_private_blend_source(scanline, png_state->next_frame_x_offset,
                                                           png_state->temp_scanline, png_state->next_frame_width,
                                                           png_state->bytes_per_pixel));
                     }
                     else
-                    { /* PNG_BLEND_OP_OVER */
+                    { /* SAIL_PNG_BLEND_OP_OVER */
                         SAIL_TRY(png_private_blend_over(scanline, png_state->next_frame_x_offset,
                                                         png_state->temp_scanline, png_state->next_frame_width,
                                                         image->pixel_format));
@@ -488,18 +488,18 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_png(void* state, struct sail_
                     /* Workaround: Apply disposal method only for images with bpp >= 8. */
                     if (png_state->bytes_per_pixel > 0)
                     {
-                        if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_BACKGROUND)
+                        if (png_state->next_frame_dispose_op == SAIL_PNG_DISPOSE_OP_BACKGROUND)
                         {
                             memset(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
                                    0, (size_t)png_state->next_frame_width * png_state->bytes_per_pixel);
                         }
-                        else if (png_state->next_frame_dispose_op == PNG_DISPOSE_OP_NONE)
+                        else if (png_state->next_frame_dispose_op == SAIL_PNG_DISPOSE_OP_NONE)
                         {
                             memcpy(png_state->prev[row] + png_state->next_frame_x_offset * png_state->bytes_per_pixel,
                                    scanline, (size_t)png_state->next_frame_width * png_state->bytes_per_pixel);
                         }
                         else
-                        { /* PNG_DISPOSE_OP_PREVIOUS */
+                        { /* SAIL_PNG_DISPOSE_OP_PREVIOUS */
                         }
                     }
                 }
@@ -816,11 +816,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
         }
 
         /* Always use default dimensions (full canvas) and position (0, 0). */
-        /* Always use DISPOSE_OP_NONE and BLEND_OP_SOURCE for simplicity. */
+        /* Always use SAIL_PNG_DISPOSE_OP_NONE and SAIL_PNG_BLEND_OP_SOURCE for simplicity. */
         png_set_next_frame_fcTL(png_state->png_ptr, png_state->info_ptr, image->width, image->height,
                                 0, /* x_offset */
                                 0, /* y_offset */
-                                delay_num, delay_den, PNG_DISPOSE_OP_NONE, PNG_BLEND_OP_SOURCE);
+                                delay_num, delay_den, SAIL_PNG_DISPOSE_OP_NONE, SAIL_PNG_BLEND_OP_SOURCE);
     }
 #endif
 

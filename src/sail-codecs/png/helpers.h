@@ -33,6 +33,30 @@
 #include <sail-common/export.h>
 #include <sail-common/status.h>
 
+#ifdef PNG_APNG_SUPPORTED
+/*
+ * APNG fcTL dispose/blend constants.
+ *
+ * Upstream libpng (PNGv3, i.e. libpng 1.6.45+ / 1.8) exposes them as PNG_fcTL_DISPOSE_OP_* and
+ * PNG_fcTL_BLEND_OP_*. The older unofficial SourceForge APNG patch named them PNG_DISPOSE_OP_* and
+ * PNG_BLEND_OP_*. We use our own SAIL_PNG_* names at the call sites and bind them here to whichever
+ * set the installed libpng headers actually provide, so both old and new libpng build unchanged.
+ */
+#ifdef PNG_fcTL_DISPOSE_OP_NONE
+#define SAIL_PNG_DISPOSE_OP_NONE       PNG_fcTL_DISPOSE_OP_NONE
+#define SAIL_PNG_DISPOSE_OP_BACKGROUND PNG_fcTL_DISPOSE_OP_BACKGROUND
+#define SAIL_PNG_DISPOSE_OP_PREVIOUS   PNG_fcTL_DISPOSE_OP_PREVIOUS
+#define SAIL_PNG_BLEND_OP_SOURCE       PNG_fcTL_BLEND_OP_SOURCE
+#define SAIL_PNG_BLEND_OP_OVER         PNG_fcTL_BLEND_OP_OVER
+#else
+#define SAIL_PNG_DISPOSE_OP_NONE       PNG_DISPOSE_OP_NONE
+#define SAIL_PNG_DISPOSE_OP_BACKGROUND PNG_DISPOSE_OP_BACKGROUND
+#define SAIL_PNG_DISPOSE_OP_PREVIOUS   PNG_DISPOSE_OP_PREVIOUS
+#define SAIL_PNG_BLEND_OP_SOURCE       PNG_BLEND_OP_SOURCE
+#define SAIL_PNG_BLEND_OP_OVER         PNG_BLEND_OP_OVER
+#endif
+#endif
+
 struct sail_hash_map;
 struct sail_iccp;
 struct sail_meta_data_node;
