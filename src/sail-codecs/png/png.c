@@ -61,8 +61,8 @@ struct png_state
     int interlaced_passes;
     bool libpng_error;
     bool frame_processed;
-    int frames;
-    int current_frame;
+    png_uint_32 frames;
+    png_uint_32 current_frame;
 
     /* APNG-specific. */
 #ifdef PNG_APNG_SUPPORTED
