@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -181,6 +182,22 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void* state, st
 
     svg_state->frame_processed = true;
 
+#ifdef SAIL_RESVG
+    const resvg_size image_size = resvg_get_image_size(svg_state->resvg_tree);
+
+    const double svg_width  = image_size.width;
+    const double svg_height = image_size.height;
+#else
+    const double svg_width  = svg_state->nsvg_image->width;
+    const double svg_height = svg_state->nsvg_image->height;
+#endif
+
+    if (svg_width < 1 || svg_width > UINT_MAX || svg_height < 1 || svg_height > UINT_MAX)
+    {
+        SAIL_LOG_ERROR("SVG: Image dimensions %.0fx%.0f are out of the supported range", svg_width, svg_height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     struct sail_image* image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
 
@@ -193,15 +210,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void* state, st
         image_local->source_image->compression  = SAIL_COMPRESSION_NONE;
     }
 
-#ifdef SAIL_RESVG
-    const resvg_size image_size = resvg_get_image_size(svg_state->resvg_tree);
-
-    image_local->width  = (unsigned)image_size.width;
-    image_local->height = (unsigned)image_size.height;
-#else
-    image_local->width  = (unsigned)svg_state->nsvg_image->width;
-    image_local->height = (unsigned)svg_state->nsvg_image->height;
-#endif
+    image_local->width          = (unsigned)svg_width;
+    image_local->height         = (unsigned)svg_height;
     image_local->pixel_format   = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
