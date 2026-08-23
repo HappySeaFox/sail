@@ -194,7 +194,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_svg(void* state, st
 
     if (svg_width < 1 || svg_width > UINT_MAX || svg_height < 1 || svg_height > UINT_MAX)
     {
-        SAIL_LOG_ERROR("SVG: Image dimensions %.0fx%.0f are out of the supported range", svg_width, svg_height);
+        SAIL_LOG_ERROR("SVG: Image dimensions %fx%f are out of the supported range", svg_width, svg_height);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
