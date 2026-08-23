@@ -336,8 +336,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, st
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
+    /*
+     * Declared before setjmp and volatile so it survives a longjmp from libpng
+     * (e.g. png_read_row) and can be released in the error handler.
+     */
+    struct sail_image* volatile image_local = NULL;
+
     if (setjmp(png_jmpbuf(png_state->png_ptr)))
     {
+        sail_destroy_image(image_local);
         png_state->libpng_error = true;
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
@@ -347,8 +354,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_png(void* state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    struct sail_image* image_local;
-    SAIL_TRY(sail_copy_image(png_state->first_image, &image_local));
+    SAIL_TRY(sail_copy_image(png_state->first_image, (struct sail_image**)&image_local));
 
 #ifdef PNG_APNG_SUPPORTED
     if (png_state->is_apng)
