@@ -696,6 +696,14 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
         /* Save ICC profile. */
         if (png_state->save_options->options & SAIL_OPTION_ICCP && image->iccp != NULL)
         {
+            /*
+             * The nested setjmp below overwrites the png_struct jmp_buf. Save the outer handler
+             * and restore it afterwards, otherwise a later libpng error (png_write_info etc.) would
+             * jump back into this block and re-run the code on a broken png_struct, looping forever.
+             */
+            jmp_buf outer_jmpbuf;
+            memcpy(outer_jmpbuf, png_jmpbuf(png_state->png_ptr), sizeof(jmp_buf));
+
             if (setjmp(png_jmpbuf(png_state->png_ptr)))
             {
                 SAIL_LOG_WARNING("PNG: ICC profile was rejected (incompatible color space?)");
@@ -707,6 +715,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
 
                 SAIL_LOG_TRACE("PNG: ICC profile has been written");
             }
+
+            memcpy(png_jmpbuf(png_state->png_ptr), outer_jmpbuf, sizeof(jmp_buf));
         }
 
         /* Save palette. */
