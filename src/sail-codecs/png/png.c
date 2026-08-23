@@ -636,9 +636,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_png(void* state, co
     {
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
-
-    png_state->frame_processed = true;
 #endif
+
+    /* Marks that at least one frame was seeked so save_finish() writes IEND via png_write_end().
+       Must be set in both APNG and plain builds, otherwise APNG-enabled builds produce truncated files. */
+    png_state->frame_processed = true;
 
     /* Error handling setup. */
     if (setjmp(png_jmpbuf(png_state->png_ptr)))
