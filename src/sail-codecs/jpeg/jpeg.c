@@ -287,17 +287,17 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpeg(struct sail_io* io,
     SAIL_TRY(alloc_jpeg_state(NULL, save_options, &jpeg_state));
     *state = jpeg_state;
 
-    /* Create compress context. */
-    void* ptr;
-    SAIL_TRY(sail_malloc(sizeof(struct jpeg_compress_struct), &ptr));
-    jpeg_state->compress_context = ptr;
-
     /* Sanity check. */
     if (jpeg_state->save_options->compression != SAIL_COMPRESSION_JPEG)
     {
         SAIL_LOG_ERROR("JPEG: Only JPEG compression is allowed for saving");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
+
+    /* Create compress context. */
+    void* ptr;
+    SAIL_TRY(sail_malloc(sizeof(struct jpeg_compress_struct), &ptr));
+    jpeg_state->compress_context = ptr;
 
     /* Error handling setup. */
     jpeg_state->compress_context->err                       = jpeg_std_error(&jpeg_state->error_context.jpeg_error_mgr);
