@@ -74,8 +74,17 @@ sail_status_t gif_private_fetch_application(const GifByteType* extension, struct
 {
     SAIL_CHECK_PTR(extension);
 
-    /* 8 bytes as per the spec. */
-    SAIL_TRY(save_str_in_meta_data((const char*)extension + 1, 8, SAIL_META_DATA_SOFTWARE, meta_data_node));
+    const unsigned length = *(unsigned char*)(extension);
+
+    if (length == 0)
+    {
+        return SAIL_OK;
+    }
+
+    /* Application identifier is 8 bytes as per the spec, but never read past the declared block length. */
+    const unsigned bytes_to_copy = (length < 8) ? length : 8;
+
+    SAIL_TRY(save_str_in_meta_data((const char*)extension + 1, bytes_to_copy, SAIL_META_DATA_SOFTWARE, meta_data_node));
 
     return SAIL_OK;
 }

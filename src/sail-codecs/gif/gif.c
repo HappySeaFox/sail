@@ -299,6 +299,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void* state, st
             {
             case GRAPHICS_EXT_FUNC_CODE:
             {
+                /*
+                 * The Graphics Control Extension declares a 4-byte block. Skip truncated blocks
+                 * to avoid reading disposal, delay and transparency fields from adjacent data.
+                 */
+                if (extension[0] < 4)
+                {
+                    break;
+                }
+
                 /* Disposal method. */
                 gif_state->disposal = (extension[1] >> 2) & 7;
 
