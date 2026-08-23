@@ -173,14 +173,24 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg(void* state, s
 
     jpeg_state->frame_processed = true;
 
+    /*
+     * Declared before setjmp and volatile so it survives a longjmp from libjpeg
+     * (e.g. jpeg_read_icc_profile) and can be released in the error handler.
+     */
+    struct sail_image* volatile image_local = NULL;
+
     if (setjmp(jpeg_state->error_context.setjmp_buffer) != 0)
     {
         jpeg_state->libjpeg_error = true;
+        sail_destroy_image(image_local);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
-    struct sail_image* image_local;
-    SAIL_TRY(sail_alloc_image(&image_local));
+    {
+        struct sail_image* image_allocated;
+        SAIL_TRY(sail_alloc_image(&image_allocated));
+        image_local = image_allocated;
+    }
 
     if (jpeg_state->load_options->options & SAIL_OPTION_SOURCE_IMAGE)
     {
