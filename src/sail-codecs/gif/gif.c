@@ -311,8 +311,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_gif(void* state, st
                 /* Disposal method. */
                 gif_state->disposal = (extension[1] >> 2) & 7;
 
-                /* Delay in 1/100 of seconds. */
-                unsigned delay = *(uint16_t*)(extension + 2);
+                /* Delay in 1/100 of seconds, stored little-endian. */
+                unsigned delay = (unsigned)extension[2] | ((unsigned)extension[3] << 8);
+
                 /*
                  * 0 means as fast as possible. However, this makes the frame
                  * almost invisible on modern CPUs. Let's make a small delay of 100 ms
