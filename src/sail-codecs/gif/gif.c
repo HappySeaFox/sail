@@ -190,7 +190,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_gif(struct sail_io* io,
 
     void* ptr;
     size_t buf_size;
-    size_t first_frame_rows_size;
 
     SAIL_TRY(sail_size_mul((unsigned)gif_state->gif->SWidth, sizeof(GifPixelType), &buf_size));
     SAIL_TRY(sail_malloc(buf_size, &ptr));
@@ -198,8 +197,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_gif(struct sail_io* io,
 
     gif_state->first_frame_height = gif_state->gif->SHeight;
 
-    SAIL_TRY(sail_size_mul((unsigned)gif_state->first_frame_height, sizeof(unsigned char*), &first_frame_rows_size));
-    SAIL_TRY(sail_malloc(first_frame_rows_size, &ptr));
+    SAIL_TRY(sail_calloc((unsigned)gif_state->first_frame_height, sizeof(unsigned char*), &ptr));
     gif_state->first_frame = ptr;
 
     for (int i = 0; i < gif_state->first_frame_height; i++)
