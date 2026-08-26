@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdio.h>
 
 #include <sail-common/sail-common.h>
@@ -34,6 +35,12 @@ avifResult avif_private_read_proc(struct avifIO* io, uint32_t read_flags, uint64
     if (read_flags != 0)
     {
         SAIL_LOG_ERROR("AVIF: Read flags must be #0, but got #%u", read_flags);
+        return AVIF_RESULT_IO_ERROR;
+    }
+
+    if (offset > (uint64_t)LONG_MAX)
+    {
+        SAIL_LOG_ERROR("AVIF: Offset %llu is too large to seek to", (unsigned long long)offset);
         return AVIF_RESULT_IO_ERROR;
     }
 
@@ -63,6 +70,12 @@ avifResult avif_private_write_proc(
     struct avifIO* io, uint32_t write_flags, uint64_t offset, const uint8_t* data, size_t size)
 {
     (void)write_flags;
+
+    if (offset > (uint64_t)LONG_MAX)
+    {
+        SAIL_LOG_ERROR("AVIF: Offset %llu is too large to seek to", (unsigned long long)offset);
+        return AVIF_RESULT_IO_ERROR;
+    }
 
     struct sail_avif_context* avif_context = io->data;
 
