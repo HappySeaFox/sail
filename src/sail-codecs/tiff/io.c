@@ -23,6 +23,9 @@
     SOFTWARE.
 */
 
+#include <limits.h>
+#include <stdint.h>
+
 #include <sail-common/sail-common.h>
 
 #include "io.h"
@@ -62,6 +65,18 @@ tmsize_t tiff_private_my_write_proc(thandle_t client_data, void* buffer, tmsize_
 toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whence)
 {
     struct sail_io* io = (struct sail_io*)client_data;
+
+/*
+ * Seeking takes a long, which is too narrow for the whole offset range on some platforms.
+ * Relative seeks arrive as unsigned values wrapped around, so compare them as signed.
+ */
+#if LONG_MAX < INT64_MAX
+    if ((int64_t)offset > LONG_MAX || (int64_t)offset < LONG_MIN)
+    {
+        TIFFError(NULL, "Offset %llu is too large to seek to", (unsigned long long)offset);
+        return (toff_t)-1;
+    }
+#endif
 
     sail_status_t err = io->seek(io->stream, (long)offset, whence);
 
