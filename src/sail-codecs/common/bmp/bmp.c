@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -481,7 +482,17 @@ sail_status_t bmp_private_read_seek_next_frame(void* state, struct sail_io* io, 
     {
         if (bmp_state->version > SAIL_BMP_V1)
         {
-            SAIL_TRY_OR_CLEANUP(io->seek(io->stream, bmp_state->dib_file_header.offset, SEEK_SET),
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < UINT32_MAX
+            if (bmp_state->dib_file_header.offset > LONG_MAX)
+            {
+                SAIL_LOG_ERROR("BMP: Bitmap data offset %u is too large to seek to", bmp_state->dib_file_header.offset);
+                sail_destroy_image(image_local);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+            }
+#endif
+
+            SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)bmp_state->dib_file_header.offset, SEEK_SET),
                                 /* cleanup */ sail_destroy_image(image_local));
         }
     }
