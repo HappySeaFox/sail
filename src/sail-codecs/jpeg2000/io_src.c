@@ -26,6 +26,9 @@
 #include <stddef.h> /* size_t */
 #include <stdio.h>  /* SEEK_CUR */
 
+#include <limits.h>
+#include <stdint.h>
+
 #include <sail-common/sail-common.h>
 
 #include "io_src.h"
@@ -56,6 +59,15 @@ static OPJ_OFF_T jpeg2000_private_stream_skip(OPJ_OFF_T bytes, void* user_data)
 {
     struct sail_io* io = user_data;
 
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < INT64_MAX
+    if (bytes > LONG_MAX || bytes < LONG_MIN)
+    {
+        SAIL_LOG_ERROR("JPEG2000: Offset %lld is too large to seek to", (long long)bytes);
+        return -1;
+    }
+#endif
+
     const sail_status_t err = io->seek(io->stream, (long)bytes, SEEK_CUR);
 
     if (err != SAIL_OK)
@@ -69,6 +81,15 @@ static OPJ_OFF_T jpeg2000_private_stream_skip(OPJ_OFF_T bytes, void* user_data)
 static OPJ_BOOL jpeg2000_private_stream_seek(OPJ_OFF_T bytes, void* user_data)
 {
     struct sail_io* io = user_data;
+
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < INT64_MAX
+    if (bytes > LONG_MAX || bytes < LONG_MIN)
+    {
+        SAIL_LOG_ERROR("JPEG2000: Offset %lld is too large to seek to", (long long)bytes);
+        return OPJ_FALSE;
+    }
+#endif
 
     const sail_status_t err = io->seek(io->stream, (long)bytes, SEEK_SET);
 
