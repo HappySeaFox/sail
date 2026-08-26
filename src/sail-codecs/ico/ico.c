@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -165,9 +166,18 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_ico(void* state, st
             return SAIL_ERROR_NO_MORE_FRAMES;
         }
 
-        SAIL_TRY(ico_state->io->seek(ico_state->io->stream,
-                                     (long)ico_state->ico_dir_entries[ico_state->current_frame++].image_offset,
-                                     SEEK_SET));
+        const uint32_t image_offset = ico_state->ico_dir_entries[ico_state->current_frame++].image_offset;
+
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < UINT32_MAX
+        if (image_offset > LONG_MAX)
+        {
+            SAIL_LOG_ERROR("ICO: Image offset %u is too large to seek to", image_offset);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+#endif
+
+        SAIL_TRY(ico_state->io->seek(ico_state->io->stream, (long)image_offset, SEEK_SET));
 
         /* Check the image is not PNG. */
         SAIL_TRY(ico_private_probe_image_type(ico_state->io, &ico_image_type));
