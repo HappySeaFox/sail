@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -69,6 +71,15 @@ int heif_private_reader_read(void* data, size_t size, void* user_data)
 int heif_private_reader_seek(int64_t position, void* user_data)
 {
     struct sail_heif_reader_context* context = user_data;
+
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < INT64_MAX
+    if (position > LONG_MAX || position < LONG_MIN)
+    {
+        SAIL_LOG_ERROR("HEIF: Position %lld is too large to seek to", (long long)position);
+        return -1;
+    }
+#endif
 
     sail_status_t status = context->io->seek(context->io->stream, (long)position, SEEK_SET);
 
