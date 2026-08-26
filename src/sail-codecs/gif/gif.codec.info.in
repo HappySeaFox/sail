@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=1.4.3
-priority=HIGHEST
+priority=@GIF_CODEC_PRIORITY@
 name=GIF
 description=Graphics Interchange Format
 magic-numbers=47 49 46 38 37 61;47 49 46 38 39 61

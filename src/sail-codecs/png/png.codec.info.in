@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=1.1.4
-priority=HIGHEST
+priority=@PNG_CODEC_PRIORITY@
 name=PNG
 description=Portable Network Graphics
 magic-numbers=89 50 4E 47 0D 0A 1A 0A

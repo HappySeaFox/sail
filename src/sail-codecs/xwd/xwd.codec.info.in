@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.5.1
-priority=LOWEST
+priority=@XWD_CODEC_PRIORITY@
 name=XWD
 description=X Window Dump
 magic-numbers=00 00 00 64

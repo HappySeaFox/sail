@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.3.2
-priority=LOWEST
+priority=@FLI_CODEC_PRIORITY@
 name=FLI
 description=Autodesk Animator FLIC Animation
 magic-numbers=11 AF;12 AF

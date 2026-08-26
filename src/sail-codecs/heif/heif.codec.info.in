@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=1.0.0
-priority=MEDIUM
+priority=@HEIF_CODEC_PRIORITY@
 name=HEIF
 description=High Efficiency Image File Format
 # ????ftypheic;????ftypheix;????ftyphevc;????ftyphevx

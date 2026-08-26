@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=1.0.0
-priority=MEDIUM
+priority=@VIDEO_CODEC_PRIORITY@
 name=VIDEO
 description=Video file formats
 magic-numbers=

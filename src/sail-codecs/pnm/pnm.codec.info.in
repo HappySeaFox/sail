@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.8.0
-priority=LOW
+priority=@PNM_CODEC_PRIORITY@
 name=PNM
 description=Portable aNy Map
 magic-numbers=50 31;50 32;50 33;50 34;50 35;50 36;50 37

@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.8.1
-priority=LOW
+priority=@TGA_CODEC_PRIORITY@
 name=TGA
 description=Truevision TGA
 magic-numbers=

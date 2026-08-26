@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.7.0
-priority=LOWEST
+priority=@XPM_CODEC_PRIORITY@
 name=XPM
 description=X11 PixMap
 magic-numbers=2f 2a 20 58 50 4d 20 2a 2f

@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.8.1
-priority=LOWEST
+priority=@XBM_CODEC_PRIORITY@
 name=XBM
 description=X BitMap
 magic-numbers=

@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=1.0.1
-priority=HIGH
+priority=@AVIF_CODEC_PRIORITY@
 name=AVIF
 description=AV1 Still Image File Format
 # ????ftypavif;????ftypavis

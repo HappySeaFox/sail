@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.9.0
-priority=MEDIUM
+priority=@OPENEXR_CODEC_PRIORITY@
 name=OPENEXR
 description=OpenEXR
 magic-numbers=76 2F 31 01

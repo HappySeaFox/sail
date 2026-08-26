@@ -3,7 +3,7 @@
 [codec]
 layout=8
 version=0.9.0
-priority=LOW
+priority=@QOI_CODEC_PRIORITY@
 name=QOI
 description=Quite OK Image
 magic-numbers=71 6F 69 66

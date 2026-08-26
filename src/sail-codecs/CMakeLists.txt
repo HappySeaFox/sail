@@ -17,6 +17,16 @@ set(CODECS ${HIGHEST_PRIORITY_CODECS}
            ${LOWEST_PRIORITY_CODECS})
 list(SORT CODECS)
 
+# Set per-codec priority variables (like BMP_CODEC_PRIORITY) used to configure
+# the corresponding .codec.info files.
+#
+foreach (priority HIGHEST HIGH MEDIUM LOW LOWEST)
+    foreach (codec IN LISTS ${priority}_PRIORITY_CODECS)
+        string(TOUPPER ${codec} codec_upper)
+        set(${codec_upper}_CODEC_PRIORITY ${priority})
+    endforeach()
+endforeach()
+
 # Expand codecs priorities to actual codecs.
 #
 macro(sail_expand_priorities)
