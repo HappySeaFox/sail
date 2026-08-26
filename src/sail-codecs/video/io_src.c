@@ -106,6 +106,15 @@ int64_t video_private_avio_seek(void* opaque, int64_t offset, int whence)
         return AVERROR(EINVAL);
     }
 
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < INT64_MAX
+    if (offset > LONG_MAX || offset < LONG_MIN)
+    {
+        SAIL_LOG_ERROR("VIDEO: Offset %lld is too large to seek to", (long long)offset);
+        return AVERROR(EIO);
+    }
+#endif
+
     sail_status_t err = io->seek(io->stream, (long)offset, std_whence);
     if (err != SAIL_OK)
     {
