@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -232,6 +233,17 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, st
         size_t offset;
         SAIL_TRY_OR_CLEANUP(tga_state->io->tell(tga_state->io->stream, &offset),
                             /* cleanup */ sail_destroy_image(image_local));
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < UINT32_MAX
+        if (tga_state->footer.extension_area_offset > LONG_MAX)
+        {
+            SAIL_LOG_ERROR("TGA: Extension area offset %u is too large to seek to",
+                           tga_state->footer.extension_area_offset);
+            sail_destroy_image(image_local);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+#endif
+
         SAIL_TRY_OR_CLEANUP(
             tga_state->io->seek(tga_state->io->stream, (long)tga_state->footer.extension_area_offset, SEEK_SET),
             /* cleanup */ sail_destroy_image(image_local));
