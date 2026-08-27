@@ -231,9 +231,6 @@ enum AVPixelFormat video_private_find_best_sail_pixel_format(enum AVPixelFormat 
         AV_PIX_FMT_YUVA422P12LE,
         AV_PIX_FMT_YUVA420P16LE,
 
-        /* Indexed formats. */
-        AV_PIX_FMT_PAL8,
-
         /* Terminator for avcodec_find_best_pix_fmt_of_list(). */
         AV_PIX_FMT_NONE,
     };
@@ -251,7 +248,9 @@ enum AVPixelFormat video_private_find_best_sail_pixel_format(enum AVPixelFormat 
         case SAIL_PIXEL_FORMAT_BPP32_YUVA:
         case SAIL_PIXEL_FORMAT_BPP40_YUVA:
         case SAIL_PIXEL_FORMAT_BPP48_YUVA:
-        case SAIL_PIXEL_FORMAT_BPP64_YUVA: break;
+        case SAIL_PIXEL_FORMAT_BPP64_YUVA:
+        /* Indexed frames carry their palettes in a separate plane which we don't export. */
+        case SAIL_PIXEL_FORMAT_BPP8_INDEXED: break;
         default: return source_pix_fmt;
         }
     }
