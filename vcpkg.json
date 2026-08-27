@@ -9,7 +9,8 @@
         "avcodec",
         "avformat",
         "swscale",
-        "swresample"
+        "swresample",
+        "zlib"
       ]
     },
     "giflib",
