@@ -557,16 +557,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_video(void* state, 
                                                         image_local->source_image->special_properties));
     }
 
-    /* Fetch resolution. */
-    AVRational sar = video_stream->sample_aspect_ratio;
-    if (sar.num > 0 && sar.den > 0)
-    {
-        SAIL_TRY(sail_alloc_resolution(&image_local->resolution));
-        image_local->resolution->unit = SAIL_RESOLUTION_UNIT_INCH;
-        image_local->resolution->x    = (double)codecpar->width * sar.num / sar.den;
-        image_local->resolution->y    = (double)codecpar->height;
-    }
-
     /* Fetch metadata. */
     if (video_state->load_options->options & SAIL_OPTION_META_DATA)
     {

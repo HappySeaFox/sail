@@ -503,6 +503,13 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
         SAIL_TRY(sail_put_hash_map_double(special_properties, "video-time-base", time_base));
     }
 
+    /* Pixel aspect ratio. */
+    if (video_stream->sample_aspect_ratio.num > 0 && video_stream->sample_aspect_ratio.den > 0)
+    {
+        double pixel_aspect_ratio = av_rational_to_double(video_stream->sample_aspect_ratio);
+        SAIL_TRY(sail_put_hash_map_double(special_properties, "video-pixel-aspect-ratio", pixel_aspect_ratio));
+    }
+
     /* Color space. */
     if (codecpar->color_space != AVCOL_SPC_UNSPECIFIED)
     {
