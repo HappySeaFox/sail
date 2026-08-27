@@ -10,6 +10,8 @@
         "avformat",
         "swscale",
         "swresample",
+        "bzip2",
+        "lzma",
         "zlib"
       ]
     },
