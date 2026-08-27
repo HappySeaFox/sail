@@ -552,16 +552,19 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_video(void* state, 
     /* Fetch specialized properties. */
     if (video_state->load_options->options & SAIL_OPTION_META_DATA)
     {
-        SAIL_TRY(sail_alloc_hash_map(&image_local->source_image->special_properties));
-        SAIL_TRY(video_private_fetch_special_properties(video_state->format_ctx, video_stream,
-                                                        image_local->source_image->special_properties));
+        SAIL_TRY_OR_CLEANUP(sail_alloc_hash_map(&image_local->source_image->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
+        SAIL_TRY_OR_CLEANUP(video_private_fetch_special_properties(video_state->format_ctx, video_stream,
+                                                                   image_local->source_image->special_properties),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Fetch metadata. */
     if (video_state->load_options->options & SAIL_OPTION_META_DATA)
     {
         struct sail_meta_data_node** last_meta_data_node = &image_local->meta_data_node;
-        SAIL_TRY(video_private_fetch_meta_data(video_state->format_ctx, video_stream, &last_meta_data_node));
+        SAIL_TRY_OR_CLEANUP(video_private_fetch_meta_data(video_state->format_ctx, video_stream, &last_meta_data_node),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     video_state->current_frame_index++;
