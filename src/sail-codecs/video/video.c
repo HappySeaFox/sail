@@ -72,6 +72,9 @@ struct video_state
     bool frame_decoded;
     int current_frame_index;
     struct SwsContext* sws_ctx;
+    int sws_source_width;
+    int sws_source_height;
+    enum AVPixelFormat sws_source_format;
     enum AVPixelFormat target_av_pix_fmt;
     AVFrame* converted_frame;
 
@@ -107,6 +110,9 @@ static sail_status_t alloc_video_state(const struct sail_load_options* load_opti
         .frame_decoded            = false,
         .current_frame_index      = 0,
         .sws_ctx                  = NULL,
+        .sws_source_width         = 0,
+        .sws_source_height        = 0,
+        .sws_source_format        = AV_PIX_FMT_NONE,
         .target_av_pix_fmt        = AV_PIX_FMT_NONE,
         .converted_frame          = NULL,
         .time_ranges              = NULL,
@@ -827,12 +833,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
         }
 
         /* Initialize or recreate swscale context if needed. */
-        if (video_state->sws_ctx == NULL || video_state->frame->width != video_state->converted_frame->width
-            || video_state->frame->height != video_state->converted_frame->height)
+        if (video_state->sws_ctx == NULL || video_state->frame->width != video_state->sws_source_width
+            || video_state->frame->height != video_state->sws_source_height
+            || source_av_pix_fmt != video_state->sws_source_format)
         {
             if (video_state->sws_ctx != NULL)
             {
                 sws_freeContext(video_state->sws_ctx);
+                video_state->sws_ctx = NULL;
             }
 
             video_state->sws_ctx =
@@ -845,7 +853,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
             }
 
+            video_state->sws_source_width  = video_state->frame->width;
+            video_state->sws_source_height = video_state->frame->height;
+            video_state->sws_source_format = source_av_pix_fmt;
+
             /* Allocate buffer for converted frame. */
+            av_freep(&video_state->converted_frame->data[0]);
+
             ret = av_image_alloc(video_state->converted_frame->data, video_state->converted_frame->linesize,
                                  image->width, image->height, target_av_pix_fmt, 32);
 
