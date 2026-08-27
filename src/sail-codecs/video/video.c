@@ -798,7 +798,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
     }
 
     /* Get source pixel format from decoded frame. */
-    enum AVPixelFormat source_av_pix_fmt = video_state->codec_ctx->pix_fmt;
+    enum AVPixelFormat source_av_pix_fmt = (enum AVPixelFormat)video_state->frame->format;
 
     /* Determine target format from image pixel format. */
     enum AVPixelFormat target_av_pix_fmt = video_private_sail_pixel_format_to_av(image->pixel_format);
@@ -819,8 +819,17 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_video(void* state, struct sai
 
     int ret;
 
-    /* If pixel format conversion is needed, use swscale. */
-    if (source_av_pix_fmt != target_av_pix_fmt)
+    /*
+     * Decoded frames may be smaller or larger than the dimensions reported by the container,
+     * for example when the stream changes its resolution in the middle. Copying such frames as is
+     * reads outside their buffers, so scale them with swscale like unsupported pixel formats.
+     */
+    const bool conversion_needed = source_av_pix_fmt != target_av_pix_fmt
+                                   || video_state->frame->width != (int)image->width
+                                   || video_state->frame->height != (int)image->height;
+
+    /* If pixel format or size conversion is needed, use swscale. */
+    if (conversion_needed)
     {
         /* Allocate converted frame if not already allocated. */
         if (video_state->converted_frame == NULL)
