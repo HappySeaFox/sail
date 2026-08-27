@@ -166,6 +166,10 @@ static void destroy_video_state(struct video_state* video_state)
         }
         avio_context_free(&video_state->avio_ctx);
     }
+    else if (video_state->avio_buffer != NULL)
+    {
+        av_freep(&video_state->avio_buffer);
+    }
 
     if (video_state->format_ctx != NULL)
     {
@@ -315,6 +319,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_video(struct sail_io* io,
     {
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
+
+    /* The AVIO context owns the buffer now and may re-allocate it on its own. */
+    video_state->avio_buffer = NULL;
 
     video_state->format_ctx->pb     = video_state->avio_ctx;
     video_state->format_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
