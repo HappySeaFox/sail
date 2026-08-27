@@ -86,10 +86,6 @@ int64_t video_private_avio_seek(void* opaque, int64_t offset, int whence)
     {
         return AVERROR(ESPIPE);
     }
-    if (offset > (int64_t)LONG_MAX || offset < (int64_t)LONG_MIN)
-    {
-        return AVERROR(EINVAL);
-    }
 
     int base_whence = whence & ~(AVSEEK_SIZE | AVSEEK_FORCE);
     int std_whence;
