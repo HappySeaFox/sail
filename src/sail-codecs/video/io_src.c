@@ -118,7 +118,7 @@ int64_t video_private_avio_seek(void* opaque, int64_t offset, int whence)
     sail_status_t err = io->seek(io->stream, (long)offset, std_whence);
     if (err != SAIL_OK)
     {
-        SAIL_LOG_ERROR("VIDEO: Failed to seek with offset: %ld, whence: #%d", offset, std_whence);
+        SAIL_LOG_ERROR("VIDEO: Failed to seek with offset: %lld, whence: #%d", (long long)offset, std_whence);
         return AVERROR(EIO);
     }
 
