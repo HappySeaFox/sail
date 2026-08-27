@@ -6,4 +6,5 @@ add_library(bmp-common OBJECT
 
 target_include_directories(bmp-common PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
+target_link_libraries(bmp-common PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 target_link_libraries(bmp-common PRIVATE sail-common)
