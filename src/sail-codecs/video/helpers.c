@@ -407,36 +407,24 @@ static double av_rational_to_double(AVRational r)
     return (double)r.num / (double)r.den;
 }
 
-static const char* av_level_to_string(int level)
+static void av_level_to_string(int level, char* level_str, size_t level_str_size)
 {
-    static char level_str[16];
-
     /*
      * FFmpeg levels are typically encoded as XX for X.X, XXX for XX.X, etc.
      * For example: 10 -> "1.0", 11 -> "1.1", 20 -> "2.0", 51 -> "5.1"
      */
     if (level < 10)
     {
-        snprintf(level_str, sizeof(level_str), "%d", level);
-    }
-    else if (level < 100)
-    {
-        snprintf(level_str, sizeof(level_str), "%d.%d", level / 10, level % 10);
-    }
-    else if (level < 1000)
-    {
-        snprintf(level_str, sizeof(level_str), "%d.%d", level / 10, level % 10);
+        snprintf(level_str, level_str_size, "%d", level);
     }
     else if (level < 10000)
     {
-        snprintf(level_str, sizeof(level_str), "%d.%d", level / 10, level % 10);
+        snprintf(level_str, level_str_size, "%d.%d", level / 10, level % 10);
     }
     else
     {
-        snprintf(level_str, sizeof(level_str), "%d", level);
+        snprintf(level_str, level_str_size, "%d", level);
     }
-
-    return level_str;
 }
 
 
@@ -478,7 +466,9 @@ sail_status_t video_private_fetch_special_properties(struct AVFormatContext* for
     /* Level (check for unknown values). */
     if (codecpar->level != AV_LEVEL_UNKNOWN && codecpar->level >= 0)
     {
-        const char* level_str = av_level_to_string(codecpar->level);
+        char level_str[16];
+        av_level_to_string(codecpar->level, level_str, sizeof(level_str));
+
         SAIL_TRY(sail_put_hash_map_string(special_properties, "video-level", level_str));
     }
 
