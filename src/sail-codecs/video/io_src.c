@@ -47,13 +47,18 @@ int video_private_avio_read_packet(void* opaque, uint8_t* buf, int buf_size)
 
     sail_status_t err = io->tolerant_read(io->stream, buf, (size_t)buf_size, &read_size);
 
-    if (err != SAIL_OK)
+    if (err != SAIL_OK && read_size == 0)
     {
-        if (read_size == 0)
-        {
-            return AVERROR_EOF;
-        }
         return AVERROR(EIO);
+    }
+
+    /*
+     * Reading nothing is a normal end of the stream. FFmpeg treats 0 as an invalid return value
+     * and re-tries reading in an infinite loop, so report the end of the stream explicitly.
+     */
+    if (read_size == 0)
+    {
+        return AVERROR_EOF;
     }
 
     return (int)read_size;
