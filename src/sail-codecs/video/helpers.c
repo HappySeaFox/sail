@@ -337,35 +337,35 @@ sail_status_t video_private_fetch_meta_data(AVFormatContext* format_ctx,
     {
         AVDictionaryEntry* entry;
 
-        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "title", NULL, AV_DICT_IGNORE_SUFFIX);
+        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "title", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "title", SAIL_META_DATA_TITLE,
                                                       last_meta_data_node));
         }
 
-        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "author", NULL, AV_DICT_IGNORE_SUFFIX);
+        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "author", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "author", SAIL_META_DATA_AUTHOR,
                                                       last_meta_data_node));
         }
 
-        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "artist", NULL, AV_DICT_IGNORE_SUFFIX);
+        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "artist", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "artist", SAIL_META_DATA_ARTIST,
                                                       last_meta_data_node));
         }
 
-        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "copyright", NULL, AV_DICT_IGNORE_SUFFIX);
+        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "copyright", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "copyright", SAIL_META_DATA_COPYRIGHT,
                                                       last_meta_data_node));
         }
 
-        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "comment", NULL, AV_DICT_IGNORE_SUFFIX);
+        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "comment", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "comment", SAIL_META_DATA_COMMENT,
@@ -373,21 +373,21 @@ sail_status_t video_private_fetch_meta_data(AVFormatContext* format_ctx,
         }
 
         entry =
-            av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "description", NULL, AV_DICT_IGNORE_SUFFIX);
+            av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "description", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "description", SAIL_META_DATA_DESCRIPTION,
                                                       last_meta_data_node));
         }
 
-        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "encoder", NULL, AV_DICT_IGNORE_SUFFIX);
+        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "encoder", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "encoder", SAIL_META_DATA_SOFTWARE,
                                                       last_meta_data_node));
         }
 
-        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "date", NULL, AV_DICT_IGNORE_SUFFIX);
+        entry = av_dict_get(format_ctx != NULL ? format_ctx->metadata : NULL, "date", NULL, 0);
         if (entry == NULL)
         {
             SAIL_TRY(fetch_single_meta_data_from_dict(video_stream->metadata, "date", SAIL_META_DATA_CREATION_TIME,
