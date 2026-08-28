@@ -1,5 +1,4 @@
 include(FindPackageHandleStandardArgs)
-include(SelectLibraryConfigurations)
 
 find_path(JPEGXL_INCLUDE_DIR jxl/decode.h)
 
@@ -23,15 +22,8 @@ foreach(i RANGE ${VAR_PREFIXES_LAST_INDEX})
     # Some libraries are required, some not. Using SAIL_CODEC_JPEGXL_REQUIRED_OPTION overcomplicates
     # the searching mechanism.
     #
-    if (SAIL_VCPKG)
-        find_library("${var_prefix}_LIBRARY_RELEASE" NAMES ${lib_shared} ${lib_static} PATHS "${JPEGXL_INCLUDE_DIR}/../lib"       NO_DEFAULT_PATH)
-        find_library("${var_prefix}_LIBRARY_DEBUG"   NAMES ${lib_shared} ${lib_static} PATHS "${JPEGXL_INCLUDE_DIR}/../debug/lib" NO_DEFAULT_PATH)
-    else()
-        find_library("${var_prefix}_LIBRARY_RELEASE" NAMES ${lib_shared} ${lib_static})
-        find_library("${var_prefix}_LIBRARY_DEBUG"   NAMES ${lib_shared} ${lib_static})
-    endif()
-
-    select_library_configurations(${var_prefix})
+    sail_find_codec_library(PREFIX ${var_prefix} VCPKG_INCLUDE_DIR "${JPEGXL_INCLUDE_DIR}"
+                            NAMES_RELEASE ${lib_shared} ${lib_static})
 
     find_package_handle_standard_args(${var_prefix}
         REQUIRED_VARS
@@ -49,7 +41,7 @@ if (NOT JPEGXL_INCLUDE_DIR OR NOT JPEGXL_LIBRARY OR NOT JPEGXL_THREADS_LIBRARY O
 endif()
 
 if (JPEGXL_CMS_LIBRARY AND NOT LCMS2_LIBRARY)
-    nessage(FATAL_ERROR "LCMS2 library is required")
+    message(FATAL_ERROR "LCMS2 library is required")
 endif()
 
 # libjxl requires JXL_STATIC_DEFINE for static builds

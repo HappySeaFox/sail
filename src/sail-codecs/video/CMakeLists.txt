@@ -23,40 +23,29 @@ endif()
 # (PNG streams in Matroska, compressed MOV headers etc.). Static FFmpeg builds don't pull
 # these libraries in automatically, so find and link them explicitly.
 #
-include(SelectLibraryConfigurations)
+# The libraries are optional. FFmpeg may be built without them.
+#
+sail_find_codec_library(PREFIX VIDEO_ZLIB VCPKG_INCLUDE_DIR "${AVCODEC_INCLUDE_DIR}"
+                        NAMES_RELEASE z zlib NAMES_DEBUG z zlibd
+                        OUTPUT_LIBS COMPRESSION_LIBRARIES)
+sail_find_codec_library(PREFIX VIDEO_BZIP2 VCPKG_INCLUDE_DIR "${AVCODEC_INCLUDE_DIR}"
+                        NAMES_RELEASE bz2 bzip2 NAMES_DEBUG bz2d bz2 bzip2
+                        OUTPUT_LIBS COMPRESSION_LIBRARIES)
+sail_find_codec_library(PREFIX VIDEO_LZMA VCPKG_INCLUDE_DIR "${AVCODEC_INCLUDE_DIR}"
+                        NAMES_RELEASE lzma NAMES_DEBUG lzmad lzma
+                        OUTPUT_LIBS COMPRESSION_LIBRARIES)
 
-set(COMPRESSION_PREFIXES       ZLIB      BZIP2            LZMA)
-set(COMPRESSION_NAMES_RELEASE  "z zlib"  "bz2 bzip2"      "lzma")
-set(COMPRESSION_NAMES_DEBUG    "z zlibd" "bz2d bz2 bzip2" "lzmad lzma")
-
-list(LENGTH COMPRESSION_PREFIXES length)
-math(EXPR COMPRESSION_PREFIXES_LAST_INDEX "${length} - 1")
-
-foreach (i RANGE ${COMPRESSION_PREFIXES_LAST_INDEX})
-    list(GET COMPRESSION_PREFIXES      ${i} var_prefix)
-    list(GET COMPRESSION_NAMES_RELEASE ${i} names_release)
-    list(GET COMPRESSION_NAMES_DEBUG   ${i} names_debug)
-
-    string(REPLACE " " ";" names_release_as_list ${names_release})
-    string(REPLACE " " ";" names_debug_as_list   ${names_debug})
-
-    # The libraries are optional. FFmpeg may be built without them.
-    #
-    if (SAIL_VCPKG)
-        find_library("VIDEO_${var_prefix}_LIBRARY_RELEASE" NAMES ${names_release_as_list} PATHS "${AVCODEC_INCLUDE_DIR}/../lib"       NO_DEFAULT_PATH)
-        find_library("VIDEO_${var_prefix}_LIBRARY_DEBUG"   NAMES ${names_debug_as_list}   PATHS "${AVCODEC_INCLUDE_DIR}/../debug/lib" NO_DEFAULT_PATH)
-    else()
-        find_library("VIDEO_${var_prefix}_LIBRARY_RELEASE" NAMES ${names_release_as_list})
-        find_library("VIDEO_${var_prefix}_LIBRARY_DEBUG"   NAMES ${names_debug_as_list})
-    endif()
-
-    select_library_configurations(VIDEO_${var_prefix})
-
-    if (VIDEO_${var_prefix}_LIBRARY)
-        list(APPEND COMPRESSION_LIBRARIES ${VIDEO_${var_prefix}_LIBRARY})
-        set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,${names_release},${names_debug}")
-    endif()
-endforeach()
+# For static builds, export the optional compression dependencies that were found
+#
+if (VIDEO_ZLIB_LIBRARY)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,z zlib,z zlibd")
+endif()
+if (VIDEO_BZIP2_LIBRARY)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,bz2 bzip2,bz2d bz2 bzip2")
+endif()
+if (VIDEO_LZMA_LIBRARY)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,lzma,lzmad lzma")
+endif()
 
 # For static builds, export dependencies
 #
