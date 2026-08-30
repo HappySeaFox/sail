@@ -179,6 +179,13 @@ sail_status_t palette::copy(SailPixelFormat pixel_format, const void* data, unsi
 
     const unsigned palette_size = sail_bytes_per_line(color_count, pixel_format);
 
+    if (palette_size == 0)
+    {
+        SAIL_LOG_ERROR("Cannot hold a palette of %u %s colors", color_count,
+                       sail_pixel_format_to_string(pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
     d->data.resize(palette_size);
     memcpy(d->data.data(), data, palette_size);
 

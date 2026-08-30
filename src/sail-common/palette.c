@@ -85,13 +85,21 @@ sail_status_t sail_alloc_palette_for_data(enum SailPixelFormat pixel_format,
 {
     SAIL_CHECK_PTR(palette);
 
+    /* sail_bytes_per_line() returns 0 when the palette size doesn't fit an unsigned. */
+    const unsigned palette_size = sail_bytes_per_line(color_count, pixel_format);
+
+    if (palette_size == 0)
+    {
+        SAIL_LOG_ERROR("Cannot allocate a palette of %u %s colors", color_count,
+                       sail_pixel_format_to_string(pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
     struct sail_palette* palette_local;
     SAIL_TRY(sail_alloc_palette(&palette_local));
 
     palette_local->pixel_format = pixel_format;
     palette_local->color_count  = color_count;
-
-    const unsigned palette_size = sail_bytes_per_line(color_count, pixel_format);
 
     void* ptr;
     SAIL_TRY_OR_CLEANUP(sail_malloc(palette_size, &ptr),
