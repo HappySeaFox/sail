@@ -159,6 +159,12 @@ void sail_log(enum SailLogLevel level, const char* file, int line, const char* f
     case SAIL_LOG_LEVEL_TRACE: level_string = "T"; break;
     }
 
+    /* Nothing to print for SAIL_LOG_LEVEL_SILENCE. */
+    if (level_string == NULL)
+    {
+        return;
+    }
+
     const bool ansi_colors_supported = check_ansi_colors_supported();
 
     if (ansi_colors_supported)
