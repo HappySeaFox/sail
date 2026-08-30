@@ -166,6 +166,8 @@ sail_status_t sail_write_next_frame(void* state, const struct sail_image* image)
     SAIL_CHECK_PTR(state);
     SAIL_CHECK_PTR(image);
 
+    SAIL_TRY(sail_check_image_valid(image));
+
     struct hidden_state* state_of_mind = (struct hidden_state*)state;
 
     SAIL_TRY(sail_check_io_valid(state_of_mind->io));
