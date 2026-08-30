@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h> /* SIZE_MAX */
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -94,6 +95,14 @@ static sail_status_t io_expanding_buffer_tolerant_write(void* stream, const void
 
     *written_size = 0;
 
+    /* Seeking is allowed to go beyond the buffer, so the position may be arbitrarily large. */
+    if (size_to_write > SIZE_MAX - expanding_buffer_stream->pos)
+    {
+        SAIL_LOG_ERROR("Writing %zu bytes at the position %zu overflows the buffer size", size_to_write,
+                       expanding_buffer_stream->pos);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_WRITE_IO);
+    }
+
     /* Calculate required capacity. */
     size_t required_capacity = expanding_buffer_stream->pos + size_to_write;
 
@@ -105,12 +114,13 @@ static sail_status_t io_expanding_buffer_tolerant_write(void* stream, const void
         /* Grow by growth_factor until we have enough space. */
         while (new_capacity < required_capacity)
         {
-            new_capacity = (size_t)(new_capacity * expanding_buffer_stream->growth_factor);
+            new_capacity = (new_capacity > SIZE_MAX / 2) ? required_capacity
+                                                         : (size_t)(new_capacity * expanding_buffer_stream->growth_factor);
 
             /* Ensure minimum growth. */
             if (new_capacity <= expanding_buffer_stream->capacity)
             {
-                new_capacity = expanding_buffer_stream->capacity + size_to_write;
+                new_capacity = required_capacity;
             }
         }
 
