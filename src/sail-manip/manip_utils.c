@@ -76,6 +76,12 @@ sail_status_t preconvert_palette_to_rgba32(const struct sail_palette* palette, s
     SAIL_CHECK_PTR(palette);
     SAIL_CHECK_PTR(rgba32_palette);
 
+    if (palette->color_count == 0 || palette->data == NULL)
+    {
+        SAIL_LOG_ERROR("Cannot pre-convert an empty palette");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
     /* Allocate array for pre-converted palette */
     void* ptr;
     SAIL_TRY(sail_malloc(palette->color_count * sizeof(sail_rgba32_t), &ptr));

@@ -174,6 +174,13 @@ sail_status_t sail_check_image_valid(const struct sail_image* image)
     if (sail_is_indexed(image->pixel_format))
     {
         SAIL_CHECK_PTR(image->palette);
+
+        /* Indexes of such an image point to nothing. */
+        if (image->palette->color_count == 0 || image->palette->data == NULL)
+        {
+            SAIL_LOG_ERROR("Indexed images must have a non-empty palette");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
     }
 
     SAIL_CHECK_PTR(image->pixels);
