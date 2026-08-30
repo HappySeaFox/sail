@@ -162,6 +162,19 @@ sail_status_t sail_check_image_skeleton_valid(const struct sail_image* image)
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_BYTES_PER_LINE);
     }
 
+    /*
+     * Scan lines may be padded, but they must always hold at least the pixels of a full row.
+     * Everyone who walks a scan line by the image width relies on that.
+     */
+    const unsigned minimum_bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
+
+    if (minimum_bytes_per_line == 0 || image->bytes_per_line < minimum_bytes_per_line)
+    {
+        SAIL_LOG_ERROR("Bytes per line %u is less than the minimum of %u for %u %s pixels", image->bytes_per_line,
+                       minimum_bytes_per_line, image->width, sail_pixel_format_to_string(image->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_BYTES_PER_LINE);
+    }
+
     return SAIL_OK;
 }
 

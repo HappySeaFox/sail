@@ -197,6 +197,9 @@ SAIL_EXPORT sail_status_t sail_copy_image_skeleton(const struct sail_image* sour
 /*
  * Returns SAIL_OK if the given image has valid pixel_format, dimensions, and bytes per line.
  *
+ * Scan lines are allowed to be padded, so bytes per line may be greater than the number of bytes
+ * the pixels of a single row occupy. It must never be less than that.
+ *
  * Returns SAIL_OK on success.
  */
 SAIL_EXPORT sail_status_t sail_check_image_skeleton_valid(const struct sail_image* image);
