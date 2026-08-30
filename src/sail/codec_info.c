@@ -203,6 +203,12 @@ sail_status_t sail_codec_info_by_magic_number_from_io(struct sail_io* io, const 
                 buffer_index++;
             }
 
+            /* An empty magic number matches nothing rather than everything. */
+            if (buffer_index == 0)
+            {
+                mismatch = true;
+            }
+
             if (mismatch)
             {
                 magic_number_node = magic_number_node->next;
