@@ -87,6 +87,15 @@ static MunitResult test_hex_string_to_data(const MunitParameter params[], void* 
     }
 
     {
+        /* Single characters are not encoded bytes. */
+        const char* str = "1 1 1 1 1 1 1 1";
+        data            = NULL;
+        munit_assert(sail_hex_string_to_data(str, &data, &data_size) == SAIL_OK);
+        munit_assert(data_size == 0);
+        sail_free(data);
+    }
+
+    {
         /* NULL strings must fail. */
         data = NULL;
         munit_assert(sail_hex_string_to_data(NULL, &data, &data_size) != SAIL_OK);

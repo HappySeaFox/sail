@@ -82,23 +82,58 @@ sail_status_t sail_pixels_buffer_size(unsigned height, unsigned bytes_per_line, 
     return SAIL_OK;
 }
 
-static sail_status_t hex_string_into_data(const char* str, size_t str_length, void* data, size_t* data_saved)
+static int hex_digit(char c)
+{
+    if (c >= '0' && c <= '9')
+    {
+        return c - '0';
+    }
+    if (c >= 'a' && c <= 'f')
+    {
+        return c - 'a' + 10;
+    }
+    if (c >= 'A' && c <= 'F')
+    {
+        return c - 'A' + 10;
+    }
+
+    return -1;
+}
+
+/*
+ * Decodes at most data_size bytes. Every byte is encoded with exactly two HEX characters,
+ * so a lone character stops decoding just like any other unexpected character does.
+ */
+static sail_status_t hex_string_into_data(
+    const char* str, size_t str_length, void* data, size_t data_size, size_t* data_saved)
 {
     unsigned char* data_local = data;
     *data_saved               = 0;
-    unsigned byte;
-    int bytes_consumed;
 
-#ifdef _MSC_VER
-    while (str_length > 1U && sscanf_s(str, "%02x%n", &byte, &bytes_consumed) == 1)
+    for (size_t i = 0; i < str_length && *data_saved < data_size;)
     {
-#else
-    while (str_length > 1U && sscanf(str, "%02x%n", &byte, &bytes_consumed) == 1)
-    {
-#endif
-        str                         += bytes_consumed;
-        str_length                  -= bytes_consumed;
-        data_local[(*data_saved)++]  = (unsigned char)byte;
+        /* Skip white spaces between the encoded bytes. */
+        if (isspace((unsigned char)str[i]))
+        {
+            i++;
+            continue;
+        }
+
+        if (i + 1 >= str_length)
+        {
+            break;
+        }
+
+        const int high = hex_digit(str[i]);
+        const int low  = hex_digit(str[i + 1]);
+
+        if (high < 0 || low < 0)
+        {
+            break;
+        }
+
+        data_local[(*data_saved)++] = (unsigned char)((high << 4) | low);
+        i                          += 2;
     }
 
     return SAIL_OK;
@@ -1229,8 +1264,10 @@ sail_status_t sail_hex_string_into_data(const char* str, void* data)
     SAIL_CHECK_PTR(str);
     SAIL_CHECK_PTR(data);
 
+    const size_t str_length = strlen(str);
+
     size_t data_saved;
-    SAIL_TRY(hex_string_into_data(str, strlen(str), data, &data_saved));
+    SAIL_TRY(hex_string_into_data(str, str_length, data, str_length / 2, &data_saved));
 
     return SAIL_OK;
 }
@@ -1248,7 +1285,7 @@ sail_status_t sail_hex_string_to_data(const char* str, void** data, size_t* data
     unsigned char* data_local = ptr;
 
     size_t data_saved;
-    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, str_length, data_local, &data_saved),
+    SAIL_TRY_OR_CLEANUP(hex_string_into_data(str, str_length, data_local, str_length / 2, &data_saved),
                         /* cleanup */ sail_free(data_local));
 
     *data      = data_local;
