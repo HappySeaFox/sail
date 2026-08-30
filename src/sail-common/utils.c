@@ -265,7 +265,7 @@ void sail_to_lower(char* str)
 
     for (size_t i = 0; i < length; i++)
     {
-        str[i] = (char)tolower(str[i]);
+        str[i] = (char)tolower((unsigned char)str[i]);
     }
 }
 
@@ -280,7 +280,7 @@ void sail_to_upper(char* str)
 
     for (size_t i = 0; i < length; i++)
     {
-        str[i] = (char)toupper(str[i]);
+        str[i] = (char)toupper((unsigned char)str[i]);
     }
 }
 

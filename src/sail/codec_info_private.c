@@ -321,7 +321,7 @@ static sail_status_t check_codec_info(const struct sail_codec_info* codec_info)
 
     for (size_t i = 0; i < strlen(codec_info->name); i++)
     {
-        if (!isupper(codec_info->name[i]) && !isdigit(codec_info->name[i]))
+        if (!isupper((unsigned char)codec_info->name[i]) && !isdigit((unsigned char)codec_info->name[i]))
         {
             SAIL_LOG_ERROR(
                 "Codec validation error: %s codec has invalid name. Only upper-case letters and numbers are allowed",
