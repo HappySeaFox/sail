@@ -25,39 +25,19 @@
 
 #pragma once
 
-#include <QImage>
-#include <QScopedPointer>
-#include <QWidget>
+#include "image_viewer.h"
 
-#include <sail-common/status.h>
-
-namespace Ui
-{
-class QtSail;
-}
-
-class QtSail : public QWidget
+/*
+ * Loads and saves images with the junior C API: one call to load, one call to save.
+ */
+class QtSail : public ImageViewer
 {
     Q_OBJECT
 
 public:
-    QtSail(QWidget* parent = nullptr);
-    ~QtSail();
+    explicit QtSail(QWidget* parent = nullptr);
 
 private:
-    sail_status_t loadImage(const QString& path, QImage* qimage);
-    sail_status_t saveImage(const QString& path, const QImage& qimage);
-    QStringList filters() const;
-
-private: // slots
-    void onOpenFile();
-    void onSave();
-
-private:
-    void fit();
-
-private:
-    QScopedPointer<Ui::QtSail> m_ui;
-
-    QImage m_qimage;
+    sail_status_t loadImage(const QString& path, QVector<QImage>* qimages, QVector<int>* delays) override;
+    sail_status_t saveImage(const QString& path, const QImage& qimage) override;
 };

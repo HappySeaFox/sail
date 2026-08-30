@@ -25,60 +25,22 @@
 
 #pragma once
 
-#include <cstddef>
+#include "image_viewer.h"
 
-#include <QScopedPointer>
-#include <QVector>
-#include <QWidget>
-
-#include <sail-common/status.h>
-
-namespace Ui
-{
-class QtSail;
-}
-
-class QImage;
-class QTimer;
-
-namespace sail
-{
-class codec_info;
-}
-
-class QtSail : public QWidget
+/*
+ * Loads and saves images with the advanced C++ API: multi-paged and animated images,
+ * probing, conversion with alpha blending, and codec tuning.
+ */
+class QtSail : public ImageViewer
 {
     Q_OBJECT
 
 public:
-    QtSail(QWidget* parent = nullptr);
-    ~QtSail();
+    explicit QtSail(QWidget* parent = nullptr);
 
 private:
-    sail_status_t init();
-    sail_status_t loadImage(const QString& path, QVector<QImage>* qimages, QVector<int>* delays);
-    sail_status_t saveImage(const QString& path, const QImage& qimage);
-    sail_status_t codecInfo(const sail::codec_info& codec_info) const;
-    QStringList filters() const;
-    void detectAnimated();
-    void updateCurrentFrameLabel();
-
-private: // slots
-    void onOpenFile();
-    sail_status_t onProbe();
-    void onSave();
-    void onFit(bool fit);
-    void onPrevious();
-    void onNext();
-    void onStop();
-
-private:
-    QScopedPointer<Ui::QtSail> m_ui;
-
-    QVector<QImage> m_qimages;
-    QVector<int> m_delays;
-    bool m_animated;
-    QScopedPointer<QTimer> m_animationTimer;
-    int m_currentIndex = 0;
-    QString m_suffix;
+    sail_status_t loadImage(const QString& path, QVector<QImage>* qimages, QVector<int>* delays) override;
+    sail_status_t saveImage(const QString& path, const QImage& qimage) override;
+    sail_status_t probeImage(const QString& path, QString* info) override;
+    QStringList filters() const override;
 };

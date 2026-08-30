@@ -23,19 +23,11 @@
     SOFTWARE.
 */
 
-#include <algorithm>
-#include <cstdlib>
+#include <cstring>
 
-#include <QDateTime>
-#include <QDebug>
-#include <QDir>
-#include <QElapsedTimer>
-#include <QFileDialog>
 #include <QFileInfo>
 #include <QImage>
-#include <QLabel>
 #include <QMessageBox>
-#include <QPushButton>
 #include <QTimer>
 
 #include <sail/sail.h>
@@ -47,18 +39,13 @@
 
 #include "qimage_sail_pixel_formats.h"
 #include "qtsail.h"
-#include "ui_qtsail.h"
 
-#include "multi-paged-impl.cpp"
-
-QtSail::~QtSail()
+QtSail::QtSail(QWidget* parent)
+    : ImageViewer(Probe | MultiFrame, parent)
 {
-    sail_finish();
-}
+    setWindowTitle(tr("Qt SAIL demo [advanced, C API]"));
 
-sail_status_t QtSail::init()
-{
-    QTimer::singleShot(0, this, [&] {
+    QTimer::singleShot(0, this, [this] {
         QMessageBox::information(this, tr("Features"),
                                  tr("This demo includes:"
                                     "<ul>"
@@ -67,32 +54,27 @@ sail_status_t QtSail::init()
                                     "<li>Conversion with alpha blending</li>"
                                     "</ul>"));
     });
-
-    return SAIL_OK;
 }
 
 sail_status_t QtSail::loadImage(const QString& path, QVector<QImage>* qimages, QVector<int>* delays)
 {
-    qimages->clear();
-    delays->clear();
-
     /*
      * Always set the initial state to NULL in C or nullptr in C++.
      */
-    void* state = NULL;
-
-    /*
-     * Save this for displaying in the status bar.
-     */
-    SailPixelFormat source_pixel_format;
-    SailPixelFormat pixel_format;
-    unsigned width = 0, height = 0;
+    void* state = nullptr;
 
     /*
      * Starts loading the specified file.
      */
-    SAIL_TRY_OR_CLEANUP(sail_start_loading_from_file(path.toLocal8Bit(), NULL, &state),
-                        /* cleanup */ sail_stop_loading(state));
+    SAIL_TRY(sail_start_loading_from_file(path.toLocal8Bit(), nullptr, &state));
+
+    /*
+     * Save the properties of the first frame for displaying in the status bar.
+     */
+    SailPixelFormat source_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN;
+    SailPixelFormat pixel_format        = SAIL_PIXEL_FORMAT_UNKNOWN;
+    unsigned width                      = 0;
+    unsigned height                     = 0;
 
     /*
      * Load all the available image frames in the file.
@@ -102,7 +84,6 @@ sail_status_t QtSail::loadImage(const QString& path, QVector<QImage>* qimages, Q
 
     while ((res = sail_load_next_frame(state, &image)) == SAIL_OK)
     {
-
         /* Mutate alpha into a green color. */
         const struct sail_conversion_options options = {
             SAIL_CONVERSION_OPTION_BLEND_ALPHA, {0, 255 * 257, 0}, {0, 255, 0}};
@@ -112,7 +93,7 @@ sail_status_t QtSail::loadImage(const QString& path, QVector<QImage>* qimages, Q
             sail_convert_image_with_options(image, SAIL_PIXEL_FORMAT_BPP24_RGB, &options, &image_converted),
             /* cleanup */ sail_stop_loading(state), sail_destroy_image(image));
 
-        if (width == 0)
+        if (qimages->isEmpty())
         {
             source_pixel_format = image->source_image->pixel_format;
             pixel_format        = image_converted->pixel_format;
@@ -123,11 +104,9 @@ sail_status_t QtSail::loadImage(const QString& path, QVector<QImage>* qimages, Q
         /*
          * Convert to QImage.
          */
-        QImage qimage = QImage(reinterpret_cast<uchar*>(image_converted->pixels), image_converted->width,
+        qimages->append(QImage(reinterpret_cast<const uchar*>(image_converted->pixels), image_converted->width,
                                image_converted->height, image_converted->bytes_per_line, QImage::Format_RGB888)
-                            .copy();
-
-        qimages->append(qimage);
+                            .copy());
         delays->append(image->delay);
 
         sail_destroy_image(image_converted);
@@ -137,7 +116,7 @@ sail_status_t QtSail::loadImage(const QString& path, QVector<QImage>* qimages, Q
     if (res != SAIL_ERROR_NO_MORE_FRAMES)
     {
         sail_stop_loading(state);
-        return res;
+        SAIL_LOG_AND_RETURN(res);
     }
 
     SAIL_LOG_DEBUG("Loaded images: %d", qimages->size());
@@ -147,36 +126,59 @@ sail_status_t QtSail::loadImage(const QString& path, QVector<QImage>* qimages, Q
      */
     SAIL_TRY(sail_stop_loading(state));
 
-    m_ui->labelStatus->setText(tr("%1  [%2x%3]  [%4 → %5]")
-                                   .arg(QFileInfo(path).fileName())
-                                   .arg(width)
-                                   .arg(height)
-                                   .arg(sail_pixel_format_to_string(source_pixel_format))
-                                   .arg(sail_pixel_format_to_string(pixel_format)));
+    /*
+     * Empty files are reported by the viewer.
+     */
+    if (qimages->isEmpty())
+    {
+        return SAIL_OK;
+    }
+
+    setStatus(tr("%1  [%2x%3]  [%4 → %5]")
+                  .arg(QFileInfo(path).fileName())
+                  .arg(width)
+                  .arg(height)
+                  .arg(sail_pixel_format_to_string(source_pixel_format))
+                  .arg(sail_pixel_format_to_string(pixel_format)));
 
     return SAIL_OK;
 }
 
 sail_status_t QtSail::saveImage(const QString& path, const QImage& qimage)
 {
+    const SailPixelFormat qimage_pixel_format = qImageFormatToSailPixelFormat(qimage.format());
+
+    if (qimage_pixel_format == SAIL_PIXEL_FORMAT_UNKNOWN)
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
     const struct sail_codec_info* codec_info;
     SAIL_TRY(sail_codec_info_from_path(path.toLocal8Bit(), &codec_info));
-
-    /*
-     * Always set the initial state to NULL in C or nullptr in C++.
-     */
-    void* state = nullptr;
 
     struct sail_image* image;
     SAIL_TRY(sail_alloc_image(&image));
 
-    const int sizeInBytes = qimage.bytesPerLine() * qimage.height();
-    image->pixels         = malloc(sizeInBytes);
-    memcpy(image->pixels, qimage.bits(), sizeInBytes);
-    image->width          = qimage.width();
-    image->height         = qimage.height();
-    image->pixel_format   = qImageFormatToSailPixelFormat(qimage.format());
-    image->bytes_per_line = sail_bytes_per_line(image->width, image->pixel_format);
+    image->width        = qimage.width();
+    image->height       = qimage.height();
+    image->pixel_format = qimage_pixel_format;
+
+    /*
+     * QImage pads its scan lines, so take the line size from QImage instead of computing
+     * the tightly packed one with sail_bytes_per_line(). SAIL accesses pixels line by line.
+     */
+    image->bytes_per_line = qimage.bytesPerLine();
+
+    const size_t pixels_size = static_cast<size_t>(image->bytes_per_line) * image->height;
+
+    /*
+     * Pixels are freed by SAIL, so allocate them with SAIL as well. Mixing allocators
+     * from different modules crashes on some platforms.
+     */
+    SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image->pixels),
+                        /* cleanup */ sail_destroy_image(image));
+
+    memcpy(image->pixels, qimage.constBits(), pixels_size);
 
     /*
      * SAIL tries to save an image as is, preserving its pixel format.
@@ -218,15 +220,39 @@ sail_status_t QtSail::saveImage(const QString& path, const QImage& qimage)
     sail_put_hash_map(save_options->tuning, "png-filter", value);
     sail_destroy_variant(value);
 
+    /*
+     * Always set the initial state to NULL in C or nullptr in C++.
+     */
+    void* state = nullptr;
+
     SAIL_TRY_OR_CLEANUP(sail_start_saving_into_file_with_options(path.toLocal8Bit(), nullptr, save_options, &state),
                         /* cleanup */ sail_destroy_save_options(save_options), sail_destroy_image(image));
 
     sail_destroy_save_options(save_options);
 
     SAIL_TRY_OR_CLEANUP(sail_write_next_frame(state, image),
-                        /* cleanup */ sail_destroy_image(image));
+                        /* cleanup */ sail_stop_saving(state), sail_destroy_image(image));
     SAIL_TRY_OR_CLEANUP(sail_stop_saving(state),
                         /* cleanup */ sail_destroy_image(image));
+
+    sail_destroy_image(image);
+
+    return SAIL_OK;
+}
+
+sail_status_t QtSail::probeImage(const QString& path, QString* info)
+{
+    struct sail_image* image;
+    const struct sail_codec_info* codec_info;
+    SAIL_TRY(sail_probe_file(path.toLocal8Bit(), &image, &codec_info));
+
+    *info = tr("Codec: %1\nSize: %2x%3\nSource compression: %4\nSource pixel format: %5\nOutput pixel format: %6")
+                .arg(codec_info->description)
+                .arg(image->width)
+                .arg(image->height)
+                .arg(sail_compression_to_string(image->source_image->compression))
+                .arg(sail_pixel_format_to_string(image->source_image->pixel_format))
+                .arg(sail_pixel_format_to_string(image->pixel_format));
 
     sail_destroy_image(image);
 
@@ -257,105 +283,4 @@ QStringList QtSail::filters() const
     }
 
     return filters;
-}
-
-void QtSail::onOpenFile()
-{
-    const QString path =
-        QFileDialog::getOpenFileName(this, tr("Select a file"), QString(), filters().join(QStringLiteral(";;")));
-
-    if (path.isEmpty())
-    {
-        return;
-    }
-
-    sail_status_t res;
-
-    if ((res = loadImage(path, &m_qimages, &m_delays)) == SAIL_OK)
-    {
-        m_currentIndex = 0;
-        onFit(m_ui->checkFit->isChecked());
-        detectAnimated();
-    }
-    else
-    {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.").arg(path).arg(res));
-        return;
-    }
-}
-
-sail_status_t QtSail::onProbe()
-{
-    const QString path = QFileDialog::getOpenFileName(this, tr("Select a file"));
-
-    if (path.isEmpty())
-    {
-        return SAIL_OK;
-    }
-
-    QElapsedTimer elapsedTimer;
-    elapsedTimer.start();
-
-    // Probe
-    sail_image* image;
-    const struct sail_codec_info* codec_info;
-    sail_status_t res;
-
-    if ((res = sail_probe_file(path.toLocal8Bit(), &image, &codec_info)) != SAIL_OK)
-    {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to probe the image. Error: %1").arg(res));
-        return res;
-    }
-
-    QMessageBox::information(this, tr("File info"),
-                             tr("Probed in: %1 ms.\nCodec: %2\nSize: %3x%4\nSource compression: %5\nSource pixel "
-                                "format: %6\nOutput pixel format: %7")
-                                 .arg(elapsedTimer.elapsed())
-                                 .arg(codec_info->description)
-                                 .arg(image->width)
-                                 .arg(image->height)
-                                 .arg(sail_compression_to_string(image->source_image->compression))
-                                 .arg(sail_pixel_format_to_string(image->source_image->pixel_format))
-                                 .arg(sail_pixel_format_to_string(image->pixel_format)));
-
-    sail_destroy_image(image);
-
-    return SAIL_OK;
-}
-
-void QtSail::onSave()
-{
-    const QString path =
-        QFileDialog::getSaveFileName(this, tr("Select a file"), QString(), filters().join(QStringLiteral(";;")));
-
-    if (path.isEmpty())
-    {
-        return;
-    }
-
-    sail_status_t res;
-
-    if ((res = saveImage(path, m_qimages.first())) != SAIL_OK)
-    {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to save '%1'. Error: %2.").arg(path).arg(res));
-        return;
-    }
-
-    if (QMessageBox::question(
-            this, tr("Open file"),
-            tr("%1 has been saved succesfully. Open the saved file?").arg(QDir::toNativeSeparators(path)))
-        == QMessageBox::Yes)
-    {
-        if ((res = loadImage(path, &m_qimages, &m_delays)) == SAIL_OK)
-        {
-            m_currentIndex = 0;
-            onFit(m_ui->checkFit->isChecked());
-            detectAnimated();
-        }
-        else
-        {
-            QMessageBox::critical(this, tr("Error"), tr("Failed to load '%1'. Error: %2.").arg(path).arg(res));
-            return;
-        }
-    }
 }

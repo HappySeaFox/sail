@@ -1,59 +1,62 @@
-cmake_minimum_required(VERSION 3.6.0)
+cmake_minimum_required(VERSION 3.16)
+
+project(junior-with-c++-api CXX)
 
 # Enable strict C++17
 #
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Option to ensable ASAN on supported platforms
+# Option to enable ASAN on supported platforms
 #
 option(SAIL_ASAN "Enable ASAN with supported compilers." ON)
-
-project(junior-with-c++-api)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-if (CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
+# Qt6 is preferred, Qt5 is still supported
+#
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
+# Add SAIL dependency. This example demonstrates linking with pkg-config
+#
 find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(SAIL_CXX IMPORTED_TARGET REQUIRED sail-c++)
+
+# Add the image viewer widget shared by all the Qt examples. It needs SAIL headers as well
+#
+set(SAIL_QT_EXAMPLE_SAIL_TARGET PkgConfig::SAIL_CXX)
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../common" common)
 
 # Manifest to support Windows 10 is embedded into our RC file
 #
 set(RC_FILE "")
 if (WIN32)
     set(RC_FILE "qtsail.rc")
-    set(CMAKE_EXE_LINKER_FLAGS "/MANIFEST:NO")
 endif()
 
 add_executable(junior-with-c++-api
                 main.cpp
                 qtsail.cpp
-                qtsail.ui
                 "${RC_FILE}")
 
-target_include_directories(junior-with-c++-api PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/..")
+if (MSVC)
+    target_link_options(junior-with-c++-api PRIVATE "/MANIFEST:NO")
+endif()
 
 # Enable ASAN
 #
 if (SAIL_ASAN)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         target_compile_options(junior-with-c++-api PRIVATE "-fsanitize=address")
-        target_link_libraries(junior-with-c++-api "-fsanitize=address")
+        target_link_options(junior-with-c++-api PRIVATE "-fsanitize=address")
     else()
-        message("ASAN is not supported with this compiler.")
+        message(STATUS "ASAN is not supported with this compiler.")
     endif()
 endif()
 
-# Add SAIL dependency
-#
-pkg_check_modules(SAIL_CXX IMPORTED_TARGET REQUIRED libsail-c++)
-target_link_libraries(junior-with-c++-api PkgConfig::SAIL_CXX)
-
-# Add Qt5 dependency
-#
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-target_link_libraries(junior-with-c++-api Qt5::Widgets)
+target_link_libraries(junior-with-c++-api PRIVATE sail-qt-example-viewer PkgConfig::SAIL_CXX)
