@@ -1145,20 +1145,21 @@ sail_status_t sail_temp_file_path(const char* prefix, char** path)
 sail_status_t sail_file_size(const char* path, size_t* size)
 {
     SAIL_CHECK_PTR(path);
+    SAIL_CHECK_PTR(size);
 
     bool is_file;
 
 #ifdef SAIL_WINDOWS_UTF8_PATHS
     wchar_t* wpath;
-    SAIL_TRY_OR_EXECUTE(sail_multibyte_to_wchar(path, &wpath),
-                        /* on error */ return false);
+    SAIL_TRY(sail_multibyte_to_wchar(path, &wpath));
 
     struct _stat attrs;
 
     if (_wstat(wpath, &attrs) != 0)
     {
         sail_free(wpath);
-        return false;
+        SAIL_LOG_ERROR("Failed to stat '%s'", path);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
     sail_free(wpath);
@@ -1170,7 +1171,8 @@ sail_status_t sail_file_size(const char* path, size_t* size)
 
     if (_stat(path, &attrs) != 0)
     {
-        return false;
+        SAIL_LOG_ERROR("Failed to stat '%s'", path);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
     is_file = (attrs.st_mode & _S_IFMT) == _S_IFREG;
@@ -1179,7 +1181,8 @@ sail_status_t sail_file_size(const char* path, size_t* size)
 
     if (stat(path, &attrs) != 0)
     {
-        return false;
+        SAIL_LOG_ERROR("Failed to stat '%s': %s", path, sail_strerror());
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
     }
 
     is_file = S_ISREG(attrs.st_mode);
