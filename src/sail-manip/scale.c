@@ -109,7 +109,9 @@ sail_status_t sail_scale_image(const struct sail_image* image,
     /* Allocate pixels. */
     size_t pixels_size;
 
-    SAIL_TRY(sail_pixels_buffer_size(output->height, output->bytes_per_line, &pixels_size));
+    SAIL_TRY_OR_CLEANUP(sail_pixels_buffer_size(output->height, output->bytes_per_line, &pixels_size),
+                        /* cleanup */ sail_destroy_image(output);
+                        sail_destroy_image(rgba_image));
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &output->pixels),
                         /* cleanup */ sail_destroy_image(output);
                         sail_destroy_image(rgba_image));
@@ -171,7 +173,9 @@ sail_status_t sail_scale_image(const struct sail_image* image,
     }
 
     /* Allocate pixels */
-    SAIL_TRY(sail_pixels_buffer_size(output->height, output->bytes_per_line, &pixels_size));
+    SAIL_TRY_OR_CLEANUP(sail_pixels_buffer_size(output->height, output->bytes_per_line, &pixels_size),
+                        /* cleanup */ sail_destroy_image(output);
+                        sail_destroy_image(rgba_image));
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &output->pixels),
                         /* cleanup */ sail_destroy_image(output);
                         sail_destroy_image(rgba_image));
