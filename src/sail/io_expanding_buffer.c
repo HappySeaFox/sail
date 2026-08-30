@@ -130,6 +130,16 @@ static sail_status_t io_expanding_buffer_tolerant_write(void* stream, const void
         expanding_buffer_stream->capacity = new_capacity;
     }
 
+    /*
+     * Seeking beyond the end of the data leaves a gap. Zero it out, otherwise the uninitialized
+     * heap memory it holds gets into the resulting image.
+     */
+    if (expanding_buffer_stream->pos > expanding_buffer_stream->size)
+    {
+        memset((char*)expanding_buffer_stream->buffer + expanding_buffer_stream->size, 0,
+               expanding_buffer_stream->pos - expanding_buffer_stream->size);
+    }
+
     /* Write data. */
     memcpy((char*)expanding_buffer_stream->buffer + expanding_buffer_stream->pos, buf, size_to_write);
     expanding_buffer_stream->pos += size_to_write;
