@@ -98,27 +98,10 @@ enum AVPixelFormat sail_to_av_pixel_format(enum SailPixelFormat sail_pix_fmt)
     case SAIL_PIXEL_FORMAT_BPP32_XBGR:
         return AV_PIX_FMT_0BGR;
 
-    case SAIL_PIXEL_FORMAT_BPP24_YUV:
-        return AV_PIX_FMT_YUV420P;
-    case SAIL_PIXEL_FORMAT_BPP30_YUV:
-        return AV_PIX_FMT_YUV420P10LE;
-    case SAIL_PIXEL_FORMAT_BPP36_YUV:
-        return AV_PIX_FMT_YUV420P12LE;
-    case SAIL_PIXEL_FORMAT_BPP48_YUV:
-        return AV_PIX_FMT_YUV420P16LE;
-
-    case SAIL_PIXEL_FORMAT_BPP32_YUVA:
-        return AV_PIX_FMT_YUVA420P;
-    case SAIL_PIXEL_FORMAT_BPP40_YUVA:
-        return AV_PIX_FMT_YUVA420P10LE;
-    case SAIL_PIXEL_FORMAT_BPP48_YUVA:
-        return AV_PIX_FMT_YUVA422P12LE;
-    case SAIL_PIXEL_FORMAT_BPP64_YUVA:
-        return AV_PIX_FMT_YUVA420P16LE;
-
-    case SAIL_PIXEL_FORMAT_BPP8_INDEXED:
-        return AV_PIX_FMT_PAL8;
-
+    /*
+     * Planar and palette formats need a pointer and a line size per plane, while we always
+     * pass a single plane, so they are deliberately not mapped here.
+     */
     default:
         return AV_PIX_FMT_NONE;
     }
@@ -142,15 +125,6 @@ sail_status_t scale_with_swscale(const struct sail_image* src_image,
     if (!sws_isSupportedInput(src_av) || !sws_isSupportedOutput(dst_av))
     {
         SAIL_LOG_ERROR("SWSCALE: Format not supported by swscale");
-        return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
-    }
-
-    /* Skip indexed formats - swscale doesn't handle palette directly. */
-    if (src_av == AV_PIX_FMT_PAL8 || src_image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED
-        || src_image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED
-        || src_image->pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED)
-    {
-        SAIL_LOG_ERROR("SWSCALE: Indexed formats not supported for scaling");
         return SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT;
     }
 
