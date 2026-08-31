@@ -554,6 +554,8 @@ static sail_status_t init_context_impl(struct sail_context* context)
 {
     SAIL_CHECK_PTR(context);
 
+    SAIL_LOG_INFO("Codecs path: not used, the codecs are combined into the library");
+
     /* Externs from sail-codecs. */
 #ifdef SAIL_STATIC
     /* For example: [ "gif", "jpeg", "png" ]. */
@@ -658,12 +660,12 @@ static sail_status_t init_context_impl(struct sail_context* context)
     if (env == NULL)
     {
         our_codecs_path = sail_codecs_path();
-        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is not set. Loading codecs from '%s'", our_codecs_path);
+        SAIL_LOG_INFO("Codecs path: %s", our_codecs_path);
     }
     else
     {
         our_codecs_path = env;
-        SAIL_LOG_DEBUG("SAIL_CODECS_PATH environment variable is set. Loading codecs from '%s'", env);
+        SAIL_LOG_INFO("Codecs path: %s (from the SAIL_CODECS_PATH environment variable)", env);
     }
 
     /* Construct a list of paths to search. */
@@ -721,16 +723,42 @@ static void print_build_statistics(void)
     SAIL_LOG_INFO("Static build: no");
 #endif
 
-#ifdef SAIL_COMBINE_CODECS
-    SAIL_LOG_INFO("Combine codecs: yes");
-#else
-    SAIL_LOG_INFO("Combine codecs: no");
-#endif
-
 #ifdef SAIL_THREAD_SAFE
     SAIL_LOG_INFO("Thread-safe: yes");
 #else
     SAIL_LOG_INFO("Thread-safe: no");
+#endif
+
+#ifdef SAIL_MANIP_SWSCALE_ENABLED
+    SAIL_LOG_INFO("Swscale: yes");
+#else
+    SAIL_LOG_INFO("Swscale: no");
+#endif
+
+#ifdef SAIL_HAVE_OPENMP
+#ifdef SAIL_OPENMP_SCHEDULE
+    SAIL_LOG_INFO("OpenMP: yes, schedule " SAIL_STRINGIFY(SAIL_OPENMP_SCHEDULE));
+#else
+    SAIL_LOG_INFO("OpenMP: yes, schedule dynamic");
+#endif
+#else
+    SAIL_LOG_INFO("OpenMP: no");
+#endif
+
+    SAIL_LOG_INFO("Magic buffer size: %d", SAIL_MAGIC_BUFFER_SIZE);
+
+#ifdef SAIL_WIN32
+#ifdef SAIL_WINDOWS_UTF8_PATHS
+    SAIL_LOG_INFO("UTF-8 paths: yes");
+#else
+    SAIL_LOG_INFO("UTF-8 paths: no");
+#endif
+#endif
+
+#ifdef SAIL_COMBINE_CODECS
+    SAIL_LOG_INFO("Combine codecs: yes");
+#else
+    SAIL_LOG_INFO("Combine codecs: no");
 #endif
 
 #ifdef SAIL_THIRD_PARTY_CODECS_PATH
