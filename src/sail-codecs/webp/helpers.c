@@ -42,11 +42,14 @@ void webp_private_fill_color(uint8_t* pixels,
 {
     uint8_t* scanline = pixels + y * bytes_per_line + x * bytes_per_pixel;
 
+    /* Never write more than a single pixel takes and never read past the color. */
+    const unsigned bytes_to_copy = bytes_per_pixel < sizeof(color) ? bytes_per_pixel : (unsigned)sizeof(color);
+
     for (unsigned row = 0; row < height; row++, scanline += bytes_per_line)
     {
         for (unsigned column = 0; column < width * bytes_per_pixel; column += bytes_per_pixel)
         {
-            memcpy(scanline + column, &color, sizeof(color));
+            memcpy(scanline + column, &color, bytes_to_copy);
         }
     }
 }
