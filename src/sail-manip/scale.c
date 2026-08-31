@@ -290,7 +290,7 @@ struct pixel_format_desc
     static inline void FUNC_NAME(const uint8_t* pixels,                                        \
                                   unsigned width,                                              \
                                   unsigned height,                                             \
-                                  unsigned bytes_per_line,                                     \
+                                  size_t bytes_per_line,                                       \
                                   int x,                                                       \
                                   int y,                                                       \
                                   uint8_t* r_out,                                              \
@@ -300,7 +300,7 @@ struct pixel_format_desc
     {                                                                                          \
         x                    = clamp_int(x, (int)width - 1);                                   \
         y                    = clamp_int(y, (int)height - 1);                                  \
-        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL;              \
+        const uint8_t* pixel = pixels + y * bytes_per_line + (size_t)x * BYTES_PER_PIXEL;      \
         if (IS_16BIT)                                                                          \
         {                                                                                      \
             /* 16-bit per channel: take high byte (MSB) for 8-bit output. */                   \
@@ -327,43 +327,43 @@ struct pixel_format_desc
     }
 
 /* Sample grayscale pixel. */
-#define SAMPLE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                    \
-    static inline uint8_t FUNC_NAME(const uint8_t* pixels,                       \
-                                     unsigned width,                             \
-                                     unsigned height,                            \
-                                     unsigned bytes_per_line,                    \
-                                     int x,                                      \
-                                     int y)                                      \
-    {                                                                            \
-        x                    = clamp_int(x, (int)width - 1);                     \
-        y                    = clamp_int(y, (int)height - 1);                    \
-        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL; \
-        return pixel[0];                                                         \
+#define SAMPLE_GRAYSCALE_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                             \
+    static inline uint8_t FUNC_NAME(const uint8_t* pixels,                                \
+                                     unsigned width,                                      \
+                                     unsigned height,                                     \
+                                     size_t bytes_per_line,                               \
+                                     int x,                                               \
+                                     int y)                                               \
+    {                                                                                     \
+        x                    = clamp_int(x, (int)width - 1);                              \
+        y                    = clamp_int(y, (int)height - 1);                             \
+        const uint8_t* pixel = pixels + y * bytes_per_line + (size_t)x * BYTES_PER_PIXEL; \
+        return pixel[0];                                                                  \
     }
 
 /* Sample grayscale+alpha pixel. */
-#define SAMPLE_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)              \
-    static inline void FUNC_NAME(const uint8_t* pixels,                          \
-                                  unsigned width,                                \
-                                  unsigned height,                               \
-                                  unsigned bytes_per_line,                       \
-                                  int x,                                         \
-                                  int y,                                         \
-                                  uint8_t* g_out,                                \
-                                  uint8_t* a_out)                                \
-    {                                                                            \
-        x                    = clamp_int(x, (int)width - 1);                     \
-        y                    = clamp_int(y, (int)height - 1);                    \
-        const uint8_t* pixel = pixels + y * bytes_per_line + x * BYTES_PER_PIXEL; \
-        *g_out               = pixel[0];                                         \
-        *a_out               = pixel[BYTES_PER_PIXEL / 2];                       \
+#define SAMPLE_GRAYSCALE_ALPHA_TEMPLATE(FUNC_NAME, BYTES_PER_PIXEL)                       \
+    static inline void FUNC_NAME(const uint8_t* pixels,                                   \
+                                  unsigned width,                                         \
+                                  unsigned height,                                        \
+                                  size_t bytes_per_line,                                  \
+                                  int x,                                                  \
+                                  int y,                                                  \
+                                  uint8_t* g_out,                                         \
+                                  uint8_t* a_out)                                         \
+    {                                                                                     \
+        x                    = clamp_int(x, (int)width - 1);                              \
+        y                    = clamp_int(y, (int)height - 1);                             \
+        const uint8_t* pixel = pixels + y * bytes_per_line + (size_t)x * BYTES_PER_PIXEL; \
+        *g_out               = pixel[0];                                                  \
+        *a_out               = pixel[BYTES_PER_PIXEL / 2];                                \
     }
 
 /* Sample grayscale+alpha pixel (8-bit: 1 byte grayscale + 1 byte alpha). */
 static inline void sample_grayscale_alpha8(const uint8_t* pixels,
                                            unsigned width,
                                            unsigned height,
-                                           unsigned bytes_per_line,
+                                           size_t bytes_per_line,
                                            int x,
                                            int y,
                                            uint8_t* g_out,
@@ -371,7 +371,7 @@ static inline void sample_grayscale_alpha8(const uint8_t* pixels,
 {
     x                    = clamp_int(x, (int)width - 1);
     y                    = clamp_int(y, (int)height - 1);
-    const uint8_t* pixel = pixels + y * bytes_per_line + x * 2;
+    const uint8_t* pixel = pixels + y * bytes_per_line + (size_t)x * 2;
     *g_out               = pixel[0];
     *a_out               = pixel[1];
 }
@@ -380,7 +380,7 @@ static inline void sample_grayscale_alpha8(const uint8_t* pixels,
 static inline void sample_grayscale_alpha16(const uint8_t* pixels,
                                             unsigned width,
                                             unsigned height,
-                                            unsigned bytes_per_line,
+                                            size_t bytes_per_line,
                                             int x,
                                             int y,
                                             uint8_t* g_out,
@@ -388,7 +388,7 @@ static inline void sample_grayscale_alpha16(const uint8_t* pixels,
 {
     x                    = clamp_int(x, (int)width - 1);
     y                    = clamp_int(y, (int)height - 1);
-    const uint8_t* pixel = pixels + y * bytes_per_line + x * 4;
+    const uint8_t* pixel = pixels + y * bytes_per_line + (size_t)x * 4;
     *g_out               = pixel[0];
     *a_out               = pixel[2];
 }
@@ -397,7 +397,7 @@ static inline void sample_grayscale_alpha16(const uint8_t* pixels,
 static inline void sample_grayscale_alpha32(const uint8_t* pixels,
                                             unsigned width,
                                             unsigned height,
-                                            unsigned bytes_per_line,
+                                            size_t bytes_per_line,
                                             int x,
                                             int y,
                                             uint8_t* g_out,
@@ -405,7 +405,7 @@ static inline void sample_grayscale_alpha32(const uint8_t* pixels,
 {
     x                    = clamp_int(x, (int)width - 1);
     y                    = clamp_int(y, (int)height - 1);
-    const uint8_t* pixel = pixels + y * bytes_per_line + x * 8;
+    const uint8_t* pixel = pixels + y * bytes_per_line + (size_t)x * 8;
     *g_out               = pixel[0];
     *a_out               = pixel[4];
 }
@@ -567,11 +567,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                    \
                                     unsigned src_width,                                                          \
                                     unsigned src_height,                                                         \
-                                    unsigned src_bytes_per_line,                                                 \
+                                    size_t src_bytes_per_line,                                                   \
                                     uint8_t* dst_pixels,                                                         \
                                     unsigned dst_width,                                                          \
                                     unsigned dst_height,                                                         \
-                                    unsigned dst_bytes_per_line)                                                 \
+                                    size_t dst_bytes_per_line)                                                   \
     {                                                                                                            \
         const double x_scale = (double)src_width / (double)dst_width;                                            \
         const double y_scale = (double)src_height / (double)dst_height;                                          \
@@ -597,11 +597,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                      \
                                     unsigned src_width,                                                            \
                                     unsigned src_height,                                                           \
-                                    unsigned src_bytes_per_line,                                                   \
+                                    size_t src_bytes_per_line,                                                     \
                                     uint8_t* dst_pixels,                                                           \
                                     unsigned dst_width,                                                            \
                                     unsigned dst_height,                                                           \
-                                    unsigned dst_bytes_per_line)                                                   \
+                                    size_t dst_bytes_per_line)                                                     \
     {                                                                                                              \
         const double x_scale = (double)src_width / (double)dst_width;                                              \
         const double y_scale = (double)src_height / (double)dst_height;                                            \
@@ -626,11 +626,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                            \
                                     unsigned src_width,                                                  \
                                     unsigned src_height,                                                 \
-                                    unsigned src_bytes_per_line,                                         \
+                                    size_t src_bytes_per_line,                                           \
                                     uint8_t* dst_pixels,                                                 \
                                     unsigned dst_width,                                                  \
                                     unsigned dst_height,                                                 \
-                                    unsigned dst_bytes_per_line)                                         \
+                                    size_t dst_bytes_per_line)                                           \
     {                                                                                                    \
         const double x_scale = (double)src_width / (double)dst_width;                                    \
         const double y_scale = (double)src_height / (double)dst_height;                                  \
@@ -656,11 +656,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                      \
                                     unsigned src_width,                                                            \
                                     unsigned src_height,                                                           \
-                                    unsigned src_bytes_per_line,                                                   \
+                                    size_t src_bytes_per_line,                                                     \
                                     uint8_t* dst_pixels,                                                           \
                                     unsigned dst_width,                                                            \
                                     unsigned dst_height,                                                           \
-                                    unsigned dst_bytes_per_line)                                                   \
+                                    size_t dst_bytes_per_line)                                                     \
     {                                                                                                              \
         const double x_scale = (double)src_width / (double)dst_width;                                              \
         const double y_scale = (double)src_height / (double)dst_height;                                            \
@@ -707,11 +707,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                   \
                                     unsigned src_width,                                                         \
                                     unsigned src_height,                                                        \
-                                    unsigned src_bytes_per_line,                                                \
+                                    size_t src_bytes_per_line,                                                  \
                                     uint8_t* dst_pixels,                                                        \
                                     unsigned dst_width,                                                         \
                                     unsigned dst_height,                                                        \
-                                    unsigned dst_bytes_per_line)                                                \
+                                    size_t dst_bytes_per_line)                                                  \
     {                                                                                                           \
         const double x_scale = (double)src_width / (double)dst_width;                                           \
         const double y_scale = (double)src_height / (double)dst_height;                                         \
@@ -750,11 +750,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                               \
                                     unsigned src_width,                                                     \
                                     unsigned src_height,                                                    \
-                                    unsigned src_bytes_per_line,                                            \
+                                    size_t src_bytes_per_line,                                              \
                                     uint8_t* dst_pixels,                                                    \
                                     unsigned dst_width,                                                     \
                                     unsigned dst_height,                                                    \
-                                    unsigned dst_bytes_per_line)                                            \
+                                    size_t dst_bytes_per_line)                                              \
     {                                                                                                       \
         const double x_scale = (double)src_width / (double)dst_width;                                       \
         const double y_scale = (double)src_height / (double)dst_height;                                     \
@@ -795,11 +795,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                    \
                                     unsigned src_width,                                                          \
                                     unsigned src_height,                                                         \
-                                    unsigned src_bytes_per_line,                                                 \
+                                    size_t src_bytes_per_line,                                                   \
                                     uint8_t* dst_pixels,                                                         \
                                     unsigned dst_width,                                                          \
                                     unsigned dst_height,                                                         \
-                                    unsigned dst_bytes_per_line)                                                 \
+                                    size_t dst_bytes_per_line)                                                   \
     {                                                                                                            \
         const double x_scale = (double)src_width / (double)dst_width;                                            \
         const double y_scale = (double)src_height / (double)dst_height;                                          \
@@ -855,11 +855,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                          \
                                     unsigned src_width,                                                                \
                                     unsigned src_height,                                                               \
-                                    unsigned src_bytes_per_line,                                                       \
+                                    size_t src_bytes_per_line,                                                         \
                                     uint8_t* dst_pixels,                                                               \
                                     unsigned dst_width,                                                                \
                                     unsigned dst_height,                                                               \
-                                    unsigned dst_bytes_per_line)                                                       \
+                                    size_t dst_bytes_per_line)                                                         \
     {                                                                                                                  \
         const double x_scale = (double)src_width / (double)dst_width;                                                  \
         const double y_scale = (double)src_height / (double)dst_height;                                                \
@@ -907,11 +907,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                    \
                                     unsigned src_width,                                                          \
                                     unsigned src_height,                                                         \
-                                    unsigned src_bytes_per_line,                                                 \
+                                    size_t src_bytes_per_line,                                                   \
                                     uint8_t* dst_pixels,                                                         \
                                     unsigned dst_width,                                                          \
                                     unsigned dst_height,                                                         \
-                                    unsigned dst_bytes_per_line)                                                 \
+                                    size_t dst_bytes_per_line)                                                   \
     {                                                                                                            \
         const int lanczos_a  = 3;                                                                                \
         const double x_scale = (double)src_width / (double)dst_width;                                            \
@@ -970,11 +970,11 @@ WRITE_PIXEL_16BIT_TEMPLATE(write_bgra64, 8, 4, 2, 0, 6)
     static sail_status_t FUNC_NAME(const uint8_t* src_pixels,                                                          \
                                     unsigned src_width,                                                                \
                                     unsigned src_height,                                                               \
-                                    unsigned src_bytes_per_line,                                                       \
+                                    size_t src_bytes_per_line,                                                         \
                                     uint8_t* dst_pixels,                                                               \
                                     unsigned dst_width,                                                                \
                                     unsigned dst_height,                                                               \
-                                    unsigned dst_bytes_per_line)                                                       \
+                                    size_t dst_bytes_per_line)                                                         \
     {                                                                                                                  \
         const int lanczos_a  = 3;                                                                                      \
         const double x_scale = (double)src_width / (double)dst_width;                                                  \
@@ -1142,11 +1142,11 @@ SCALE_LANCZOS_TEMPLATE(scale_lanczos_bgra64, sample_bgra64, write_bgra64, 8)
 typedef sail_status_t (*scale_func_t)(const uint8_t* src_pixels,
                                       unsigned src_width,
                                       unsigned src_height,
-                                      unsigned src_bytes_per_line,
+                                      size_t src_bytes_per_line,
                                       uint8_t* dst_pixels,
                                       unsigned dst_width,
                                       unsigned dst_height,
-                                      unsigned dst_bytes_per_line);
+                                      size_t dst_bytes_per_line);
 
 /*
  * Format dispatcher structure.
