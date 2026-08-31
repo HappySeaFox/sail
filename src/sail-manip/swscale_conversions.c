@@ -28,6 +28,7 @@
 
 #include <sail-common/sail-common.h>
 
+#include "scale_swscale.h"
 #include "swscale_conversions.h"
 
 #ifdef SAIL_MANIP_SWSCALE_ENABLED
@@ -38,60 +39,6 @@
 /*
  * Private functions.
  */
-
-/* Convert SailPixelFormat to AVPixelFormat. */
-static enum AVPixelFormat sail_to_av_pixel_format(enum SailPixelFormat sail_pix_fmt)
-{
-    switch (sail_pix_fmt)
-    {
-    case SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE:
-        return AV_PIX_FMT_GRAY8;
-    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE:
-        return AV_PIX_FMT_GRAY16LE;
-    case SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE_ALPHA:
-        return AV_PIX_FMT_YA8;
-    case SAIL_PIXEL_FORMAT_BPP32_GRAYSCALE_ALPHA:
-        return AV_PIX_FMT_YA16LE;
-
-    case SAIL_PIXEL_FORMAT_BPP24_RGB:
-        return AV_PIX_FMT_RGB24;
-    case SAIL_PIXEL_FORMAT_BPP24_BGR:
-        return AV_PIX_FMT_BGR24;
-    case SAIL_PIXEL_FORMAT_BPP48_RGB:
-        return AV_PIX_FMT_RGB48LE;
-    case SAIL_PIXEL_FORMAT_BPP48_BGR:
-        return AV_PIX_FMT_BGR48LE;
-
-    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-        return AV_PIX_FMT_RGBA;
-    case SAIL_PIXEL_FORMAT_BPP32_BGRA:
-        return AV_PIX_FMT_BGRA;
-    case SAIL_PIXEL_FORMAT_BPP32_ARGB:
-        return AV_PIX_FMT_ARGB;
-    case SAIL_PIXEL_FORMAT_BPP32_ABGR:
-        return AV_PIX_FMT_ABGR;
-    case SAIL_PIXEL_FORMAT_BPP64_RGBA:
-        return AV_PIX_FMT_RGBA64LE;
-    case SAIL_PIXEL_FORMAT_BPP64_BGRA:
-        return AV_PIX_FMT_BGRA64LE;
-
-    case SAIL_PIXEL_FORMAT_BPP32_RGBX:
-        return AV_PIX_FMT_RGB0;
-    case SAIL_PIXEL_FORMAT_BPP32_BGRX:
-        return AV_PIX_FMT_BGR0;
-    case SAIL_PIXEL_FORMAT_BPP32_XRGB:
-        return AV_PIX_FMT_0RGB;
-    case SAIL_PIXEL_FORMAT_BPP32_XBGR:
-        return AV_PIX_FMT_0BGR;
-
-    /*
-     * Planar and palette formats need a pointer and a line size per plane, while we always
-     * pass a single plane, so they are deliberately not mapped here.
-     */
-    default:
-        return AV_PIX_FMT_NONE;
-    }
-}
 
 /* Check if swscale supports this conversion. */
 static bool swscale_supports_conversion(enum AVPixelFormat src_fmt, enum AVPixelFormat dst_fmt)
