@@ -82,6 +82,24 @@ sail_status_t sail_pixels_buffer_size(unsigned height, unsigned bytes_per_line, 
     return SAIL_OK;
 }
 
+sail_status_t sail_alloc_pixels(unsigned height, unsigned bytes_per_line, void** pixels)
+{
+    SAIL_CHECK_PTR(pixels);
+
+    size_t pixels_size;
+    SAIL_TRY(sail_pixels_buffer_size(height, bytes_per_line, &pixels_size));
+
+    if (pixels_size > SIZE_MAX - SAIL_PIXELS_TAIL_SIZE)
+    {
+        SAIL_LOG_ERROR("Cannot allocate %zu pixels bytes with the tail", pixels_size);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    SAIL_TRY(sail_malloc(pixels_size + SAIL_PIXELS_TAIL_SIZE, pixels));
+
+    return SAIL_OK;
+}
+
 static int hex_digit(char c)
 {
     if (c >= '0' && c <= '9')

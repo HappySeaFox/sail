@@ -85,7 +85,7 @@ sail_status_t sail_copy_image(const struct sail_image* source, struct sail_image
 
         SAIL_TRY_OR_CLEANUP(sail_pixels_buffer_size(source->height, source->bytes_per_line, &pixels_size),
                             /* cleanup */ sail_destroy_image(image_local));
-        SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
+        SAIL_TRY_OR_CLEANUP(sail_alloc_pixels(source->height, source->bytes_per_line, &image_local->pixels),
                             /* cleanup */ sail_destroy_image(image_local));
 
         memcpy(image_local->pixels, source->pixels, pixels_size);

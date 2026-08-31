@@ -2293,7 +2293,7 @@ sail_status_t sail_convert_image_with_options(const struct sail_image* image,
 
     SAIL_TRY_OR_CLEANUP(sail_pixels_buffer_size(image_local->height, image_local->bytes_per_line, &pixels_size),
                         /* cleanup */ sail_destroy_image(image_local));
-    SAIL_TRY_OR_CLEANUP(sail_malloc(pixels_size, &image_local->pixels),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_pixels(image_local->height, image_local->bytes_per_line, &image_local->pixels),
                         /* cleanup */ sail_destroy_image(image_local));
 
     /* Try swscale conversion first (if enabled and no alpha blending) */

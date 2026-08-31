@@ -167,6 +167,24 @@ SAIL_EXPORT sail_status_t sail_size_mul(unsigned a, unsigned b, size_t* result);
 SAIL_EXPORT sail_status_t sail_pixels_buffer_size(unsigned height, unsigned bytes_per_line, size_t* pixels_size);
 
 /*
+ * The number of extra bytes SAIL allocates past the pixels of every image.
+ *
+ * libswscale, which SAIL uses to convert and scale images when it's compiled with swscale
+ * support, processes scan lines in SIMD-sized blocks. It reads and writes up to 32 bytes past
+ * the pixels of the last scan line, which is why FFmpeg allocates its own buffers with extra
+ * room as well (see av_image_alloc()).
+ */
+#define SAIL_PIXELS_TAIL_SIZE 64
+
+/*
+ * Allocates a pixels buffer for the specified scan lines plus the tail of SAIL_PIXELS_TAIL_SIZE
+ * bytes. Use it to allocate the pixels of the images you construct yourself.
+ *
+ * Returns SAIL_OK on success.
+ */
+SAIL_EXPORT sail_status_t sail_alloc_pixels(unsigned height, unsigned bytes_per_line, void** pixels);
+
+/*
  * Returns true if the given pixel format is indexed and assumes having a palette.
  */
 SAIL_EXPORT bool sail_is_indexed(enum SailPixelFormat pixel_format);

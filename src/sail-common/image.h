@@ -52,6 +52,11 @@ struct sail_image
      * Image pixels. The channels are interleaved per pixel. The pixels are
      * organized row by row, left to right, top to bottom.
      *
+     * Allocate them with sail_alloc_pixels(), which adds the tail of SAIL_PIXELS_TAIL_SIZE
+     * bytes required by libswscale. Pixels allocated without the tail must not be converted
+     * with sail_convert_image() or scaled with sail_scale_image() when SAIL is compiled with
+     * swscale support. Without swscale the tail is not needed.
+     *
      * LOAD: Set by SAIL to an allocated array of pixels.
      * SAVE: Must be set by a caller to an allocated array of pixels.
      */

@@ -100,8 +100,12 @@ image::image(SailPixelFormat pixel_format, unsigned width, unsigned height)
 
     d->pixels_size = static_cast<std::size_t>(bytes_per_line()) * height;
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(d->pixels_size, &d->sail_image->pixels),
-                        /* on error */ throw std::bad_alloc());
+    /* Nothing to allocate for invalid dimensions or pixel formats. The image stays invalid. */
+    if (d->pixels_size > 0)
+    {
+        SAIL_TRY_OR_EXECUTE(sail_alloc_pixels(height, bytes_per_line(), &d->sail_image->pixels),
+                            /* on error */ throw std::bad_alloc());
+    }
 }
 
 image::image(SailPixelFormat pixel_format, unsigned width, unsigned height, unsigned bytes_per_line)
@@ -113,8 +117,12 @@ image::image(SailPixelFormat pixel_format, unsigned width, unsigned height, unsi
 
     d->pixels_size = static_cast<std::size_t>(height) * bytes_per_line;
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(d->pixels_size, &d->sail_image->pixels),
-                        /* on error */ throw std::bad_alloc());
+    /* Nothing to allocate for invalid dimensions or pixel formats. The image stays invalid. */
+    if (d->pixels_size > 0)
+    {
+        SAIL_TRY_OR_EXECUTE(sail_alloc_pixels(height, bytes_per_line, &d->sail_image->pixels),
+                            /* on error */ throw std::bad_alloc());
+    }
 }
 
 image::image(void* pixels, SailPixelFormat pixel_format, unsigned width, unsigned height)
@@ -988,7 +996,8 @@ void image::set_pixels(const void* pixels, std::size_t pixels_size)
         return;
     }
 
-    SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size, &d->sail_image->pixels),
+    /* The tail is the same one sail_alloc_pixels() adds. */
+    SAIL_TRY_OR_EXECUTE(sail_malloc(pixels_size + SAIL_PIXELS_TAIL_SIZE, &d->sail_image->pixels),
                         /* on error */ return);
 
     memcpy(d->sail_image->pixels, pixels, pixels_size);

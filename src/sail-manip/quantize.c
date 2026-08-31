@@ -894,7 +894,7 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     SAIL_TRY_OR_CLEANUP(
         sail_pixels_buffer_size(indexed_image->height, indexed_image->bytes_per_line, &indexed_pixels_size),
         /* cleanup */ sail_destroy_image(indexed_image), sail_free(state->Qadd), sail_free(state));
-    SAIL_TRY_OR_CLEANUP(sail_malloc(indexed_pixels_size, &indexed_image->pixels),
+    SAIL_TRY_OR_CLEANUP(sail_alloc_pixels(indexed_image->height, indexed_image->bytes_per_line, &indexed_image->pixels),
                         /* cleanup */ sail_destroy_image(indexed_image), sail_free(state->Qadd), sail_free(state));
 
     /* Copy indexed pixels. */
