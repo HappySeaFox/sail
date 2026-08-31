@@ -387,6 +387,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void* state, s
     webp_state->frame_dispose_method = webp_state->webp_iterator->dispose_method;
     webp_state->frame_blend_method   = webp_state->webp_iterator->blend_method;
 
+    /* Every frame must fit into the canvas as we write into it directly. */
+    if (webp_state->frame_x + webp_state->frame_width > webp_state->canvas_image->width
+        || webp_state->frame_y + webp_state->frame_height > webp_state->canvas_image->height)
+    {
+        SAIL_LOG_ERROR("WEBP: Frame %ux%u at (%u, %u) doesn't fit into the %ux%u canvas",
+                       webp_state->frame_width, webp_state->frame_height, webp_state->frame_x, webp_state->frame_y,
+                       webp_state->canvas_image->width, webp_state->canvas_image->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
     /* Construct image. */
     struct sail_image* image_local;
     SAIL_TRY(sail_copy_image_skeleton(webp_state->canvas_image, &image_local));
@@ -418,16 +428,18 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_webp(void* state, struct sail
                                      &canvas_pixels_size));
     SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &frame_pixels_size));
 
+    /* Offset of the frame origin in the canvas and the number of bytes available starting from it. */
+    const size_t canvas_frame_offset = (size_t)webp_state->canvas_image->bytes_per_line * webp_state->frame_y
+                                       + (size_t)webp_state->frame_x * webp_state->bytes_per_pixel;
+    const size_t canvas_frame_pixels_size = canvas_pixels_size - canvas_frame_offset;
+
     switch (webp_state->frame_blend_method)
     {
     case WEBP_MUX_NO_BLEND:
     {
         if (WebPDecodeRGBAInto(webp_state->webp_iterator->fragment.bytes, webp_state->webp_iterator->fragment.size,
-                               (uint8_t*)webp_state->canvas_image->pixels
-                                   + webp_state->canvas_image->bytes_per_line * webp_state->frame_y
-                                   + webp_state->frame_x * webp_state->bytes_per_pixel,
-                               canvas_pixels_size,
-                               webp_state->canvas_image->bytes_per_line)
+                               (uint8_t*)webp_state->canvas_image->pixels + canvas_frame_offset,
+                               canvas_frame_pixels_size, webp_state->canvas_image->bytes_per_line)
             == NULL)
         {
             SAIL_LOG_ERROR("WEBP: Failed to decode image");
