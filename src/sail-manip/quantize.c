@@ -742,7 +742,7 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
                                   bool dither,
                                   struct sail_image** target_image)
 {
-    SAIL_CHECK_PTR(source_image);
+    SAIL_TRY(sail_check_image_valid(source_image));
     SAIL_CHECK_PTR(target_image);
 
     /* Determine max_colors based on output pixel format. */
@@ -849,7 +849,8 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     /* Build color lookup table. */
     unsigned char* tag = NULL;
     SAIL_TRY_OR_CLEANUP(sail_malloc(33 * 33 * 33, (void**)&tag),
-                        /* cleanup */ sail_free(state->Qadd), sail_free(state));
+                        /* cleanup */ sail_free(original_r), sail_free(original_g), sail_free(original_b),
+                        sail_free(state->Qadd), sail_free(state));
 
     memset(tag, 0, 33 * 33 * 33);
 
@@ -880,7 +881,8 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     /* Create output indexed image. */
     struct sail_image* indexed_image = NULL;
     SAIL_TRY_OR_CLEANUP(sail_alloc_image(&indexed_image),
-                        /* cleanup */ sail_free(state->Qadd), sail_free(state));
+                        /* cleanup */ sail_free(original_r), sail_free(original_g), sail_free(original_b),
+                        sail_free(state->Qadd), sail_free(state));
 
     indexed_image->width  = source_image->width;
     indexed_image->height = source_image->height;
@@ -893,9 +895,11 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
 
     SAIL_TRY_OR_CLEANUP(
         sail_pixels_buffer_size(indexed_image->height, indexed_image->bytes_per_line, &indexed_pixels_size),
-        /* cleanup */ sail_destroy_image(indexed_image), sail_free(state->Qadd), sail_free(state));
+        /* cleanup */ sail_destroy_image(indexed_image), sail_free(original_r), sail_free(original_g),
+        sail_free(original_b), sail_free(state->Qadd), sail_free(state));
     SAIL_TRY_OR_CLEANUP(sail_alloc_pixels(indexed_image->height, indexed_image->bytes_per_line, &indexed_image->pixels),
-                        /* cleanup */ sail_destroy_image(indexed_image), sail_free(state->Qadd), sail_free(state));
+                        /* cleanup */ sail_destroy_image(indexed_image), sail_free(original_r), sail_free(original_g),
+                        sail_free(original_b), sail_free(state->Qadd), sail_free(state));
 
     /* Copy indexed pixels. */
     if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
@@ -956,7 +960,8 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     /* Create palette. */
     struct sail_palette* palette = NULL;
     SAIL_TRY_OR_CLEANUP(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, state->K, &palette),
-                        /* cleanup */ sail_destroy_image(indexed_image), sail_free(state));
+                        /* cleanup */ sail_destroy_image(indexed_image), sail_free(original_r), sail_free(original_g),
+                        sail_free(original_b), sail_free(state));
 
     unsigned char* pal_data = (unsigned char*)palette->data;
     for (int k = 0; k < state->K; ++k)
