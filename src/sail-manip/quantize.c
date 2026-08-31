@@ -413,10 +413,19 @@ static sail_status_t extract_rgb_channels(const struct sail_image* image,
                                           unsigned char** g_out,
                                           unsigned char** b_out)
 {
-    const unsigned int pixel_count = image->width * image->height;
-    unsigned char* r_channel       = NULL;
-    unsigned char* g_channel       = NULL;
-    unsigned char* b_channel       = NULL;
+    size_t pixel_count;
+    SAIL_TRY(sail_size_mul(image->width, image->height, &pixel_count));
+
+    /* The Wu quantizer addresses the pixels with an int. */
+    if (pixel_count > INT_MAX)
+    {
+        SAIL_LOG_ERROR("Cannot quantize an image of %zu pixels", pixel_count);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    unsigned char* r_channel = NULL;
+    unsigned char* g_channel = NULL;
+    unsigned char* b_channel = NULL;
 
     SAIL_TRY(sail_malloc(pixel_count, (void**)&r_channel));
     SAIL_TRY_OR_CLEANUP(sail_malloc(pixel_count, (void**)&g_channel),
@@ -426,11 +435,11 @@ static sail_status_t extract_rgb_channels(const struct sail_image* image,
 
     /* Extract RGB channels based on pixel format. */
     const unsigned char* pixels = (const unsigned char*)image->pixels;
-    unsigned int idx            = 0;
+    size_t idx                  = 0;
 
     for (unsigned int y = 0; y < image->height; y++)
     {
-        const unsigned char* scan = pixels + y * image->bytes_per_line;
+        const unsigned char* scan = pixels + (size_t)y * image->bytes_per_line;
 
         for (unsigned int x = 0; x < image->width; x++)
         {
@@ -624,7 +633,7 @@ static sail_status_t apply_floyd_steinberg_dithering(struct sail_image* indexed_
         /* Process each pixel in the row. */
         for (unsigned x = 0; x < width; x++)
         {
-            const unsigned pixel_idx = y * width + x;
+            const size_t pixel_idx = (size_t)y * width + x;
 
             /* Get original RGB values with accumulated error. */
             int r = (int)original_r[pixel_idx] + error_r_current[x + 1];
@@ -648,7 +657,7 @@ static sail_status_t apply_floyd_steinberg_dithering(struct sail_image* indexed_
             }
             else if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
             {
-                int byte_idx = y * indexed_image->bytes_per_line + x / 2;
+                size_t byte_idx = (size_t)y * indexed_image->bytes_per_line + x / 2;
                 if (x % 2 == 0)
                 {
                     pixels[byte_idx] = (pixels[byte_idx] & 0x0F) | ((best_idx & 0x0F) << 4);
@@ -660,7 +669,7 @@ static sail_status_t apply_floyd_steinberg_dithering(struct sail_image* indexed_
             }
             else if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED)
             {
-                int byte_idx = y * indexed_image->bytes_per_line + x / 4;
+                size_t byte_idx = (size_t)y * indexed_image->bytes_per_line + x / 4;
                 int shift = 6 - ((x % 4) * 2);
                 pixels[byte_idx] = (pixels[byte_idx] & ~(0x03 << shift)) | ((best_idx & 0x03) << shift);
             }
@@ -783,7 +792,8 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
     state->Ir   = original_r;
     state->Ig   = original_g;
     state->Ib   = original_b;
-    state->size = source_image->width * source_image->height;
+    /* extract_rgb_channels() has already checked that the number of pixels fits an int. */
+    state->size = (int)((size_t)source_image->width * source_image->height);
     state->K    = max_colors;
 
     wu_Hist3d(state, (long int*)state->wt, (long int*)state->mr, (long int*)state->mg, (long int*)state->mb,
@@ -923,10 +933,10 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
         {
             for (unsigned int x = 0; x < source_image->width; x++)
             {
-                unsigned char idx = (unsigned char)state->Qadd[y * source_image->width + x];
+                unsigned char idx = (unsigned char)state->Qadd[(size_t)y * source_image->width + x];
                 if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
                 {
-                    int byte_idx = y * indexed_image->bytes_per_line + x / 2;
+                    size_t byte_idx = (size_t)y * indexed_image->bytes_per_line + x / 2;
                     if (x % 2 == 0)
                     {
                         dest[byte_idx] = (idx & 0x0F) << 4;
@@ -938,13 +948,13 @@ sail_status_t sail_quantize_image(const struct sail_image* source_image,
                 }
                 else if (indexed_image->pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED)
                 {
-                    int byte_idx = y * indexed_image->bytes_per_line + x / 4;
+                    size_t byte_idx = (size_t)y * indexed_image->bytes_per_line + x / 4;
                     int shift = 6 - ((x % 4) * 2);
                     dest[byte_idx] |= (idx & 0x03) << shift;
                 }
                 else
                 {
-                    int byte_idx = y * indexed_image->bytes_per_line + x / 8;
+                    size_t byte_idx = (size_t)y * indexed_image->bytes_per_line + x / 8;
                     int bit_idx  = 7 - (x % 8);
                     if (idx)
                     {
