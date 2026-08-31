@@ -51,6 +51,7 @@ struct webp_state
     struct sail_image* canvas_image;
     WebPDemuxer* webp_demux;
     WebPIterator* webp_iterator;
+    bool webp_iterator_valid;
     unsigned frame_number;
     uint32_t background_color;
     uint32_t frame_count;
@@ -90,6 +91,7 @@ static sail_status_t alloc_webp_state(struct sail_io* io,
         .canvas_image         = NULL,
         .webp_demux           = NULL,
         .webp_iterator        = NULL,
+        .webp_iterator_valid  = false,
         .frame_number         = 0,
         .background_color     = 0,
         .frame_count          = 0,
@@ -123,11 +125,12 @@ static void destroy_webp_state(struct webp_state* webp_state)
     }
 
     /* Load-specific cleanup. */
-    if (webp_state->webp_iterator != NULL)
+    if (webp_state->webp_iterator_valid)
     {
         WebPDemuxReleaseIterator(webp_state->webp_iterator);
-        sail_free(webp_state->webp_iterator);
     }
+
+    sail_free(webp_state->webp_iterator);
 
     sail_free(webp_state->image_data);
 
@@ -330,6 +333,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_webp(void* state, s
             SAIL_LOG_ERROR("WEBP: Failed to get the first frame");
             SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
         }
+
+        /* Only an iterator filled by WebPDemuxGetFrame() may be released. */
+        webp_state->webp_iterator_valid = true;
 
         /* Allocate a canvas frame to apply disposal later. */
         size_t image_size;
