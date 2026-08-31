@@ -169,7 +169,22 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_pcx(void* state, st
     image_local->width          = pcx_state->pcx_header.xmax - pcx_state->pcx_header.xmin + 1;
     image_local->height         = pcx_state->pcx_header.ymax - pcx_state->pcx_header.ymin + 1;
     image_local->pixel_format   = pixel_format;
-    image_local->bytes_per_line = pcx_state->pcx_header.bytes_per_line * pcx_state->pcx_header.planes;
+    /*
+     * Scan lines shorter than the image width would be read out of bounds by everyone who walks
+     * the image width, so such scan lines are padded with zeros.
+     */
+    const unsigned file_bytes_per_line   = pcx_state->pcx_header.bytes_per_line * pcx_state->pcx_header.planes;
+    const unsigned needed_bytes_per_line = sail_bytes_per_line(image_local->width, pixel_format);
+
+    if (file_bytes_per_line < needed_bytes_per_line)
+    {
+        SAIL_LOG_WARNING("PCX: Bytes per line (%u per plane, %u planes) is less than %u bytes needed for %u pixels",
+                         pcx_state->pcx_header.bytes_per_line, pcx_state->pcx_header.planes, needed_bytes_per_line,
+                         image_local->width);
+    }
+
+    image_local->bytes_per_line =
+        (file_bytes_per_line < needed_bytes_per_line) ? needed_bytes_per_line : file_bytes_per_line;
 
     /* Scan line buffer to store planes so we can merge them later into individual pixels. */
     void* ptr;
@@ -198,6 +213,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
 {
     const struct pcx_state* pcx_state = state;
 
+    const unsigned file_bytes_per_line = pcx_state->pcx_header.bytes_per_line * pcx_state->pcx_header.planes;
+
+    /* Pad short scan lines with zeros instead of leaving them uninitialized. */
+    if (file_bytes_per_line < image->bytes_per_line)
+    {
+        memset(image->pixels, 0, (size_t)image->bytes_per_line * image->height);
+    }
+
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING)
     {
         SAIL_TRY(pcx_private_read_uncompressed(pcx_state->io, pcx_state->pcx_header.bytes_per_line,
@@ -210,7 +233,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
             unsigned buffer_offset = 0;
 
             /* Decode all planes of a single scan line. */
-            for (unsigned bytes = 0; bytes < image->bytes_per_line;)
+            for (unsigned bytes = 0; bytes < file_bytes_per_line;)
             {
                 uint8_t marker;
                 SAIL_TRY(pcx_state->io->strict_read(pcx_state->io->stream, &marker, sizeof(marker)));
@@ -237,7 +260,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
                 }
 
                 /* Clamp to the buffer size. */
-                count = (bytes + count) <= image->bytes_per_line ? count : (uint8_t)(image->bytes_per_line - bytes);
+                count = (bytes + count) <= file_bytes_per_line ? count : (uint8_t)(file_bytes_per_line - bytes);
 
                 bytes += count;
 
