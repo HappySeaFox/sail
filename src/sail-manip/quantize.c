@@ -500,7 +500,7 @@ static sail_status_t extract_rgb_channels(const struct sail_image* image,
 static void build_palette_lookup_table(const unsigned char* lut_r,
                                        const unsigned char* lut_g,
                                        const unsigned char* lut_b,
-                                       unsigned char palette_size,
+                                       unsigned palette_size,
                                        unsigned char lookup[32][32][32])
 {
     /* For each quantized RGB value, find the closest palette entry. */
@@ -519,7 +519,7 @@ static void build_palette_lookup_table(const unsigned char* lut_r,
                 unsigned char best_idx = 0;
                 int best_distance      = INT_MAX;
 
-                for (unsigned char i = 0; i < palette_size; i++)
+                for (unsigned i = 0; i < palette_size; i++)
                 {
                     const int dr       = r - (int)lut_r[i];
                     const int dg       = g - (int)lut_g[i];
@@ -529,7 +529,7 @@ static void build_palette_lookup_table(const unsigned char* lut_r,
                     if (distance < best_distance)
                     {
                         best_distance = distance;
-                        best_idx      = i;
+                        best_idx      = (unsigned char)i;
 
                         /* Early exit on exact match. */
                         if (distance == 0)
@@ -591,7 +591,7 @@ static sail_status_t apply_floyd_steinberg_dithering(struct sail_image* indexed_
     unsigned char(*lookup)[32][32] = NULL;
     SAIL_TRY(sail_malloc(32 * 32 * 32, (void**)&lookup));
 
-    build_palette_lookup_table(lut_r, lut_g, lut_b, (unsigned char)indexed_image->palette->color_count, lookup);
+    build_palette_lookup_table(lut_r, lut_g, lut_b, indexed_image->palette->color_count, lookup);
 
     /* Allocate error buffers for current and next row (R, G, B channels). */
     int* error_r_current = NULL;
