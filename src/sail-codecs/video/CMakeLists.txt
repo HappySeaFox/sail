@@ -19,6 +19,16 @@ if (NOT AVCODEC_INCLUDE_DIR OR NOT AVCODEC_LIBRARY
     return()
 endif()
 
+# For static builds, export dependencies. The order matters: linkers resolving static
+# archives in a single pass require every library to be listed after its consumers,
+# so the compression libraries below are exported after FFmpeg.
+#
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avformat,avformat")
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avcodec,avcodec")
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,swscale,swscale")
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,swresample,swresample")
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avutil,avutil")
+
 # FFmpeg decompresses some streams and container headers with zlib, bzip2, and lzma
 # (PNG streams in Matroska, compressed MOV headers etc.). Static FFmpeg builds don't pull
 # these libraries in automatically, so find and link them explicitly.
@@ -47,14 +57,6 @@ if (VIDEO_LZMA_LIBRARY)
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,lzma,lzmad lzma")
 endif()
 
-# For static builds, export dependencies
-#
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avformat,avformat")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avcodec,avcodec")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,swresample,swresample")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avutil,avutil")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,swscale,swscale")
-
 # Static FFmpeg builds pull in platform specific system libraries
 #
 if (WIN32)
@@ -73,5 +75,5 @@ sail_codec(NAME video
             SOURCES helpers.h helpers.c io_src.h io_src.c video.c
             ICON video.png
             DEPENDENCY_INCLUDE_DIRS ${AVCODEC_INCLUDE_DIR} ${AVFORMAT_INCLUDE_DIR} ${AVUTIL_INCLUDE_DIR} ${SWSCALE_INCLUDE_DIR} ${SWRESAMPLE_INCLUDE_DIR}
-            DEPENDENCY_LIBS ${AVFORMAT_LIBRARY} ${AVCODEC_LIBRARY} ${SWRESAMPLE_LIBRARY} ${AVUTIL_LIBRARY} ${SWSCALE_LIBRARY}
+            DEPENDENCY_LIBS ${AVFORMAT_LIBRARY} ${AVCODEC_LIBRARY} ${SWSCALE_LIBRARY} ${SWRESAMPLE_LIBRARY} ${AVUTIL_LIBRARY}
                             ${COMPRESSION_LIBRARIES})
