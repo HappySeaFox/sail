@@ -158,13 +158,23 @@ sail_enable_pic(INTERFACE_LIB sail-common-flags)
 sail_enable_no_undefined(INTERFACE_LIB sail-common-flags)
 sail_windows_enable_exception_handling(INTERFACE_LIB sail-common-flags)
 
-# Enable C11
+# Enable strict C11 (not applied currently because INTERFACE is not enough)
+#
+# TODO Re-enable CMAKE_C_STANDARD enforcement in 2.0.0
 #
 target_compile_features(sail-common-flags INTERFACE c_std_11)
+# set(CMAKE_C_STANDARD 11)
+# set(CMAKE_C_STANDARD_REQUIRED ON)
+# set(CMAKE_C_EXTENSIONS OFF)
 
-# Enable C++11
+# Enable strict C++11 (not applied currently because INTERFACE is not enough)
+#
+# TODO Re-enable CMAKE_CXX_STANDARD enforcement in 2.0.0
 #
 target_compile_features(sail-common-flags INTERFACE cxx_std_11)
+# set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Internal flag used to include SAIL headers locally with "header.h" or <sail/header.h> otherwise
 #
