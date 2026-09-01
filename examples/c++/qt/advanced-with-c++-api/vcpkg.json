@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "advanced-cpp",
+  "homepage": "https://github.com/HappySeaFox/sail",
+  "dependencies": [
+    {
+      "name": "sail",
+      "features": [
+        "all"
+      ]
+    }
+  ]
+}
