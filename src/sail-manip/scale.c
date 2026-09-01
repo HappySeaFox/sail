@@ -23,9 +23,6 @@
  *  SOFTWARE.
  */
 
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#endif
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -37,6 +34,11 @@
 
 #include "scale.h"
 #include "scale_swscale.h"
+
+/* M_PI is not a part of the C standard. */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 /*
  * Forward declaration for manual scaling function.

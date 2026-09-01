@@ -12,6 +12,10 @@ target_link_libraries(sail-app PRIVATE sail-manip)
 
 target_link_libraries(sail-app PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
 
+# Enable POSIX declarations like strtok_r()
+#
+sail_enable_posix_c_source(TARGET sail-app VERSION 200112L)
+
 # Install PDB
 #
 if (SAIL_WINDOWS_INSTALL_PDB)

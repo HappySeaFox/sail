@@ -17,3 +17,7 @@ target_link_libraries(example-deep-diver-api PRIVATE $<BUILD_INTERFACE:sail-comm
 add_executable(example-technical-diver-api technical_diver.c)
 target_link_libraries(example-technical-diver-api PRIVATE sail)
 target_link_libraries(example-technical-diver-api PRIVATE $<BUILD_INTERFACE:sail-common-flags>)
+
+# Enable POSIX declarations like fileno()
+#
+sail_enable_posix_c_source(TARGET example-technical-diver-api VERSION 200112L)
