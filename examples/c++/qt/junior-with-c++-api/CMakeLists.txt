@@ -21,15 +21,13 @@ set(CMAKE_AUTOUIC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
-# Add SAIL dependency. This example demonstrates linking with pkg-config
+# Add SAIL dependency
 #
-find_package(PkgConfig REQUIRED)
-
-pkg_check_modules(SAIL_CXX IMPORTED_TARGET REQUIRED sail-c++)
+find_package(SailC++ REQUIRED)
 
 # Add the image viewer widget shared by all the Qt examples. It needs SAIL headers as well
 #
-set(SAIL_QT_EXAMPLE_SAIL_TARGET PkgConfig::SAIL_CXX)
+set(SAIL_QT_EXAMPLE_SAIL_TARGET SAIL::sail-c++)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../common" common)
 
 # Manifest to support Windows 10 is embedded into our RC file
@@ -59,4 +57,4 @@ if (SAIL_ASAN)
     endif()
 endif()
 
-target_link_libraries(junior-with-c++-api PRIVATE sail-qt-example-viewer PkgConfig::SAIL_CXX)
+target_link_libraries(junior-with-c++-api PRIVATE sail-qt-example-viewer SAIL::sail-c++)
