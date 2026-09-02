@@ -146,6 +146,25 @@ if (NOT BUILD_SHARED_LIBS)
 find_dependency(${dependency_name} REQUIRED)
 target_link_libraries(SAIL::sail-codecs INTERFACE ${dependency_link_target})
 ")
+        elseif(dependency_search_mechanism STREQUAL "pkg_config")
+            list(GET dependency 1 dependency_modules)
+
+            # Get "libavformat" from "libavformat libavcodec" to build a unique variable prefix
+            set(dependency_modules_as_list ${dependency_modules})
+            string(REGEX REPLACE " +" ";" dependency_modules_as_list ${dependency_modules_as_list})
+            list(GET dependency_modules_as_list 0 dependency_name)
+
+            # pkg-config reports the libraries the modules were actually built with, in link
+            # order: the full dependency closure for a static build and just the modules
+            # themselves for a shared one.
+            #
+            set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
+# ${dependency_modules}
+find_dependency(PkgConfig REQUIRED)
+set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
+pkg_check_modules(sail_pkg_${dependency_name} REQUIRED ${dependency_modules})
+target_link_libraries(SAIL::sail-codecs INTERFACE \${sail_pkg_${dependency_name}_LINK_LIBRARIES})
+")
         elseif(dependency_search_mechanism STREQUAL "find_library")
             list(GET dependency 1 dependency_release_names)
             list(GET dependency 2 dependency_debug_names)
