@@ -1,61 +1,19 @@
-# Find FFmpeg AV_LIBRARIES using CMake (no pkg-config)
-#
-find_path(AVCODEC_INCLUDE_DIR    NAMES libavcodec/avcodec.h)
-find_path(AVFORMAT_INCLUDE_DIR   NAMES libavformat/avformat.h)
-find_path(AVUTIL_INCLUDE_DIR     NAMES libavutil/avutil.h)
-find_path(SWSCALE_INCLUDE_DIR    NAMES libswscale/swscale.h)
-find_path(SWRESAMPLE_INCLUDE_DIR NAMES libswresample/swresample.h)
+find_package(PkgConfig ${SAIL_CODEC_VIDEO_REQUIRED_OPTION})
 
-find_library(AVCODEC_LIBRARY    NAMES avcodec)
-find_library(AVFORMAT_LIBRARY   NAMES avformat)
-find_library(AVUTIL_LIBRARY     NAMES avutil)
-find_library(SWSCALE_LIBRARY    NAMES swscale)
-find_library(SWRESAMPLE_LIBRARY NAMES swresample)
-
-if (NOT AVCODEC_INCLUDE_DIR OR NOT AVCODEC_LIBRARY
-        OR NOT AVFORMAT_INCLUDE_DIR OR NOT AVFORMAT_LIBRARY
-        OR NOT AVUTIL_INCLUDE_DIR OR NOT AVUTIL_LIBRARY
-        OR NOT SWSCALE_INCLUDE_DIR OR NOT SWSCALE_LIBRARY)
+if (NOT PkgConfig_FOUND)
     return()
 endif()
 
-# For static builds, export dependencies. The order matters: linkers resolving static
-# archives in a single pass require every library to be listed after its consumers,
-# so the compression libraries below are exported after FFmpeg.
-#
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avformat,avformat")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avcodec,avcodec")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,swscale,swscale")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,swresample,swresample")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,avutil,avutil")
+pkg_check_modules(FFMPEG ${SAIL_CODEC_VIDEO_REQUIRED_OPTION}
+                  libavformat libavcodec libswscale libswresample libavutil)
 
-# FFmpeg decompresses some streams and container headers with zlib, bzip2, and lzma
-# (PNG streams in Matroska, compressed MOV headers etc.). Static FFmpeg builds don't pull
-# these libraries in automatically, so find and link them explicitly.
-#
-# The libraries are optional. FFmpeg may be built without them.
-#
-sail_find_codec_library(PREFIX VIDEO_ZLIB VCPKG_INCLUDE_DIR "${AVCODEC_INCLUDE_DIR}"
-                        NAMES_RELEASE z zlib NAMES_DEBUG z zlibd
-                        OUTPUT_LIBS COMPRESSION_LIBRARIES)
-sail_find_codec_library(PREFIX VIDEO_BZIP2 VCPKG_INCLUDE_DIR "${AVCODEC_INCLUDE_DIR}"
-                        NAMES_RELEASE bz2 bzip2 NAMES_DEBUG bz2d bz2 bzip2
-                        OUTPUT_LIBS COMPRESSION_LIBRARIES)
-sail_find_codec_library(PREFIX VIDEO_LZMA VCPKG_INCLUDE_DIR "${AVCODEC_INCLUDE_DIR}"
-                        NAMES_RELEASE lzma NAMES_DEBUG lzmad lzma
-                        OUTPUT_LIBS COMPRESSION_LIBRARIES)
+if (NOT FFMPEG_FOUND)
+    return()
+endif()
 
-# For static builds, export the optional compression dependencies that were found
+# For static builds, export dependencies
 #
-if (VIDEO_ZLIB_LIBRARY)
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,z zlib,z zlibd")
-endif()
-if (VIDEO_BZIP2_LIBRARY)
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,bz2 bzip2,bz2d bz2 bzip2")
-endif()
-if (VIDEO_LZMA_LIBRARY)
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,lzma,lzmad lzma")
-endif()
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "pkg_config,libavformat libavcodec libswscale libswresample libavutil")
 
 # Static FFmpeg builds pull in platform specific system libraries
 #
@@ -74,6 +32,5 @@ set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} PARENT_SCOPE)
 sail_codec(NAME video
             SOURCES helpers.h helpers.c io_src.h io_src.c video.c
             ICON video.png
-            DEPENDENCY_INCLUDE_DIRS ${AVCODEC_INCLUDE_DIR} ${AVFORMAT_INCLUDE_DIR} ${AVUTIL_INCLUDE_DIR} ${SWSCALE_INCLUDE_DIR} ${SWRESAMPLE_INCLUDE_DIR}
-            DEPENDENCY_LIBS ${AVFORMAT_LIBRARY} ${AVCODEC_LIBRARY} ${SWSCALE_LIBRARY} ${SWRESAMPLE_LIBRARY} ${AVUTIL_LIBRARY}
-                            ${COMPRESSION_LIBRARIES})
+            DEPENDENCY_INCLUDE_DIRS ${FFMPEG_INCLUDE_DIRS}
+            DEPENDENCY_LIBS ${FFMPEG_LINK_LIBRARIES})
