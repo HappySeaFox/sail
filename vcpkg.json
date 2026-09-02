@@ -15,6 +15,10 @@
         "zlib"
       ]
     },
+    {
+      "name": "pkgconf",
+      "host": true
+    },
     "giflib",
     "jbigkit",
     {
