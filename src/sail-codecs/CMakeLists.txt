@@ -144,7 +144,7 @@ if (NOT BUILD_SHARED_LIBS)
             set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_name}
 find_dependency(${dependency_name} REQUIRED)
-set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${dependency_link_target})
+target_link_libraries(SAIL::sail-codecs INTERFACE ${dependency_link_target})
 ")
         elseif(dependency_search_mechanism STREQUAL "find_library")
             list(GET dependency 1 dependency_release_names)
