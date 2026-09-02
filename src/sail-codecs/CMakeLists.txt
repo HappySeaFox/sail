@@ -115,6 +115,11 @@ foreach (codec IN LISTS FORCED_CODECS)
     set(SAIL_CODEC_${codec_upper}_REQUIRED_OPTION "REQUIRED")
 endforeach()
 
+# Codecs looking their dependencies up with pkg-config need this to search the prefixes
+# passed through CMAKE_PREFIX_PATH, like a vcpkg tree, and not just its own defaults.
+#
+set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
+
 # Add enabled codecs.
 #
 foreach (codec ${ENABLED_CODECS})

@@ -4,11 +4,6 @@ if (NOT PkgConfig_FOUND)
     return()
 endif()
 
-# Without this pkg-config only searches its own default directories and misses FFmpeg
-# installed into a prefix passed through CMAKE_PREFIX_PATH, like a vcpkg tree.
-#
-set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
-
 pkg_check_modules(FFMPEG ${SAIL_CODEC_VIDEO_REQUIRED_OPTION}
                   libavformat libavcodec libswscale libswresample libavutil)
 
