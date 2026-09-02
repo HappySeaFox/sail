@@ -35,7 +35,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev \
+        sudo apt-get install -y cmake pkg-config libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev \
                                 libavif-dev libgif-dev libheif-dev libheif-plugin-x265            \
                                 libjbig-dev libjpeg-dev libjxl-dev libnanosvg-dev libopenexr-dev  \
                                 libopenjp2-7-dev libopenjpip-dec-server libopenjpip-server        \
@@ -44,7 +44,7 @@ jobs:
     - name: Install build dependencies (macOS)
       if: runner.os == 'macOS'
       run: |
-        brew install ffmpeg giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libraw libtiff openexr openjpeg resvg webp
+        brew install pkg-config ffmpeg giflib jbigkit jpeg-turbo jpeg-xl libavif libheif libpng libraw libtiff openexr openjpeg resvg webp
 
     - name: Restore vcpkg cache (Windows)
       if: runner.os == 'Windows'
