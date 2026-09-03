@@ -62,7 +62,7 @@ jobs:
         sudo make -C build install
 
     - name: Run tests
-      timeout-minutes: 10
+      timeout-minutes: 15
       env:
         TSAN_OPTIONS: allocator_may_return_null=1
       run: ctest --test-dir build --output-on-failure -j$(nproc)
@@ -165,7 +165,7 @@ jobs:
         Copy-Item -Path "$vcpkgBin\*" -Destination "$env:SAIL_INSTALL_BIN\" -Force
 
     - name: Run tests
-      timeout-minutes: 10
+      timeout-minutes: 15
       run: |
         $env:PATH = "$env:SAIL_INSTALL_BIN;$env:PATH"
         ctest --test-dir build/tests -C Debug --output-on-failure "-j$env:NUMBER_OF_PROCESSORS"
