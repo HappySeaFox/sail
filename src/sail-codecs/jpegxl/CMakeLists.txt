@@ -1,102 +1,46 @@
-include(FindPackageHandleStandardArgs)
+find_package(PkgConfig ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION})
 
-find_path(JPEGXL_INCLUDE_DIR jxl/decode.h)
+if (NOT PkgConfig_FOUND)
+    return()
+endif()
 
-# Find dependencies for static builds as libjxl doesn't provide CMake configs
-# to find them automatically.
+pkg_check_modules(JPEGXL ${SAIL_CODEC_JPEGXL_REQUIRED_OPTION} libjxl libjxl_threads)
+
+if (NOT JPEGXL_FOUND)
+    return()
+endif()
+
+# Static libjxl requires JXL_STATIC_DEFINE and friends to disable dllimport declarations.
+# pkg-config reports them along with the other compile flags.
 #
-# See also https://github.com/microsoft/vcpkg/issues/47882
-#
-set(VAR_PREFIXES JPEGXL     JPEGXL_THREADS     JPEGXL_CMS     HWY BROTLI_COMMON       BROTLI_DEC       BROTLI_ENC       LCMS2)
-set(LIBS_SHARED  jxl        jxl_threads        jxl_cms        hwy brotlicommon        brotlidec        brotlienc        lcms2)
-set(LIBS_STATIC  jxl-static jxl_threads-static jxl_cms-static hwy brotlicommon-static brotlidec-static brotlienc-static lcms2)
-
-list(LENGTH VAR_PREFIXES length)
-math(EXPR VAR_PREFIXES_LAST_INDEX "${length} - 1")
-
-foreach(i RANGE ${VAR_PREFIXES_LAST_INDEX})
-    list(GET VAR_PREFIXES ${i} var_prefix)
-    list(GET LIBS_SHARED  ${i} lib_shared)
-    list(GET LIBS_STATIC  ${i} lib_static)
-
-    # Some libraries are required, some not. Using SAIL_CODEC_JPEGXL_REQUIRED_OPTION overcomplicates
-    # the searching mechanism.
-    #
-    sail_find_codec_library(PREFIX ${var_prefix} VCPKG_INCLUDE_DIR "${JPEGXL_INCLUDE_DIR}"
-                            NAMES_RELEASE ${lib_shared} ${lib_static})
-
-    find_package_handle_standard_args(${var_prefix}
-        REQUIRED_VARS
-            JPEGXL_INCLUDE_DIR
-            ${var_prefix}_LIBRARY)
+foreach (JPEGXL_CFLAG IN LISTS JPEGXL_CFLAGS_OTHER)
+    if (JPEGXL_CFLAG MATCHES "^-D(.+)$")
+        list(APPEND JPEGXL_COMPILE_DEFINITIONS ${CMAKE_MATCH_1})
+    endif()
 endforeach()
 
-if (NOT JPEGXL_INCLUDE_DIR OR NOT JPEGXL_LIBRARY OR NOT JPEGXL_THREADS_LIBRARY OR
-        NOT HWY_LIBRARY OR NOT BROTLI_COMMON_LIBRARY OR NOT BROTLI_DEC_LIBRARY OR NOT BROTLI_ENC_LIBRARY)
-    if (SAIL_CODEC_JPEGXL_REQUIRED_OPTION STREQUAL "REQUIRED")
-        message(FATAL_ERROR "JPEGXL: Missing dependencies")
-    else()
-        return()
-    endif()
-endif()
-
-if (JPEGXL_CMS_LIBRARY AND NOT LCMS2_LIBRARY)
-    message(FATAL_ERROR "LCMS2 library is required")
-endif()
-
-# libjxl requires JXL_STATIC_DEFINE for static builds
+# For static builds, export dependencies
 #
-if (JPEGXL_LIBRARY MATCHES "jxl-static")
-    set(JXL_STATIC_DEFINE "JXL_STATIC_DEFINE")
-endif()
+set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "pkg_config,libjxl libjxl_threads")
 
-# This will add the following CMake rules to the CMake config for static builds so a client
-# application links against the required dependencies:
-#
-# find_library(jxl_RELEASE_LIBRARY NAMES jxl jxl-static)
-# find_library(jxl_DEBUG_LIBRARY NAMES jxl jxl-static)
-# set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jxl_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jxl_DEBUG_LIBRARY}>)
-#
-# etc.
-#
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl jxl-static,jxl jxl-static")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl_threads jxl_threads-static,jxl_threads jxl_threads-static")
-
-if (JPEGXL_CMS_LIBRARY)
-    set(JPEGXL_CMS_LIBRARY_LINK ${JPEGXL_CMS_LIBRARY})
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jxl_cms jxl_cms-static,jxl_cms jxl_cms-static")
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,lcms2,lcms2")
-endif()
-
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,brotlidec brotlidec-static,brotlidec brotlidec-static")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,brotlienc brotlienc-static,brotlienc brotlienc-static")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,brotlicommon brotlicommon-static,brotlicommon brotlicommon-static")
-set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,hwy,hwy")
-
-# Static libjxl uses Android logging API
+# Static libjxl uses the Android logging API. pkg-config does not report it, and the codec
+# itself needs it just as much as a client does: the exported entry below only reaches
+# the link through sail-codecs, which exists when codecs are combined into an archive.
 #
 if (ANDROID)
-    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "link_libraries,-llog")
+    set(JPEGXL_SYSTEM_LIBRARIES log)
+
+    list(JOIN JPEGXL_SYSTEM_LIBRARIES " " JPEGXL_SYSTEM_LIBRARIES_JOINED)
+    set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "link_libraries,${JPEGXL_SYSTEM_LIBRARIES_JOINED}")
 endif()
 
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} PARENT_SCOPE)
-
-if (NOT BUILD_SHARED_LIBS)
-    find_library(MATH_LIBRARY m)
-
-    if (MATH_LIBRARY)
-        set(EXTRA_LINK ${MATH_LIBRARY})
-    endif()
-endif()
-
 
 # Common codec configuration
 #
 sail_codec(NAME jpegxl
             SOURCES helpers.h helpers.c jpegxl.c memory.h memory.c
             ICON jpegxl.png
-            DEPENDENCY_COMPILE_DEFINITIONS ${JXL_STATIC_DEFINE}
-            DEPENDENCY_INCLUDE_DIRS ${JPEGXL_INCLUDE_DIR}
-            DEPENDENCY_LIBS ${JPEGXL_LIBRARY} ${JPEGXL_THREADS_LIBRARY} ${JPEGXL_CMS_LIBRARY_LINK}
-                            ${BROTLI_DEC_LIBRARY} ${BROTLI_ENC_LIBRARY} ${BROTLI_COMMON_LIBRARY} ${HWY_LIBRARY} ${LCMS2_LIBRARY}
-                            ${EXTRA_LINK})
+            DEPENDENCY_COMPILE_DEFINITIONS ${JPEGXL_COMPILE_DEFINITIONS}
+            DEPENDENCY_INCLUDE_DIRS ${JPEGXL_INCLUDE_DIRS}
+            DEPENDENCY_LIBS ${JPEGXL_LINK_LIBRARIES} ${JPEGXL_SYSTEM_LIBRARIES})
