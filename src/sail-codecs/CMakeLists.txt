@@ -10,6 +10,14 @@ set(MEDIUM_PRIORITY_CODECS  heif openexr psd raw tiff video)
 set(LOW_PRIORITY_CODECS     bmp hdr jpeg2000 jpegxl pnm qoi tga)
 set(LOWEST_PRIORITY_CODECS  fli jbig pcx wal xbm xpm xwd)
 
+# TODO Update priorities in 2.0.0
+#
+# set(HIGHEST_PRIORITY_CODECS gif jpeg png)
+# set(HIGH_PRIORITY_CODECS    avif heif svg webp)
+# set(MEDIUM_PRIORITY_CODECS  jpegxl psd raw tiff video)
+# set(LOW_PRIORITY_CODECS     bmp hdr ico jpeg2000 openexr pnm qoi tga)
+# set(LOWEST_PRIORITY_CODECS  fli jbig pcx wal xbm xpm xwd)
+
 set(CODECS ${HIGHEST_PRIORITY_CODECS}
            ${HIGH_PRIORITY_CODECS}
            ${MEDIUM_PRIORITY_CODECS}
