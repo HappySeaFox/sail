@@ -10,6 +10,13 @@ if (NOT JPEGXL_FOUND)
     return()
 endif()
 
+# Static libjxl pulls -lm through Libs.private. FindPkgConfig keeps the unresolved 'm'
+# as a bare library name, and MSVC then fails to link a non-existent m.lib.
+#
+if (MSVC)
+    list(REMOVE_ITEM JPEGXL_LINK_LIBRARIES m -lm)
+endif()
+
 # Static libjxl requires JXL_STATIC_DEFINE and friends to disable dllimport declarations.
 # pkg-config reports them along with the other compile flags.
 #

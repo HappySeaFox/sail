@@ -176,6 +176,13 @@ target_link_libraries(SAIL::sail-codecs INTERFACE ${dependency_link_target})
 find_dependency(PkgConfig REQUIRED)
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 pkg_check_modules(sail_pkg_${dependency_name} REQUIRED ${dependency_modules})
+
+# Some libraries (libjxl and others) put -lm into Libs.private. FindPkgConfig keeps the
+# unresolved 'm' as a bare library name, and MSVC then fails to link a non-existent m.lib.
+if (MSVC)
+    list(REMOVE_ITEM sail_pkg_${dependency_name}_LINK_LIBRARIES m -lm)
+endif()
+
 target_link_libraries(SAIL::sail-codecs INTERFACE \${sail_pkg_${dependency_name}_LINK_LIBRARIES})
 ")
         elseif(dependency_search_mechanism STREQUAL "find_library")
