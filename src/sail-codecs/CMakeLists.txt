@@ -123,11 +123,6 @@ foreach (codec IN LISTS FORCED_CODECS)
     set(SAIL_CODEC_${codec_upper}_REQUIRED_OPTION "REQUIRED")
 endforeach()
 
-# Codecs looking their dependencies up with pkg-config need this to search the prefixes
-# passed through CMAKE_PREFIX_PATH, like a vcpkg tree, and not just its own defaults.
-#
-set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
-
 # Add enabled codecs.
 #
 foreach (codec ${ENABLED_CODECS})
@@ -174,7 +169,6 @@ target_link_libraries(SAIL::sail-codecs INTERFACE ${dependency_link_target})
             set(SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED "${SAIL_CODECS_FIND_DEPENDENCIES_EXPANDED}
 # ${dependency_modules}
 find_dependency(PkgConfig REQUIRED)
-set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 pkg_check_modules(sail_pkg_${dependency_name} REQUIRED ${dependency_modules})
 
 # Some libraries (libjxl and others) put -lm into Libs.private. FindPkgConfig keeps the
