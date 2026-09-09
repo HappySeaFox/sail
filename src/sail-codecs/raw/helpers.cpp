@@ -443,7 +443,11 @@ bool raw_private_tuning_key_value_callback(const char* key, const struct sail_va
         {
             const char* str_value = sail_variant_to_string(value);
             float user_mul[4]     = {1.0f, 1.0f, 1.0f, 1.0f};
+#ifdef _MSC_VER
+            int parsed = sscanf_s(str_value, "%f %f %f %f", &user_mul[0], &user_mul[1], &user_mul[2], &user_mul[3]);
+#else
             int parsed = sscanf(str_value, "%f %f %f %f", &user_mul[0], &user_mul[1], &user_mul[2], &user_mul[3]);
+#endif
 
             if (parsed == 4)
             {
