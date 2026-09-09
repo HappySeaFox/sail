@@ -47,11 +47,12 @@ struct openexr_state
     const struct sail_save_options* save_options;
     struct sail_io* io;
 
+    /* Declared before the files below: the files must be destroyed while their streams are alive. */
+    std::unique_ptr<sail::openexr::SailIStream> istream;
+    std::unique_ptr<sail::openexr::SailOStream> ostream;
+
     std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile> input_file;
     std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::OutputFile> output_file;
-
-    std::string temp_path_read;
-    std::string temp_path_write;
 
     bool frame_processed;
 
@@ -67,17 +68,17 @@ static sail_status_t alloc_openexr_state(struct sail_io* io,
                                          openexr_state** state)
 {
     *state = new openexr_state{
-        load_options,                  // load_options
-        save_options,                  // save_options
-        io,                            // io
+        load_options,                                                  // load_options
+        save_options,                                                  // save_options
+        io,                                                            // io
+        std::unique_ptr<sail::openexr::SailIStream>(),                 // istream
+        std::unique_ptr<sail::openexr::SailOStream>(),                 // ostream
         std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile>(),  // input_file
         std::unique_ptr<OPENEXR_IMF_INTERNAL_NAMESPACE::OutputFile>(), // output_file
-        {},                            // temp_path_read
-        {},                            // temp_path_write
-        false,                         // frame_processed
-        0,                             // width
-        0,                             // height
-        {}                             // channel_info
+        false,                                                         // frame_processed
+        0,                                                             // width
+        0,                                                             // height
+        {}                                                             // channel_info
     };
 
     return SAIL_OK;
@@ -88,16 +89,6 @@ static void destroy_openexr_state(openexr_state* state)
     if (state == nullptr)
     {
         return;
-    }
-
-    if (!state->temp_path_read.empty())
-    {
-        remove(state->temp_path_read.c_str());
-    }
-
-    if (!state->temp_path_write.empty())
-    {
-        remove(state->temp_path_write.c_str());
     }
 
     delete state;
@@ -117,11 +108,18 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_init_v8_openexr(struct sail
     SAIL_TRY(alloc_openexr_state(io, load_options, NULL, &openexr_state));
     *state = openexr_state;
 
-    /* Create temporary file from I/O. */
+    /* OpenEXR seeks back and forth while parsing. */
+    if ((io->features & SAIL_IO_FEATURE_SEEKABLE) == 0)
+    {
+        SAIL_LOG_ERROR("OpenEXR: Non-seekable I/O streams are not supported");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);
+    }
+
+    /* Read straight from the I/O stream. Pass 0 threads not to depend on the global thread count. */
     try
     {
-        openexr_state->temp_path_read = sail::openexr::create_temp_file_from_io(io);
-        openexr_state->input_file.reset(new OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile(openexr_state->temp_path_read.c_str()));
+        openexr_state->istream.reset(new sail::openexr::SailIStream(io));
+        openexr_state->input_file.reset(new OPENEXR_IMF_INTERNAL_NAMESPACE::InputFile(*openexr_state->istream, 0));
     }
     catch (const std::exception& e)
     {
@@ -256,24 +254,21 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_init_v8_openexr(struct sail
     SAIL_TRY(alloc_openexr_state(io, NULL, save_options, &openexr_state));
     *state = openexr_state;
 
-    /* Create temporary file for writing. */
+    /* OpenEXR comes back to patch the line offset table after writing the pixels. */
+    if ((io->features & SAIL_IO_FEATURE_SEEKABLE) == 0)
+    {
+        SAIL_LOG_ERROR("OpenEXR: Non-seekable I/O streams are not supported");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IO);
+    }
+
+    /* Write straight into the I/O stream. */
     try
     {
-        char* path_c = nullptr;
-        const sail_status_t status = sail_temp_file_path("sail_exr_write", &path_c);
-
-        if (status != SAIL_OK)
-        {
-            SAIL_LOG_ERROR("OpenEXR: Failed to create temporary file");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_OPEN_FILE);
-        }
-
-        openexr_state->temp_path_write = path_c;
-        sail_free(path_c);
+        openexr_state->ostream.reset(new sail::openexr::SailOStream(io));
     }
     catch (const std::exception& e)
     {
-        SAIL_LOG_ERROR("OpenEXR: Failed to create temporary file: %s", e.what());
+        SAIL_LOG_ERROR("OpenEXR: Failed to open output stream: %s", e.what());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
@@ -306,7 +301,8 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_openexr(
         sail::openexr::setup_header_write(header, image->pixel_format, static_cast<int>(image->width),
                                           static_cast<int>(image->height), openexr_state->save_options->compression);
 
-        openexr_state->output_file.reset(new OPENEXR_IMF_INTERNAL_NAMESPACE::OutputFile(openexr_state->temp_path_write.c_str(), header));
+        openexr_state->output_file.reset(
+            new OPENEXR_IMF_INTERNAL_NAMESPACE::OutputFile(*openexr_state->ostream, header, 0));
 
         /* Analyze the format we're writing. */
         openexr_state->channel_info = sail::openexr::analyze_channels(header.channels());
@@ -355,26 +351,8 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_openexr(void** st
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = nullptr;
 
+    /* Flushes the line offset table into the I/O stream. */
     openexr_state->output_file.reset();
-
-    /* Copy temporary file back to I/O stream. */
-    if (!openexr_state->temp_path_write.empty())
-    {
-        FILE* temp_file = fopen(openexr_state->temp_path_write.c_str(), "rb");
-        if (temp_file != nullptr)
-        {
-            SAIL_TRY(openexr_state->io->seek(openexr_state->io->stream, 0, SEEK_SET));
-
-            unsigned char buffer[8192];
-            size_t bytes_read;
-            while ((bytes_read = fread(buffer, 1, sizeof(buffer), temp_file)) > 0)
-            {
-                SAIL_TRY(openexr_state->io->strict_write(openexr_state->io->stream, buffer, bytes_read));
-            }
-
-            fclose(temp_file);
-        }
-    }
 
     destroy_openexr_state(openexr_state);
 

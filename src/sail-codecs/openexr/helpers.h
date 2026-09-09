@@ -35,6 +35,7 @@
 #include <OpenEXR/ImfCompression.h>
 #include <OpenEXR/ImfFrameBuffer.h>
 #include <OpenEXR/ImfHeader.h>
+#include <OpenEXR/ImfIO.h>
 #include <OpenEXR/ImfPixelType.h>
 
 struct sail_io;
@@ -57,6 +58,40 @@ struct ChannelInfo
     int by_xsampling, by_ysampling;                 // BY channel subsampling
 };
 
+/*
+ * Reads an OpenEXR file straight from a SAIL I/O object. Requires a seekable I/O.
+ */
+class SailIStream : public OPENEXR_IMF_INTERNAL_NAMESPACE::IStream
+{
+public:
+    explicit SailIStream(struct sail_io* io);
+
+    bool read(char c[], int n) override;
+    uint64_t tellg() override;
+    void seekg(uint64_t pos) override;
+
+private:
+    struct sail_io* m_io;
+    uint64_t m_size;
+};
+
+/*
+ * Writes an OpenEXR file straight into a SAIL I/O object. Requires a seekable I/O as OpenEXR
+ * comes back to patch the line offset table.
+ */
+class SailOStream : public OPENEXR_IMF_INTERNAL_NAMESPACE::OStream
+{
+public:
+    explicit SailOStream(struct sail_io* io);
+
+    void write(const char c[], int n) override;
+    uint64_t tellp() override;
+    void seekp(uint64_t pos) override;
+
+private:
+    struct sail_io* m_io;
+};
+
 SailPixelFormat pixel_type_to_sail(int pixel_type, int channel_count);
 
 std::tuple<int, int> sail_to_pixel_type(SailPixelFormat pixel_format);
@@ -66,8 +101,6 @@ SailCompression compression_to_sail(int compression);
 int sail_compression_to_exr(SailCompression compression);
 
 const char* compression_to_string(int compression);
-
-std::string create_temp_file_from_io(sail_io* io);
 
 ChannelInfo analyze_channels(const OPENEXR_IMF_INTERNAL_NAMESPACE::ChannelList& channels);
 

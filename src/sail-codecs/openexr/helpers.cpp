@@ -23,29 +23,14 @@
     SOFTWARE.
 */
 
-#ifdef _WIN32
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#endif
-
 #include <algorithm>
-#include <array>
+#include <climits>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <fcntl.h>
-
-#ifdef _WIN32
-#include <io.h>
-#include <sys/stat.h>
-#include <windows.h>
-#else
-#include <unistd.h>
-#endif
 
 #include <Imath/ImathBox.h>
 #include <Imath/half.h>
@@ -181,84 +166,112 @@ const char* compression_to_string(int compression)
     }
 }
 
-std::string create_temp_file_from_io(sail_io* io)
+namespace
 {
-    auto path = []() {
-        char* path_c = nullptr;
 
-        SAIL_TRY_OR_EXECUTE(sail_temp_file_path("sail_exr", &path_c),
-                            /* on error */ throw std::runtime_error("Failed to create temporary file"));
-
-        std::string path{path_c};
-        sail_free(path_c);
-        return path;
-    }();
-
-    /* Open the file */
-#ifdef _WIN32
-    int fd;
-    if (_sopen_s(&fd, path.c_str(), _O_RDWR | _O_CREAT | _O_BINARY, _SH_DENYRW, _S_IREAD | _S_IWRITE) != 0)
+void seek_io(sail_io* io, uint64_t position)
+{
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < INT64_MAX
+    if (position > static_cast<uint64_t>(LONG_MAX))
     {
-        throw std::runtime_error("Failed to open temporary file");
-    }
-#else
-    const int fd = open(path.c_str(), O_RDWR | O_CREAT, 0600);
-
-    if (fd < 0)
-    {
-        throw std::runtime_error("Failed to open temporary file");
+        throw std::runtime_error("Position is too large to seek to");
     }
 #endif
 
-    // Copy data from SAIL I/O to the temp file
-    if (io->seek(io->stream, 0, SEEK_SET) != SAIL_OK)
+    if (io->seek(io->stream, static_cast<long>(position), SEEK_SET) != SAIL_OK)
     {
-#ifdef _MSC_VER
-        _close(fd);
-#else
-        close(fd);
-#endif
-        remove(path.c_str());
-        throw std::runtime_error("Failed to seek I/O stream");
+        throw std::runtime_error("Failed to seek the I/O stream");
+    }
+}
+
+uint64_t tell_io(sail_io* io)
+{
+    size_t position;
+
+    if (io->tell(io->stream, &position) != SAIL_OK)
+    {
+        throw std::runtime_error("Failed to get the I/O stream position");
     }
 
-    std::array<unsigned char, 8192> buffer{};
-    size_t bytes_read;
-    sail_status_t err;
+    return position;
+}
 
-    while ((err = io->tolerant_read(io->stream, buffer.data(), buffer.size(), &bytes_read)) == SAIL_OK
-           && bytes_read > 0)
+} // namespace
+
+SailIStream::SailIStream(struct sail_io* io)
+    : OPENEXR_IMF_INTERNAL_NAMESPACE::IStream("SAIL I/O")
+    , m_io(io)
+    , m_size(0)
+{
+    size_t size;
+
+    if (sail_io_size(m_io, &size) != SAIL_OK)
     {
-#ifdef _WIN32
-        if (_write(fd, buffer.data(), static_cast<unsigned int>(bytes_read)) != static_cast<int>(bytes_read))
-#else
-        if (write(fd, buffer.data(), bytes_read) != static_cast<ssize_t>(bytes_read))
-#endif
-        {
-#ifdef _WIN32
-            _close(fd);
-#else
-            close(fd);
-#endif
-            remove(path.c_str());
-            throw std::runtime_error("Failed to write to temporary file");
-        }
+        throw std::runtime_error("Failed to get the I/O stream size");
     }
 
-#ifdef _WIN32
-    _close(fd);
-#else
-    close(fd);
-#endif
+    m_size = size;
 
-    // EOF is expected when reaching the end of the stream
-    if (err != SAIL_OK && err != SAIL_ERROR_EOF)
+    /* Don't rely on the stream being positioned at the beginning. */
+    seek_io(m_io, 0);
+}
+
+bool SailIStream::read(char c[], int n)
+{
+    if (n < 0)
     {
-        remove(path.c_str());
-        throw std::runtime_error("Failed to read from I/O stream");
+        throw std::runtime_error("Negative number of bytes to read");
     }
 
-    return path;
+    if (m_io->strict_read(m_io->stream, c, static_cast<size_t>(n)) != SAIL_OK)
+    {
+        throw std::runtime_error("Failed to read from the I/O stream");
+    }
+
+    /* OpenEXR expects false when the last byte of the stream has just been read. */
+    return tell_io(m_io) < m_size;
+}
+
+uint64_t SailIStream::tellg()
+{
+    return tell_io(m_io);
+}
+
+void SailIStream::seekg(uint64_t pos)
+{
+    seek_io(m_io, pos);
+}
+
+SailOStream::SailOStream(struct sail_io* io)
+    : OPENEXR_IMF_INTERNAL_NAMESPACE::OStream("SAIL I/O")
+    , m_io(io)
+{
+    /* Don't rely on the stream being positioned at the beginning. */
+    seek_io(m_io, 0);
+}
+
+void SailOStream::write(const char c[], int n)
+{
+    if (n < 0)
+    {
+        throw std::runtime_error("Negative number of bytes to write");
+    }
+
+    if (m_io->strict_write(m_io->stream, c, static_cast<size_t>(n)) != SAIL_OK)
+    {
+        throw std::runtime_error("Failed to write to the I/O stream");
+    }
+}
+
+uint64_t SailOStream::tellp()
+{
+    return tell_io(m_io);
+}
+
+void SailOStream::seekp(uint64_t pos)
+{
+    seek_io(m_io, pos);
 }
 
 ChannelInfo analyze_channels(const OPENEXR_IMF_INTERNAL_NAMESPACE::ChannelList& channels)
