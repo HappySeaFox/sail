@@ -82,11 +82,6 @@ if (SAIL_MANIP_SWSCALE_ENABLED)
     endif()
 endif()
 
-# pkg-config integration
-#
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail-manip.pc.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/sail-manip.pc" @ONLY)
-
 # Installation
 #
 install(TARGETS sail-manip
@@ -95,10 +90,5 @@ install(TARGETS sail-manip
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-manip")
-
-# Install development packages
-#
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail-manip.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 sail_install_cmake_config(TARGET "SailManip" FOLDER "sailmanip" VERSION "${VERSION}")

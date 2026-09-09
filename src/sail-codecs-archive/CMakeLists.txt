@@ -74,11 +74,6 @@ endif()
 
 target_include_directories(sail-codecs PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../sail)
 
-# pkg-config integration
-#
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail-codecs.pc.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/sail-codecs.pc" @ONLY)
-
 # Installation
 #
 install(TARGETS sail-codecs
@@ -89,6 +84,3 @@ install(TARGETS sail-codecs
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-codecs)
 
 sail_install_cmake_config(TARGET "SailCodecs" FOLDER "sailcodecs" VERSION ${VERSION})
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail-codecs.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")

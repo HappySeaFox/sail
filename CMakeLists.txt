@@ -38,13 +38,6 @@ include(sail_windows_enable_exception_handling)
 include(sail_windows_install_pdb)
 include(sail_windows_set_crt)
 
-include(JoinPaths)
-
-# https://github.com/jtojnar/cmake-snips#concatenating-paths-when-building-pkg-config-files
-#
-join_paths(SAIL_LIBDIR_FOR_PKG_CONFIG     "\${exec_prefix}" "${CMAKE_INSTALL_LIBDIR}")
-join_paths(SAIL_INCLUDEDIR_FOR_PKG_CONFIG "\${prefix}"      "${CMAKE_INSTALL_INCLUDEDIR}")
-
 # Check features
 #
 sail_check_alignas()

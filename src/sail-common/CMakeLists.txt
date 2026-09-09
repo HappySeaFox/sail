@@ -118,11 +118,6 @@ target_include_directories(sail-common
                                    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
                                    $<INSTALL_INTERFACE:include/sail>)
 
-# pkg-config integration
-#
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail-common.pc.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/sail-common.pc" @ONLY)
-
 # Installation
 #
 install(TARGETS sail-common
@@ -131,10 +126,5 @@ install(TARGETS sail-common
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-common")
-
-# Install development packages
-#
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail-common.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 sail_install_cmake_config(TARGET "SailCommon" FOLDER "sailcommon" VERSION "${VERSION}")

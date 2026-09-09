@@ -113,14 +113,6 @@ if (SAIL_THREAD_SAFE)
     endif()
 endif()
 
-# pkg-config integration
-#
-if (SAIL_COMBINE_CODECS)
-    set(SAIL_CODECS_DEPENDENCY_FOR_PKG_CONFIG "sail-codecs")
-endif()
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail.pc.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/sail.pc" @ONLY)
-
 # Installation
 #
 install(TARGETS sail
@@ -133,11 +125,6 @@ install(TARGETS sail
 # Install layouts for debugging codecs
 #
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/layout/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail/layout")
-
-# Install development packages
-#
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 if (SAIL_COMBINE_CODECS)
     set(SAIL_CODECS_FIND_DEPENDENCY "find_dependency(SailCodecs REQUIRED PATHS \${CMAKE_CURRENT_LIST_DIR})")

@@ -118,11 +118,6 @@ target_include_directories(sail-c++ PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOU
 
 target_link_libraries(sail-c++ PUBLIC sail-common sail sail-manip)
 
-# pkg-config integration
-#
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pkgconfig/sail-c++.pc.in"
-                "${CMAKE_CURRENT_BINARY_DIR}/sail-c++.pc" @ONLY)
-
 # Installation
 #
 install(TARGETS sail-c++
@@ -131,10 +126,5 @@ install(TARGETS sail-c++
         LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
         PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/sail/sail-c++")
-
-# Install development packages
-#
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sail-c++.pc"
-        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
 
 sail_install_cmake_config(TARGET "SailC++" FOLDER "sailc++" VERSION "${VERSION}")
