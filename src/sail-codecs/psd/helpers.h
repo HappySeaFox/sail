@@ -65,3 +65,13 @@ SAIL_HIDDEN sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
                                                         enum SailPixelFormat* result);
 
 SAIL_HIDDEN enum SailCompression psd_private_sail_compression(enum SailPsdCompression compression);
+
+/*
+ * Places a byte of a channel scan line into the interleaved destination scan line.
+ */
+SAIL_HIDDEN void psd_private_put_channel_byte(unsigned char* scan_line,
+                                              unsigned index,
+                                              unsigned char value,
+                                              unsigned channel,
+                                              unsigned bytes_per_sample,
+                                              unsigned bytes_per_pixel);

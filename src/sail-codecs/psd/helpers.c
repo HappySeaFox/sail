@@ -192,6 +192,19 @@ sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
     SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
 }
 
+void psd_private_put_channel_byte(unsigned char* scan_line,
+                                  unsigned index,
+                                  unsigned char value,
+                                  unsigned channel,
+                                  unsigned bytes_per_sample,
+                                  unsigned bytes_per_pixel)
+{
+    const unsigned pixel          = index / bytes_per_sample;
+    const unsigned byte_in_sample = index % bytes_per_sample;
+
+    *(scan_line + pixel * bytes_per_pixel + channel * bytes_per_sample + byte_in_sample) = value;
+}
+
 enum SailCompression psd_private_sail_compression(enum SailPsdCompression compression)
 {
     switch (compression)

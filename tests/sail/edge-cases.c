@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <sail/sail.h>
 
@@ -337,6 +338,71 @@ static MunitResult test_edge_null_pointers(const MunitParameter params[], void* 
     return MUNIT_OK;
 }
 
+/*
+ * Test a PSD whose RLE runs claim more bytes than a scan line holds.
+ *
+ * The image is 1-bit, so a scan line takes eight times less than the number of pixels in it.
+ */
+static MunitResult test_edge_psd_rle_overrun(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_PSD
+    const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/rle-overrun.psd";
+
+    struct sail_image* image = NULL;
+
+    munit_assert(sail_load_from_file(path, &image) == SAIL_OK);
+    munit_assert_not_null(image);
+    munit_assert(image->pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED);
+
+    sail_destroy_image(image);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
+/* Test that RLE compressed PSD images decode exactly like their uncompressed counterparts */
+static MunitResult test_edge_psd_rle_vs_uncompressed(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_PSD
+    static const char* const pairs[][2] = {
+        {SAIL_TEST_IMAGES_ACCEPTANCE_PATH "/psd/bpp1-indexed.psd",
+         SAIL_TEST_IMAGES_ACCEPTANCE_PATH "/psd/bpp1-indexed.rle.psd"},
+        {SAIL_TEST_IMAGES_ACCEPTANCE_PATH "/psd/bpp16-grayscale.psd",
+         SAIL_TEST_IMAGES_ACCEPTANCE_PATH "/psd/bpp16-grayscale.rle.psd"},
+    };
+
+    for (size_t i = 0; i < sizeof(pairs) / sizeof(pairs[0]); i++)
+    {
+        struct sail_image* uncompressed = NULL;
+        struct sail_image* rle          = NULL;
+
+        munit_assert(sail_load_from_file(pairs[i][0], &uncompressed) == SAIL_OK);
+        munit_assert(sail_load_from_file(pairs[i][1], &rle) == SAIL_OK);
+
+        munit_assert(uncompressed->width == rle->width);
+        munit_assert(uncompressed->height == rle->height);
+        munit_assert(uncompressed->pixel_format == rle->pixel_format);
+        munit_assert(uncompressed->bytes_per_line == rle->bytes_per_line);
+        munit_assert(memcmp(uncompressed->pixels, rle->pixels, (size_t)rle->height * rle->bytes_per_line) == 0);
+
+        sail_destroy_image(uncompressed);
+        sail_destroy_image(rle);
+    }
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
 /* Test options with NULL state */
 static MunitResult test_edge_options_null_state(const MunitParameter params[], void* user_data)
 {
@@ -538,28 +604,30 @@ static MunitResult test_edge_zero_dimensions(const MunitParameter params[], void
 
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/1x1-image",                 test_edge_1x1_image,                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/cleanup-on-error",          test_edge_cleanup_on_error,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/corrupted-compression",     test_edge_corrupted_compression,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/corrupted-palette",         test_edge_corrupted_palette,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/double-destroy",            test_edge_double_destroy,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/early-stop-no-frames",      test_edge_early_stop_no_frames,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/empty-memory-buffer",       test_edge_empty_memory_buffer,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/invalid-codec-queries",     test_edge_invalid_codec_queries,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/invalid-magic",             test_edge_invalid_magic,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/invalid-palette-size",      test_edge_invalid_palette_size,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/memory-boundary",           test_edge_memory_boundary,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/nonexistent-file",          test_edge_nonexistent_file,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/null-pointers",             test_edge_null_pointers,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/options-null-state",        test_edge_options_null_state,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/partial-frame-cleanup",     test_edge_partial_frame_cleanup,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/readonly-format-save",      test_edge_readonly_format_save,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/save-without-start",        test_edge_save_without_start,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/stopped-state-load",        test_edge_stopped_state_load,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/truncated-file",            test_edge_truncated_file,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/unsupported-pixel-format",  test_edge_unsupported_pixel_format,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/zero-byte-file",            test_edge_zero_byte_file,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/zero-dimensions",           test_edge_zero_dimensions,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/1x1-image",                test_edge_1x1_image,                NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/cleanup-on-error",         test_edge_cleanup_on_error,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/corrupted-compression",    test_edge_corrupted_compression,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/corrupted-palette",        test_edge_corrupted_palette,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/double-destroy",           test_edge_double_destroy,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/early-stop-no-frames",     test_edge_early_stop_no_frames,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/empty-memory-buffer",      test_edge_empty_memory_buffer,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-codec-queries",    test_edge_invalid_codec_queries,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-magic",            test_edge_invalid_magic,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-palette-size",     test_edge_invalid_palette_size,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/memory-boundary",          test_edge_memory_boundary,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/nonexistent-file",         test_edge_nonexistent_file,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/null-pointers",            test_edge_null_pointers,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/options-null-state",       test_edge_options_null_state,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/partial-frame-cleanup",    test_edge_partial_frame_cleanup,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/psd-rle-overrun",          test_edge_psd_rle_overrun,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/psd-rle-vs-uncompressed",  test_edge_psd_rle_vs_uncompressed,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/readonly-format-save",     test_edge_readonly_format_save,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-without-start",       test_edge_save_without_start,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/stopped-state-load",       test_edge_stopped_state_load,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/truncated-file",           test_edge_truncated_file,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/unsupported-pixel-format", test_edge_unsupported_pixel_format, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/zero-byte-file",           test_edge_zero_byte_file,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/zero-dimensions",          test_edge_zero_dimensions,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

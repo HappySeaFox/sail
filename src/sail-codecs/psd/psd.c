@@ -290,64 +290,69 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_psd(void* state, struct sail_
     {
         const unsigned bytes_per_sample = (psd_state->depth + 7) / 8;
 
+        /*
+         * PSD compresses the bytes of every channel scan line, not its pixels. Counting pixels
+         * writes past the scan line when a pixel takes less than a byte.
+         */
+        const unsigned bytes_per_channel_line = (image->width * psd_state->depth + 7) / 8;
+
         for (unsigned channel = 0; channel < psd_state->channels; channel++)
         {
             for (unsigned row = 0; row < image->height; row++)
             {
-                for (unsigned count = 0; count < image->width;)
+                unsigned char* scan_line = sail_scan_line(image, row);
+
+                for (unsigned count = 0; count < bytes_per_channel_line;)
                 {
                     unsigned char c;
                     SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &c, sizeof(c)));
 
                     if (c > 128)
                     {
-                        c ^= 0xFF;
-                        c += 2;
+                        /* Repeat the next byte 257 - c times. */
+                        const unsigned repeat = 257U - c;
 
-                        unsigned char value[4]; // To support 32-bit depth.
-                        SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
+                        unsigned char value;
+                        SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
 
-                        /* Clamp to the buffer size. */
-                        c = (count + c) <= image->width ? c : (unsigned char)(image->width - count);
-
-                        for (unsigned i = count; i < count + c; i++)
-                        {
-                            unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + i * bytes_per_pixel;
-                            for (unsigned b = 0; b < bytes_per_sample; b++)
-                            {
-                                *(scan + channel * bytes_per_sample + b) = value[b];
-                            }
-                        }
-
-                        count += c;
-                    }
-                    else if (c < 128)
-                    {
-                        c++;
-
-                        /* Clamp to the buffer size. */
-                        unsigned actual_count = (count + c) <= image->width ? c : (image->width - count);
+                        /* Clamp to the scan line size. */
+                        const unsigned actual_count =
+                            (count + repeat) <= bytes_per_channel_line ? repeat : (bytes_per_channel_line - count);
 
                         for (unsigned i = 0; i < actual_count; i++)
                         {
-                            unsigned char value[4]; // To support 32-bit depth.
-                            SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, value, bytes_per_sample));
+                            psd_private_put_channel_byte(scan_line, count + i, value, channel, bytes_per_sample,
+                                                         bytes_per_pixel);
+                        }
 
-                            unsigned char* scan = (unsigned char*)sail_scan_line(image, row) + (count + i) * bytes_per_pixel;
-                            for (unsigned b = 0; b < bytes_per_sample; b++)
-                            {
-                                *(scan + channel * bytes_per_sample + b) = value[b];
-                            }
+                        count += repeat;
+                    }
+                    else if (c < 128)
+                    {
+                        /* Copy the next c + 1 bytes as is. */
+                        const unsigned literal = c + 1U;
+
+                        /* Clamp to the scan line size. */
+                        const unsigned actual_count =
+                            (count + literal) <= bytes_per_channel_line ? literal : (bytes_per_channel_line - count);
+
+                        for (unsigned i = 0; i < actual_count; i++)
+                        {
+                            unsigned char value;
+                            SAIL_TRY(psd_state->io->strict_read(psd_state->io->stream, &value, sizeof(value)));
+
+                            psd_private_put_channel_byte(scan_line, count + i, value, channel, bytes_per_sample,
+                                                         bytes_per_pixel);
                         }
 
                         /* Skip remaining bytes if we had to truncate. */
-                        if (actual_count < c)
+                        if (actual_count < literal)
                         {
-                            SAIL_TRY(psd_state->io->seek(psd_state->io->stream, (long)((unsigned)c - actual_count) * bytes_per_sample,
-                                                         SEEK_CUR));
+                            SAIL_TRY(
+                                psd_state->io->seek(psd_state->io->stream, (long)(literal - actual_count), SEEK_CUR));
                         }
 
-                        count += c;
+                        count += literal;
                     }
                     /* c == 128 is NOP, do nothing. */
                 }
