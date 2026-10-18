@@ -6,18 +6,32 @@
 #
 # Sets:
 #   SAIL_MANIP_SWSCALE_ENABLED - ON or OFF
+#   SAIL_SWSCALE_INCLUDE_DIRS, SAIL_SWSCALE_LINK_LIBRARIES - when enabled
 #
 macro(sail_find_swscale MODE)
     set(SAIL_MANIP_SWSCALE_ENABLED OFF)
     set(SAIL_MANIP_SWSCALE_ENABLED_DISPLAY "OFF")
 
     if (${MODE} STREQUAL "ON" OR ${MODE} STREQUAL "AUTO")
-        find_path(SAIL_SWSCALE_INCLUDE_DIR NAMES libswscale/swscale.h)
-        find_path(SAIL_AVUTIL_INCLUDE_DIR NAMES libavutil/pixfmt.h)
-        find_library(SAIL_SWSCALE_LIBS NAMES swscale)
-        find_library(SAIL_AVUTIL_LIBS NAMES avutil)
+        if (${MODE} STREQUAL "ON")
+            set(SAIL_SWSCALE_REQUIRED_OPTION REQUIRED)
+        else()
+            set(SAIL_SWSCALE_REQUIRED_OPTION QUIET)
+        endif()
 
-        if (SAIL_SWSCALE_INCLUDE_DIR AND SAIL_AVUTIL_INCLUDE_DIR AND SAIL_SWSCALE_LIBS AND SAIL_AVUTIL_LIBS)
+        # pkg-config only, just like the video codec. sail-manip is linked after the codecs,
+        # so its libraries land at the very end of the link line. Plain libswscale and
+        # libavutil paths would then sit after the libraries that satisfy them, like zlib
+        # or OpenCL, and a static link would fail with undefined references. pkg-config
+        # reports the whole dependency closure instead.
+        #
+        find_package(PkgConfig ${SAIL_SWSCALE_REQUIRED_OPTION})
+
+        if (PkgConfig_FOUND)
+            pkg_check_modules(SAIL_SWSCALE ${SAIL_SWSCALE_REQUIRED_OPTION} libswscale libavutil)
+        endif()
+
+        if (SAIL_SWSCALE_FOUND)
             message(STATUS "Using libswscale for pixel format conversion in sail-manip")
             set(SAIL_MANIP_SWSCALE_ENABLED ON)
             set(SAIL_MANIP_SWSCALE_ENABLED_DISPLAY "ON")
