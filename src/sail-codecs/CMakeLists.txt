@@ -212,8 +212,19 @@ else()
     find_library(${dependency_name}_DEBUG_LIBRARY NAMES ${dependency_debug_names})
 endif()
 
-if (NOT ${dependency_name}_RELEASE_LIBRARY OR NOT ${dependency_name}_DEBUG_LIBRARY)
+if (NOT ${dependency_name}_RELEASE_LIBRARY AND NOT ${dependency_name}_DEBUG_LIBRARY)
     message(FATAL_ERROR \"Missing dependency: ${dependency_name}\")
+endif()
+
+# Release only or debug only installations, like the VCPKG_BUILD_TYPE=release triplets,
+# ship a single flavor of the library. Use it for every configuration.
+#
+if (NOT ${dependency_name}_RELEASE_LIBRARY)
+    set(${dependency_name}_RELEASE_LIBRARY \${${dependency_name}_DEBUG_LIBRARY})
+endif()
+
+if (NOT ${dependency_name}_DEBUG_LIBRARY)
+    set(${dependency_name}_DEBUG_LIBRARY \${${dependency_name}_RELEASE_LIBRARY})
 endif()
 
 set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \$<\$<CONFIG:Release>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:RelWithDebInfo>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:Debug>:\${${dependency_name}_DEBUG_LIBRARY}>)
