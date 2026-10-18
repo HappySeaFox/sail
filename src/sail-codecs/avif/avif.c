@@ -50,6 +50,7 @@ struct avif_state
     struct sail_avif_context avif_context;
     struct avifImage* avif_image;
     unsigned frames_saved;
+    bool single_image;
 };
 
 static sail_status_t alloc_avif_state(struct sail_io* io,
@@ -101,6 +102,7 @@ static sail_status_t alloc_avif_state(struct sail_io* io,
                                        .avif_encoder = NULL,
                                        .avif_image   = NULL,
                                        .frames_saved = 0,
+                                       .single_image = false,
                                        .avif_context = (struct sail_avif_context){
                                            .io          = io,
                                            .buffer      = buffer,
@@ -400,6 +402,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_avif(void* state, const struc
 {
     struct avif_state* avif_state = state;
 
+    if (avif_state->single_image)
+    {
+        SAIL_LOG_ERROR("AVIF: Cannot save more frames after a still image. Set a non-negative delay in every frame "
+                       "to save an animation");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_CONFLICTING_OPERATION);
+    }
+
     /* Setup pixel data for conversion. */
     avif_state->rgb_image.pixels   = image->pixels;
     avif_state->rgb_image.rowBytes = image->bytes_per_line;
@@ -415,8 +424,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_avif(void* state, const struc
 
     uint64_t duration_in_timescales = (image->delay > 0) ? (uint64_t)image->delay : 100;
 
-    /* Add frame to encoder. */
-    avifAddImageFlags flags = (avif_state->frames_saved == 0) ? AVIF_ADD_IMAGE_FLAG_NONE : AVIF_ADD_IMAGE_FLAG_NONE;
+    /*
+     * A negative delay means a still image. Telling that to the encoder makes it signal "still_picture"
+     * to AV1, which enables still image compression rules. libavif forbids adding more frames afterwards.
+     */
+    const avifAddImageFlags flags =
+        (avif_state->frames_saved == 0 && image->delay < 0) ? AVIF_ADD_IMAGE_FLAG_SINGLE : AVIF_ADD_IMAGE_FLAG_NONE;
+
     avif_result = avifEncoderAddImage(avif_state->avif_encoder, avif_state->avif_image, duration_in_timescales, flags);
 
     if (avif_result != AVIF_RESULT_OK)
@@ -427,6 +441,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_avif(void* state, const struc
     }
 
     avif_state->frames_saved++;
+    avif_state->single_image = (flags & AVIF_ADD_IMAGE_FLAG_SINGLE) != 0;
 
     /* Destroy the image after adding to encoder. */
     avifImageDestroy(avif_state->avif_image);
