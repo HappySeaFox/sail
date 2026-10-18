@@ -41,6 +41,19 @@ elseif (ANDROID)
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "link_libraries,${VIDEO_SYSTEM_LIBRARIES_JOINED}")
 endif()
 
+# FFmpeg may be built with OpenCL support
+#
+foreach (lib IN LISTS FFMPEG_LDFLAGS FFMPEG_STATIC_LDFLAGS)
+    if (lib MATCHES "OpenCL")
+        find_package(OpenCL REQUIRED)
+
+        set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,OpenCL,OpenCL::OpenCL")
+        list(APPEND VIDEO_SYSTEM_LIBRARIES OpenCL::OpenCL)
+
+        break()
+    endif()
+endforeach()
+
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} PARENT_SCOPE)
 
 # Common codec configuration
