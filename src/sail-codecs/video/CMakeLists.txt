@@ -21,7 +21,7 @@ set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "pkg_config,l
 # combined into an archive.
 #
 if (WIN32)
-    set(VIDEO_SYSTEM_LIBRARIES secur32 ncrypt crypt32 bcrypt mfuuid strmiids)
+    set(VIDEO_SYSTEM_LIBRARIES Secur32 Ncrypt Crypt32 Bcrypt Mfuuid Strmiids)
 
     list(JOIN VIDEO_SYSTEM_LIBRARIES " " VIDEO_SYSTEM_LIBRARIES_JOINED)
     set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "link_libraries,${VIDEO_SYSTEM_LIBRARIES_JOINED}")
