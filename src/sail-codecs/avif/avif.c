@@ -78,15 +78,26 @@ static sail_status_t alloc_avif_state(struct sail_io* io,
     SAIL_TRY_OR_CLEANUP(sail_malloc(buffer_size, &buffer),
                         /* on error */ sail_free(avif_io));
 
+    /* decoder */
+    struct avifDecoder* avif_decoder = avifDecoderCreate();
+
+    if (avif_decoder == NULL)
+    {
+        SAIL_LOG_ERROR("AVIF: Failed to create decoder");
+        sail_free(buffer);
+        sail_free(avif_io);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
     /* avif_state */
     SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(struct avif_state), &ptr),
-                        /* on error */ sail_free(buffer), sail_free(avif_io));
+                        /* on error */ avifDecoderDestroy(avif_decoder), sail_free(buffer), sail_free(avif_io));
     *avif_state = ptr;
 
     **avif_state = (struct avif_state){.load_options = load_options,
                                        .save_options = save_options,
                                        .avif_io      = avif_io,
-                                       .avif_decoder = avifDecoderCreate(),
+                                       .avif_decoder = avif_decoder,
                                        .avif_encoder = NULL,
                                        .avif_image   = NULL,
                                        .frames_saved = 0,
