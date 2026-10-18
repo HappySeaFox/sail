@@ -32,10 +32,11 @@ jobs:
         run: |
             sudo apt-get update
             sudo apt-get install -y cmake pkg-config libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev \
-                                    libavif-dev libgif-dev libheif-dev libheif-plugin-x265            \
-                                    libjbig-dev libjpeg-dev libjxl-dev libnanosvg-dev libopenexr-dev  \
-                                    libopenjp2-7-dev libopenjpip-dec-server libopenjpip-server        \
-                                    libpng-dev libraw-dev libsdl2-dev libtiff-dev libwebp-dev zlib1g-dev
+                                    libavif-dev libgif-dev libheif-dev libheif-plugin-x265           \
+                                    libjbig-dev libjpeg-dev libjxl-dev libnanosvg-dev libopenexr-dev \
+                                    libopenjp2-7-dev libopenjpip-dec-server libopenjpip-server       \
+                                    libpng-dev libraw-dev libsdl2-dev libtiff-dev libwebp-dev        \
+                                    ocl-icd-opencl-dev zlib1g-dev
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
