@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <string.h>
 
 #include <sail-common/sail-common.h>
@@ -130,6 +131,23 @@ uint32_t avif_private_round_depth(uint32_t depth)
     {
         return 8;
     }
+}
+
+int avif_private_frame_delay(double duration_in_seconds)
+{
+    /*
+     * The frame duration comes from the file and is not validated by libavif. Converting an out-of-range
+     * or NaN double to int is undefined behavior, so reject everything we cannot represent. NaN fails
+     * both comparisons on its own.
+     */
+    const double delay_in_milliseconds = duration_in_seconds * 1000;
+
+    if (delay_in_milliseconds > 0 && delay_in_milliseconds < INT_MAX)
+    {
+        return (int)delay_in_milliseconds;
+    }
+
+    return 0;
 }
 
 sail_status_t avif_private_fetch_iccp(const struct avifRWData* avif_iccp, struct sail_iccp** iccp)

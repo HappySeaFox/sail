@@ -213,7 +213,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_avif(void* state, s
     image_local->pixel_format =
         avif_private_rgb_sail_pixel_format(avif_state->rgb_image.format, avif_state->rgb_image.depth);
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
-    image_local->delay          = (int)(avif_state->avif_decoder->imageTiming.duration * 1000);
+    image_local->delay          = avif_private_frame_delay(avif_state->avif_decoder->imageTiming.duration);
 
     /* Fetch ICC profile. */
     if (avif_state->load_options->options & SAIL_OPTION_ICCP)

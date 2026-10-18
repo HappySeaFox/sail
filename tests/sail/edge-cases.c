@@ -191,6 +191,48 @@ static MunitResult test_edge_empty_memory_buffer(const MunitParameter params[], 
     return MUNIT_OK;
 }
 
+/*
+ * Test an animation whose frame duration doesn't fit into the frame delay.
+ *
+ * The image is bpp24-yuv-animated.avif with the media timescale set to 1 and the sample delta
+ * set to 0xFFFFFFFF, which makes libavif report a duration of ~4.3e9 seconds.
+ */
+static MunitResult test_edge_huge_frame_duration(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_AVIF
+    const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-frame-duration.avif";
+
+    void* state = NULL;
+    munit_assert(sail_start_loading_from_file(path, NULL, &state) == SAIL_OK);
+
+    for (;;)
+    {
+        struct sail_image* image = NULL;
+        sail_status_t status     = sail_load_next_frame(state, &image);
+
+        if (status != SAIL_OK)
+        {
+            munit_assert_null(image);
+            break;
+        }
+
+        munit_assert_not_null(image);
+        munit_assert(image->delay >= 0);
+
+        sail_destroy_image(image);
+    }
+
+    munit_assert(sail_stop_loading(state) == SAIL_OK);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
 /* Test invalid codec info queries */
 static MunitResult test_edge_invalid_codec_queries(const MunitParameter params[], void* user_data)
 {
@@ -611,6 +653,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/double-destroy",           test_edge_double_destroy,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/early-stop-no-frames",     test_edge_early_stop_no_frames,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/empty-memory-buffer",      test_edge_empty_memory_buffer,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/huge-frame-duration",      test_edge_huge_frame_duration,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-codec-queries",    test_edge_invalid_codec_queries,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-magic",            test_edge_invalid_magic,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/invalid-palette-size",     test_edge_invalid_palette_size,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },

@@ -49,6 +49,12 @@ SAIL_HIDDEN enum SailPixelFormat avif_private_rgb_sail_pixel_format(enum avifRGB
 
 SAIL_HIDDEN uint32_t avif_private_round_depth(uint32_t depth);
 
+/*
+ * Converts the frame duration in seconds into the frame delay in milliseconds.
+ * Returns 0 when the duration cannot be represented as a delay.
+ */
+SAIL_HIDDEN int avif_private_frame_delay(double duration_in_seconds);
+
 SAIL_HIDDEN sail_status_t avif_private_fetch_iccp(const struct avifRWData* avif_iccp, struct sail_iccp** iccp);
 
 SAIL_HIDDEN sail_status_t avif_private_fetch_meta_data(enum SailMetaData key,
