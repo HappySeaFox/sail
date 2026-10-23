@@ -44,6 +44,7 @@ static const char * const SAIL_TEST_IMAGES_MUST_SUCCEED[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_XWD
     "@SAIL_TEST_IMAGES_PATH@/xwd/GHSA-3g38-x2pj-mv55.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/window-name.xwd",
 #endif
 
     NULL,

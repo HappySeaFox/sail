@@ -49,16 +49,21 @@ sail_status_t xwd_private_read_header(struct sail_io* io, struct XWDFileHeader* 
 
     SAIL_TRY(io->strict_read(io->stream, buffer, sizeof(buffer)));
 
-    /* Detect byte order by checking header_size field. */
+    /*
+     * Detect byte order by checking the header size field. The header is followed by the window
+     * name, so the size is not necessarily equal to the size of the header structure.
+     */
     bool need_swap       = false;
     uint32_t header_size = buffer[0];
 
-    if (header_size != XWD_HEADER_SIZE)
+    if (header_size < XWD_HEADER_SIZE || header_size > XWD_MAX_HEADER_SIZE)
     {
-        header_size = sail_reverse_uint32(header_size);
-        if (header_size == XWD_HEADER_SIZE)
+        const uint32_t swapped_header_size = sail_reverse_uint32(header_size);
+
+        if (swapped_header_size >= XWD_HEADER_SIZE && swapped_header_size <= XWD_MAX_HEADER_SIZE)
         {
-            need_swap = true;
+            need_swap   = true;
+            header_size = swapped_header_size;
         }
         else
         {
@@ -105,6 +110,12 @@ sail_status_t xwd_private_read_header(struct sail_io* io, struct XWDFileHeader* 
     {
         SAIL_LOG_ERROR("XWD: Invalid image dimensions %ux%u", header->pixmap_width, header->pixmap_height);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    /* Skip the window name stored between the header and the color map. */
+    if (header->header_size > XWD_HEADER_SIZE)
+    {
+        SAIL_TRY(io->seek(io->stream, (long)(header->header_size - XWD_HEADER_SIZE), SEEK_CUR));
     }
 
     return SAIL_OK;

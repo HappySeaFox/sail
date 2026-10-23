@@ -40,6 +40,9 @@ struct sail_palette;
 #define XWD_FILE_VERSION 7
 #define XWD_HEADER_SIZE 100
 
+/* The window name follows the header, so the header size may be larger. */
+#define XWD_MAX_HEADER_SIZE (XWD_HEADER_SIZE + 4096)
+
 /* XWD pixmap formats. */
 #define XYBitmap 0
 #define XYPixmap 1
