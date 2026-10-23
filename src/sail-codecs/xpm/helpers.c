@@ -1179,6 +1179,13 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
                         pixel[2]             = colors[c].b;
                         pixel[3]             = colors[c].a;
                     }
+                    else if (pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
+                    {
+                        unsigned char* pixel = pixels + (y * width + x) * 3;
+                        pixel[0]             = colors[c].r;
+                        pixel[1]             = colors[c].g;
+                        pixel[2]             = colors[c].b;
+                    }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
                     {
                         pixels[y * width + x] = (unsigned char)c;
@@ -1200,6 +1207,11 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
                         unsigned byte_index = (y * width + x) / 8;
                         unsigned shift      = 7 - ((y * width + x) % 8);
                         pixels[byte_index]  = (pixels[byte_index] & ~(1 << shift)) | ((c & 1) << shift);
+                    }
+                    else
+                    {
+                        SAIL_LOG_ERROR("XPM: Unsupported pixel format %s", sail_pixel_format_to_string(pixel_format));
+                        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
                     }
                     found = true;
                     break;
