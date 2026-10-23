@@ -1421,6 +1421,32 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
     return SAIL_OK;
 }
 
+/* The name is written into a C header, so it must be an identifier that also fits the header buffer. */
+#define SAIL_XPM_MAX_NAME_LENGTH 100
+
+static bool is_valid_name(const char* name)
+{
+    if (name == NULL || *name == '\0' || strlen(name) > SAIL_XPM_MAX_NAME_LENGTH)
+    {
+        return false;
+    }
+
+    if (!isalpha((unsigned char)name[0]) && name[0] != '_')
+    {
+        return false;
+    }
+
+    for (const char* character = name + 1; *character != '\0'; character++)
+    {
+        if (!isalnum((unsigned char)*character) && *character != '_')
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool xpm_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
     struct xpm_state* xpm_state = user_data;
@@ -1431,7 +1457,7 @@ bool xpm_private_tuning_key_value_callback(const char* key, const struct sail_va
         {
             const char* str_value = sail_variant_to_string(value);
 
-            if (str_value != NULL)
+            if (is_valid_name(str_value))
             {
 #ifdef _MSC_VER
                 strncpy_s(xpm_state->var_name, sizeof(xpm_state->var_name), str_value, sizeof(xpm_state->var_name) - 1);
@@ -1440,6 +1466,11 @@ bool xpm_private_tuning_key_value_callback(const char* key, const struct sail_va
 #endif
                 xpm_state->var_name[sizeof(xpm_state->var_name) - 1] = '\0';
                 SAIL_LOG_TRACE("XPM: Using variable name '%s'", xpm_state->var_name);
+            }
+            else
+            {
+                SAIL_LOG_WARNING("XPM: 'xpm-name' must be a C identifier of up to %d characters, using the default one",
+                                 SAIL_XPM_MAX_NAME_LENGTH);
             }
         }
         else
