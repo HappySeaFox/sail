@@ -67,7 +67,8 @@ sail_status_t xbm_private_read_hex_literal(struct sail_io* io, unsigned* holder)
     do
     {
         SAIL_TRY(io->strict_read(io->stream, &ch, 1));
-    } while (isspace(ch) || ch == ',');
+        /* Bytes above 127 are negative in a signed char, which is undefined behavior for isspace(). */
+    } while (isspace((unsigned char)ch) || ch == ',');
 
     if (ch != '0')
     {
