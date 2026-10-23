@@ -1482,33 +1482,6 @@ bool xpm_private_tuning_key_value_callback(const char* key, const struct sail_va
     return true;
 }
 
-sail_status_t xpm_private_skip_extensions(struct sail_io* io)
-{
-    /* XPM extensions start with "XPMEXT" and end with "XPMENDEXT".
-     * We simply skip them for now. */
-    char buf[512];
-
-    while (true)
-    {
-        size_t bytes_read;
-        SAIL_TRY(io->tolerant_read(io->stream, buf, sizeof(buf) - 1, &bytes_read));
-
-        if (bytes_read == 0)
-        {
-            break;
-        }
-
-        buf[bytes_read] = '\0';
-
-        if (strstr(buf, "XPMENDEXT") != NULL)
-        {
-            break;
-        }
-    }
-
-    return SAIL_OK;
-}
-
 enum SailPixelFormat xpm_private_determine_pixel_format(unsigned num_colors, bool has_transparency)
 {
     if (has_transparency)

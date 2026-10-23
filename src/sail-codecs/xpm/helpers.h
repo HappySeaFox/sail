@@ -105,8 +105,6 @@ SAIL_HIDDEN bool xpm_private_tuning_key_value_callback(const char* key,
                                                        const struct sail_variant* value,
                                                        void* user_data);
 
-SAIL_HIDDEN sail_status_t xpm_private_skip_extensions(struct sail_io* io);
-
 SAIL_HIDDEN enum SailPixelFormat xpm_private_determine_pixel_format(unsigned num_colors, bool has_transparency);
 
 SAIL_HIDDEN sail_status_t xpm_private_build_palette(struct sail_palette** palette,
