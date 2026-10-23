@@ -1,0 +1,4 @@
+#define wrap_width 8388608
+#define wrap_height 4096
+static unsigned char wrap_bits[] = {
+ 0x00 };

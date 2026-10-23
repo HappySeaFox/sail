@@ -25,7 +25,6 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h> /* atoi() */
 #include <string.h>
 
 #include <sail-common/sail-common.h>
@@ -128,7 +127,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
-    unsigned width = atoi(ptr + 6);
+    unsigned width;
+    SAIL_TRY(xbm_private_parse_dimension(ptr + 6, &width));
 
     /* Read height. */
     SAIL_TRY(sail_read_string_from_io(xbm_state->io, buf, sizeof(buf)));
@@ -143,7 +143,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xbm(void* state, st
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
-    unsigned height = atoi(ptr + 7);
+    unsigned height;
+    SAIL_TRY(xbm_private_parse_dimension(ptr + 7, &height));
 
     /* Skip other defines. */
     do

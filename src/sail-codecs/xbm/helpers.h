@@ -34,6 +34,9 @@
 struct sail_io;
 struct sail_variant;
 
+/* Images larger than this are rejected. */
+#define SAIL_XBM_MAX_DIMENSION 65535
+
 enum SailXbmVersion
 {
     SAIL_XBM_VERSION_10 = 10,
@@ -50,6 +53,8 @@ struct xbm_state
 };
 
 SAIL_HIDDEN unsigned char xbm_private_reverse_byte(unsigned char byte);
+
+SAIL_HIDDEN sail_status_t xbm_private_parse_dimension(const char* str, unsigned* dimension);
 
 SAIL_HIDDEN sail_status_t xbm_private_read_hex_literal(struct sail_io* io, unsigned* holder);
 

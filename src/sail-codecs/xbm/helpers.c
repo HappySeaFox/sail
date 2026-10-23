@@ -24,7 +24,9 @@
 */
 
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <sail-common/sail-common.h>
@@ -38,6 +40,24 @@ static const unsigned char reverse_lookup_4bits[] = {
 unsigned char xbm_private_reverse_byte(unsigned char byte)
 {
     return (reverse_lookup_4bits[byte & 0xF] << 4) | reverse_lookup_4bits[byte >> 4];
+}
+
+sail_status_t xbm_private_parse_dimension(const char* str, unsigned* dimension)
+{
+    errno = 0;
+
+    char* end;
+    const long value = strtol(str, &end, 10);
+
+    if (end == str || errno == ERANGE || value <= 0 || value > SAIL_XBM_MAX_DIMENSION)
+    {
+        SAIL_LOG_ERROR("XBM: Image dimension must be a positive number not greater than %d", SAIL_XBM_MAX_DIMENSION);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    *dimension = (unsigned)value;
+
+    return SAIL_OK;
 }
 
 sail_status_t xbm_private_read_hex_literal(struct sail_io* io, unsigned* holder)

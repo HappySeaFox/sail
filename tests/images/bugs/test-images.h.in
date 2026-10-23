@@ -25,6 +25,11 @@ static const char * const SAIL_TEST_IMAGES_MUST_FAIL[] = {
     "@SAIL_TEST_IMAGES_PATH@/webp/TALOS-2025-2224.webp",
 #endif
 
+#ifdef SAIL_HAVE_BUILTIN_XBM
+    "@SAIL_TEST_IMAGES_PATH@/xbm/negative-width.xbm",
+    "@SAIL_TEST_IMAGES_PATH@/xbm/huge-dimensions.xbm",
+#endif
+
     NULL,
 };
 
