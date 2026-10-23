@@ -1171,9 +1171,12 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
             {
                 if (memcmp(pixel_chars, colors[c].chars, cpp) == 0)
                 {
+                    /* Scan lines are padded to a whole number of bytes. */
+                    unsigned char* scan = pixels + (size_t)y * bytes_per_line;
+
                     if (pixel_format == SAIL_PIXEL_FORMAT_BPP32_RGBA)
                     {
-                        unsigned char* pixel = pixels + (y * width + x) * 4;
+                        unsigned char* pixel = scan + (size_t)x * 4;
                         pixel[0]             = colors[c].r;
                         pixel[1]             = colors[c].g;
                         pixel[2]             = colors[c].b;
@@ -1181,32 +1184,29 @@ sail_status_t xpm_private_read_pixels(struct sail_io* io,
                     }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP24_RGB)
                     {
-                        unsigned char* pixel = pixels + (y * width + x) * 3;
+                        unsigned char* pixel = scan + (size_t)x * 3;
                         pixel[0]             = colors[c].r;
                         pixel[1]             = colors[c].g;
                         pixel[2]             = colors[c].b;
                     }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
                     {
-                        pixels[y * width + x] = (unsigned char)c;
+                        scan[x] = (unsigned char)c;
                     }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
                     {
-                        unsigned byte_index = (y * width + x) / 2;
-                        unsigned shift      = ((y * width + x) % 2) ? 0 : 4;
-                        pixels[byte_index]  = (pixels[byte_index] & ~(0x0F << shift)) | ((c & 0x0F) << shift);
+                        const unsigned shift = (x % 2) ? 0 : 4;
+                        scan[x / 2]          = (scan[x / 2] & ~(0x0F << shift)) | ((c & 0x0F) << shift);
                     }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED)
                     {
-                        unsigned byte_index = (y * width + x) / 4;
-                        unsigned shift      = 6 - ((y * width + x) % 4) * 2;
-                        pixels[byte_index]  = (pixels[byte_index] & ~(0x03 << shift)) | ((c & 0x03) << shift);
+                        const unsigned shift = 6 - (x % 4) * 2;
+                        scan[x / 4]          = (scan[x / 4] & ~(0x03 << shift)) | ((c & 0x03) << shift);
                     }
                     else if (pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED)
                     {
-                        unsigned byte_index = (y * width + x) / 8;
-                        unsigned shift      = 7 - ((y * width + x) % 8);
-                        pixels[byte_index]  = (pixels[byte_index] & ~(1 << shift)) | ((c & 1) << shift);
+                        const unsigned shift = 7 - (x % 8);
+                        scan[x / 8]          = (scan[x / 8] & ~(1 << shift)) | ((c & 1) << shift);
                     }
                     else
                     {
@@ -1332,10 +1332,15 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
     SAIL_TRY(sail_malloc(line_size, &ptr));
     line = ptr;
 
+    /* Scan lines are padded to a whole number of bytes. */
+    const unsigned bytes_per_line = sail_bytes_per_line(width, pixel_format);
+
     for (unsigned y = 0; y < height; y++)
     {
         line[0]      = '"';
         unsigned pos = 1;
+
+        const unsigned char* scan = pixels + (size_t)y * bytes_per_line;
 
         for (unsigned x = 0; x < width; x++)
         {
@@ -1344,25 +1349,22 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
             /* Extract pixel index based on pixel format. */
             if (pixel_format == SAIL_PIXEL_FORMAT_BPP8_INDEXED)
             {
-                pixel_index = pixels[y * width + x];
+                pixel_index = scan[x];
             }
             else if (pixel_format == SAIL_PIXEL_FORMAT_BPP4_INDEXED)
             {
-                unsigned byte_index = (y * width + x) / 2;
-                unsigned shift      = ((y * width + x) % 2) ? 0 : 4;
-                pixel_index         = (pixels[byte_index] >> shift) & 0x0F;
+                const unsigned shift = (x % 2) ? 0 : 4;
+                pixel_index          = (scan[x / 2] >> shift) & 0x0F;
             }
             else if (pixel_format == SAIL_PIXEL_FORMAT_BPP2_INDEXED)
             {
-                unsigned byte_index = (y * width + x) / 4;
-                unsigned shift      = 6 - ((y * width + x) % 4) * 2;
-                pixel_index         = (pixels[byte_index] >> shift) & 0x03;
+                const unsigned shift = 6 - (x % 4) * 2;
+                pixel_index          = (scan[x / 4] >> shift) & 0x03;
             }
             else if (pixel_format == SAIL_PIXEL_FORMAT_BPP1_INDEXED)
             {
-                unsigned byte_index = (y * width + x) / 8;
-                unsigned shift      = 7 - ((y * width + x) % 8);
-                pixel_index         = (pixels[byte_index] >> shift) & 0x01;
+                const unsigned shift = 7 - (x % 8);
+                pixel_index          = (scan[x / 8] >> shift) & 0x01;
             }
             else
             {
