@@ -324,6 +324,15 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_xbm(void* state, co
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
 
+    /* The reader rejects such dimensions. */
+    if (image->width == 0 || image->height == 0 || image->width > SAIL_XBM_MAX_DIMENSION
+        || image->height > SAIL_XBM_MAX_DIMENSION)
+    {
+        SAIL_LOG_ERROR("XBM: Image dimensions %ux%u are not supported, maximum is %dx%d", image->width, image->height,
+                       SAIL_XBM_MAX_DIMENSION, SAIL_XBM_MAX_DIMENSION);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
     /* Process tuning options. */
     if (xbm_codec_state->save_options->tuning != NULL)
     {
