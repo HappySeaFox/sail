@@ -24,6 +24,7 @@
 */
 
 #include <ctype.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -1326,8 +1327,19 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
                                        unsigned num_colors,
                                        enum SailPixelFormat pixel_format)
 {
-    char* line               = NULL;
-    const unsigned line_size = width * cpp + 16;
+    char* line = NULL;
+
+    /* Every pixel takes cpp characters plus the quotes, the comma and the new line. */
+    size_t line_size;
+    SAIL_TRY(sail_size_mul(width, cpp, &line_size));
+
+    if (line_size > SIZE_MAX - 16)
+    {
+        SAIL_LOG_ERROR("XPM: Line of %ux%u characters is too long", width, cpp);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    line_size += 16;
 
     void* ptr;
     SAIL_TRY(sail_malloc(line_size, &ptr));
