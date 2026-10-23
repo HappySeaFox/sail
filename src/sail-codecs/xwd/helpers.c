@@ -433,6 +433,32 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
     const bool bit_swap =
         header->bitmap_bit_order == LeastSignificant && resolved_bpp < 8 && header->bits_per_pixel == resolved_bpp;
 
+    /*
+     * Pixel values of indexed images are not necessarily palette indexes, so build a table
+     * mapping them to the indexes once instead of scanning the color map for every pixel.
+     */
+    const bool remap_indexes = colormap != NULL && header->bits_per_pixel == 8
+                               && (header->visual_class == PseudoColor || header->visual_class == StaticColor);
+
+    uint8_t colormap_indexes[256];
+
+    if (remap_indexes)
+    {
+        for (unsigned i = 0; i < sizeof(colormap_indexes); i++)
+        {
+            colormap_indexes[i] = (uint8_t)i;
+        }
+
+        /* Iterate backwards to let the first matching color map entry win. */
+        for (uint32_t i = SAIL_MIN(header->ncolors, sizeof(colormap_indexes)); i > 0; i--)
+        {
+            if (colormap[i - 1].pixel < sizeof(colormap_indexes))
+            {
+                colormap_indexes[colormap[i - 1].pixel] = (uint8_t)(i - 1);
+            }
+        }
+    }
+
     /* Read scanlines. */
     for (uint32_t y = 0; y < header->pixmap_height; y++)
     {
@@ -485,24 +511,11 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
         }
 
         /* For indexed formats, convert pixel values to palette indices. */
-        if (colormap != NULL && (header->visual_class == PseudoColor || header->visual_class == StaticColor))
+        if (remap_indexes)
         {
-            /* Pixel values might not be sequential, need to map them. */
-            if (header->bits_per_pixel == 8)
+            for (uint32_t x = 0; x < header->pixmap_width; x++)
             {
-                for (uint32_t x = 0; x < header->pixmap_width; x++)
-                {
-                    uint8_t pixel_value = scan[x];
-                    /* Find the index in colormap. */
-                    for (uint32_t i = 0; i < header->ncolors; i++)
-                    {
-                        if (colormap[i].pixel == pixel_value)
-                        {
-                            scan[x] = (uint8_t)i;
-                            break;
-                        }
-                    }
-                }
+                scan[x] = colormap_indexes[scan[x]];
             }
         }
     }
