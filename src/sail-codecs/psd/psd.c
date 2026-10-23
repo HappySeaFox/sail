@@ -215,10 +215,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, st
 
     /* Skip the image resources. */
     SAIL_TRY(psd_private_get_big_endian_uint32_t(psd_state->io, &data_size));
-    SAIL_TRY(psd_state->io->seek(psd_state->io->stream, data_size, SEEK_CUR));
+    SAIL_TRY(psd_private_skip(psd_state->io, data_size));
     /* Skip the layer and mask information. */
     SAIL_TRY(psd_private_get_big_endian_uint32_t(psd_state->io, &data_size));
-    SAIL_TRY(psd_state->io->seek(psd_state->io->stream, data_size, SEEK_CUR));
+    SAIL_TRY(psd_private_skip(psd_state->io, data_size));
 
     /* Compression. */
     uint16_t compression;

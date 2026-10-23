@@ -59,6 +59,11 @@ SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint16_t(struct sail_io* io
 
 SAIL_HIDDEN sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io* io, uint32_t* v);
 
+/*
+ * Skips the specified number of bytes in the I/O stream.
+ */
+SAIL_HIDDEN sail_status_t psd_private_skip(struct sail_io* io, uint32_t bytes);
+
 SAIL_HIDDEN sail_status_t psd_private_sail_pixel_format(enum SailPsdMode mode,
                                                         uint16_t channels,
                                                         uint16_t depth,

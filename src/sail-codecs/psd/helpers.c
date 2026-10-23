@@ -23,6 +23,9 @@
     SOFTWARE.
 */
 
+#include <limits.h>
+#include <stdint.h>
+
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
@@ -41,6 +44,22 @@ sail_status_t psd_private_get_big_endian_uint32_t(struct sail_io* io, uint32_t* 
     SAIL_TRY(io->strict_read(io->stream, v, sizeof(*v)));
 
     *v = sail_reverse_uint32(*v);
+
+    return SAIL_OK;
+}
+
+sail_status_t psd_private_skip(struct sail_io* io, uint32_t bytes)
+{
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < UINT32_MAX
+    if (bytes > LONG_MAX)
+    {
+        SAIL_LOG_ERROR("PSD: Section of %u bytes is too large to skip", bytes);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+#endif
+
+    SAIL_TRY(io->seek(io->stream, (long)bytes, SEEK_CUR));
 
     return SAIL_OK;
 }
