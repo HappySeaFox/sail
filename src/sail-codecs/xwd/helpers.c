@@ -121,38 +121,60 @@ sail_status_t xwd_private_read_header(struct sail_io* io, struct XWDFileHeader* 
     return SAIL_OK;
 }
 
+static void xwd_private_put_uint32(uint8_t* buffer, uint32_t value)
+{
+    buffer[0] = (uint8_t)(value >> 24);
+    buffer[1] = (uint8_t)(value >> 16);
+    buffer[2] = (uint8_t)(value >> 8);
+    buffer[3] = (uint8_t)value;
+}
+
+static void xwd_private_put_uint16(uint8_t* buffer, uint16_t value)
+{
+    buffer[0] = (uint8_t)(value >> 8);
+    buffer[1] = (uint8_t)value;
+}
+
 sail_status_t xwd_private_write_header(struct sail_io* io, const struct XWDFileHeader* header)
 {
     SAIL_CHECK_PTR(io);
     SAIL_CHECK_PTR(header);
 
-    uint32_t buffer[25];
+    /* Always write the most significant byte first as X11 tools do. */
+    uint32_t fields[25];
 
-    buffer[0]  = header->header_size;
-    buffer[1]  = header->file_version;
-    buffer[2]  = header->pixmap_format;
-    buffer[3]  = header->pixmap_depth;
-    buffer[4]  = header->pixmap_width;
-    buffer[5]  = header->pixmap_height;
-    buffer[6]  = header->xoffset;
-    buffer[7]  = header->byte_order;
-    buffer[8]  = header->bitmap_unit;
-    buffer[9]  = header->bitmap_bit_order;
-    buffer[10] = header->bitmap_pad;
-    buffer[11] = header->bits_per_pixel;
-    buffer[12] = header->bytes_per_line;
-    buffer[13] = header->visual_class;
-    buffer[14] = header->red_mask;
-    buffer[15] = header->green_mask;
-    buffer[16] = header->blue_mask;
-    buffer[17] = header->bits_per_rgb;
-    buffer[18] = header->colormap_entries;
-    buffer[19] = header->ncolors;
-    buffer[20] = header->window_width;
-    buffer[21] = header->window_height;
-    buffer[22] = header->window_x;
-    buffer[23] = header->window_y;
-    buffer[24] = header->window_border_width;
+    fields[0]  = header->header_size;
+    fields[1]  = header->file_version;
+    fields[2]  = header->pixmap_format;
+    fields[3]  = header->pixmap_depth;
+    fields[4]  = header->pixmap_width;
+    fields[5]  = header->pixmap_height;
+    fields[6]  = header->xoffset;
+    fields[7]  = header->byte_order;
+    fields[8]  = header->bitmap_unit;
+    fields[9]  = header->bitmap_bit_order;
+    fields[10] = header->bitmap_pad;
+    fields[11] = header->bits_per_pixel;
+    fields[12] = header->bytes_per_line;
+    fields[13] = header->visual_class;
+    fields[14] = header->red_mask;
+    fields[15] = header->green_mask;
+    fields[16] = header->blue_mask;
+    fields[17] = header->bits_per_rgb;
+    fields[18] = header->colormap_entries;
+    fields[19] = header->ncolors;
+    fields[20] = header->window_width;
+    fields[21] = header->window_height;
+    fields[22] = header->window_x;
+    fields[23] = header->window_y;
+    fields[24] = header->window_border_width;
+
+    uint8_t buffer[XWD_HEADER_SIZE];
+
+    for (unsigned i = 0; i < sizeof(fields) / sizeof(fields[0]); i++)
+    {
+        xwd_private_put_uint32(buffer + i * 4, fields[i]);
+    }
 
     SAIL_TRY(io->strict_write(io->stream, buffer, sizeof(buffer)));
 
@@ -234,12 +256,16 @@ sail_status_t xwd_private_write_colormap(struct sail_io* io, const struct XWDCol
 
     for (uint32_t i = 0; i < ncolors; i++)
     {
-        SAIL_TRY(io->strict_write(io->stream, &colormap[i].pixel, sizeof(colormap[i].pixel)));
-        SAIL_TRY(io->strict_write(io->stream, &colormap[i].red, sizeof(colormap[i].red)));
-        SAIL_TRY(io->strict_write(io->stream, &colormap[i].green, sizeof(colormap[i].green)));
-        SAIL_TRY(io->strict_write(io->stream, &colormap[i].blue, sizeof(colormap[i].blue)));
-        SAIL_TRY(io->strict_write(io->stream, &colormap[i].flags, sizeof(colormap[i].flags)));
-        SAIL_TRY(io->strict_write(io->stream, &colormap[i].pad, sizeof(colormap[i].pad)));
+        uint8_t buffer[12];
+
+        xwd_private_put_uint32(buffer, colormap[i].pixel);
+        xwd_private_put_uint16(buffer + 4, colormap[i].red);
+        xwd_private_put_uint16(buffer + 6, colormap[i].green);
+        xwd_private_put_uint16(buffer + 8, colormap[i].blue);
+        buffer[10] = colormap[i].flags;
+        buffer[11] = colormap[i].pad;
+
+        SAIL_TRY(io->strict_write(io->stream, buffer, sizeof(buffer)));
     }
 
     return SAIL_OK;
@@ -485,10 +511,8 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
     header->window_y            = 0;
     header->window_border_width = 0;
 
-    /* Determine byte order - use native. */
-    uint32_t test         = 1;
-    bool is_little_endian = (*((uint8_t*)&test) == 1);
-    header->byte_order    = is_little_endian ? LSBFirst : MSBFirst;
+    /* Pixels are written in the same order as the masks describe them. */
+    header->byte_order = MSBFirst;
 
     /* Configure based on pixel format. */
     switch (image->pixel_format)
