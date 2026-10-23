@@ -319,23 +319,28 @@ enum SailPixelFormat xwd_private_pixel_format_from_header(const struct XWDFileHe
             }
             else if (header->bits_per_pixel == 16)
             {
+                /*
+                 * SAIL names 16-bit pixel formats after the components starting from the least
+                 * significant bits, so the red mask of the most common X11 layout (0xF800) maps
+                 * to BGR565 rather than to RGB565.
+                 */
                 if (header->red_mask == 0xF800 && header->green_mask == 0x07E0 && header->blue_mask == 0x001F)
-                {
-                    return SAIL_PIXEL_FORMAT_BPP16_RGB565;
-                }
-                else if (header->red_mask == 0x001F && header->green_mask == 0x07E0 && header->blue_mask == 0xF800)
                 {
                     return SAIL_PIXEL_FORMAT_BPP16_BGR565;
                 }
-                else if (header->red_mask == 0x7C00 && header->green_mask == 0x03E0 && header->blue_mask == 0x001F)
+                else if (header->red_mask == 0x001F && header->green_mask == 0x07E0 && header->blue_mask == 0xF800)
                 {
-                    return SAIL_PIXEL_FORMAT_BPP16_RGB555;
+                    return SAIL_PIXEL_FORMAT_BPP16_RGB565;
                 }
-                else if (header->red_mask == 0x001F && header->green_mask == 0x03E0 && header->blue_mask == 0x7C00)
+                else if (header->red_mask == 0x7C00 && header->green_mask == 0x03E0 && header->blue_mask == 0x001F)
                 {
                     return SAIL_PIXEL_FORMAT_BPP16_BGR555;
                 }
-                return SAIL_PIXEL_FORMAT_BPP16_RGB565;
+                else if (header->red_mask == 0x001F && header->green_mask == 0x03E0 && header->blue_mask == 0x7C00)
+                {
+                    return SAIL_PIXEL_FORMAT_BPP16_RGB555;
+                }
+                return SAIL_PIXEL_FORMAT_BPP16_BGR565;
             }
         }
         else if (header->visual_class == PseudoColor || header->visual_class == StaticColor
@@ -397,11 +402,15 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
 
     /*
      * The masks describe a pixel value, and the byte order tells how that value is stored in
-     * the file. The pixel format resolved from the masks assumes the most significant byte
-     * first, so only the least significant byte first files need swapping. This does not
-     * depend on the byte order of the machine we run on.
+     * the file. 24- and 32-bit SAIL pixel formats store components in individual bytes, so the
+     * pixel format resolved from the masks assumes the most significant byte first and only the
+     * least significant byte first files need swapping. 16-bit SAIL pixel formats store a pixel
+     * in a single unit read in the byte order of the machine we run on, so they need swapping
+     * when the file byte order differs from ours.
      */
-    const bool byte_swap = (header->byte_order == LSBFirst);
+    const unsigned resolved_bpp = sail_bits_per_pixel(image->pixel_format);
+    const bool byte_swap        = (resolved_bpp == 16) ? !xwd_private_is_native_byte_order(header->byte_order)
+                                                       : (header->byte_order == LSBFirst);
 
     /* Read scanlines. */
     for (uint32_t y = 0; y < header->pixmap_height; y++)
@@ -418,8 +427,6 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
         /* Handle byte swapping for multi-byte pixels. */
         if (byte_swap)
         {
-            const unsigned resolved_bpp = sail_bits_per_pixel(image->pixel_format);
-
             if (resolved_bpp == 32)
             {
                 uint32_t* pixels = (uint32_t*)scan;
@@ -482,13 +489,41 @@ sail_status_t xwd_private_write_pixels(struct sail_io* io,
     SAIL_CHECK_PTR(header);
     SAIL_CHECK_PTR(image);
 
+    /*
+     * 16-bit pixels are stored in a single unit in the byte order of the machine we run on,
+     * while the header always declares the most significant byte order.
+     */
+    const bool byte_swap = header->bits_per_pixel == 16 && !xwd_private_is_native_byte_order(header->byte_order);
+
+    void* row_local = NULL;
+
+    if (byte_swap)
+    {
+        SAIL_TRY(sail_malloc(header->bytes_per_line, &row_local));
+    }
+
     /* Write scanlines. */
     for (uint32_t y = 0; y < header->pixmap_height; y++)
     {
         const unsigned char* scan = (const unsigned char*)image->pixels + y * image->bytes_per_line;
 
-        SAIL_TRY(io->strict_write(io->stream, scan, header->bytes_per_line));
+        if (byte_swap)
+        {
+            const uint16_t* source = (const uint16_t*)scan;
+            uint16_t* target       = row_local;
+
+            for (uint32_t x = 0; x < header->pixmap_width; x++)
+            {
+                target[x] = sail_reverse_uint16(source[x]);
+            }
+
+            scan = row_local;
+        }
+
+        SAIL_TRY_OR_CLEANUP(io->strict_write(io->stream, scan, header->bytes_per_line), /* cleanup */ sail_free(row_local));
     }
+
+    sail_free(row_local);
 
     return SAIL_OK;
 }
@@ -593,9 +628,9 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->visual_class     = TrueColor;
         header->bitmap_bit_order = MSBFirst;
         header->bytes_per_line   = image->width * 2;
-        header->red_mask         = 0x7C00;
+        header->red_mask         = 0x001F;
         header->green_mask       = 0x03E0;
-        header->blue_mask        = 0x001F;
+        header->blue_mask        = 0x7C00;
         header->bits_per_rgb     = 5;
         header->colormap_entries = 0;
         header->ncolors          = 0;
@@ -609,9 +644,9 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->visual_class     = TrueColor;
         header->bitmap_bit_order = MSBFirst;
         header->bytes_per_line   = image->width * 2;
-        header->red_mask         = 0x001F;
+        header->red_mask         = 0x7C00;
         header->green_mask       = 0x03E0;
-        header->blue_mask        = 0x7C00;
+        header->blue_mask        = 0x001F;
         header->bits_per_rgb     = 5;
         header->colormap_entries = 0;
         header->ncolors          = 0;
@@ -625,9 +660,9 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->visual_class     = TrueColor;
         header->bitmap_bit_order = MSBFirst;
         header->bytes_per_line   = image->width * 2;
-        header->red_mask         = 0xF800;
+        header->red_mask         = 0x001F;
         header->green_mask       = 0x07E0;
-        header->blue_mask        = 0x001F;
+        header->blue_mask        = 0xF800;
         header->bits_per_rgb     = 6;
         header->colormap_entries = 0;
         header->ncolors          = 0;
@@ -641,9 +676,9 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->visual_class     = TrueColor;
         header->bitmap_bit_order = MSBFirst;
         header->bytes_per_line   = image->width * 2;
-        header->red_mask         = 0x001F;
+        header->red_mask         = 0xF800;
         header->green_mask       = 0x07E0;
-        header->blue_mask        = 0xF800;
+        header->blue_mask        = 0x001F;
         header->bits_per_rgb     = 6;
         header->colormap_entries = 0;
         header->ncolors          = 0;
