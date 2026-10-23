@@ -968,6 +968,15 @@ sail_status_t xpm_private_parse_colors(
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
+        /* The line comes from the file and may be shorter than the characters per pixel. */
+        if (strlen(line) < cpp)
+        {
+            SAIL_LOG_ERROR("XPM: Color line %u holds fewer than %u characters per pixel", i, cpp);
+            sail_free(*colors);
+            *colors = NULL;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
         memcpy((*colors)[i].chars, line, cpp);
         (*colors)[i].chars[cpp]  = '\0';
         line                    += cpp;
