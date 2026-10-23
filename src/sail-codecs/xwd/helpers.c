@@ -514,6 +514,10 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
     /* Pixels are written in the same order as the masks describe them. */
     header->byte_order = MSBFirst;
 
+    /* Rows are written tightly packed, so a byte is the only padding unit we can promise. */
+    header->bitmap_unit = 8;
+    header->bitmap_pad  = 8;
+
     /* Configure based on pixel format. */
     switch (image->pixel_format)
     {
@@ -523,9 +527,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 1;
         header->bits_per_pixel   = 1;
         header->visual_class     = PseudoColor;
-        header->bitmap_unit      = 8;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 8;
         header->bytes_per_line   = (image->width + 7) / 8;
         header->red_mask         = 0;
         header->green_mask       = 0;
@@ -541,9 +543,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 2;
         header->bits_per_pixel   = 2;
         header->visual_class     = PseudoColor;
-        header->bitmap_unit      = 8;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 8;
         header->bytes_per_line   = (image->width * 2 + 7) / 8;
         header->red_mask         = 0;
         header->green_mask       = 0;
@@ -559,9 +559,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 4;
         header->bits_per_pixel   = 4;
         header->visual_class     = PseudoColor;
-        header->bitmap_unit      = 8;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 8;
         header->bytes_per_line   = (image->width * 4 + 7) / 8;
         header->red_mask         = 0;
         header->green_mask       = 0;
@@ -577,9 +575,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 8;
         header->bits_per_pixel   = 8;
         header->visual_class     = PseudoColor;
-        header->bitmap_unit      = 8;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 8;
         header->bytes_per_line   = image->width;
         header->red_mask         = 0;
         header->green_mask       = 0;
@@ -595,9 +591,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 15;
         header->bits_per_pixel   = 16;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 16;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 16;
         header->bytes_per_line   = image->width * 2;
         header->red_mask         = 0x7C00;
         header->green_mask       = 0x03E0;
@@ -613,9 +607,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 15;
         header->bits_per_pixel   = 16;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 16;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 16;
         header->bytes_per_line   = image->width * 2;
         header->red_mask         = 0x001F;
         header->green_mask       = 0x03E0;
@@ -631,9 +623,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 16;
         header->bits_per_pixel   = 16;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 16;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 16;
         header->bytes_per_line   = image->width * 2;
         header->red_mask         = 0xF800;
         header->green_mask       = 0x07E0;
@@ -649,9 +639,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 16;
         header->bits_per_pixel   = 16;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 16;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 16;
         header->bytes_per_line   = image->width * 2;
         header->red_mask         = 0x001F;
         header->green_mask       = 0x07E0;
@@ -667,9 +655,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 24;
         header->bits_per_pixel   = 24;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 32;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 32;
         header->bytes_per_line   = image->width * 3;
         header->red_mask         = 0xFF0000;
         header->green_mask       = 0x00FF00;
@@ -685,9 +671,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 24;
         header->bits_per_pixel   = 24;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 32;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 32;
         header->bytes_per_line   = image->width * 3;
         header->red_mask         = 0x0000FF;
         header->green_mask       = 0x00FF00;
@@ -703,9 +687,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 24;
         header->bits_per_pixel   = 32;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 32;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 32;
         header->bytes_per_line   = image->width * 4;
         header->red_mask         = 0xFF000000;
         header->green_mask       = 0x00FF0000;
@@ -721,9 +703,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 24;
         header->bits_per_pixel   = 32;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 32;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 32;
         header->bytes_per_line   = image->width * 4;
         header->red_mask         = 0x0000FF00;
         header->green_mask       = 0x00FF0000;
@@ -739,9 +719,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 24;
         header->bits_per_pixel   = 32;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 32;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 32;
         header->bytes_per_line   = image->width * 4;
         header->red_mask         = 0x00FF0000;
         header->green_mask       = 0x0000FF00;
@@ -757,9 +735,7 @@ sail_status_t xwd_private_header_from_image(const struct sail_image* image, stru
         header->pixmap_depth     = 24;
         header->bits_per_pixel   = 32;
         header->visual_class     = TrueColor;
-        header->bitmap_unit      = 32;
         header->bitmap_bit_order = MSBFirst;
-        header->bitmap_pad       = 32;
         header->bytes_per_line   = image->width * 4;
         header->red_mask         = 0x000000FF;
         header->green_mask       = 0x0000FF00;
