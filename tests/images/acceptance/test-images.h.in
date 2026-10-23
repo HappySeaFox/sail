@@ -232,8 +232,8 @@ static const char * const SAIL_TEST_IMAGES[] = {
     "@SAIL_TEST_IMAGES_PATH@/xwd/bpp1-indexed.xwd",
     "@SAIL_TEST_IMAGES_PATH@/xwd/bpp4-indexed.xwd",
     "@SAIL_TEST_IMAGES_PATH@/xwd/bpp8-indexed.xwd",
-    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp16-rgb555.xwd",
-    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp16-rgb565.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp16-bgr555.xwd",
+    "@SAIL_TEST_IMAGES_PATH@/xwd/bpp16-bgr565.xwd",
     "@SAIL_TEST_IMAGES_PATH@/xwd/bpp24-rgb.xwd",
     "@SAIL_TEST_IMAGES_PATH@/xwd/bpp32-rgba.xwd",
 #endif
