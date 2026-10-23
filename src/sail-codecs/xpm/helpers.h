@@ -96,6 +96,7 @@ SAIL_HIDDEN sail_status_t xpm_private_write_pixels(struct sail_io* io,
                                                    const unsigned char* pixels,
                                                    unsigned width,
                                                    unsigned height,
+                                                   unsigned bytes_per_line,
                                                    unsigned cpp,
                                                    unsigned num_colors,
                                                    enum SailPixelFormat pixel_format);

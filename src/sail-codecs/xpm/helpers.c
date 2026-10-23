@@ -1321,6 +1321,7 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
                                        const unsigned char* pixels,
                                        unsigned width,
                                        unsigned height,
+                                       unsigned bytes_per_line,
                                        unsigned cpp,
                                        unsigned num_colors,
                                        enum SailPixelFormat pixel_format)
@@ -1332,9 +1333,7 @@ sail_status_t xpm_private_write_pixels(struct sail_io* io,
     SAIL_TRY(sail_malloc(line_size, &ptr));
     line = ptr;
 
-    /* Scan lines are padded to a whole number of bytes. */
-    const unsigned bytes_per_line = sail_bytes_per_line(width, pixel_format);
-
+    /* Scan lines are addressed with bytes_per_line as it may contain padding bytes. */
     for (unsigned y = 0; y < height; y++)
     {
         line[0]      = '"';

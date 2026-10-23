@@ -346,8 +346,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_xpm(void* state, const struct
 
     /* Write pixel data. */
     SAIL_TRY(xpm_private_write_pixels(xpm_codec_state->io, image->pixels, xpm_codec_state->width,
-                                      xpm_codec_state->height, xpm_codec_state->cpp, xpm_codec_state->num_colors,
-                                      image->pixel_format));
+                                      xpm_codec_state->height, image->bytes_per_line, xpm_codec_state->cpp,
+                                      xpm_codec_state->num_colors, image->pixel_format));
 
     return SAIL_OK;
 }
