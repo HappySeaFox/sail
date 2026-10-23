@@ -369,7 +369,13 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
 
     const uint32_t row_padding = header->bytes_per_line - image->bytes_per_line;
 
-    bool byte_swap = !xwd_private_is_native_byte_order(header->byte_order);
+    /*
+     * The masks describe a pixel value, and the byte order tells how that value is stored in
+     * the file. The pixel format resolved from the masks assumes the most significant byte
+     * first, so only the least significant byte first files need swapping. This does not
+     * depend on the byte order of the machine we run on.
+     */
+    const bool byte_swap = (header->byte_order == LSBFirst);
 
     /* Read scanlines. */
     for (uint32_t y = 0; y < header->pixmap_height; y++)
