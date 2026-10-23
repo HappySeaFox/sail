@@ -353,7 +353,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_xbm(void* state, const struct
 
     /* Write pixel data. */
     SAIL_TRY(xbm_private_write_pixels(xbm_codec_state->io, image->pixels, image->width, image->height,
-                                      xbm_codec_state->version));
+                                      image->bytes_per_line, xbm_codec_state->version));
 
     return SAIL_OK;
 }

@@ -150,46 +150,47 @@ sail_status_t xbm_private_write_header(
     return SAIL_OK;
 }
 
-sail_status_t xbm_private_write_pixels(
-    struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height, enum SailXbmVersion version)
+sail_status_t xbm_private_write_pixels(struct sail_io* io,
+                                       const unsigned char* pixels,
+                                       unsigned width,
+                                       unsigned height,
+                                       unsigned bytes_per_line,
+                                       enum SailXbmVersion version)
 {
-    const unsigned bytes_per_line = (width + 7) / 8;
-    size_t pixel_buffer_size;
-    size_t total_units;
+    /* Scan lines are addressed with bytes_per_line as it may contain padding bytes. */
+    const unsigned bytes_per_row = (width + 7) / 8;
+    const unsigned shorts_per_row = (bytes_per_row + 1) / 2;
 
-    SAIL_TRY(sail_size_mul(bytes_per_line, height, &pixel_buffer_size));
+    size_t total_units;
 
     if (version == SAIL_XBM_VERSION_10)
     {
         /* X10: uses shorts (2 bytes per unit), padded to even number of bytes per line. */
-        SAIL_TRY(sail_size_mul((bytes_per_line + 1) / 2, height, &total_units));
+        SAIL_TRY(sail_size_mul(shorts_per_row, height, &total_units));
     }
     else
     {
         /* X11: uses chars (1 byte per unit). */
-        total_units = pixel_buffer_size;
+        SAIL_TRY(sail_size_mul(bytes_per_row, height, &total_units));
     }
 
-    const unsigned shorts_per_row = (bytes_per_line + 1) / 2;
-
-    for (unsigned i = 0; i < total_units; i++)
+    for (size_t i = 0; i < total_units; i++)
     {
         char hex_str[16];
         int written;
-        unsigned short value;
 
         if (version == SAIL_XBM_VERSION_10)
         {
             /* X10: Write as shorts (2 bytes), padded to an even number of bytes per row. */
-            const unsigned row           = i / shorts_per_row;
-            const unsigned short_in_row  = i % shorts_per_row;
-            const unsigned row_start     = row * bytes_per_line;
-            const unsigned byte_idx      = row_start + short_in_row * 2;
-            const unsigned char byte1 =
-                (byte_idx < pixel_buffer_size) ? xbm_private_reverse_byte(pixels[byte_idx]) : 0;
+            const unsigned row          = (unsigned)(i / shorts_per_row);
+            const unsigned short_in_row = (unsigned)(i % shorts_per_row);
+            const unsigned column       = short_in_row * 2;
+            const size_t row_start      = (size_t)row * bytes_per_line;
+
+            const unsigned char byte1 = xbm_private_reverse_byte(pixels[row_start + column]);
             const unsigned char byte2 =
-                (byte_idx + 1 < row_start + bytes_per_line) ? xbm_private_reverse_byte(pixels[byte_idx + 1]) : 0;
-            value = byte1 | (byte2 << 8);
+                (column + 1 < bytes_per_row) ? xbm_private_reverse_byte(pixels[row_start + column + 1]) : 0;
+            const unsigned short value = (unsigned short)(byte1 | (byte2 << 8));
 
             if (i == total_units - 1)
             {
@@ -207,7 +208,10 @@ sail_status_t xbm_private_write_pixels(
         else
         {
             /* X11: Write as chars (1 byte). */
-            const unsigned char byte = xbm_private_reverse_byte(pixels[i]);
+            const unsigned row    = (unsigned)(i / bytes_per_row);
+            const unsigned column = (unsigned)(i % bytes_per_row);
+
+            const unsigned char byte = xbm_private_reverse_byte(pixels[(size_t)row * bytes_per_line + column]);
 
             if (i == total_units - 1)
             {

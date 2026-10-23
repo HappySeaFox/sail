@@ -61,8 +61,12 @@ SAIL_HIDDEN sail_status_t xbm_private_read_hex_literal(struct sail_io* io, unsig
 SAIL_HIDDEN sail_status_t xbm_private_write_header(
     struct sail_io* io, unsigned width, unsigned height, const char* name, enum SailXbmVersion version);
 
-SAIL_HIDDEN sail_status_t xbm_private_write_pixels(
-    struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height, enum SailXbmVersion version);
+SAIL_HIDDEN sail_status_t xbm_private_write_pixels(struct sail_io* io,
+                                                   const unsigned char* pixels,
+                                                   unsigned width,
+                                                   unsigned height,
+                                                   unsigned bytes_per_line,
+                                                   enum SailXbmVersion version);
 
 SAIL_HIDDEN bool xbm_private_tuning_key_value_callback(const char* key,
                                                        const struct sail_variant* value,
