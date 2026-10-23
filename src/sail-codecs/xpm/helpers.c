@@ -746,6 +746,34 @@ static const struct xpm_x11_color XPM_X11_COLORS[] = {
 
 static const size_t XPM_X11_COLORS_COUNT = sizeof(XPM_X11_COLORS) / sizeof(XPM_X11_COLORS[0]);
 
+/* Color names are case insensitive and may contain spaces like "sky blue". */
+static bool color_name_equals(const char* name, const char* table_name)
+{
+    while (*name != '\0' && *table_name != '\0')
+    {
+        if (*name == ' ')
+        {
+            name++;
+            continue;
+        }
+
+        if (tolower((unsigned char)*name) != tolower((unsigned char)*table_name))
+        {
+            return false;
+        }
+
+        name++;
+        table_name++;
+    }
+
+    while (*name == ' ')
+    {
+        name++;
+    }
+
+    return *name == '\0' && *table_name == '\0';
+}
+
 static sail_status_t parse_color_value(const char* str, unsigned char* r, unsigned char* g, unsigned char* b)
 {
     /* Parse #RRGGBB format. */
@@ -792,7 +820,7 @@ static sail_status_t parse_color_value(const char* str, unsigned char* r, unsign
     /* Named colors - search in X11 color database. */
     for (size_t i = 0; i < XPM_X11_COLORS_COUNT; i++)
     {
-        if (strcmp(str, XPM_X11_COLORS[i].name) == 0)
+        if (color_name_equals(str, XPM_X11_COLORS[i].name))
         {
             *r = XPM_X11_COLORS[i].r;
             *g = XPM_X11_COLORS[i].g;
@@ -806,6 +834,17 @@ static sail_status_t parse_color_value(const char* str, unsigned char* r, unsign
     *r = *g = *b = 0;
 
     return SAIL_OK;
+}
+
+/* XPM color keys: c (color), m (mono), g (gray), g4 (4-level gray), s (symbolic). */
+static bool is_color_key(const char* token, size_t length)
+{
+    if (length == 1)
+    {
+        return token[0] == 'c' || token[0] == 'm' || token[0] == 'g' || token[0] == 's';
+    }
+
+    return length == 2 && token[0] == 'g' && token[1] == '4';
 }
 
 /* Check if line is a C comment or empty. */
@@ -1017,15 +1056,52 @@ sail_status_t xpm_private_parse_colors(
                 color_ptr++;
             }
 
-            /* Extract color value. */
+            /* Extract color value. Names like "sky blue" consist of several words. */
             char color_value[64];
-            int j = 0;
-            while (*color_ptr && !isspace((unsigned char)*color_ptr) && *color_ptr != '"'
-                   && j < (int)sizeof(color_value) - 1)
+            size_t value_length = 0;
+            color_value[0]      = '\0';
+
+            while (*color_ptr != '\0' && *color_ptr != '"')
             {
-                color_value[j++] = *color_ptr++;
+                const char* token = color_ptr;
+                while (*token != '\0' && isspace((unsigned char)*token))
+                {
+                    token++;
+                }
+
+                const char* token_end = token;
+                while (*token_end != '\0' && !isspace((unsigned char)*token_end) && *token_end != '"')
+                {
+                    token_end++;
+                }
+
+                const size_t token_length = (size_t)(token_end - token);
+
+                if (token_length == 0)
+                {
+                    break;
+                }
+
+                /* The next color specification starts with its own key. */
+                if (value_length > 0 && is_color_key(token, token_length))
+                {
+                    break;
+                }
+
+                if (value_length + token_length + 1 < sizeof(color_value))
+                {
+                    if (value_length > 0)
+                    {
+                        color_value[value_length++] = ' ';
+                    }
+
+                    memcpy(color_value + value_length, token, token_length);
+                    value_length              += token_length;
+                    color_value[value_length]  = '\0';
+                }
+
+                color_ptr = token_end;
             }
-            color_value[j] = '\0';
 
             /* Process based on key. */
             if (key == 'c')
