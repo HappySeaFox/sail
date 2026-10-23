@@ -237,6 +237,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_psd(void* state, st
     enum SailPixelFormat pixel_format;
     SAIL_TRY(psd_private_sail_pixel_format(mode, psd_state->channels, psd_state->depth, &pixel_format));
 
+    /* Indexed images address a palette, which lives in the color mode data section. */
+    if (sail_is_indexed(pixel_format) && psd_state->palette == NULL)
+    {
+        SAIL_LOG_ERROR("PSD: Indexed image has no palette");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
+    }
+
     /* Skip byte counts for all the scan lines. */
     if (psd_state->compression == SAIL_PSD_COMPRESSION_RLE)
     {

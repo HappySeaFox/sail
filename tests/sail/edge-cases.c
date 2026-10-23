@@ -381,6 +381,32 @@ static MunitResult test_edge_null_pointers(const MunitParameter params[], void* 
 }
 
 /*
+ * Test a PSD that says its pixels are palette indexes but carries no palette.
+ *
+ * Such an image must not reach the caller: everything that draws indexed pixels dereferences
+ * the palette.
+ */
+static MunitResult test_edge_psd_missing_palette(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_PSD
+    const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/indexed-without-palette.psd";
+
+    struct sail_image* image = NULL;
+    sail_status_t status     = sail_load_from_file(path, &image);
+
+    munit_assert(status == SAIL_ERROR_MISSING_PALETTE);
+    munit_assert_null(image);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
+/*
  * Test a PSD whose RLE runs claim more bytes than a scan line holds.
  *
  * The image is 1-bit, so a scan line takes eight times less than the number of pixels in it.
@@ -662,6 +688,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/null-pointers",            test_edge_null_pointers,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/options-null-state",       test_edge_options_null_state,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/partial-frame-cleanup",    test_edge_partial_frame_cleanup,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/psd-missing-palette",      test_edge_psd_missing_palette,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/psd-rle-overrun",          test_edge_psd_rle_overrun,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/psd-rle-vs-uncompressed",  test_edge_psd_rle_vs_uncompressed,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
     { (char *)"/readonly-format-save",     test_edge_readonly_format_save,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
