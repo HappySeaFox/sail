@@ -378,6 +378,20 @@ enum SailPixelFormat xwd_private_pixel_format_from_header(const struct XWDFileHe
     return SAIL_PIXEL_FORMAT_UNKNOWN;
 }
 
+/* Reverses the order of the sub-byte pixels packed into the byte. */
+static uint8_t xwd_private_reverse_pixels_in_byte(uint8_t byte, uint32_t bits_per_pixel)
+{
+    const uint8_t mask = (uint8_t)((1U << bits_per_pixel) - 1);
+    uint8_t result     = 0;
+
+    for (unsigned shift = 0; shift < 8; shift += bits_per_pixel)
+    {
+        result = (uint8_t)((result << bits_per_pixel) | ((byte >> shift) & mask));
+    }
+
+    return result;
+}
+
 sail_status_t xwd_private_read_pixels(struct sail_io* io,
                                       const struct XWDFileHeader* header,
                                       const struct XWDColor* colormap,
@@ -412,6 +426,13 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
     const bool byte_swap        = (resolved_bpp == 16) ? !xwd_private_is_native_byte_order(header->byte_order)
                                                        : (header->byte_order == LSBFirst);
 
+    /*
+     * SAIL packs the leftmost sub-byte pixel into the most significant bits of the byte, so
+     * the pixels packed the other way around must be reversed.
+     */
+    const bool bit_swap =
+        header->bitmap_bit_order == LeastSignificant && resolved_bpp < 8 && header->bits_per_pixel == resolved_bpp;
+
     /* Read scanlines. */
     for (uint32_t y = 0; y < header->pixmap_height; y++)
     {
@@ -422,6 +443,14 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
         if (row_padding > 0)
         {
             SAIL_TRY(io->seek(io->stream, row_padding, SEEK_CUR));
+        }
+
+        if (bit_swap)
+        {
+            for (unsigned i = 0; i < image->bytes_per_line; i++)
+            {
+                scan[i] = xwd_private_reverse_pixels_in_byte(scan[i], header->bits_per_pixel);
+            }
         }
 
         /* Handle byte swapping for multi-byte pixels. */
