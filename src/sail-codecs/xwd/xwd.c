@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -154,13 +155,20 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_xwd(void* state, st
     /* Create palette for indexed formats. */
     if (xwd_state->colormap != NULL)
     {
+        if (xwd_state->header.ncolors > UINT_MAX / 3)
+        {
+            sail_destroy_image(image_local);
+            SAIL_LOG_ERROR("XWD: Too many colors in the color map: %u", xwd_state->header.ncolors);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
         SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&image_local->palette),
                             /* cleanup */ sail_destroy_image(image_local));
 
         image_local->palette->pixel_format = SAIL_PIXEL_FORMAT_BPP24_RGB;
         image_local->palette->color_count  = xwd_state->header.ncolors;
 
-        SAIL_TRY_OR_CLEANUP(sail_malloc(image_local->palette->color_count * 3, &image_local->palette->data),
+        SAIL_TRY_OR_CLEANUP(sail_malloc((size_t)image_local->palette->color_count * 3, &image_local->palette->data),
                             /* cleanup */ sail_destroy_image(image_local));
 
         /* Convert XWD colormap to RGB palette. */
