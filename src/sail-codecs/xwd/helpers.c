@@ -444,10 +444,8 @@ sail_status_t xwd_private_read_pixels(struct sail_io* io,
 
     if (remap_indexes)
     {
-        for (unsigned i = 0; i < sizeof(colormap_indexes); i++)
-        {
-            colormap_indexes[i] = (uint8_t)i;
-        }
+        /* Pixel values missing from the color map fall back to the first color. */
+        memset(colormap_indexes, 0, sizeof(colormap_indexes));
 
         /* Iterate backwards to let the first matching color map entry win. */
         for (uint32_t i = SAIL_MIN(header->ncolors, sizeof(colormap_indexes)); i > 0; i--)
