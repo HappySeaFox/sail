@@ -1,0 +1,9 @@
+/* XPM */
+static char *bpp1_indexed_odd_width[] = {
+"5 3 2 1",
+". c #000000",
+"# c #FFFFFF",
+".#.#.",
+"##..#",
+".##.#"
+};

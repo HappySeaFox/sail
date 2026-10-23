@@ -1,0 +1,14 @@
+/* XPM */
+static char *multiword_colors[] = {
+"6 4 6 1",
+"a c sky blue",
+"b c light green",
+"c c NAVY BLUE",
+"d c DarkOliveGreen",
+"e c medium sea green",
+"f c None",
+"abcdef",
+"fedcba",
+"abcdef",
+"fedcba"
+};
