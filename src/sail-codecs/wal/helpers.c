@@ -68,6 +68,18 @@ static const unsigned char WAL_PALETTE[256 * 3] = {
     27,  23,  19,  19,  15,  235, 151, 127, 195, 115, 83,  159, 87,  51,  123, 63,  27,  235, 211, 199, 199, 171, 155,
     167, 139, 119, 135, 107, 87,  159, 91,  83};
 
+unsigned wal_private_mipmap_levels(unsigned width, unsigned height)
+{
+    unsigned levels = 0;
+
+    while (levels < 4 && (width >> levels) > 0 && (height >> levels) > 0)
+    {
+        levels++;
+    }
+
+    return levels;
+}
+
 sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHeader* wal_header)
 {
     /* WAL file header structure (100 bytes total):
@@ -115,15 +127,20 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
-    /* Validate that offsets are in ascending order and calculate expected sizes. */
+    /*
+     * Validate that offsets are in ascending order and calculate expected sizes. Offsets of
+     * the mipmap levels the texture cannot hold are meaningless, so they are not validated.
+     */
+    const unsigned levels = wal_private_mipmap_levels(wal_header->width, wal_header->height);
+
     unsigned current_width  = wal_header->width;
     unsigned current_height = wal_header->height;
 
-    for (int i = 0; i < 4; i++)
+    for (unsigned i = 0; i < levels; i++)
     {
         if (wal_header->offset[i] <= 0)
         {
-            SAIL_LOG_ERROR("WAL: Mipmap offset[%d] = %d is invalid", i, wal_header->offset[i]);
+            SAIL_LOG_ERROR("WAL: Mipmap offset[%u] = %d is invalid", i, wal_header->offset[i]);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
@@ -137,15 +154,15 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
             }
         }
 
-        /* Verify expected mipmap size matches offset difference (except for last level). */
-        if (i < 3)
+        /* Verify expected mipmap size matches offset difference (except for the last level). */
+        if (i + 1 < levels)
         {
             const size_t expected_size = (size_t)current_width * current_height;
             const size_t actual_size   = wal_header->offset[i + 1] - wal_header->offset[i];
 
             if (actual_size != expected_size)
             {
-                SAIL_LOG_ERROR("WAL: Mipmap level %d size mismatch. Expected %zu bytes, got %zu bytes", i,
+                SAIL_LOG_ERROR("WAL: Mipmap level %u size mismatch. Expected %zu bytes, got %zu bytes", i,
                                expected_size, actual_size);
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }

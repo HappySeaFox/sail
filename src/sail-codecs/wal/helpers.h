@@ -45,6 +45,12 @@ struct WalFileHeader
     unsigned value;
 };
 
+/*
+ * Returns the number of mipmap levels the texture can hold. Textures with a short side
+ * have fewer than four of them.
+ */
+SAIL_HIDDEN unsigned wal_private_mipmap_levels(unsigned width, unsigned height);
+
 SAIL_HIDDEN sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHeader* wal_header);
 
 SAIL_HIDDEN sail_status_t wal_private_assign_palette(struct sail_image* image);
