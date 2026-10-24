@@ -32,6 +32,7 @@
 struct sail_io;
 struct sail_image;
 struct sail_meta_data_node;
+struct sail_palette;
 
 /* Textures larger than this are rejected. */
 #define SAIL_WAL_MAX_DIMENSION 16384
@@ -64,6 +65,12 @@ SAIL_HIDDEN sail_status_t wal_private_assign_meta_data(const struct WalFileHeade
 SAIL_HIDDEN sail_status_t wal_private_write_file_header(struct sail_io* io, const struct WalFileHeader* wal_header);
 
 SAIL_HIDDEN sail_status_t wal_private_supported_write_pixel_format(enum SailPixelFormat pixel_format);
+
+/*
+ * Builds a map from the indexes of the image palette to the indexes of the Quake2 palette
+ * WAL files always use.
+ */
+SAIL_HIDDEN sail_status_t wal_private_build_palette_map(const struct sail_palette* palette, unsigned char* map);
 
 SAIL_HIDDEN sail_status_t wal_private_downsample_indexed(
     const void* src, unsigned src_width, unsigned src_height, void** dst, unsigned* dst_width, unsigned* dst_height);

@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <string.h>
 
 #include <sail-common/sail-common.h>
@@ -233,6 +234,76 @@ sail_status_t wal_private_supported_write_pixel_format(enum SailPixelFormat pixe
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
     }
     }
+}
+
+sail_status_t wal_private_build_palette_map(const struct sail_palette* palette, unsigned char* map)
+{
+    SAIL_CHECK_PTR(palette);
+    SAIL_CHECK_PTR(map);
+
+    unsigned bytes_per_color;
+
+    switch (palette->pixel_format)
+    {
+    case SAIL_PIXEL_FORMAT_BPP24_RGB: bytes_per_color = 3; break;
+    case SAIL_PIXEL_FORMAT_BPP32_RGBA: bytes_per_color = 4; break;
+    default:
+    {
+        SAIL_LOG_ERROR("WAL: Unsupported palette pixel format %s. Only BPP24-RGB and BPP32-RGBA are supported",
+                       sail_pixel_format_to_string(palette->pixel_format));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+    }
+
+    const unsigned char* colors = palette->data;
+
+    /* Images that already use the Quake2 palette keep their indexes. */
+    if (bytes_per_color == 3 && palette->color_count == WAL_PALETTE_ELEMENTS
+        && memcmp(colors, WAL_PALETTE, sizeof(WAL_PALETTE)) == 0)
+    {
+        for (unsigned i = 0; i < WAL_PALETTE_ELEMENTS; i++)
+        {
+            map[i] = (unsigned char)i;
+        }
+
+        return SAIL_OK;
+    }
+
+    /* Every other palette is mapped to the closest Quake2 colors. */
+    for (unsigned i = 0; i < WAL_PALETTE_ELEMENTS; i++)
+    {
+        if (i >= palette->color_count)
+        {
+            map[i] = 0;
+            continue;
+        }
+
+        const int r = colors[i * bytes_per_color + 0];
+        const int g = colors[i * bytes_per_color + 1];
+        const int b = colors[i * bytes_per_color + 2];
+
+        unsigned best_index    = 0;
+        unsigned best_distance = UINT_MAX;
+
+        for (unsigned k = 0; k < WAL_PALETTE_ELEMENTS; k++)
+        {
+            const int dr = r - WAL_PALETTE[k * 3 + 0];
+            const int dg = g - WAL_PALETTE[k * 3 + 1];
+            const int db = b - WAL_PALETTE[k * 3 + 2];
+
+            const unsigned distance = (unsigned)(dr * dr + dg * dg + db * db);
+
+            if (distance < best_distance)
+            {
+                best_distance = distance;
+                best_index    = k;
+            }
+        }
+
+        map[i] = (unsigned char)best_index;
+    }
+
+    return SAIL_OK;
 }
 
 sail_status_t wal_private_downsample_indexed(

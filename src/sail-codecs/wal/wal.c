@@ -329,14 +329,36 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_wal(void* state, const struct
     const unsigned mipmap_index = wal_state->frame_number - 1;
     const size_t data_size      = (size_t)image->width * image->height;
 
+    /* WAL files carry no palette: they always address the Quake2 one. */
+    unsigned char palette_map[256];
+
+    if (image->palette == NULL)
+    {
+        SAIL_LOG_WARNING("WAL: Image has no palette, its indexes are written as is");
+
+        for (unsigned i = 0; i < sizeof(palette_map); i++)
+        {
+            palette_map[i] = (unsigned char)i;
+        }
+    }
+    else
+    {
+        SAIL_TRY(wal_private_build_palette_map(image->palette, palette_map));
+    }
+
     void* buffer;
     SAIL_TRY(sail_malloc(data_size, &buffer));
 
     /* Scan lines are copied separately as bytes_per_line may contain padding bytes. */
     for (unsigned row = 0; row < image->height; row++)
     {
-        memcpy((unsigned char*)buffer + (size_t)row * image->width,
-               (const unsigned char*)image->pixels + (size_t)row * image->bytes_per_line, image->width);
+        unsigned char* dst       = (unsigned char*)buffer + (size_t)row * image->width;
+        const unsigned char* src = (const unsigned char*)image->pixels + (size_t)row * image->bytes_per_line;
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            dst[column] = palette_map[src[column]];
+        }
     }
 
     wal_state->mipmap_buffers[mipmap_index] = buffer;
