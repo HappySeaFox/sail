@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -124,28 +125,42 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format,
         const int palette_colors = 256;     /* 256 RGB entries. */
         const int palette_size   = 256 * 3; /* 256 RGB entries. */
 
-        /* Seek to offset. */
-        size_t saved_offset;
-        SAIL_TRY(io->tell(io->stream, &saved_offset));
-        SAIL_TRY(io->seek(io->stream, (long)-(palette_size + 1), SEEK_END));
-
-        uint8_t signature;
-        SAIL_TRY(io->strict_read(io->stream, &signature, sizeof(signature)));
-
-        if (signature != SAIL_PCX_PALETTE_SIGNATURE)
-        {
-            SAIL_LOG_ERROR("PCX: Palette has invalid signature %u, must be %u", signature, SAIL_PCX_PALETTE_SIGNATURE);
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
-        }
-
         struct sail_palette* palette_local;
         SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, palette_colors, &palette_local));
 
-        SAIL_TRY_OR_CLEANUP(io->strict_read(io->stream, palette_local->data, palette_size),
-                            /* cleanup */ sail_destroy_palette(palette_local));
+        size_t saved_offset;
+        SAIL_TRY_OR_CLEANUP(io->tell(io->stream, &saved_offset), /* cleanup */ sail_destroy_palette(palette_local));
+
+        /*
+         * The 256-color palette is stored at the end of the file after a signature byte.
+         * Files without it are not broken: they are just older than the palette extension.
+         */
+        bool have_palette = false;
+        size_t stream_size;
+
+        if (io->size(io->stream, &stream_size) == SAIL_OK && stream_size > (size_t)palette_size
+            && io->seek(io->stream, (long)-(palette_size + 1), SEEK_END) == SAIL_OK)
+        {
+            uint8_t signature;
+
+            if (io->strict_read(io->stream, &signature, sizeof(signature)) == SAIL_OK
+                && signature == SAIL_PCX_PALETTE_SIGNATURE
+                && io->strict_read(io->stream, palette_local->data, palette_size) == SAIL_OK)
+            {
+                have_palette = true;
+            }
+        }
 
         SAIL_TRY_OR_CLEANUP(io->seek(io->stream, (long)saved_offset, SEEK_SET),
                             /* cleanup */ sail_destroy_palette(palette_local));
+
+        if (!have_palette)
+        {
+            /* Fall back to the 16 colors from the header, the rest of the palette is black. */
+            SAIL_LOG_WARNING("PCX: No 256-color palette found, using the 16 colors from the header");
+            memcpy(palette_local->data, palette16, 16 * 3);
+            memset((unsigned char*)palette_local->data + 16 * 3, 0, palette_size - 16 * 3);
+        }
 
         *palette = palette_local;
 
