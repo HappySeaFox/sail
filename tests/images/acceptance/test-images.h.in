@@ -118,8 +118,11 @@ static const char * const SAIL_TEST_IMAGES[] = {
 #ifdef SAIL_HAVE_BUILTIN_PCX
     "@SAIL_TEST_IMAGES_PATH@/pcx/bpp1-indexed.pcx",
     "@SAIL_TEST_IMAGES_PATH@/pcx/bpp4-indexed.pcx",
+    "@SAIL_TEST_IMAGES_PATH@/pcx/bpp4-indexed.packed.pcx",
     "@SAIL_TEST_IMAGES_PATH@/pcx/bpp8-indexed.pcx",
+    "@SAIL_TEST_IMAGES_PATH@/pcx/bpp8-indexed.no-rle.pcx",
     "@SAIL_TEST_IMAGES_PATH@/pcx/bpp24-rgb.pcx",
+    "@SAIL_TEST_IMAGES_PATH@/pcx/bpp32-rgba.pcx",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_PNG
