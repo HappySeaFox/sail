@@ -389,9 +389,9 @@ sail_status_t pcx_private_write_palette(struct sail_io* io, const struct sail_pa
 
     /* Write palette data (256 RGB entries). PCX always requires exactly 256 entries.
      * If palette has fewer colors, pad with zeros. */
-    unsigned char rgb[768]; /* 256 * 3 */
+    unsigned char rgb[256 * 3];
     memset(rgb, 0, sizeof(rgb));
-    pcx_private_palette_to_rgb(palette, rgb, palette->color_count);
+    pcx_private_palette_to_rgb(palette, rgb, sizeof(rgb) / 3);
     SAIL_TRY(io->strict_write(io->stream, rgb, sizeof(rgb)));
 
     return SAIL_OK;
