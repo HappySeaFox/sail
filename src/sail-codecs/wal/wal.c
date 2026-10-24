@@ -331,7 +331,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_wal(void* state, const struct
 
     void* buffer;
     SAIL_TRY(sail_malloc(data_size, &buffer));
-    memcpy(buffer, image->pixels, data_size);
+
+    /* Scan lines are copied separately as bytes_per_line may contain padding bytes. */
+    for (unsigned row = 0; row < image->height; row++)
+    {
+        memcpy((unsigned char*)buffer + (size_t)row * image->width,
+               (const unsigned char*)image->pixels + (size_t)row * image->bytes_per_line, image->width);
+    }
 
     wal_state->mipmap_buffers[mipmap_index] = buffer;
     wal_state->mipmap_sizes[mipmap_index]   = data_size;
