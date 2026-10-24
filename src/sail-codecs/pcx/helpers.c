@@ -113,8 +113,8 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format,
     }
     case SAIL_PIXEL_FORMAT_BPP4_INDEXED:
     {
-        const int palette_colors = 16;     /* 256 RGB entries. */
-        const int palette_size   = 16 * 3; /* 256 RGB entries. */
+        const int palette_colors = 16;     /* 16 RGB entries. */
+        const int palette_size   = 16 * 3; /* 16 RGB entries. */
 
         SAIL_TRY(sail_alloc_palette_for_data(SAIL_PIXEL_FORMAT_BPP24_RGB, palette_colors, palette));
         memcpy((*palette)->data, palette16, palette_size);
