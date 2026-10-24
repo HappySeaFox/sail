@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <string.h>
+
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
@@ -168,13 +170,18 @@ sail_status_t wal_private_assign_palette(struct sail_image* image)
 sail_status_t wal_private_assign_meta_data(const struct WalFileHeader* wal_header,
                                            struct sail_meta_data_node** meta_data_node)
 {
+    /* The name comes from the file and is not necessarily NUL-terminated. */
+    char name[sizeof(wal_header->name) + 1];
+    memcpy(name, wal_header->name, sizeof(wal_header->name));
+    name[sizeof(wal_header->name)] = '\0';
+
     struct sail_meta_data_node* meta_data_node_local;
     SAIL_TRY(sail_alloc_meta_data_node(&meta_data_node_local));
 
     SAIL_TRY_OR_CLEANUP(
         sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_NAME, &meta_data_node_local->meta_data),
         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
-    SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node_local->meta_data->value, wal_header->name),
+    SAIL_TRY_OR_CLEANUP(sail_set_variant_string(meta_data_node_local->meta_data->value, name),
                         /* cleanup */ sail_destroy_meta_data_node(meta_data_node_local));
 
     *meta_data_node = meta_data_node_local;
