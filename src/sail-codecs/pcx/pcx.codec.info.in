@@ -16,7 +16,7 @@ tuning=
 
 [save-features]
 features=STATIC
-pixel-formats=BPP1-INDEXED;BPP4-INDEXED;BPP8-INDEXED;BPP24-RGB;BPP32-RGBA
+pixel-formats=BPP1-INDEXED;BPP4-INDEXED;BPP8-INDEXED;BPP24-RGB
 compressions=NONE;RLE
 default-compression=RLE
 compression-level-min=0

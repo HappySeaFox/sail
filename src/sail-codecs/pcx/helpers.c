@@ -336,12 +336,11 @@ sail_status_t pcx_private_pixel_format_to_pcx_format(enum SailPixelFormat pixel_
         *planes         = 3;
         return SAIL_OK;
     }
-    case SAIL_PIXEL_FORMAT_BPP32_RGBA:
-    {
-        *bits_per_plane = 8;
-        *planes         = 4;
-        return SAIL_OK;
-    }
+    /*
+     * Four 8-bit planes are not a part of the format. Such files are read for compatibility
+     * with the writers that produce them, but writing them would produce images that most
+     * decoders reject.
+     */
     default:
     {
         SAIL_LOG_ERROR("PCX: Pixel format %s is not supported for saving", sail_pixel_format_to_string(pixel_format));
