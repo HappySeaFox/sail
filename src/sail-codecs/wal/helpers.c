@@ -109,10 +109,10 @@ sail_status_t wal_private_read_file_header(struct sail_io* io, struct WalFileHea
     }
 
     /* Reasonable size limit to prevent memory exhaustion (16K x 16K). */
-    if (wal_header->width > 16384 || wal_header->height > 16384)
+    if (wal_header->width > SAIL_WAL_MAX_DIMENSION || wal_header->height > SAIL_WAL_MAX_DIMENSION)
     {
-        SAIL_LOG_ERROR("WAL: Image dimensions %ux%u exceed maximum allowed (16384x16384)", wal_header->width,
-                       wal_header->height);
+        SAIL_LOG_ERROR("WAL: Image dimensions %ux%u exceed maximum allowed (%dx%d)", wal_header->width,
+                       wal_header->height, SAIL_WAL_MAX_DIMENSION, SAIL_WAL_MAX_DIMENSION);
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 

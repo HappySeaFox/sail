@@ -253,15 +253,17 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_wal(void* state, co
     /* First frame determines the dimensions. */
     if (wal_state->frame_number == 0)
     {
-        /* Check that dimensions are valid and divisible by 8 for mipmaps. */
         if (image->width == 0 || image->height == 0)
         {
+            SAIL_LOG_ERROR("WAL: Invalid image dimensions %ux%u", image->width, image->height);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
         }
-        if ((image->width % 8) != 0 || (image->height % 8) != 0)
+
+        /* Larger textures cannot be loaded back. */
+        if (image->width > SAIL_WAL_MAX_DIMENSION || image->height > SAIL_WAL_MAX_DIMENSION)
         {
-            SAIL_LOG_ERROR("WAL: Image dimensions must be divisible by 8 for mipmap generation. Got %ux%u",
-                           image->width, image->height);
+            SAIL_LOG_ERROR("WAL: Image dimensions %ux%u exceed maximum allowed (%dx%d)", image->width, image->height,
+                           SAIL_WAL_MAX_DIMENSION, SAIL_WAL_MAX_DIMENSION);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
         }
 

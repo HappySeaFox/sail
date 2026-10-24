@@ -33,6 +33,9 @@ struct sail_io;
 struct sail_image;
 struct sail_meta_data_node;
 
+/* Textures larger than this are rejected. */
+#define SAIL_WAL_MAX_DIMENSION 16384
+
 struct WalFileHeader
 {
     char name[32];
