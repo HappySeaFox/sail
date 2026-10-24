@@ -337,11 +337,26 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_pcx(void* state, co
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_COMPRESSION);
     }
 
+    /* Dimensions are stored as 16-bit coordinates of the last pixel. */
+    if (image->width == 0 || image->height == 0 || image->width > (unsigned)UINT16_MAX + 1
+        || image->height > (unsigned)UINT16_MAX + 1)
+    {
+        SAIL_LOG_ERROR("PCX: Image dimensions %ux%u exceed maximum allowed %ux%u", image->width, image->height,
+                       (unsigned)UINT16_MAX + 1, (unsigned)UINT16_MAX + 1);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
     /* Calculate bytes per line (must be even). */
     unsigned bytes_per_plane = (image->width * bits_per_plane + 7) / 8;
     if (bytes_per_plane % 2 != 0)
     {
         bytes_per_plane++;
+    }
+
+    if (bytes_per_plane > UINT16_MAX)
+    {
+        SAIL_LOG_ERROR("PCX: %u bytes per line of %u pixels don't fit into the header", bytes_per_plane, image->width);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
     }
 
     /* Fill PCX header. */
