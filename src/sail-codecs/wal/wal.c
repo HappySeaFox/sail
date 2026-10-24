@@ -349,30 +349,22 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_wal(void** state)
         return SAIL_ERROR_NO_MORE_FRAMES;
     }
 
-    /* If only one frame was provided, generate mipmaps automatically. */
-    if (wal_state->frame_number == 1)
+    /* Generate the mipmap levels that were not provided. */
+    const unsigned levels = wal_private_mipmap_levels(wal_state->width, wal_state->height);
+
+    for (unsigned i = wal_state->frame_number; i < levels; i++)
     {
-        unsigned current_width  = wal_state->width;
-        unsigned current_height = wal_state->height;
-        const void* src_data    = wal_state->mipmap_buffers[0];
+        void* dst_data;
+        unsigned dst_width, dst_height;
 
-        for (unsigned i = 1; i < 4; i++)
-        {
-            void* dst_data;
-            unsigned dst_width, dst_height;
+        SAIL_TRY_OR_CLEANUP(wal_private_downsample_indexed(wal_state->mipmap_buffers[i - 1],
+                                                           wal_state->width >> (i - 1), wal_state->height >> (i - 1),
+                                                           &dst_data, &dst_width, &dst_height),
+                            /* cleanup */ destroy_wal_state(wal_state);
+                            *state = NULL);
 
-            SAIL_TRY_OR_CLEANUP(wal_private_downsample_indexed(src_data, current_width, current_height, &dst_data,
-                                                               &dst_width, &dst_height),
-                                /* cleanup */ destroy_wal_state(wal_state);
-                                *state = NULL);
-
-            wal_state->mipmap_buffers[i] = dst_data;
-            wal_state->mipmap_sizes[i]   = (size_t)dst_width * dst_height;
-
-            src_data       = dst_data;
-            current_width  = dst_width;
-            current_height = dst_height;
-        }
+        wal_state->mipmap_buffers[i] = dst_data;
+        wal_state->mipmap_sizes[i]   = (size_t)dst_width * dst_height;
     }
 
     /* Calculate offsets for each mipmap level. */
@@ -383,6 +375,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_wal(void** state)
 
     wal_state->wal_header.offset[0] = (int)header_size;
 
+    /* Offsets of the levels the texture cannot hold point past the last one. */
     for (unsigned i = 1; i < 4; i++)
     {
         wal_state->wal_header.offset[i] = wal_state->wal_header.offset[i - 1] + (int)wal_state->mipmap_sizes[i - 1];
