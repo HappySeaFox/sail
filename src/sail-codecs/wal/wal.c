@@ -132,6 +132,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_wal(void* state, st
     {
         wal_state->width  /= 2;
         wal_state->height /= 2;
+
+        /* Textures with a short side have fewer than four mipmap levels. */
+        if (wal_state->width == 0 || wal_state->height == 0)
+        {
+            return SAIL_ERROR_NO_MORE_FRAMES;
+        }
     }
 
     /* Validate dimensions for this mipmap level. */
