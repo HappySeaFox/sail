@@ -175,26 +175,108 @@ sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_format,
     return SAIL_OK;
 }
 
+void pcx_private_merge_planes(const struct SailPcxHeader* header,
+                              unsigned width,
+                              const unsigned char* buffer,
+                              unsigned char* target_scan)
+{
+    if (header->bits_per_plane == 1 && header->planes > 1)
+    {
+        /*
+         * Every pixel takes a single bit from every plane. Bit 0 of the pixel comes from
+         * the first plane, bit 1 from the second one and so on.
+         */
+        const unsigned columns = (width < header->bytes_per_line * 8) ? width : header->bytes_per_line * 8u;
+
+        memset(target_scan, 0, (width * header->planes + 7) / 8);
+
+        for (unsigned column = 0; column < columns; column++)
+        {
+            unsigned value = 0;
+
+            for (unsigned plane = 0; plane < header->planes; plane++)
+            {
+                const unsigned char plane_byte = buffer[plane * header->bytes_per_line + column / 8];
+                value |= ((plane_byte >> (7 - column % 8)) & 1u) << plane;
+            }
+
+            /* Two 4-bit pixels per byte, the leftmost pixel occupies the high bits. */
+            if (column % 2 == 0)
+            {
+                target_scan[column / 2] = (unsigned char)(value << 4);
+            }
+            else
+            {
+                target_scan[column / 2] |= (unsigned char)value;
+            }
+        }
+    }
+    else
+    {
+        /* Every pixel takes a whole byte from every plane. */
+        for (unsigned plane = 0; plane < header->planes; plane++)
+        {
+            for (unsigned column = 0; column < header->bytes_per_line; column++)
+            {
+                target_scan[column * header->planes + plane] = buffer[plane * header->bytes_per_line + column];
+            }
+        }
+    }
+}
+
+void pcx_private_split_planes(const struct SailPcxHeader* header,
+                              const struct sail_image* image,
+                              const unsigned char* scan,
+                              unsigned char* buffer)
+{
+    if (header->bits_per_plane == 1 && header->planes > 1)
+    {
+        /* Split every 4-bit pixel into four 1-bit planes. */
+        memset(buffer, 0, (size_t)header->bytes_per_line * header->planes);
+
+        for (unsigned column = 0; column < image->width; column++)
+        {
+            if (column / 2 >= image->bytes_per_line || column / 8 >= header->bytes_per_line)
+            {
+                break;
+            }
+
+            const unsigned char pixel =
+                (column % 2 == 0) ? (unsigned char)(scan[column / 2] >> 4) : (unsigned char)(scan[column / 2] & 0x0F);
+
+            for (unsigned plane = 0; plane < header->planes; plane++)
+            {
+                if ((pixel >> plane) & 1u)
+                {
+                    buffer[plane * header->bytes_per_line + column / 8] |= (unsigned char)(0x80 >> (column % 8));
+                }
+            }
+        }
+    }
+    else
+    {
+        for (unsigned plane = 0; plane < header->planes; plane++)
+        {
+            for (unsigned column = 0; column < header->bytes_per_line; column++)
+            {
+                const unsigned index = column * header->planes + plane;
+
+                buffer[plane * header->bytes_per_line + column] = (index < image->bytes_per_line) ? scan[index] : 0;
+            }
+        }
+    }
+}
+
 sail_status_t pcx_private_read_uncompressed(struct sail_io* io,
-                                            unsigned bytes_per_plane_to_read,
-                                            unsigned planes,
+                                            const struct SailPcxHeader* header,
                                             unsigned char* buffer,
                                             struct sail_image* image)
 {
     for (unsigned row = 0; row < image->height; row++)
     {
-        unsigned char* target_scan = sail_scan_line(image, row);
+        SAIL_TRY(io->strict_read(io->stream, buffer, (size_t)header->bytes_per_line * header->planes));
 
-        /* Read plane by plane and then merge them into the image pixels. */
-        for (unsigned plane = 0; plane < planes; plane++)
-        {
-            SAIL_TRY(io->strict_read(io->stream, buffer, bytes_per_plane_to_read));
-
-            for (unsigned column = 0; column < bytes_per_plane_to_read; column++)
-            {
-                *(target_scan + column * planes + plane) = *(buffer + column);
-            }
-        }
+        pcx_private_merge_planes(header, image->width, buffer, sail_scan_line(image, row));
     }
 
     return SAIL_OK;

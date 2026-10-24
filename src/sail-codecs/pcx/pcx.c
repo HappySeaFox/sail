@@ -223,8 +223,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
 
     if (pcx_state->pcx_header.encoding == SAIL_PCX_NO_ENCODING)
     {
-        SAIL_TRY(pcx_private_read_uncompressed(pcx_state->io, pcx_state->pcx_header.bytes_per_line,
-                                               pcx_state->pcx_header.planes, pcx_state->scanline_buffer, image));
+        SAIL_TRY(pcx_private_read_uncompressed(pcx_state->io, &pcx_state->pcx_header, pcx_state->scanline_buffer,
+                                               image));
     }
     else
     {
@@ -269,18 +269,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pcx(void* state, struct sail_
             }
 
             /* Merge planes into the image pixels. */
-            unsigned char* const scan = sail_scan_line(image, row);
-
-            for (unsigned plane = 0; plane < pcx_state->pcx_header.planes; plane++)
-            {
-                const unsigned buffer_plane_offset = plane * pcx_state->pcx_header.bytes_per_line;
-
-                for (unsigned column = 0; column < pcx_state->pcx_header.bytes_per_line; column++)
-                {
-                    *(scan + column * pcx_state->pcx_header.planes + plane) =
-                        *(pcx_state->scanline_buffer + buffer_plane_offset + column);
-                }
-            }
+            pcx_private_merge_planes(&pcx_state->pcx_header, image->width, pcx_state->scanline_buffer,
+                                     sail_scan_line(image, row));
         }
     }
 
@@ -468,21 +458,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pcx(void* state, const struct
             const unsigned char* scan = sail_scan_line(image, row);
 
             /* Convert interleaved pixels to planar format. */
-            for (unsigned plane = 0; plane < pcx_state->pcx_header.planes; plane++)
-            {
-                for (unsigned column = 0; column < pcx_state->pcx_header.bytes_per_line; column++)
-                {
-                    if (column * pcx_state->pcx_header.planes + plane < image->bytes_per_line)
-                    {
-                        pcx_state->scanline_buffer[plane * pcx_state->pcx_header.bytes_per_line + column] =
-                            scan[column * pcx_state->pcx_header.planes + plane];
-                    }
-                    else
-                    {
-                        pcx_state->scanline_buffer[plane * pcx_state->pcx_header.bytes_per_line + column] = 0;
-                    }
-                }
-            }
+            pcx_private_split_planes(&pcx_state->pcx_header, image, scan, pcx_state->scanline_buffer);
 
             /* Write all planes. */
             SAIL_TRY(pcx_state->io->strict_write(pcx_state->io->stream, pcx_state->scanline_buffer,
@@ -497,21 +473,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pcx(void* state, const struct
             const unsigned char* scan = sail_scan_line(image, row);
 
             /* Convert interleaved pixels to planar format. */
-            for (unsigned plane = 0; plane < pcx_state->pcx_header.planes; plane++)
-            {
-                for (unsigned column = 0; column < pcx_state->pcx_header.bytes_per_line; column++)
-                {
-                    if (column * pcx_state->pcx_header.planes + plane < image->bytes_per_line)
-                    {
-                        pcx_state->scanline_buffer[plane * pcx_state->pcx_header.bytes_per_line + column] =
-                            scan[column * pcx_state->pcx_header.planes + plane];
-                    }
-                    else
-                    {
-                        pcx_state->scanline_buffer[plane * pcx_state->pcx_header.bytes_per_line + column] = 0;
-                    }
-                }
-            }
+            pcx_private_split_planes(&pcx_state->pcx_header, image, scan, pcx_state->scanline_buffer);
 
             /* RLE encode and write each plane. */
             for (unsigned plane = 0; plane < pcx_state->pcx_header.planes; plane++)

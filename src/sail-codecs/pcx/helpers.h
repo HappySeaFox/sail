@@ -79,9 +79,18 @@ SAIL_HIDDEN sail_status_t pcx_private_build_palette(enum SailPixelFormat pixel_f
                                                     uint8_t palette16[48],
                                                     struct sail_palette** palette);
 
+SAIL_HIDDEN void pcx_private_merge_planes(const struct SailPcxHeader* header,
+                                          unsigned width,
+                                          const unsigned char* buffer,
+                                          unsigned char* target_scan);
+
+SAIL_HIDDEN void pcx_private_split_planes(const struct SailPcxHeader* header,
+                                          const struct sail_image* image,
+                                          const unsigned char* scan,
+                                          unsigned char* buffer);
+
 SAIL_HIDDEN sail_status_t pcx_private_read_uncompressed(struct sail_io* io,
-                                                        unsigned bytes_per_plane_to_read,
-                                                        unsigned planes,
+                                                        const struct SailPcxHeader* header,
                                                         unsigned char* buffer,
                                                         struct sail_image* image);
 
