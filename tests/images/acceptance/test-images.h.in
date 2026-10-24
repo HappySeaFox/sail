@@ -197,6 +197,9 @@ static const char * const SAIL_TEST_IMAGES[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_WAL
     "@SAIL_TEST_IMAGES_PATH@/wal/bpp8-indexed.wal",
+    "@SAIL_TEST_IMAGES_PATH@/wal/bpp8-indexed.non-square.wal",
+    "@SAIL_TEST_IMAGES_PATH@/wal/bpp8-indexed.one-mipmap.wal",
+    "@SAIL_TEST_IMAGES_PATH@/wal/bpp8-indexed.three-mipmaps.wal",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_WEBP
