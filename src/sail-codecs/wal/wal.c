@@ -325,6 +325,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_wal(void* state, const struct
 {
     struct wal_state* wal_state = state;
 
+    if (wal_state->frame_number == 0)
+    {
+        SAIL_LOG_ERROR("WAL: Mipmap level was not started");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
     /* Store the mipmap data. */
     const unsigned mipmap_index = wal_state->frame_number - 1;
     const size_t data_size      = (size_t)image->width * image->height;
@@ -377,6 +383,18 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_wal(void** state)
         destroy_wal_state(wal_state);
         *state = NULL;
         return SAIL_ERROR_NO_MORE_FRAMES;
+    }
+
+    /* Every started level must have been written. */
+    for (unsigned i = 0; i < wal_state->frame_number; i++)
+    {
+        if (wal_state->mipmap_buffers[i] == NULL)
+        {
+            SAIL_LOG_ERROR("WAL: Mipmap level %u was not written", i);
+            destroy_wal_state(wal_state);
+            *state = NULL;
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+        }
     }
 
     /* Generate the mipmap levels that were not provided. */
