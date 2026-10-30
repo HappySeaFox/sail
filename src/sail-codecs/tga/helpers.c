@@ -799,6 +799,13 @@ sail_status_t tga_private_write_palette(struct sail_io* io,
     const unsigned bytes_per_entry    = (file_header->color_map_entry_size + 7) / 8;
     const unsigned char* palette_data = palette->data;
 
+    /* Other entry sizes would write uninitialized bytes into the file. */
+    if (bytes_per_entry != 3 && bytes_per_entry != 4)
+    {
+        SAIL_LOG_ERROR("TGA: Unsupported color map entry size %u", file_header->color_map_entry_size);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+    }
+
     for (unsigned i = 0; i < palette->color_count; i++)
     {
         unsigned char entry[4];
