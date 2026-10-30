@@ -72,7 +72,11 @@ bool jbig_private_is_jbig(const void* data, size_t size)
     return true;
 }
 
-sail_status_t jbig_private_read_header(struct sail_io* io, unsigned long* width, unsigned long* height, int* planes)
+sail_status_t jbig_private_read_header(struct sail_io* io,
+                                       unsigned long* width,
+                                       unsigned long* height,
+                                       int* planes,
+                                       bool* variable_length)
 {
     unsigned char header[JBIG_MAGIC_SIZE];
     size_t bytes_read;
@@ -92,6 +96,13 @@ sail_status_t jbig_private_read_header(struct sail_io* io, unsigned long* width,
 
     /* Parse width, height and planes from BIH header (big-endian). */
     *planes = header[2];
+
+    /*
+     * With the variable length option the height in the header is just an upper bound.
+     * The real one is announced by a NEWLEN marker in the last stripe, so it's only known
+     * after decoding.
+     */
+    *variable_length = (header[19] & JBG_VLENGTH) != 0;
 
     uint32_t width32, height32;
     memcpy(&width32, header + 4, sizeof(uint32_t));

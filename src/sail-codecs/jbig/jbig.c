@@ -47,6 +47,10 @@ struct jbig_codec_state
     unsigned long width;
     unsigned long height;
     int planes;
+
+    struct jbg_dec_state decoder;
+    bool decoder_initialized;
+    bool decoded;
 };
 
 static sail_status_t alloc_jbig_codec_state(struct sail_io* io,
@@ -68,6 +72,9 @@ static sail_status_t alloc_jbig_codec_state(struct sail_io* io,
         .width  = 0,
         .height = 0,
         .planes = 0,
+
+        .decoder_initialized = false,
+        .decoded             = false,
     };
 
     return SAIL_OK;
@@ -80,7 +87,60 @@ static void destroy_jbig_codec_state(struct jbig_codec_state* jbig_codec_state)
         return;
     }
 
+    if (jbig_codec_state->decoder_initialized)
+    {
+        jbg_dec_free(&jbig_codec_state->decoder);
+    }
+
     sail_free(jbig_codec_state);
+}
+
+/*
+ * Decodes the whole image into the codec state. Does nothing when the image is already decoded.
+ */
+static sail_status_t decode_image(struct jbig_codec_state* jbig_codec_state)
+{
+    if (jbig_codec_state->decoded)
+    {
+        return SAIL_OK;
+    }
+
+    if (!jbig_codec_state->decoder_initialized)
+    {
+        jbg_dec_init(&jbig_codec_state->decoder);
+        jbig_codec_state->decoder_initialized = true;
+    }
+
+    unsigned char buffer[4096];
+
+    /* Read and decode JBIG data until the decoder reports a complete image. */
+    while (!jbig_codec_state->decoded)
+    {
+        size_t bytes_read;
+        SAIL_TRY(
+            jbig_codec_state->io->tolerant_read(jbig_codec_state->io->stream, buffer, sizeof(buffer), &bytes_read));
+
+        if (bytes_read == 0)
+        {
+            SAIL_LOG_ERROR("JBIG: Image data is truncated");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
+        size_t cnt;
+        const int result = jbg_dec_in(&jbig_codec_state->decoder, buffer, bytes_read, &cnt);
+
+        if (result == JBG_EOK)
+        {
+            jbig_codec_state->decoded = true;
+        }
+        else if (result != JBG_EAGAIN)
+        {
+            SAIL_LOG_ERROR("JBIG: Decoding error: %s", jbg_strerror(result));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+    }
+
+    return SAIL_OK;
 }
 
 /*
@@ -113,7 +173,28 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jbig(void* state, s
     jbig_state->frame_processed = true;
 
     /* Read JBIG header to get image dimensions. */
-    SAIL_TRY(jbig_private_read_header(jbig_state->io, &jbig_state->width, &jbig_state->height, &jbig_state->planes));
+    bool variable_length;
+    SAIL_TRY(jbig_private_read_header(jbig_state->io, &jbig_state->width, &jbig_state->height, &jbig_state->planes,
+                                      &variable_length));
+
+    /*
+     * The header of a variable length stream announces just an upper bound of the height.
+     * Decode the image right away to ask the decoder about the real dimensions.
+     */
+    if (variable_length)
+    {
+        SAIL_TRY(decode_image(jbig_state));
+
+        jbig_state->width  = jbg_dec_getwidth(&jbig_state->decoder);
+        jbig_state->height = jbg_dec_getheight(&jbig_state->decoder);
+        jbig_state->planes = jbg_dec_getplanes(&jbig_state->decoder);
+    }
+
+    if (jbig_state->width == 0 || jbig_state->height == 0)
+    {
+        SAIL_LOG_ERROR("JBIG: Invalid image dimensions %lux%lu", jbig_state->width, jbig_state->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
 
     SAIL_LOG_TRACE("JBIG: %lux%lu, %d planes", jbig_state->width, jbig_state->height, jbig_state->planes);
 
@@ -155,89 +236,47 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jbig(void* state, s
 
 SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail_image* image)
 {
-    const struct jbig_codec_state* jbig_codec_state = state;
+    struct jbig_codec_state* jbig_codec_state = state;
 
-    struct jbg_dec_state decoder;
-    unsigned char buffer[4096];
-    size_t bytes_read;
-    int result;
-    size_t cnt;
+    SAIL_TRY(decode_image(jbig_codec_state));
 
-    /* Initialize JBIG decoder. */
-    jbg_dec_init(&decoder);
-
-    /* Read and decode JBIG data until the decoder reports a complete image. */
-    bool decoded = false;
-
-    while (!decoded)
-    {
-        SAIL_TRY_OR_CLEANUP(
-            jbig_codec_state->io->tolerant_read(jbig_codec_state->io->stream, buffer, sizeof(buffer), &bytes_read),
-            /* cleanup */ jbg_dec_free(&decoder));
-
-        if (bytes_read == 0)
-        {
-            jbg_dec_free(&decoder);
-            SAIL_LOG_ERROR("JBIG: Image data is truncated");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
-        }
-
-        result = jbg_dec_in(&decoder, buffer, bytes_read, &cnt);
-
-        if (result == JBG_EOK)
-        {
-            decoded = true;
-        }
-        else if (result == JBG_EAGAIN)
-        {
-            continue;
-        }
-        else
-        {
-            jbg_dec_free(&decoder);
-            SAIL_LOG_ERROR("JBIG: Decoding error: %s", jbg_strerror(result));
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
-        }
-    }
-
-    /* Get decoded image dimensions. */
-    int planes = jbg_dec_getplanes(&decoder);
+    const int planes = jbg_dec_getplanes(&jbig_codec_state->decoder);
 
     SAIL_LOG_TRACE("JBIG: %d planes", planes);
 
-    /* For single-plane images, copy directly. */
-    if (planes == 1)
-    {
-        unsigned char* jbig_data = jbg_dec_getimage(&decoder, 0);
-        unsigned long jbig_size  = jbg_dec_getsize(&decoder);
-
-        size_t expected_size = (size_t)((image->width + 7) / 8) * image->height;
-
-        if (jbig_size < expected_size)
-        {
-            jbg_dec_free(&decoder);
-            SAIL_LOG_ERROR("JBIG: Insufficient decoded data");
-            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
-        }
-
-        /* Copy scanlines. */
-        unsigned char* dest              = image->pixels;
-        unsigned long src_bytes_per_line = (image->width + 7) / 8;
-
-        for (unsigned long y = 0; y < image->height; y++)
-        {
-            memcpy(dest + y * image->bytes_per_line, jbig_data + y * src_bytes_per_line, src_bytes_per_line);
-        }
-    }
-    else
+    if (planes != 1)
     {
         /* TODO: Multi-plane JBIG images are not yet supported. */
-        jbg_dec_free(&decoder);
         SAIL_LOG_ERROR("JBIG: Multi-plane images not yet supported");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
     }
 
-    jbg_dec_free(&decoder);
+    const unsigned char* jbig_data = jbg_dec_getimage(&jbig_codec_state->decoder, 0);
+
+    if (jbig_data == NULL)
+    {
+        SAIL_LOG_ERROR("JBIG: Decoded image is missing");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    const unsigned long jbig_size    = jbg_dec_getsize(&jbig_codec_state->decoder);
+    const size_t src_bytes_per_line  = (image->width + 7) / 8;
+    const size_t expected_size       = src_bytes_per_line * image->height;
+
+    if (jbig_size < expected_size)
+    {
+        SAIL_LOG_ERROR("JBIG: Insufficient decoded data");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    /* Copy scanlines. */
+    unsigned char* dest = image->pixels;
+
+    for (unsigned y = 0; y < image->height; y++)
+    {
+        memcpy(dest + (size_t)y * image->bytes_per_line, jbig_data + (size_t)y * src_bytes_per_line,
+               src_bytes_per_line);
+    }
 
     return SAIL_OK;
 }

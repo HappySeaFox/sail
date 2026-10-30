@@ -41,6 +41,7 @@ struct sail_io;
 SAIL_HIDDEN sail_status_t jbig_private_read_header(struct sail_io* io,
                                                    unsigned long* width,
                                                    unsigned long* height,
-                                                   int* planes);
+                                                   int* planes,
+                                                   bool* variable_length);
 
 SAIL_HIDDEN bool jbig_private_is_jbig(const void* data, size_t size);
