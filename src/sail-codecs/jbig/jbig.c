@@ -414,8 +414,32 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jbig(void* state, const struc
     struct jbg_enc_state encoder;
 
     /* Prepare image data as required by JBIG encoder (array of plane pointers). */
+    const unsigned packed_bytes_per_line = (image->width + 7) / 8;
+    unsigned char* packed_pixels         = NULL;
     unsigned char* planes[1];
-    planes[0] = image->pixels;
+
+    if (image->bytes_per_line == packed_bytes_per_line)
+    {
+        planes[0] = image->pixels;
+    }
+    else
+    {
+        /* The encoder expects tightly packed scan lines without padding bytes. */
+        size_t packed_size;
+        SAIL_TRY(sail_size_mul(packed_bytes_per_line, image->height, &packed_size));
+
+        void* ptr;
+        SAIL_TRY(sail_malloc(packed_size, &ptr));
+        packed_pixels = ptr;
+
+        for (unsigned row = 0; row < image->height; row++)
+        {
+            memcpy(packed_pixels + (size_t)row * packed_bytes_per_line,
+                   (const unsigned char*)image->pixels + (size_t)row * image->bytes_per_line, packed_bytes_per_line);
+        }
+
+        planes[0] = packed_pixels;
+    }
 
     /* Initialize JBIG encoder. */
     jbg_enc_init(&encoder, image->width, image->height, 1, /* 1 plane. */
@@ -429,6 +453,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jbig(void* state, const struc
     jbg_enc_out(&encoder);
 
     jbg_enc_free(&encoder);
+    sail_free(packed_pixels);
 
     if (write_ctx.status != SAIL_OK)
     {
