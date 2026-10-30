@@ -169,8 +169,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail
     /* Read and decode JBIG data. */
     while (true)
     {
-        SAIL_TRY(
-            jbig_codec_state->io->tolerant_read(jbig_codec_state->io->stream, buffer, sizeof(buffer), &bytes_read));
+        SAIL_TRY_OR_CLEANUP(
+            jbig_codec_state->io->tolerant_read(jbig_codec_state->io->stream, buffer, sizeof(buffer), &bytes_read),
+            /* cleanup */ jbg_dec_free(&decoder));
 
         if (bytes_read == 0)
         {
