@@ -112,7 +112,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tga(struct sail_io* io,
     SAIL_TRY(tga_private_read_file_footer(io, &tga_state->footer));
     SAIL_TRY(tga_state->io->seek(tga_state->io->stream, 0, SEEK_SET));
 
-    tga_state->tga2 = strcmp(TGA_SIGNATURE, (const char*)tga_state->footer.signature) == 0;
+    /* The signature comes from the file and is not necessarily null-terminated. */
+    tga_state->tga2 = memcmp(tga_state->footer.signature, TGA_SIGNATURE, sizeof(tga_state->footer.signature)) == 0;
 
     return SAIL_OK;
 }
