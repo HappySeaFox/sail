@@ -475,6 +475,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_fli(void* state, co
 
         SAIL_TRY(fli_private_write_header(fli_state->io, &fli_state->fli_header));
     }
+    else if (image->width != fli_state->fli_header.width || image->height != fli_state->fli_header.height)
+    {
+        /* All frames share the dimensions from the file header. */
+        SAIL_LOG_ERROR("FLI: All frames must have the same dimensions: %ux%u expected, got %ux%u",
+                       fli_state->fli_header.width, fli_state->fli_header.height, image->width, image->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
 
     fli_state->frames_written++;
 
