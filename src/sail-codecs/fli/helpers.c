@@ -494,43 +494,63 @@ sail_status_t fli_private_decode_ss2(struct SailFliChunkReader* reader,
                                      unsigned width,
                                      unsigned height)
 {
-    uint16_t lines_count;
-    SAIL_TRY(fli_private_chunk_read(reader, &lines_count, sizeof(lines_count)));
+    uint16_t compressed_lines;
+    SAIL_TRY(fli_private_chunk_read(reader, &compressed_lines, sizeof(compressed_lines)));
 
-    for (uint32_t y = 0; y < lines_count && y < height; y++)
+    unsigned y = 0;
+
+    while (compressed_lines > 0)
     {
-        unsigned char* line = pixels + y * width;
-        uint16_t packets;
-        SAIL_TRY(fli_private_chunk_read(reader, &packets, sizeof(packets)));
+        uint16_t line_word;
+        SAIL_TRY(fli_private_chunk_read(reader, &line_word, sizeof(line_word)));
 
-        /* High byte of packets can indicate lines to skip. */
-        uint8_t skip_lines  = (packets >> 8) & 0xFF;
-        packets            &= 0xFF;
-
-        if (skip_lines > 0)
+        /* Lines are prefixed with optional words carrying a line skip count or the last pixel of a line. */
+        if ((line_word & 0xC000) == 0xC000)
         {
-            /* Last packet in line - skip to next line. */
-            y += skip_lines - 1;
+            y += (unsigned)(-(int16_t)line_word);
             continue;
         }
 
-        if (packets == 0)
+        if ((line_word & 0xC000) == 0x8000)
         {
-            /* Last line indicator. */
-            break;
+            if (y >= height)
+            {
+                SAIL_LOG_ERROR("FLI: SS2 line %u is out of bounds", y);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+            }
+
+            /* The low byte holds the last pixel of the current line. */
+            pixels[(size_t)y * width + width - 1] = (unsigned char)(line_word & 0xFF);
+            continue;
         }
 
-        unsigned x = 0;
+        if ((line_word & 0xC000) != 0)
+        {
+            SAIL_LOG_ERROR("FLI: Unexpected SS2 line word 0x%04X", line_word);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
 
-        for (uint16_t j = 0; j < packets; j++)
+        if (y >= height)
+        {
+            SAIL_LOG_ERROR("FLI: SS2 line %u is out of bounds", y);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
+        compressed_lines--;
+
+        unsigned char* line = pixels + (size_t)y * width;
+        unsigned x          = 0;
+
+        for (uint16_t j = 0; j < line_word; j++)
         {
             uint8_t skip;
             SAIL_TRY(fli_private_chunk_read(reader, &skip, sizeof(skip)));
-            x += skip * 2; /* Word-aligned. */
+            x += skip;
 
             if (x >= width)
             {
-                break;
+                SAIL_LOG_ERROR("FLI: SS2 packet starts past the line end");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
             int8_t packet;
@@ -538,39 +558,39 @@ sail_status_t fli_private_decode_ss2(struct SailFliChunkReader* reader,
 
             if (packet >= 0)
             {
-                /* Copy packet (word count). */
-                unsigned count = packet * 2;
-                if (x + count > width)
-                {
-                    count = width - x;
-                }
-                SAIL_TRY(fli_private_chunk_read(reader, line + x, count));
-                x += count;
+                /* Copy packet: the count is in words. */
+                const unsigned count = (unsigned)packet * 2;
+                uint8_t buffer[254];
+
+                SAIL_TRY(fli_private_chunk_read(reader, buffer, count));
+
+                const unsigned to_copy = (count > width - x) ? (width - x) : count;
+                memcpy(line + x, buffer, to_copy);
+                x += to_copy;
             }
             else
             {
-                /* Run packet. */
-                unsigned count = (-packet) * 2;
-                if (x + count > width)
+                /* Run packet: repeat a word (-packet) times. */
+                unsigned count = (unsigned)(-packet) * 2;
+                uint8_t value[2];
+
+                SAIL_TRY(fli_private_chunk_read(reader, value, sizeof(value)));
+
+                if (count > width - x)
                 {
                     count = width - x;
                 }
-                uint8_t value[2];
-                SAIL_TRY(fli_private_chunk_read(reader, value, 2));
-                for (unsigned k = 0; k < count; k += 2)
+
+                for (unsigned k = 0; k < count; k++)
                 {
-                    if (x + k < width)
-                    {
-                        line[x + k] = value[0];
-                    }
-                    if (x + k + 1 < width)
-                    {
-                        line[x + k + 1] = value[1];
-                    }
+                    line[x + k] = value[k % 2];
                 }
+
                 x += count;
             }
         }
+
+        y++;
     }
 
     return SAIL_OK;
