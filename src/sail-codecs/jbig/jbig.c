@@ -378,9 +378,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jbig(void* state, c
     }
 
     jbig_codec_state->frame_processed = true;
-    jbig_codec_state->width           = image->width;
-    jbig_codec_state->height          = image->height;
-    jbig_codec_state->planes          = 1;
 
     return SAIL_OK;
 }
