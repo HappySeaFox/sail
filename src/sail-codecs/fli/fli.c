@@ -148,6 +148,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_fli(struct sail_io* io,
     fli_state->prev_frame = ptr;
     memset(fli_state->prev_frame, 0, prev_frame_size);
 
+    /* Frames may start past the header. oframe2 is only a loop hint for players. */
+    if (fli_state->fli_header.oframe1 > SAIL_FLI_HEADER_SIZE)
+    {
+        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)fli_state->fli_header.oframe1, SEEK_SET));
+    }
+
     SAIL_LOG_TRACE("FLI: %s format, %ux%u, %u frames, speed=%u", fli_state->is_fli ? "FLI" : "FLC",
                    fli_state->fli_header.width, fli_state->fli_header.height, fli_state->fli_header.frames,
                    fli_state->fli_header.speed);
