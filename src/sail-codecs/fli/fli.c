@@ -51,7 +51,6 @@ struct fli_state
     /* For saving. */
     int frames_written;
     bool is_first_frame;
-    unsigned char* first_frame;
 };
 
 static sail_status_t alloc_fli_state(struct sail_io* io,
@@ -75,7 +74,6 @@ static sail_status_t alloc_fli_state(struct sail_io* io,
 
         .frames_written = 0,
         .is_first_frame = true,
-        .first_frame    = NULL,
     };
 
     return SAIL_OK;
@@ -90,7 +88,6 @@ static void destroy_fli_state(struct fli_state* fli_state)
 
     sail_destroy_palette(fli_state->current_palette);
     sail_free(fli_state->prev_frame);
-    sail_free(fli_state->first_frame);
 
     sail_free(fli_state);
 }
@@ -473,13 +470,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_fli(void* state, co
         fli_state->fli_header.aspect_y = 5;
 
         SAIL_TRY(fli_private_write_header(fli_state->io, &fli_state->fli_header));
-
-        void* ptr;
-        size_t first_frame_size;
-
-        SAIL_TRY(sail_size_mul(image->width, image->height, &first_frame_size));
-        SAIL_TRY(sail_malloc(first_frame_size, &ptr));
-        fli_state->first_frame = ptr;
     }
 
     fli_state->frames_written++;
@@ -490,9 +480,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_fli(void* state, co
 SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct sail_image* image)
 {
     struct fli_state* fli_state = state;
-
-    size_t frame_size;
-    SAIL_TRY(sail_size_mul(image->width, image->height, &frame_size));
 
     size_t frame_pos;
     SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &frame_pos));
@@ -557,9 +544,6 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
         SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)end_pos, SEEK_SET));
 
         chunk_count++;
-
-        /* Save first frame for later. */
-        memcpy(fli_state->first_frame, image->pixels, frame_size);
     }
     else
     {
