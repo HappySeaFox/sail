@@ -166,8 +166,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail
     /* Initialize JBIG decoder. */
     jbg_dec_init(&decoder);
 
-    /* Read and decode JBIG data. */
-    while (true)
+    /* Read and decode JBIG data until the decoder reports a complete image. */
+    bool decoded = false;
+
+    while (!decoded)
     {
         SAIL_TRY_OR_CLEANUP(
             jbig_codec_state->io->tolerant_read(jbig_codec_state->io->stream, buffer, sizeof(buffer), &bytes_read),
@@ -175,14 +177,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jbig(void* state, struct sail
 
         if (bytes_read == 0)
         {
-            break;
+            jbg_dec_free(&decoder);
+            SAIL_LOG_ERROR("JBIG: Image data is truncated");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
         result = jbg_dec_in(&decoder, buffer, bytes_read, &cnt);
 
         if (result == JBG_EOK)
         {
-            break;
+            decoded = true;
         }
         else if (result == JBG_EAGAIN)
         {
