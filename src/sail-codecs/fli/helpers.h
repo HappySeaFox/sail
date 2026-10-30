@@ -97,6 +97,22 @@ struct SailFliChunkHeader
     uint16_t type;
 };
 
+/*
+ * Reader over a single chunk. Chunk decoders never read past the chunk boundary
+ * into the following chunks and frames.
+ */
+struct SailFliChunkReader
+{
+    struct sail_io* io;
+    uint32_t bytes_left;
+};
+
+SAIL_HIDDEN void fli_private_init_chunk_reader(struct SailFliChunkReader* reader,
+                                               struct sail_io* io,
+                                               uint32_t payload_size);
+
+SAIL_HIDDEN sail_status_t fli_private_chunk_read(struct SailFliChunkReader* reader, void* buffer, size_t size);
+
 SAIL_HIDDEN sail_status_t fli_private_read_header(struct sail_io* io, struct SailFliHeader* header);
 
 SAIL_HIDDEN sail_status_t fli_private_write_header(struct sail_io* io, const struct SailFliHeader* header);
@@ -111,17 +127,15 @@ SAIL_HIDDEN sail_status_t fli_private_read_chunk_header(struct sail_io* io, stru
 SAIL_HIDDEN sail_status_t fli_private_write_chunk_header(struct sail_io* io,
                                                          const struct SailFliChunkHeader* chunk_header);
 
-SAIL_HIDDEN sail_status_t fli_private_decode_color64(struct sail_io* io,
-                                                     uint32_t chunk_size,
+SAIL_HIDDEN sail_status_t fli_private_decode_color64(struct SailFliChunkReader* reader,
                                                      struct sail_palette* palette);
 
-SAIL_HIDDEN sail_status_t fli_private_decode_color256(struct sail_io* io,
-                                                      uint32_t chunk_size,
+SAIL_HIDDEN sail_status_t fli_private_decode_color256(struct SailFliChunkReader* reader,
                                                       struct sail_palette* palette);
 
 SAIL_HIDDEN sail_status_t fli_private_encode_color256(struct sail_io* io, const struct sail_palette* palette);
 
-SAIL_HIDDEN sail_status_t fli_private_decode_brun(struct sail_io* io,
+SAIL_HIDDEN sail_status_t fli_private_decode_brun(struct SailFliChunkReader* reader,
                                                   unsigned char* pixels,
                                                   unsigned width,
                                                   unsigned height);
@@ -131,7 +145,7 @@ SAIL_HIDDEN sail_status_t fli_private_encode_brun(struct sail_io* io,
                                                   unsigned width,
                                                   unsigned height);
 
-SAIL_HIDDEN sail_status_t fli_private_decode_copy(struct sail_io* io,
+SAIL_HIDDEN sail_status_t fli_private_decode_copy(struct SailFliChunkReader* reader,
                                                   unsigned char* pixels,
                                                   unsigned width,
                                                   unsigned height);
@@ -141,12 +155,12 @@ SAIL_HIDDEN sail_status_t fli_private_encode_copy(struct sail_io* io,
                                                   unsigned width,
                                                   unsigned height);
 
-SAIL_HIDDEN sail_status_t fli_private_decode_lc(struct sail_io* io,
+SAIL_HIDDEN sail_status_t fli_private_decode_lc(struct SailFliChunkReader* reader,
                                                 unsigned char* pixels,
                                                 unsigned width,
                                                 unsigned height);
 
-SAIL_HIDDEN sail_status_t fli_private_decode_ss2(struct sail_io* io,
+SAIL_HIDDEN sail_status_t fli_private_decode_ss2(struct SailFliChunkReader* reader,
                                                  unsigned char* pixels,
                                                  unsigned width,
                                                  unsigned height);

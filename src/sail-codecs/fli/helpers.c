@@ -31,6 +31,26 @@
 
 #include "helpers.h"
 
+void fli_private_init_chunk_reader(struct SailFliChunkReader* reader, struct sail_io* io, uint32_t payload_size)
+{
+    reader->io         = io;
+    reader->bytes_left = payload_size;
+}
+
+sail_status_t fli_private_chunk_read(struct SailFliChunkReader* reader, void* buffer, size_t size)
+{
+    if (size > reader->bytes_left)
+    {
+        SAIL_LOG_ERROR("FLI: Chunk is truncated: %zu bytes requested, %u bytes left", size, reader->bytes_left);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    SAIL_TRY(reader->io->strict_read(reader->io->stream, buffer, size));
+    reader->bytes_left -= (uint32_t)size;
+
+    return SAIL_OK;
+}
+
 sail_status_t fli_private_read_header(struct sail_io* io, struct SailFliHeader* header)
 {
     SAIL_TRY(io->strict_read(io->stream, &header->size, sizeof(header->size)));
@@ -119,20 +139,18 @@ sail_status_t fli_private_write_chunk_header(struct sail_io* io, const struct Sa
     return SAIL_OK;
 }
 
-sail_status_t fli_private_decode_color64(struct sail_io* io, uint32_t chunk_size, struct sail_palette* palette)
+sail_status_t fli_private_decode_color64(struct SailFliChunkReader* reader, struct sail_palette* palette)
 {
-    (void)chunk_size;
-
     uint16_t packets;
-    SAIL_TRY(io->strict_read(io->stream, &packets, sizeof(packets)));
+    SAIL_TRY(fli_private_chunk_read(reader, &packets, sizeof(packets)));
 
     unsigned index = 0;
 
     for (uint16_t i = 0; i < packets; i++)
     {
         uint8_t skip, count;
-        SAIL_TRY(io->strict_read(io->stream, &skip, sizeof(skip)));
-        SAIL_TRY(io->strict_read(io->stream, &count, sizeof(count)));
+        SAIL_TRY(fli_private_chunk_read(reader, &skip, sizeof(skip)));
+        SAIL_TRY(fli_private_chunk_read(reader, &count, sizeof(count)));
 
         index += skip;
 
@@ -142,7 +160,7 @@ sail_status_t fli_private_decode_color64(struct sail_io* io, uint32_t chunk_size
         for (unsigned j = 0; j < colors_to_read && index < 256; j++, index++)
         {
             uint8_t rgb[3];
-            SAIL_TRY(io->strict_read(io->stream, rgb, 3));
+            SAIL_TRY(fli_private_chunk_read(reader, rgb, 3));
 
             /* FLI COLOR64 uses 6-bit color values (0-63), scale to 8-bit (0-255). */
             unsigned char* pal_entry = (unsigned char*)palette->data + index * 3;
@@ -155,20 +173,18 @@ sail_status_t fli_private_decode_color64(struct sail_io* io, uint32_t chunk_size
     return SAIL_OK;
 }
 
-sail_status_t fli_private_decode_color256(struct sail_io* io, uint32_t chunk_size, struct sail_palette* palette)
+sail_status_t fli_private_decode_color256(struct SailFliChunkReader* reader, struct sail_palette* palette)
 {
-    (void)chunk_size;
-
     uint16_t packets;
-    SAIL_TRY(io->strict_read(io->stream, &packets, sizeof(packets)));
+    SAIL_TRY(fli_private_chunk_read(reader, &packets, sizeof(packets)));
 
     unsigned index = 0;
 
     for (uint16_t i = 0; i < packets; i++)
     {
         uint8_t skip, count;
-        SAIL_TRY(io->strict_read(io->stream, &skip, sizeof(skip)));
-        SAIL_TRY(io->strict_read(io->stream, &count, sizeof(count)));
+        SAIL_TRY(fli_private_chunk_read(reader, &skip, sizeof(skip)));
+        SAIL_TRY(fli_private_chunk_read(reader, &count, sizeof(count)));
 
         index += skip;
 
@@ -178,7 +194,7 @@ sail_status_t fli_private_decode_color256(struct sail_io* io, uint32_t chunk_siz
         for (unsigned j = 0; j < colors_to_read && index < 256; j++, index++)
         {
             uint8_t rgb[3];
-            SAIL_TRY(io->strict_read(io->stream, rgb, 3));
+            SAIL_TRY(fli_private_chunk_read(reader, rgb, 3));
 
             /* FLI COLOR256 uses 8-bit color values. */
             unsigned char* pal_entry = (unsigned char*)palette->data + index * 3;
@@ -212,7 +228,10 @@ sail_status_t fli_private_encode_color256(struct sail_io* io, const struct sail_
     return SAIL_OK;
 }
 
-sail_status_t fli_private_decode_brun(struct sail_io* io, unsigned char* pixels, unsigned width, unsigned height)
+sail_status_t fli_private_decode_brun(struct SailFliChunkReader* reader,
+                                      unsigned char* pixels,
+                                      unsigned width,
+                                      unsigned height)
 {
     /* BRUN format: each line starts with packet count byte, followed by packets. */
     for (unsigned y = 0; y < height; y++)
@@ -222,12 +241,12 @@ sail_status_t fli_private_decode_brun(struct sail_io* io, unsigned char* pixels,
 
         /* Read packet count for this line. */
         uint8_t packet_count;
-        SAIL_TRY(io->strict_read(io->stream, &packet_count, sizeof(packet_count)));
+        SAIL_TRY(fli_private_chunk_read(reader, &packet_count, sizeof(packet_count)));
 
         for (uint8_t pkt = 0; pkt < packet_count && x < width; pkt++)
         {
             int8_t packet_type;
-            SAIL_TRY(io->strict_read(io->stream, &packet_type, sizeof(packet_type)));
+            SAIL_TRY(fli_private_chunk_read(reader, &packet_type, sizeof(packet_type)));
 
             if (packet_type > 0)
             {
@@ -238,7 +257,7 @@ sail_status_t fli_private_decode_brun(struct sail_io* io, unsigned char* pixels,
                     count = width - x;
                 }
                 uint8_t value;
-                SAIL_TRY(io->strict_read(io->stream, &value, sizeof(value)));
+                SAIL_TRY(fli_private_chunk_read(reader, &value, sizeof(value)));
                 memset(line + x, value, count);
                 x += count;
             }
@@ -250,7 +269,7 @@ sail_status_t fli_private_decode_brun(struct sail_io* io, unsigned char* pixels,
                 {
                     count = width - x;
                 }
-                SAIL_TRY(io->strict_read(io->stream, line + x, count));
+                SAIL_TRY(fli_private_chunk_read(reader, line + x, count));
                 x += count;
             }
         }
@@ -368,12 +387,15 @@ sail_status_t fli_private_encode_brun(struct sail_io* io, const unsigned char* p
     return SAIL_OK;
 }
 
-sail_status_t fli_private_decode_copy(struct sail_io* io, unsigned char* pixels, unsigned width, unsigned height)
+sail_status_t fli_private_decode_copy(struct SailFliChunkReader* reader,
+                                      unsigned char* pixels,
+                                      unsigned width,
+                                      unsigned height)
 {
     size_t frame_size;
 
     SAIL_TRY(sail_size_mul(width, height, &frame_size));
-    SAIL_TRY(io->strict_read(io->stream, pixels, frame_size));
+    SAIL_TRY(fli_private_chunk_read(reader, pixels, frame_size));
 
     return SAIL_OK;
 }
@@ -388,11 +410,14 @@ sail_status_t fli_private_encode_copy(struct sail_io* io, const unsigned char* p
     return SAIL_OK;
 }
 
-sail_status_t fli_private_decode_lc(struct sail_io* io, unsigned char* pixels, unsigned width, unsigned height)
+sail_status_t fli_private_decode_lc(struct SailFliChunkReader* reader,
+                                    unsigned char* pixels,
+                                    unsigned width,
+                                    unsigned height)
 {
     uint16_t lines_start_y, lines_count;
-    SAIL_TRY(io->strict_read(io->stream, &lines_start_y, sizeof(lines_start_y)));
-    SAIL_TRY(io->strict_read(io->stream, &lines_count, sizeof(lines_count)));
+    SAIL_TRY(fli_private_chunk_read(reader, &lines_start_y, sizeof(lines_start_y)));
+    SAIL_TRY(fli_private_chunk_read(reader, &lines_count, sizeof(lines_count)));
 
     for (uint16_t i = 0; i < lines_count; i++)
     {
@@ -404,14 +429,14 @@ sail_status_t fli_private_decode_lc(struct sail_io* io, unsigned char* pixels, u
 
         unsigned char* line = pixels + y * width;
         uint8_t packets;
-        SAIL_TRY(io->strict_read(io->stream, &packets, sizeof(packets)));
+        SAIL_TRY(fli_private_chunk_read(reader, &packets, sizeof(packets)));
 
         unsigned x = 0;
 
         for (uint8_t j = 0; j < packets; j++)
         {
             uint8_t skip;
-            SAIL_TRY(io->strict_read(io->stream, &skip, sizeof(skip)));
+            SAIL_TRY(fli_private_chunk_read(reader, &skip, sizeof(skip)));
             x += skip;
 
             if (x >= width)
@@ -420,7 +445,7 @@ sail_status_t fli_private_decode_lc(struct sail_io* io, unsigned char* pixels, u
             }
 
             int8_t packet;
-            SAIL_TRY(io->strict_read(io->stream, &packet, sizeof(packet)));
+            SAIL_TRY(fli_private_chunk_read(reader, &packet, sizeof(packet)));
 
             if (packet >= 0)
             {
@@ -430,7 +455,7 @@ sail_status_t fli_private_decode_lc(struct sail_io* io, unsigned char* pixels, u
                 {
                     count = width - x;
                 }
-                SAIL_TRY(io->strict_read(io->stream, line + x, count));
+                SAIL_TRY(fli_private_chunk_read(reader, line + x, count));
                 x += count;
             }
             else
@@ -442,7 +467,7 @@ sail_status_t fli_private_decode_lc(struct sail_io* io, unsigned char* pixels, u
                     count = width - x;
                 }
                 uint8_t value;
-                SAIL_TRY(io->strict_read(io->stream, &value, sizeof(value)));
+                SAIL_TRY(fli_private_chunk_read(reader, &value, sizeof(value)));
                 memset(line + x, value, count);
                 x += count;
             }
@@ -452,16 +477,19 @@ sail_status_t fli_private_decode_lc(struct sail_io* io, unsigned char* pixels, u
     return SAIL_OK;
 }
 
-sail_status_t fli_private_decode_ss2(struct sail_io* io, unsigned char* pixels, unsigned width, unsigned height)
+sail_status_t fli_private_decode_ss2(struct SailFliChunkReader* reader,
+                                     unsigned char* pixels,
+                                     unsigned width,
+                                     unsigned height)
 {
     uint16_t lines_count;
-    SAIL_TRY(io->strict_read(io->stream, &lines_count, sizeof(lines_count)));
+    SAIL_TRY(fli_private_chunk_read(reader, &lines_count, sizeof(lines_count)));
 
     for (uint32_t y = 0; y < lines_count && y < height; y++)
     {
         unsigned char* line = pixels + y * width;
         uint16_t packets;
-        SAIL_TRY(io->strict_read(io->stream, &packets, sizeof(packets)));
+        SAIL_TRY(fli_private_chunk_read(reader, &packets, sizeof(packets)));
 
         /* High byte of packets can indicate lines to skip. */
         uint8_t skip_lines  = (packets >> 8) & 0xFF;
@@ -485,7 +513,7 @@ sail_status_t fli_private_decode_ss2(struct sail_io* io, unsigned char* pixels, 
         for (uint16_t j = 0; j < packets; j++)
         {
             uint8_t skip;
-            SAIL_TRY(io->strict_read(io->stream, &skip, sizeof(skip)));
+            SAIL_TRY(fli_private_chunk_read(reader, &skip, sizeof(skip)));
             x += skip * 2; /* Word-aligned. */
 
             if (x >= width)
@@ -494,7 +522,7 @@ sail_status_t fli_private_decode_ss2(struct sail_io* io, unsigned char* pixels, 
             }
 
             int8_t packet;
-            SAIL_TRY(io->strict_read(io->stream, &packet, sizeof(packet)));
+            SAIL_TRY(fli_private_chunk_read(reader, &packet, sizeof(packet)));
 
             if (packet >= 0)
             {
@@ -504,7 +532,7 @@ sail_status_t fli_private_decode_ss2(struct sail_io* io, unsigned char* pixels, 
                 {
                     count = width - x;
                 }
-                SAIL_TRY(io->strict_read(io->stream, line + x, count));
+                SAIL_TRY(fli_private_chunk_read(reader, line + x, count));
                 x += count;
             }
             else
@@ -516,7 +544,7 @@ sail_status_t fli_private_decode_ss2(struct sail_io* io, unsigned char* pixels, 
                     count = width - x;
                 }
                 uint8_t value[2];
-                SAIL_TRY(io->strict_read(io->stream, value, 2));
+                SAIL_TRY(fli_private_chunk_read(reader, value, 2));
                 for (unsigned k = 0; k < count; k += 2)
                 {
                     if (x + k < width)

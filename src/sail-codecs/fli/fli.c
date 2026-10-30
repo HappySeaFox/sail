@@ -254,11 +254,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
+        struct SailFliChunkReader chunk_reader;
+        fli_private_init_chunk_reader(&chunk_reader, fli_state->io,
+                                      chunk_header.size - SAIL_FLI_CHUNK_HEADER_SIZE);
+
         switch (chunk_header.type)
         {
         case SAIL_FLI_COLOR256:
         {
-            SAIL_TRY(fli_private_decode_color256(fli_state->io, chunk_header.size, fli_state->current_palette));
+            SAIL_TRY(fli_private_decode_color256(&chunk_reader, fli_state->current_palette));
             sail_destroy_palette(image->palette);
             SAIL_TRY(sail_copy_palette(fli_state->current_palette, &image->palette));
             break;
@@ -266,7 +270,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
 
         case SAIL_FLI_COLOR64:
         {
-            SAIL_TRY(fli_private_decode_color64(fli_state->io, chunk_header.size, fli_state->current_palette));
+            SAIL_TRY(fli_private_decode_color64(&chunk_reader, fli_state->current_palette));
             sail_destroy_palette(image->palette);
             SAIL_TRY(sail_copy_palette(fli_state->current_palette, &image->palette));
             break;
@@ -281,7 +285,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         case SAIL_FLI_BRUN:
         case SAIL_FLI_DTA_BRUN:
         {
-            SAIL_TRY(fli_private_decode_brun(fli_state->io, image->pixels, image->width, image->height));
+            SAIL_TRY(fli_private_decode_brun(&chunk_reader, image->pixels, image->width, image->height));
             SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)(chunk_start_pos + chunk_header.size), SEEK_SET));
             break;
         }
@@ -289,21 +293,21 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         case SAIL_FLI_COPY:
         case SAIL_FLI_DTA_COPY:
         {
-            SAIL_TRY(fli_private_decode_copy(fli_state->io, image->pixels, image->width, image->height));
+            SAIL_TRY(fli_private_decode_copy(&chunk_reader, image->pixels, image->width, image->height));
             break;
         }
 
         case SAIL_FLI_LC:
         case SAIL_FLI_DTA_LC:
         {
-            SAIL_TRY(fli_private_decode_lc(fli_state->io, image->pixels, image->width, image->height));
+            SAIL_TRY(fli_private_decode_lc(&chunk_reader, image->pixels, image->width, image->height));
             SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)(chunk_start_pos + chunk_header.size), SEEK_SET));
             break;
         }
 
         case SAIL_FLI_SS2:
         {
-            SAIL_TRY(fli_private_decode_ss2(fli_state->io, image->pixels, image->width, image->height));
+            SAIL_TRY(fli_private_decode_ss2(&chunk_reader, image->pixels, image->width, image->height));
             SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)(chunk_start_pos + chunk_header.size), SEEK_SET));
             break;
         }
