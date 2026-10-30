@@ -107,9 +107,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tga(struct sail_io* io,
     SAIL_TRY(alloc_tga_state(io, load_options, NULL, &tga_state));
     *state = tga_state;
 
-    /* Read TGA footer. */
-    SAIL_TRY(tga_state->io->seek(tga_state->io->stream, -TGA_FOOTER_SIZE, SEEK_END));
-    SAIL_TRY(tga_private_read_file_footer(io, &tga_state->footer));
+    /* Read TGA footer. TGA 1.0 files have no footer, and small files cannot even hold it. */
+    if (tga_state->io->seek(tga_state->io->stream, -TGA_FOOTER_SIZE, SEEK_END) == SAIL_OK)
+    {
+        SAIL_TRY(tga_private_read_file_footer(io, &tga_state->footer));
+    }
+    else
+    {
+        memset(&tga_state->footer, 0, sizeof(tga_state->footer));
+    }
+
     SAIL_TRY(tga_state->io->seek(tga_state->io->stream, 0, SEEK_SET));
 
     /* The signature comes from the file and is not necessarily null-terminated. */
