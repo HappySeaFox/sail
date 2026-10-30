@@ -90,6 +90,12 @@ static const char * const SAIL_TEST_IMAGES[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_JBIG
     "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.1x1.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.63x17.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.layers.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.lrltwo.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.stripe-height.jbig",
+    "@SAIL_TEST_IMAGES_PATH@/jbig/bpp1.tpdon.jbig",
     "@SAIL_TEST_IMAGES_PATH@/jbig/stripes.jbig",
     "@SAIL_TEST_IMAGES_PATH@/jbig/black.jbig",
     "@SAIL_TEST_IMAGES_PATH@/jbig/white.jbig",
