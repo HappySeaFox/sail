@@ -240,6 +240,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         struct SailFliChunkHeader chunk_header;
         SAIL_TRY(fli_private_read_chunk_header(fli_state->io, &chunk_header));
 
+        /* Chunks smaller than their own header make the stream stand still. */
+        if (chunk_header.size < SAIL_FLI_CHUNK_HEADER_SIZE)
+        {
+            SAIL_LOG_ERROR("FLI: Invalid chunk size %u (less than the chunk header size)", chunk_header.size);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
         switch (chunk_header.type)
         {
         case SAIL_FLI_COLOR256:
@@ -296,13 +303,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
 
         case SAIL_FLI_PSTAMP:
         {
-            /* On-disk chunk header is 6 bytes (uint32 size + uint16 type). */
-            if (chunk_header.size < 6)
-            {
-                SAIL_LOG_ERROR("FLI: Invalid chunk size %u (less than header size)", chunk_header.size);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
-            }
-            size_t bytes_to_skip = chunk_header.size - 6;
+            size_t bytes_to_skip = chunk_header.size - SAIL_FLI_CHUNK_HEADER_SIZE;
             SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)bytes_to_skip, SEEK_CUR));
             break;
         }
@@ -310,13 +311,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         default:
         {
             SAIL_LOG_WARNING("FLI: Unknown chunk type %u, skipping", chunk_header.type);
-            /* On-disk chunk header is 6 bytes (uint32 size + uint16 type). */
-            if (chunk_header.size < 6)
-            {
-                SAIL_LOG_ERROR("FLI: Invalid chunk size %u (less than header size)", chunk_header.size);
-                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
-            }
-            size_t bytes_to_skip = chunk_header.size - 6;
+            size_t bytes_to_skip = chunk_header.size - SAIL_FLI_CHUNK_HEADER_SIZE;
             SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)bytes_to_skip, SEEK_CUR));
             break;
         }
@@ -327,10 +322,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &current_pos));
         size_t expected_pos = chunk_start_pos + chunk_header.size;
 
-        if (current_pos != expected_pos)
+        if (current_pos > expected_pos)
         {
-            SAIL_LOG_WARNING("FLI: Chunk %u position mismatch: at 0x%zX, expected 0x%zX (diff=%zd)", i, current_pos,
-                             expected_pos, (long)expected_pos - (long)current_pos);
+            SAIL_LOG_ERROR("FLI: Chunk %u consumed %zu bytes more than its size %u", i, current_pos - expected_pos,
+                           chunk_header.size);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+        }
+
+        if (current_pos < expected_pos)
+        {
+            SAIL_LOG_WARNING("FLI: Chunk %u position mismatch: at 0x%zX, expected 0x%zX", i, current_pos, expected_pos);
             SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)expected_pos, SEEK_SET));
         }
     }

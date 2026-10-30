@@ -41,6 +41,11 @@ struct sail_palette;
 /* Frame magic number. */
 #define SAIL_FLI_FRAME_MAGIC 0xF1FA
 
+/* On-disk header sizes. */
+#define SAIL_FLI_HEADER_SIZE       128
+#define SAIL_FLI_FRAME_HEADER_SIZE 16
+#define SAIL_FLI_CHUNK_HEADER_SIZE 6
+
 /* Chunk types. */
 #define SAIL_FLI_COLOR256 4
 #define SAIL_FLI_SS2 7
