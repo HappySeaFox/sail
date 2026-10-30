@@ -261,16 +261,24 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         case SAIL_FLI_COLOR256:
         {
             SAIL_TRY(fli_private_decode_color256(&chunk_reader, fli_state->current_palette));
+
+            struct sail_palette* palette;
+            SAIL_TRY(sail_copy_palette(fli_state->current_palette, &palette));
+
             sail_destroy_palette(image->palette);
-            SAIL_TRY(sail_copy_palette(fli_state->current_palette, &image->palette));
+            image->palette = palette;
             break;
         }
 
         case SAIL_FLI_COLOR64:
         {
             SAIL_TRY(fli_private_decode_color64(&chunk_reader, fli_state->current_palette));
+
+            struct sail_palette* palette;
+            SAIL_TRY(sail_copy_palette(fli_state->current_palette, &palette));
+
             sail_destroy_palette(image->palette);
-            SAIL_TRY(sail_copy_palette(fli_state->current_palette, &image->palette));
+            image->palette = palette;
             break;
         }
 
