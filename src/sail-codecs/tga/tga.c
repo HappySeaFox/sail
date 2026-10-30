@@ -611,13 +611,16 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_tga(void** state)
     /* Subsequent calls to finish() will expectedly fail in the above line. */
     *state = NULL;
 
-    /* Write TGA 2.0 footer. */
-    memcpy(tga_state->footer.signature, TGA_SIGNATURE, sizeof(tga_state->footer.signature));
-    tga_state->footer.extension_area_offset = (uint32_t)tga_state->extension_offset;
-    tga_state->footer.developer_area_offset = 0;
+    /* Write TGA 2.0 footer. Never write a lonely footer without an image. */
+    if (tga_state->frame_processed)
+    {
+        memcpy(tga_state->footer.signature, TGA_SIGNATURE, sizeof(tga_state->footer.signature));
+        tga_state->footer.extension_area_offset = (uint32_t)tga_state->extension_offset;
+        tga_state->footer.developer_area_offset = 0;
 
-    SAIL_TRY_OR_CLEANUP(tga_private_write_file_footer(tga_state->io, &tga_state->footer),
-                        /* cleanup */ destroy_tga_state(tga_state));
+        SAIL_TRY_OR_CLEANUP(tga_private_write_file_footer(tga_state->io, &tga_state->footer),
+                            /* cleanup */ destroy_tga_state(tga_state));
+    }
 
     destroy_tga_state(tga_state);
 
