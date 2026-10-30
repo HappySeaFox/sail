@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -30,6 +31,33 @@
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
+
+sail_status_t fli_private_seek_to(struct sail_io* io, size_t position)
+{
+    /* The I/O layer takes a long offset which is 32-bit on some platforms. */
+    if (position > LONG_MAX)
+    {
+        SAIL_LOG_ERROR("FLI: Position %zu is too far to seek to", position);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    SAIL_TRY(io->seek(io->stream, (long)position, SEEK_SET));
+
+    return SAIL_OK;
+}
+
+sail_status_t fli_private_skip(struct sail_io* io, size_t bytes)
+{
+    if (bytes > LONG_MAX)
+    {
+        SAIL_LOG_ERROR("FLI: Cannot skip %zu bytes", bytes);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    SAIL_TRY(io->seek(io->stream, (long)bytes, SEEK_CUR));
+
+    return SAIL_OK;
+}
 
 void fli_private_init_chunk_reader(struct SailFliChunkReader* reader, struct sail_io* io, uint32_t payload_size)
 {

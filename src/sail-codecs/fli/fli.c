@@ -151,7 +151,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_fli(struct sail_io* io,
     /* Frames may start past the header. oframe2 is only a loop hint for players. */
     if (fli_state->fli_header.oframe1 > SAIL_FLI_HEADER_SIZE)
     {
-        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)fli_state->fli_header.oframe1, SEEK_SET));
+        SAIL_TRY(fli_private_seek_to(fli_state->io, fli_state->fli_header.oframe1));
     }
 
     SAIL_LOG_TRACE("FLI: %s format, %ux%u, %u frames, speed=%u", fli_state->is_fli ? "FLI" : "FLC",
@@ -295,7 +295,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         case SAIL_FLI_DTA_BRUN:
         {
             SAIL_TRY(fli_private_decode_brun(&chunk_reader, image->pixels, image->width, image->height));
-            SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)(chunk_start_pos + chunk_header.size), SEEK_SET));
+            SAIL_TRY(fli_private_seek_to(fli_state->io, chunk_start_pos + chunk_header.size));
             break;
         }
 
@@ -310,29 +310,27 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         case SAIL_FLI_DTA_LC:
         {
             SAIL_TRY(fli_private_decode_lc(&chunk_reader, image->pixels, image->width, image->height));
-            SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)(chunk_start_pos + chunk_header.size), SEEK_SET));
+            SAIL_TRY(fli_private_seek_to(fli_state->io, chunk_start_pos + chunk_header.size));
             break;
         }
 
         case SAIL_FLI_SS2:
         {
             SAIL_TRY(fli_private_decode_ss2(&chunk_reader, image->pixels, image->width, image->height));
-            SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)(chunk_start_pos + chunk_header.size), SEEK_SET));
+            SAIL_TRY(fli_private_seek_to(fli_state->io, chunk_start_pos + chunk_header.size));
             break;
         }
 
         case SAIL_FLI_PSTAMP:
         {
-            size_t bytes_to_skip = chunk_header.size - SAIL_FLI_CHUNK_HEADER_SIZE;
-            SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)bytes_to_skip, SEEK_CUR));
+            SAIL_TRY(fli_private_skip(fli_state->io, chunk_header.size - SAIL_FLI_CHUNK_HEADER_SIZE));
             break;
         }
 
         default:
         {
             SAIL_LOG_WARNING("FLI: Unknown chunk type %u, skipping", chunk_header.type);
-            size_t bytes_to_skip = chunk_header.size - SAIL_FLI_CHUNK_HEADER_SIZE;
-            SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)bytes_to_skip, SEEK_CUR));
+            SAIL_TRY(fli_private_skip(fli_state->io, chunk_header.size - SAIL_FLI_CHUNK_HEADER_SIZE));
             break;
         }
         }
@@ -352,13 +350,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         if (current_pos < expected_pos)
         {
             SAIL_LOG_WARNING("FLI: Chunk %u position mismatch: at 0x%zX, expected 0x%zX", i, current_pos, expected_pos);
-            SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)expected_pos, SEEK_SET));
+            SAIL_TRY(fli_private_seek_to(fli_state->io, expected_pos));
         }
     }
 
     /* Seek to next frame using frame size from header. */
-    size_t next_frame_pos = frame_start_pos + frame_header.size;
-    SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)next_frame_pos, SEEK_SET));
+    const size_t next_frame_pos = frame_start_pos + frame_header.size;
+    SAIL_TRY(fli_private_seek_to(fli_state->io, next_frame_pos));
 
     /* Save current frame for next delta. */
     memcpy(fli_state->prev_frame, image->pixels, frame_size);
@@ -520,9 +518,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
 
         /* Update chunk size. */
         chunk_header.size = (uint32_t)(end_pos - chunk_pos);
-        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)chunk_pos, SEEK_SET));
+        SAIL_TRY(fli_private_seek_to(fli_state->io, chunk_pos));
         SAIL_TRY(fli_private_write_chunk_header(fli_state->io, &chunk_header));
-        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)end_pos, SEEK_SET));
+        SAIL_TRY(fli_private_seek_to(fli_state->io, end_pos));
 
         chunk_count++;
     }
@@ -545,9 +543,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
         SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &end_pos));
 
         chunk_header.size = (uint32_t)(end_pos - chunk_pos);
-        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)chunk_pos, SEEK_SET));
+        SAIL_TRY(fli_private_seek_to(fli_state->io, chunk_pos));
         SAIL_TRY(fli_private_write_chunk_header(fli_state->io, &chunk_header));
-        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)end_pos, SEEK_SET));
+        SAIL_TRY(fli_private_seek_to(fli_state->io, end_pos));
 
         chunk_count++;
     }
@@ -569,9 +567,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
         SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &end_pos));
 
         chunk_header.size = (uint32_t)(end_pos - chunk_pos);
-        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)chunk_pos, SEEK_SET));
+        SAIL_TRY(fli_private_seek_to(fli_state->io, chunk_pos));
         SAIL_TRY(fli_private_write_chunk_header(fli_state->io, &chunk_header));
-        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)end_pos, SEEK_SET));
+        SAIL_TRY(fli_private_seek_to(fli_state->io, end_pos));
 
         chunk_count++;
     }
@@ -583,9 +581,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
     frame_header.size   = (uint32_t)(end_pos - frame_pos);
     frame_header.chunks = chunk_count;
 
-    SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)frame_pos, SEEK_SET));
+    SAIL_TRY(fli_private_seek_to(fli_state->io, frame_pos));
     SAIL_TRY(fli_private_write_frame_header(fli_state->io, &frame_header));
-    SAIL_TRY(fli_state->io->seek(fli_state->io->stream, (long)end_pos, SEEK_SET));
+    SAIL_TRY(fli_private_seek_to(fli_state->io, end_pos));
 
     return SAIL_OK;
 }

@@ -113,6 +113,10 @@ SAIL_HIDDEN void fli_private_init_chunk_reader(struct SailFliChunkReader* reader
 
 SAIL_HIDDEN sail_status_t fli_private_chunk_read(struct SailFliChunkReader* reader, void* buffer, size_t size);
 
+SAIL_HIDDEN sail_status_t fli_private_seek_to(struct sail_io* io, size_t position);
+
+SAIL_HIDDEN sail_status_t fli_private_skip(struct sail_io* io, size_t bytes);
+
 SAIL_HIDDEN sail_status_t fli_private_read_header(struct sail_io* io, struct SailFliHeader* header);
 
 SAIL_HIDDEN sail_status_t fli_private_write_header(struct sail_io* io, const struct SailFliHeader* header);
