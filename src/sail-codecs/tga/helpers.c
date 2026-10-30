@@ -96,6 +96,8 @@ enum SailPixelFormat tga_private_sail_pixel_format(int image_type, int bpp)
     {
         switch (bpp)
         {
+        /* 15 bits per pixel is the same 5-5-5 layout with the attribute bit unused. */
+        case 15:
         case 16: return SAIL_PIXEL_FORMAT_BPP16_BGR555;
         case 24: return SAIL_PIXEL_FORMAT_BPP24_BGR;
         case 32: return SAIL_PIXEL_FORMAT_BPP32_BGRA;

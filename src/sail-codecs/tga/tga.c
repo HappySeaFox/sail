@@ -142,7 +142,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tga(void* state, st
     }
 
     const unsigned resolved_bpp = sail_bits_per_pixel(pixel_format);
-    if (resolved_bpp != (unsigned)tga_state->file_header.bpp)
+    /* 15-bit pixels occupy the same 16 bits on disk. */
+    const unsigned expected_bpp = (tga_state->file_header.bpp == 15) ? 16 : tga_state->file_header.bpp;
+
+    if (resolved_bpp != expected_bpp)
     {
         SAIL_LOG_ERROR("TGA: bpp=%d in header does not match resolved pixel format: %u bpp",
                        tga_state->file_header.bpp, resolved_bpp);
