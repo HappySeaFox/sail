@@ -305,6 +305,11 @@ struct jbig_write_context
     int options;
 };
 
+/*
+ * Remembers the first write error. jbg_enc_out() cannot be interrupted: it returns nothing
+ * and the callback has no way to report a failure back to it, so the remaining output is
+ * encoded and dropped, and the error is reported after encoding.
+ */
 static void jbig_write_callback(unsigned char* data, size_t len, void* context)
 {
     struct jbig_write_context* ctx = context;
