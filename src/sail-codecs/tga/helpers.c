@@ -34,6 +34,10 @@
 
 static const uint16_t TGA2_EXTENSION_AREA_LENGTH = 495;
 
+/* Comments occupy 4 lines of 81 bytes: 80 characters and a terminating NUL. */
+#define TGA2_COMMENT_LINES     4
+#define TGA2_COMMENT_LINE_SIZE 81
+
 sail_status_t tga_private_read_file_header(struct sail_io* io, struct TgaFileHeader* file_header)
 {
     SAIL_TRY(io->strict_read(io->stream, &file_header->id_length, sizeof(file_header->id_length)));
@@ -202,16 +206,41 @@ sail_status_t tga_private_fetch_extension(struct sail_io* io,
         }
     }
 
-    /* Comments. */
+    /* Comments. 4 lines, every line is NUL-terminated. */
     {
-        char comments[81 * 4 + 1];
-        SAIL_TRY(io->strict_read(io->stream, comments, 81));
-        SAIL_TRY(io->strict_read(io->stream, comments + 81, 81));
-        SAIL_TRY(io->strict_read(io->stream, comments + 81 * 2, 81));
-        SAIL_TRY(io->strict_read(io->stream, comments + 81 * 3, 81));
-        comments[81 * 4] = '\0';
+        char lines[TGA2_COMMENT_LINES][TGA2_COMMENT_LINE_SIZE];
+        unsigned filled_lines = 0;
 
-        if (strlen(comments) > 0)
+        for (unsigned i = 0; i < TGA2_COMMENT_LINES; i++)
+        {
+            SAIL_TRY(io->strict_read(io->stream, lines[i], sizeof(lines[i])));
+            lines[i][TGA2_COMMENT_LINE_SIZE - 1] = '\0';
+
+            if (strlen(lines[i]) > 0)
+            {
+                filled_lines = i + 1;
+            }
+        }
+
+        /* Join the lines with new lines. */
+        char comments[TGA2_COMMENT_LINES * TGA2_COMMENT_LINE_SIZE];
+        size_t offset = 0;
+
+        for (unsigned i = 0; i < filled_lines; i++)
+        {
+            if (i > 0)
+            {
+                comments[offset++] = '\n';
+            }
+
+            const size_t length = strlen(lines[i]);
+            memcpy(comments + offset, lines[i], length);
+            offset += length;
+        }
+
+        comments[offset] = '\0';
+
+        if (offset > 0)
         {
             SAIL_TRY(sail_alloc_meta_data_node(last_meta_data_node));
             SAIL_TRY(sail_alloc_meta_data_and_value_from_known_key(SAIL_META_DATA_COMMENT,
@@ -552,24 +581,39 @@ sail_status_t tga_private_write_extension_area(struct sail_io* io,
     }
     SAIL_TRY(io->strict_write(io->stream, author, sizeof(author)));
 
-    /* Comments (324 bytes = 4 lines x 81 bytes). */
-    char comments[324] = {0};
+    /* Comments (4 lines x 81 bytes). Every line must be NUL-terminated. */
+    char comments[TGA2_COMMENT_LINES][TGA2_COMMENT_LINE_SIZE] = {{0}};
+    const char* comment_str                                  = NULL;
+
     for (const struct sail_meta_data_node* node = meta_data_node; node != NULL; node = node->next)
     {
         if (node->meta_data->key == SAIL_META_DATA_COMMENT && node->meta_data->value->type == SAIL_VARIANT_TYPE_STRING)
         {
-            const char* comment_str = sail_variant_to_string(node->meta_data->value);
-            if (comment_str != NULL)
-            {
-#ifdef _MSC_VER
-                strncpy_s(comments, sizeof(comments), comment_str, 323);
-#else
-                strncpy(comments, comment_str, 323);
-#endif
-            }
+            comment_str = sail_variant_to_string(node->meta_data->value);
             break;
         }
     }
+
+    for (unsigned i = 0; i < TGA2_COMMENT_LINES && comment_str != NULL && *comment_str != '\0'; i++)
+    {
+        const char* new_line = strchr(comment_str, '\n');
+        size_t length        = (new_line == NULL) ? strlen(comment_str) : (size_t)(new_line - comment_str);
+
+        /* Longer lines are wrapped to the next comment line. */
+        if (length > TGA2_COMMENT_LINE_SIZE - 1)
+        {
+            length = TGA2_COMMENT_LINE_SIZE - 1;
+        }
+
+        memcpy(comments[i], comment_str, length);
+        comment_str += length;
+
+        if (*comment_str == '\n')
+        {
+            comment_str++;
+        }
+    }
+
     SAIL_TRY(io->strict_write(io->stream, comments, sizeof(comments)));
 
     /* Date/Time Stamp (12 bytes). */
