@@ -143,7 +143,8 @@ SAIL_HIDDEN sail_status_t fli_private_decode_brun(struct SailFliChunkReader* rea
 SAIL_HIDDEN sail_status_t fli_private_encode_brun(struct sail_io* io,
                                                   const unsigned char* pixels,
                                                   unsigned width,
-                                                  unsigned height);
+                                                  unsigned height,
+                                                  unsigned bytes_per_line);
 
 SAIL_HIDDEN sail_status_t fli_private_decode_copy(struct SailFliChunkReader* reader,
                                                   unsigned char* pixels,
@@ -153,7 +154,8 @@ SAIL_HIDDEN sail_status_t fli_private_decode_copy(struct SailFliChunkReader* rea
 SAIL_HIDDEN sail_status_t fli_private_encode_copy(struct sail_io* io,
                                                   const unsigned char* pixels,
                                                   unsigned width,
-                                                  unsigned height);
+                                                  unsigned height,
+                                                  unsigned bytes_per_line);
 
 SAIL_HIDDEN sail_status_t fli_private_decode_lc(struct SailFliChunkReader* reader,
                                                 unsigned char* pixels,

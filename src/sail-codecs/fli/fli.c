@@ -537,7 +537,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
         chunk_header.type = SAIL_FLI_BRUN;
         SAIL_TRY(fli_private_write_chunk_header(fli_state->io, &chunk_header));
 
-        SAIL_TRY(fli_private_encode_brun(fli_state->io, image->pixels, image->width, image->height));
+        SAIL_TRY(fli_private_encode_brun(fli_state->io, image->pixels, image->width, image->height, image->bytes_per_line));
 
         size_t end_pos;
         SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &end_pos));
@@ -564,7 +564,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_fli(void* state, const struct
         chunk_header.type = SAIL_FLI_COPY;
         SAIL_TRY(fli_private_write_chunk_header(fli_state->io, &chunk_header));
 
-        SAIL_TRY(fli_private_encode_copy(fli_state->io, image->pixels, image->width, image->height));
+        SAIL_TRY(fli_private_encode_copy(fli_state->io, image->pixels, image->width, image->height, image->bytes_per_line));
 
         size_t end_pos;
         SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &end_pos));

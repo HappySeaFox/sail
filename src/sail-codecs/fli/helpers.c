@@ -290,13 +290,17 @@ sail_status_t fli_private_decode_brun(struct SailFliChunkReader* reader,
     return SAIL_OK;
 }
 
-sail_status_t fli_private_encode_brun(struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height)
+sail_status_t fli_private_encode_brun(struct sail_io* io,
+                                      const unsigned char* pixels,
+                                      unsigned width,
+                                      unsigned height,
+                                      unsigned bytes_per_line)
 {
     /* BRUN format: each line starts with packet count byte, followed by packets. */
     /* First pass: build packets for all lines. */
     for (unsigned y = 0; y < height; y++)
     {
-        const unsigned char* line = pixels + y * width;
+        const unsigned char* line = pixels + (size_t)y * bytes_per_line;
 
         /* Count packets for this line. */
         unsigned packet_count = 0;
@@ -412,12 +416,17 @@ sail_status_t fli_private_decode_copy(struct SailFliChunkReader* reader,
     return SAIL_OK;
 }
 
-sail_status_t fli_private_encode_copy(struct sail_io* io, const unsigned char* pixels, unsigned width, unsigned height)
+sail_status_t fli_private_encode_copy(struct sail_io* io,
+                                      const unsigned char* pixels,
+                                      unsigned width,
+                                      unsigned height,
+                                      unsigned bytes_per_line)
 {
-    size_t frame_size;
-
-    SAIL_TRY(sail_size_mul(width, height, &frame_size));
-    SAIL_TRY(io->strict_write(io->stream, pixels, frame_size));
+    /* Scan lines are written separately as bytes_per_line may contain padding bytes. */
+    for (unsigned y = 0; y < height; y++)
+    {
+        SAIL_TRY(io->strict_write(io->stream, pixels + (size_t)y * bytes_per_line, width));
+    }
 
     return SAIL_OK;
 }
