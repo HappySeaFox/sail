@@ -597,15 +597,18 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_fli(void** state)
 
     *state = NULL;
 
-    /* Update file header with actual frame count and file size. */
-    size_t file_size;
-    SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &file_size));
+    /* Update file header with actual frame count and file size. Never write a lonely header. */
+    if (fli_state->frames_written > 0)
+    {
+        size_t file_size;
+        SAIL_TRY(fli_state->io->tell(fli_state->io->stream, &file_size));
 
-    fli_state->fli_header.size   = (uint32_t)file_size;
-    fli_state->fli_header.frames = (uint16_t)fli_state->frames_written;
+        fli_state->fli_header.size   = (uint32_t)file_size;
+        fli_state->fli_header.frames = (uint16_t)fli_state->frames_written;
 
-    SAIL_TRY(fli_state->io->seek(fli_state->io->stream, 0, SEEK_SET));
-    SAIL_TRY(fli_private_write_header(fli_state->io, &fli_state->fli_header));
+        SAIL_TRY(fli_state->io->seek(fli_state->io->stream, 0, SEEK_SET));
+        SAIL_TRY(fli_private_write_header(fli_state->io, &fli_state->fli_header));
+    }
 
     destroy_fli_state(fli_state);
 
