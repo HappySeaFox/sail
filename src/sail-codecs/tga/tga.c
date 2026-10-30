@@ -498,10 +498,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tga(void* state, const struct
 {
     struct tga_state* tga_state = state;
 
-    size_t pixels_size;
-    SAIL_TRY(sail_pixels_buffer_size(image->height, image->bytes_per_line, &pixels_size));
-
     const unsigned pixel_size = (tga_state->file_header.bpp + 7) / 8;
+    const size_t row_size     = (size_t)image->width * pixel_size;
 
     switch (tga_state->file_header.image_type)
     {
@@ -509,70 +507,82 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_tga(void* state, const struct
     case TGA_TRUE_COLOR:
     case TGA_GRAY:
     {
-        /* Write uncompressed pixel data. */
-        SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, image->pixels, pixels_size));
+        /* Write uncompressed pixel data. Scan lines are written separately as bytes_per_line
+         * may contain padding bytes.
+         */
+        for (unsigned row = 0; row < image->height; row++)
+        {
+            SAIL_TRY(tga_state->io->strict_write(
+                tga_state->io->stream, (const unsigned char*)image->pixels + (size_t)row * image->bytes_per_line,
+                row_size));
+        }
         break;
     }
     case TGA_INDEXED_RLE:
     case TGA_TRUE_COLOR_RLE:
     case TGA_GRAY_RLE:
     {
-        /* Write RLE compressed pixel data. */
-        const unsigned pixels_num   = image->width * image->height;
-        const unsigned char* pixels = image->pixels;
-
-        for (unsigned i = 0; i < pixels_num;)
+        /* Write RLE compressed pixel data. Scan lines are compressed separately as bytes_per_line
+         * may contain padding bytes.
+         */
+        for (unsigned row = 0; row < image->height; row++)
         {
-            /* Look ahead for run length. */
-            unsigned run_length                = 1;
-            const unsigned char* current_pixel = pixels;
+            const unsigned char* pixels = (const unsigned char*)image->pixels + (size_t)row * image->bytes_per_line;
 
-            /* Check for RLE run (repeated pixels). */
-            while (run_length < 128 && (i + run_length) < pixels_num)
+            for (unsigned i = 0; i < image->width;)
             {
-                if (memcmp(current_pixel, current_pixel + (size_t)run_length * pixel_size, pixel_size) != 0)
+                /* Look ahead for run length. */
+                unsigned run_length                = 1;
+                const unsigned char* current_pixel = pixels;
+
+                /* Check for RLE run (repeated pixels). */
+                while (run_length < 128 && (i + run_length) < image->width)
                 {
-                    break;
-                }
-                run_length++;
-            }
-
-            if (run_length > 1)
-            {
-                /* RLE packet: 1-bit flag (1) + 7-bit count. */
-                unsigned char marker = 0x80 | (unsigned char)(run_length - 1);
-                SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, &marker, 1));
-                SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, current_pixel, pixel_size));
-
-                pixels += (size_t)run_length * pixel_size;
-                i      += run_length;
-            }
-            else
-            {
-                /* Find raw run (non-repeated pixels). */
-                unsigned raw_length = 1;
-                while (raw_length < 128 && (i + raw_length) < pixels_num)
-                {
-                    /* Check if next pixel starts a run. */
-                    if (raw_length + 1 < 128 && (i + raw_length + 1) < pixels_num)
+                    if (memcmp(current_pixel, current_pixel + (size_t)run_length * pixel_size, pixel_size) != 0)
                     {
-                        if (memcmp(pixels + (size_t)raw_length * pixel_size,
-                                   pixels + (size_t)(raw_length + 1) * pixel_size, pixel_size)
-                            == 0)
-                        {
-                            break;
-                        }
+                        break;
                     }
-                    raw_length++;
+                    run_length++;
                 }
 
-                /* Raw packet: 1-bit flag (0) + 7-bit count. */
-                unsigned char marker = (unsigned char)(raw_length - 1);
-                SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, &marker, 1));
-                SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, pixels, (size_t)raw_length * pixel_size));
+                if (run_length > 1)
+                {
+                    /* RLE packet: 1-bit flag (1) + 7-bit count. */
+                    unsigned char marker = 0x80 | (unsigned char)(run_length - 1);
+                    SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, &marker, 1));
+                    SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, current_pixel, pixel_size));
 
-                pixels += (size_t)raw_length * pixel_size;
-                i      += raw_length;
+                    pixels += (size_t)run_length * pixel_size;
+                    i      += run_length;
+                }
+                else
+                {
+                    /* Find raw run (non-repeated pixels). */
+                    unsigned raw_length = 1;
+                    while (raw_length < 128 && (i + raw_length) < image->width)
+                    {
+                        /* Check if next pixel starts a run. */
+                        if (raw_length + 1 < 128 && (i + raw_length + 1) < image->width)
+                        {
+                            if (memcmp(pixels + (size_t)raw_length * pixel_size,
+                                       pixels + (size_t)(raw_length + 1) * pixel_size, pixel_size)
+                                == 0)
+                            {
+                                break;
+                            }
+                        }
+                        raw_length++;
+                    }
+
+                    /* Raw packet: 1-bit flag (0) + 7-bit count. */
+                    unsigned char marker = (unsigned char)(raw_length - 1);
+                    SAIL_TRY(tga_state->io->strict_write(tga_state->io->stream, &marker, 1));
+                    SAIL_TRY(
+                        tga_state->io->strict_write(tga_state->io->stream, pixels, (size_t)raw_length * pixel_size));
+
+                    pixels += (size_t)raw_length * pixel_size;
+                    i      += raw_length;
+                }
             }
         }
         break;
