@@ -418,7 +418,11 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jbig(void* state, const struc
     unsigned char* packed_pixels         = NULL;
     unsigned char* planes[1];
 
-    if (image->bytes_per_line == packed_bytes_per_line)
+    /*
+     * The encoder clears the bits beyond the image width in place, so it gets a copy
+     * unless the scan lines are both tightly packed and byte-aligned.
+     */
+    if (image->bytes_per_line == packed_bytes_per_line && image->width % 8 == 0)
     {
         planes[0] = image->pixels;
     }
