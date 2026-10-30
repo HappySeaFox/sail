@@ -225,6 +225,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_fli(void* state, struct sail_
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
+    /* Frames smaller than their own header make the stream stand still. */
+    if (frame_header.size < SAIL_FLI_FRAME_HEADER_SIZE)
+    {
+        SAIL_LOG_ERROR("FLI: Invalid frame size %u (less than the frame header size)", frame_header.size);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     size_t frame_size;
     SAIL_TRY(sail_size_mul(image->width, image->height, &frame_size));
 

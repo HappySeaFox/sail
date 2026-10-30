@@ -14,6 +14,7 @@ static const char * const SAIL_TEST_IMAGES_MUST_FAIL[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_FLI
     "@SAIL_TEST_IMAGES_PATH@/fli/zero-chunk-size.fli",
+    "@SAIL_TEST_IMAGES_PATH@/fli/zero-frame-size.fli",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_PSD
