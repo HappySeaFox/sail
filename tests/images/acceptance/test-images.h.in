@@ -182,13 +182,18 @@ static const char * const SAIL_TEST_IMAGES[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_TGA
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-grayscale.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-grayscale.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-grayscale.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-indexed.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-indexed.bpp32-palette.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp8-indexed.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp16-bgr555.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp16-bgr555.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp24-bgr.extension.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/bpp32-bgra.tga",
+    "@SAIL_TEST_IMAGES_PATH@/tga/bpp32-bgra.rle.tga",
     "@SAIL_TEST_IMAGES_PATH@/tga/test-metadata.tga",
 #endif
 
