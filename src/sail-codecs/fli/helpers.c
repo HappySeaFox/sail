@@ -239,11 +239,14 @@ sail_status_t fli_private_decode_brun(struct SailFliChunkReader* reader,
         unsigned char* line = pixels + y * width;
         unsigned x          = 0;
 
-        /* Read packet count for this line. */
+        /*
+         * Read packet count for this line. Lines wider than 255 packets don't fit into that byte,
+         * so it's just a hint. Decode until the line is complete like other FLIC decoders do.
+         */
         uint8_t packet_count;
         SAIL_TRY(fli_private_chunk_read(reader, &packet_count, sizeof(packet_count)));
 
-        for (uint8_t pkt = 0; pkt < packet_count && x < width; pkt++)
+        while (x < width)
         {
             int8_t packet_type;
             SAIL_TRY(fli_private_chunk_read(reader, &packet_type, sizeof(packet_type)));
@@ -252,25 +255,34 @@ sail_status_t fli_private_decode_brun(struct SailFliChunkReader* reader,
             {
                 /* Run packet: repeat next byte (packet_type) times. */
                 unsigned count = packet_type;
-                if (x + count > width)
+                uint8_t value;
+                SAIL_TRY(fli_private_chunk_read(reader, &value, sizeof(value)));
+
+                if (count > width - x)
                 {
                     count = width - x;
                 }
-                uint8_t value;
-                SAIL_TRY(fli_private_chunk_read(reader, &value, sizeof(value)));
+
                 memset(line + x, value, count);
                 x += count;
             }
             else if (packet_type < 0)
             {
-                /* Copy packet: read (-packet_type) bytes. */
-                unsigned count = -packet_type;
-                if (x + count > width)
-                {
-                    count = width - x;
-                }
-                SAIL_TRY(fli_private_chunk_read(reader, line + x, count));
-                x += count;
+                /* Copy packet: read (-packet_type) bytes. Always consume the whole packet. */
+                const unsigned count = -packet_type;
+                uint8_t buffer[128];
+
+                SAIL_TRY(fli_private_chunk_read(reader, buffer, count));
+
+                const unsigned to_copy = (count > width - x) ? (width - x) : count;
+                memcpy(line + x, buffer, to_copy);
+                x += to_copy;
+            }
+            else
+            {
+                /* An empty packet never completes the line. */
+                SAIL_LOG_ERROR("FLI: Empty BRUN packet in line %u", y);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
         }
     }
