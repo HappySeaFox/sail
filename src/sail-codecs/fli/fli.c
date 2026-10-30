@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -183,17 +184,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_fli(void* state, st
     image_local->pixel_format   = SAIL_PIXEL_FORMAT_BPP8_INDEXED;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
-    /* Calculate delay. */
-    if (fli_state->is_fli)
-    {
-        /* FLI: speed is in 1/70 second units. */
-        image_local->delay = (int)(fli_state->fli_header.speed * 1000.0 / 70.0);
-    }
-    else
-    {
-        /* FLC: speed is in milliseconds. */
-        image_local->delay = fli_state->fli_header.speed;
-    }
+    /* Calculate delay. Speed comes from the file and can overflow the delay. */
+    const double delay = fli_state->is_fli
+                             /* FLI: speed is in 1/70 second units. */
+                             ? fli_state->fli_header.speed * 1000.0 / 70.0
+                             /* FLC: speed is in milliseconds. */
+                             : (double)fli_state->fli_header.speed;
+
+    image_local->delay = (delay > INT_MAX) ? INT_MAX : (int)delay;
 
     /* Copy palette. */
     SAIL_TRY_OR_CLEANUP(sail_copy_palette(fli_state->current_palette, &image_local->palette),
@@ -445,10 +443,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_fli(void* state, co
         fli_state->fli_header.depth  = 8;
         fli_state->fli_header.flags  = 0;
 
+        /* Negative delays cannot be converted to the unsigned speed. */
+        const unsigned delay = (image->delay > 0) ? (unsigned)image->delay : 0;
+
         if (fli_state->is_fli)
         {
             /* FLI: convert milliseconds to 1/70 second units. */
-            fli_state->fli_header.speed = (uint32_t)(image->delay * 70.0 / 1000.0);
+            fli_state->fli_header.speed = (uint32_t)(delay * 70.0 / 1000.0);
             if (fli_state->fli_header.speed == 0)
             {
                 fli_state->fli_header.speed = 5; /* Default ~70ms. */
@@ -457,7 +458,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_fli(void* state, co
         else
         {
             /* FLC: speed is in milliseconds. */
-            fli_state->fli_header.speed = (image->delay > 0) ? image->delay : 70;
+            fli_state->fli_header.speed = (delay > 0) ? delay : 70;
         }
 
         fli_state->fli_header.aspect_x = 6;
