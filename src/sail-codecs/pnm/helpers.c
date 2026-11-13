@@ -365,9 +365,14 @@ enum SailPixelFormat pnm_private_pam_sail_pixel_format(enum SailPamTuplType tupl
     {
     case SAIL_PAM_TUPLTYPE_BLACKANDWHITE:
     {
-        if (depth == 1 && bpc == 1)
+        /* PAM stores black and white images with one sample per pixel just like grayscale ones. */
+        if (depth == 1)
         {
-            return SAIL_PIXEL_FORMAT_BPP1_INDEXED;
+            switch (bpc)
+            {
+            case 8: return SAIL_PIXEL_FORMAT_BPP8_GRAYSCALE;
+            case 16: return SAIL_PIXEL_FORMAT_BPP16_GRAYSCALE;
+            }
         }
         break;
     }
