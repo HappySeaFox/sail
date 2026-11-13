@@ -108,6 +108,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_pnm(struct sail_io* io,
     char str[8];
     SAIL_TRY(pnm_private_read_word(pnm_state->io, str, sizeof(str)));
 
+    if (str[0] != 'P')
+    {
+        SAIL_LOG_ERROR("PNM: Invalid signature");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
     const char pnm = str[1];
 
     SAIL_LOG_TRACE("PNM: Version '%c'", pnm);
