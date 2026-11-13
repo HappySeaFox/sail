@@ -72,6 +72,8 @@ SAIL_HIDDEN enum SailPixelFormat pnm_private_rgb_sail_pixel_format(enum SailPnmV
 SAIL_HIDDEN sail_status_t pnm_private_store_ascii(enum SailPnmVersion pnm_version,
                                                   struct sail_hash_map* special_properties);
 
+SAIL_HIDDEN void pnm_private_scale_pixels(void* scan_line, unsigned bytes_in_row, unsigned bpc, double multiplier);
+
 SAIL_HIDDEN sail_status_t pnm_private_read_pam_header(struct sail_io* io,
                                                       unsigned* width,
                                                       unsigned* height,

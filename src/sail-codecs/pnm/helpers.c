@@ -221,6 +221,37 @@ sail_status_t pnm_private_store_ascii(enum SailPnmVersion pnm_version, struct sa
     return SAIL_OK;
 }
 
+void pnm_private_scale_pixels(void* scan_line, unsigned bytes_in_row, unsigned bpc, double multiplier)
+{
+    if (multiplier == 1.0)
+    {
+        return;
+    }
+
+    if (bpc == 8)
+    {
+        uint8_t* scan = scan_line;
+
+        for (unsigned i = 0; i < bytes_in_row; i++)
+        {
+            const double value = scan[i] * multiplier;
+
+            scan[i] = (value > 255.0) ? 255 : (uint8_t)value;
+        }
+    }
+    else if (bpc == 16)
+    {
+        uint16_t* scan = scan_line;
+
+        for (unsigned i = 0; i < bytes_in_row / 2; i++)
+        {
+            const double value = scan[i] * multiplier;
+
+            scan[i] = (value > 65535.0) ? 65535 : (uint16_t)value;
+        }
+    }
+}
+
 sail_status_t pnm_private_read_pam_header(struct sail_io* io,
                                           unsigned* width,
                                           unsigned* height,

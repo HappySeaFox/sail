@@ -387,6 +387,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void* state, struct sail_
                 }
             }
         }
+
+        /* Binary samples are stored in the 0..MAXVAL range just like the ASCII ones. */
+        for (unsigned row = 0; row < image->height; row++)
+        {
+            pnm_private_scale_pixels(sail_scan_line(image, row), image->bytes_per_line, pnm_state->bpc,
+                                     pnm_state->multiplier_to_full_range);
+        }
         break;
     }
     case SAIL_PNM_VERSION_P7:
@@ -409,6 +416,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_pnm(void* state, struct sail_
                     pixels[i] = sail_reverse_uint16(pixels[i]);
                 }
             }
+        }
+
+        /* Binary samples are stored in the 0..MAXVAL range just like the ASCII ones. */
+        for (unsigned row = 0; row < image->height; row++)
+        {
+            pnm_private_scale_pixels(sail_scan_line(image, row), image->bytes_per_line, pnm_state->bpc,
+                                     pnm_state->multiplier_to_full_range);
         }
         break;
     }
