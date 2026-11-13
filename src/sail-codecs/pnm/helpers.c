@@ -123,7 +123,8 @@ sail_status_t pnm_private_read_pixels(
         {
             for (unsigned channel = 0; channel < channels; channel++)
             {
-                char buffer[8];
+                /* Enough for any 32-bit value. */
+                char buffer[16];
                 SAIL_TRY(pnm_private_read_word(io, buffer, sizeof(buffer)));
 
                 unsigned value;
