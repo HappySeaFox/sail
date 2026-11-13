@@ -490,11 +490,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pnm(void* state, const struct
     /* For 16-bit formats, need to swap byte order to big-endian. */
     if (pnm_state->bpc == 16)
     {
+        void* buffer;
+        SAIL_TRY(sail_malloc(image->bytes_per_line, &buffer));
+
         for (unsigned row = 0; row < image->height; row++)
         {
             const uint8_t* scan = sail_scan_line(image, row);
-            void* buffer;
-            SAIL_TRY(sail_malloc(image->bytes_per_line, &buffer));
 
             memcpy(buffer, scan, image->bytes_per_line);
 
@@ -507,8 +508,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_pnm(void* state, const struct
 
             SAIL_TRY_OR_CLEANUP(pnm_state->io->strict_write(pnm_state->io->stream, buffer, image->bytes_per_line),
                                 /* cleanup */ sail_free(buffer));
-            sail_free(buffer);
         }
+
+        sail_free(buffer);
     }
     else
     {
