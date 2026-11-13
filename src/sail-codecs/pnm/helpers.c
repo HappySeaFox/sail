@@ -138,13 +138,16 @@ sail_status_t pnm_private_read_pixels(
                     SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
                 }
 
+                /* Samples above MAXVAL come from the file, so keep them in the target range. */
+                const double scaled = value * multiplier_to_full_range;
+
                 if (SAIL_LIKELY(bpc == 8))
                 {
-                    *scan8++ = (uint8_t)(value * multiplier_to_full_range);
+                    *scan8++ = (scaled > 255.0) ? 255 : (uint8_t)scaled;
                 }
                 else
                 {
-                    *scan16++ = (uint16_t)(value * multiplier_to_full_range);
+                    *scan16++ = (scaled > 65535.0) ? 65535 : (uint16_t)scaled;
                 }
             }
         }
