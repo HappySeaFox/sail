@@ -48,7 +48,7 @@ sail_status_t pnm_private_skip_to_letters_numbers_force_read(struct sail_io* io,
                 SAIL_TRY(io->strict_read(io->stream, &c, 1));
             } while (c != '\n');
         }
-    } while (!isalnum(c));
+    } while (!isalnum((unsigned char)c));
 
     *first_char = c;
 
@@ -57,7 +57,7 @@ sail_status_t pnm_private_skip_to_letters_numbers_force_read(struct sail_io* io,
 
 sail_status_t pnm_private_skip_to_letters_numbers(struct sail_io* io, char starting_char, char* first_char)
 {
-    if (isalnum(starting_char))
+    if (isalnum((unsigned char)starting_char))
     {
         *first_char = starting_char;
         return SAIL_OK;
@@ -90,7 +90,7 @@ sail_status_t pnm_private_read_word(struct sail_io* io, char* str, size_t str_si
     }
     else
     {
-        while ((isalnum(c) || c == '_') && i < str_size - 1 && !eof)
+        while ((isalnum((unsigned char)c) || c == '_') && i < str_size - 1 && !eof)
         {
             *(str + i++) = c;
 
