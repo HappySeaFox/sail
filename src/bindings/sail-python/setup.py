@@ -68,6 +68,21 @@ def sail_version():
     _, version = find_sail_root()
     return version
 
+def is_runtime_so(path):
+    """Return True for the shared library files needed at runtime.
+
+    CMake creates libsail.so -> libsail.so.1 -> libsail.so.1.4.0. The dynamic
+    loader only looks for the SONAME (libsail.so.1); libsail.so is needed only
+    for linking. Wheels are zip files and don't keep symlinks, so copying all
+    three names would store the same library three times.
+
+    Keeps: libsail.so.1 (SONAME, copied with the real file's content) and
+    unversioned libraries such as libsail-codecs.so (SONAME is libsail-codecs.so).
+    """
+    if re.search(r'\.so\.\d+$', path.name):
+        return True
+    return path.name.endswith('.so') and not path.is_symlink()
+
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
@@ -203,7 +218,7 @@ class CMakeBuild(build_ext):
         copied_count = 0
         for search_dir in search_dirs:
             for lib_file in search_dir.glob(lib_pattern):
-                if lib_file.is_file():
+                if lib_file.is_file() and (is_windows or is_runtime_so(lib_file)):
                     # Copy to extdir for wheel packaging
                     if not (Path(extdir) / lib_file.name).exists():
                         shutil.copy2(lib_file, extdir)
