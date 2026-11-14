@@ -235,9 +235,8 @@ class CustomSDist(sdist):
 
             # Create clean archive using git archive
             subprocess.check_call(
-                ['git', 'archive', '--format=tar', 'HEAD'],
-                cwd=sail_root,
-                stdout=open(archive_dir / 'archive.tar', 'wb')
+                ['git', 'archive', '--format=tar', '--output', str(archive_dir / 'archive.tar'), 'HEAD'],
+                cwd=sail_root
             )
             subprocess.check_call(
                 ['tar', '-xf', 'archive.tar'],
