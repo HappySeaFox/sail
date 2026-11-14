@@ -42,9 +42,9 @@ def main():
         import time
 
         # Probe metadata WITHOUT loading pixels (instant!)
-        start = time.time()
+        start = time.perf_counter()
         metadata = sailpy.ImageInput.probe(probe_path)
-        probe_time = time.time() - start
+        probe_time = time.perf_counter() - start
 
         print(f"Image: {Path(probe_path).name}")
         print(f"  Dimensions: {metadata['width']}x{metadata['height']}")
@@ -63,9 +63,9 @@ def main():
         print(f"\n+ Probed without loading {pixels_size_mb:.1f}MB of pixels!")
 
         # Compare with full load
-        start = time.time()
+        start = time.perf_counter()
         full_img = sailpy.Image.from_file(probe_path)
-        load_time = time.time() - start
+        load_time = time.perf_counter() - start
 
         print(f"\nPerformance comparison:")
         print(f"  Probe time: {probe_time*1000:.2f} ms")
