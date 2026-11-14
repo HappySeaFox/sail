@@ -296,10 +296,7 @@ class CustomSDist(sdist):
 
 
 setup(
-    name='sailpy',
     version=sail_version(),
-    long_description=Path('README.md').read_text(encoding='utf-8'),
-    long_description_content_type='text/markdown',
     packages=find_packages(),
     include_package_data=True,
     ext_modules=[CMakeExtension('sailpy._libsail')],
