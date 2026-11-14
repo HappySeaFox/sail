@@ -75,7 +75,7 @@ source_venv()
 
 cleanup_build_files()
 {
-    rm -rf dist/ build/ build-python/ *.egg-info sailpy/*.so sailpy/*.dylib sailpy/*.pyd sailpy/*.dll
+    rm -rf dist/ build/ build-python/ *.egg-info sailpy/*.so sailpy/*.so.* sailpy/*.dylib sailpy/*.pyd sailpy/*.dll
 }
 
 # Function to build wheel for a specific Python version
