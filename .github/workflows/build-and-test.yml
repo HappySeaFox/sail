@@ -140,6 +140,14 @@ jobs:
           ./bootstrap-vcpkg.bat
         fi
 
+    # Remember what's in the vcpkg binary cache, so we save a new cache entry
+    # only if vcpkg had to build something
+    - name: Remember vcpkg binary cache state
+      shell: bash
+      run: |
+        mkdir -p vcpkg/archives
+        echo "VCPKG_CACHE_STATE=$(find vcpkg/archives -type f | sort | sha1sum | cut -d' ' -f1)" >> "$GITHUB_ENV"
+
     - name: Configure CMake
       shell: bash
       run: |
@@ -154,7 +162,7 @@ jobs:
           -DVCPKG_TARGET_TRIPLET=${{ matrix.config.triplet }} \
           -DVCPKG_HOST_TRIPLET=x64-windows \
           -DVCPKG_MANIFEST_DIR="${{ github.workspace }}"      \
-          -DVCPKG_INSTALL_OPTIONS="--clean-buildtrees-after-build"
+          -DVCPKG_INSTALL_OPTIONS="--clean-after-build"
 
     - name: Build
       run: cmake --build build --config Debug --target install "-j$env:NUMBER_OF_PROCESSORS"
@@ -204,8 +212,25 @@ jobs:
           -DVCPKG_MANIFEST_DIR=${{ github.workspace }}
         cmake --build build-cmake --config Debug "-j$env:NUMBER_OF_PROCESSORS"
 
+    - name: Check vcpkg binary cache state
+      id: vcpkg-cache-state
+      shell: bash
+      run: |
+        state="$(find vcpkg/archives -type f | sort | sha1sum | cut -d' ' -f1)"
+        if [ "$state" != "$VCPKG_CACHE_STATE" ]; then
+          echo "vcpkg built new packages, the cache will be saved"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+          # Only archives/ is needed to restore packages. --clean-after-build leaves
+          # the extracted tools (MSYS2, Perl, Python, ...) in downloads/tools,
+          # and the external link tests leave restored packages in packages/
+          rm -rf vcpkg/downloads vcpkg/packages vcpkg/buildtrees
+        else
+          echo "Nothing new in the vcpkg binary cache, skipping the cache save"
+        fi
+
     - name: Save vcpkg cache
-      if: success()
+      if: success() && steps.vcpkg-cache-state.outputs.changed == 'true'
       uses: actions/cache/save@v5
       with:
         path: vcpkg
