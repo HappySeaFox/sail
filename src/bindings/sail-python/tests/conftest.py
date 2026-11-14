@@ -1,7 +1,6 @@
-
 #  This file is part of SAIL (https://github.com/HappySeaFox/sail)
 #
-#  Copyright (c) 2025 Dmitry Baryshev
+#  Copyright (c) 2025-2026 Dmitry Baryshev
 #
 #  The MIT License
 #
@@ -38,13 +37,16 @@ Usage:
         img = sailpy.Image.from_file(str(webp_path))
 """
 
+import os
 import sys
 from pathlib import Path
 import pytest
 
-# Add python directory to path for importing sailpy
+# Add python directory to path for importing sailpy from the source tree.
+# CI sets SAILPY_TEST_INSTALLED=1 to test the installed wheel instead.
 python_dir = Path(__file__).parent.parent
-sys.path.insert(0, str(python_dir))
+if not os.environ.get("SAILPY_TEST_INSTALLED"):
+    sys.path.insert(0, str(python_dir))
 
 # Base directory for test images
 # __file__ is in sail/src/bindings/python/tests/conftest.py
