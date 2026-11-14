@@ -673,6 +673,9 @@ void init_image(py::module_& m)
                  sail::image img = input.next_frame();
                  if (!img.is_valid())
                  {
+                     // All frames are read: release the file right away, don't wait for the
+                     // object to be destroyed. On Windows an open file can't be deleted.
+                     input.finish();
                      throw py::stop_iteration();
                  }
                  return img;
@@ -704,13 +707,16 @@ void init_image(py::module_& m)
                     sail::image img = input.next_frame();
                     if (!img.is_valid())
                     {
+                        // All frames are read: release the file right away, don't wait for the
+                        // object to be destroyed. On Windows an open file can't be deleted.
+                        input.finish();
                         break;
                     }
                     images.push_back(std::move(img));
                 }
                 return images;
             },
-            "Load all frames/images")
+            "Load all frames/images and finish loading")
 
         .def_static(
             "probe",
