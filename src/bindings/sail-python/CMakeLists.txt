@@ -61,17 +61,6 @@ if (NOT TARGET sail)
     endif()
 endif()
 
-# Get SAIL version from parent project
-get_directory_property(SAIL_VERSION DIRECTORY ${SAIL_SOURCE_DIR} DEFINITION PROJECT_VERSION)
-message(STATUS "SAIL version: ${SAIL_VERSION}")
-
-# Generate pyproject.toml with version
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/pyproject.toml
-    @ONLY
-)
-
 set(PYTHON_BINDING_SOURCES
     src/codec_bindings.cpp
     src/core_bindings.cpp
