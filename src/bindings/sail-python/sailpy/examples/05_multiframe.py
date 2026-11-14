@@ -34,8 +34,8 @@ def main():
     try:
         # Method: load_all()
         print("  Using load_all():")
-        input = sailpy.ImageInput(test_path)
-        frames = input.load_all()
+        with sailpy.ImageInput(test_path) as input:
+            frames = input.load_all()
         print(f"    Loaded {len(frames)} frame(s)")
         for i, frame in enumerate(frames):
             print(f"    Frame {i}: {frame.width}x{frame.height}")
