@@ -297,8 +297,6 @@ class CustomSDist(sdist):
 
 setup(
     version=sail_version(),
-    packages=find_packages(),
-    include_package_data=True,
     ext_modules=[CMakeExtension('sailpy._libsail')],
     cmdclass={'build_ext': CMakeBuild, 'sdist': CustomSDist},
     zip_safe=False,
