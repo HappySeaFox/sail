@@ -33,7 +33,7 @@ endif()
 #
 # find_library(jbig_RELEASE_LIBRARY NAMES jbig libjbig)
 # find_library(jbig_DEBUG_LIBRARY NAMES jbig libjbig)
-# set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES $<$<CONFIG:Release>:${jbig_RELEASE_LIBRARY}> $<$<CONFIG:Debug>:${jbig_DEBUG_LIBRARY}>)
+# set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES "$<IF:$<CONFIG:Debug>,${jbig_DEBUG_LIBRARY},${jbig_RELEASE_LIBRARY}>")
 #
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_library,jbig libjbig,jbig libjbig" PARENT_SCOPE)
 

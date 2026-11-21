@@ -227,7 +227,10 @@ if (NOT ${dependency_name}_DEBUG_LIBRARY)
     set(${dependency_name}_DEBUG_LIBRARY \${${dependency_name}_RELEASE_LIBRARY})
 endif()
 
-set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \$<\$<CONFIG:Release>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:RelWithDebInfo>:\${${dependency_name}_RELEASE_LIBRARY}> \$<\$<CONFIG:Debug>:\${${dependency_name}_DEBUG_LIBRARY}>)
+# Debug picks the debug flavor. Any other configuration (Release, RelWithDebInfo, MinSizeRel,
+# custom ones, or an empty CMAKE_BUILD_TYPE) picks the release flavor.
+#
+set_property(TARGET SAIL::sail-codecs APPEND PROPERTY INTERFACE_LINK_LIBRARIES \"\$<IF:\$<CONFIG:Debug>,\${${dependency_name}_DEBUG_LIBRARY},\${${dependency_name}_RELEASE_LIBRARY}>\")
 ")
         elseif(dependency_search_mechanism STREQUAL "link_libraries" OR dependency_search_mechanism STREQUAL "link_frameworks")
             if (dependency_search_mechanism STREQUAL "link_frameworks")
