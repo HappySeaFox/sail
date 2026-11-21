@@ -31,6 +31,20 @@
 #include <sail/sail.h>
 
 /*
+ * Embed inih directly into this translation unit with internal linkage.
+ */
+#define INI_API static
+
+/* Simplify the parser. */
+#define INI_ALLOW_MULTILINE       0
+#define INI_ALLOW_INLINE_COMMENTS 0
+#define INI_CUSTOM_ALLOCATOR      1
+#define INI_STOP_ON_FIRST_ERROR   1
+#define INI_MAX_LINE              500
+
+#include "ini.c"
+
+/*
  * Private functions.
  */
 
