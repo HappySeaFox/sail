@@ -83,6 +83,23 @@ static sail_status_t read_line(struct sail_io* io, char* buffer, size_t buffer_s
     return SAIL_OK;
 }
 
+/* Header values come from the file, so reject everything that is not a positive finite number. */
+static bool parse_positive_float(const char* str, float* value)
+{
+    char* end = NULL;
+
+    const float parsed = strtof(str, &end);
+
+    if (end == str || !isfinite(parsed) || parsed <= 0.0f)
+    {
+        return false;
+    }
+
+    *value = parsed;
+
+    return true;
+}
+
 sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* header)
 {
     char line[1024];
@@ -118,11 +135,29 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
         /* Parse header variables. */
         if (strncmp(line, "EXPOSURE=", 9) == 0)
         {
-            header->exposure = (float)atof(line + 9);
+            float value;
+
+            if (parse_positive_float(line + 9, &value))
+            {
+                header->exposure = value;
+            }
+            else
+            {
+                SAIL_LOG_WARNING("HDR: Ignoring invalid exposure '%s'", line + 9);
+            }
         }
         else if (strncmp(line, "GAMMA=", 6) == 0)
         {
-            header->gamma = (float)atof(line + 6);
+            float value;
+
+            if (parse_positive_float(line + 6, &value))
+            {
+                header->gamma = value;
+            }
+            else
+            {
+                SAIL_LOG_WARNING("HDR: Ignoring invalid gamma '%s'", line + 6);
+            }
         }
         else if (strncmp(line, "VIEW=", 5) == 0)
         {
