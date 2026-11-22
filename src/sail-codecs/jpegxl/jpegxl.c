@@ -76,6 +76,8 @@ struct jpegxl_state
     bool is_animation;
     unsigned first_frame_width;
     unsigned first_frame_height;
+    /* Where the next meta data node of the current frame goes. */
+    struct sail_meta_data_node** last_meta_data_node;
 };
 
 static sail_status_t alloc_jpegxl_state(struct sail_io* io,
@@ -129,6 +131,8 @@ static sail_status_t alloc_jpegxl_state(struct sail_io* io,
         .is_animation       = false,
         .first_frame_width  = 0,
         .first_frame_height = 0,
+
+        .last_meta_data_node = NULL,
     };
 
     return SAIL_OK;
@@ -231,6 +235,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
 
     struct sail_image* image_local = NULL;
     SAIL_TRY(sail_alloc_image(&image_local));
+
+    jpegxl_state->last_meta_data_node = NULL;
 
     struct sail_meta_data_node** last_meta_data_node = &image_local->meta_data_node;
 
@@ -395,6 +401,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
         }
     }
 
+    /* Frame loading continues filling the same meta data list. */
+    jpegxl_state->last_meta_data_node = last_meta_data_node;
+
     *image = image_local;
 
     return SAIL_OK;
@@ -423,7 +432,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void* state, struct sa
 
     jpegxl_state->frame_header_seen = false;
 
-    struct sail_meta_data_node** last_meta_data_node = &image->meta_data_node;
+    struct sail_meta_data_node** last_meta_data_node = (jpegxl_state->last_meta_data_node != NULL)
+                                                          ? jpegxl_state->last_meta_data_node
+                                                          : &image->meta_data_node;
 
     for (status = JxlDecoderProcessInput(jpegxl_state->decoder);
          !jpegxl_state->frame_header_seen && !jpegxl_state->libjxl_success;

@@ -119,6 +119,7 @@ static const char * const SAIL_TEST_IMAGES[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_JPEGXL
     "@SAIL_TEST_IMAGES_PATH@/jpegxl/bpp24.iccp.jxl",
+    "@SAIL_TEST_IMAGES_PATH@/jpegxl/bpp24.exif.xmp.jxl",
 #endif
 
 #ifdef SAIL_HAVE_BUILTIN_PCX
