@@ -25,6 +25,7 @@
 
 #include <float.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -217,6 +218,40 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
     SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
 }
 
+/*
+ * snprintf() returns the length the line would take, which may exceed the buffer.
+ * Write what actually fits and keep the line terminated.
+ */
+static sail_status_t write_header_line(struct sail_io* io, const char* format, ...)
+{
+    char line[1024];
+
+    va_list args;
+    va_start(args, format);
+    const int printed = vsnprintf(line, sizeof(line), format, args);
+    va_end(args);
+
+    if (printed < 0)
+    {
+        SAIL_LOG_ERROR("HDR: Failed to format a header line");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
+    size_t length = (size_t)printed;
+
+    if (length >= sizeof(line))
+    {
+        SAIL_LOG_WARNING("HDR: Header line is too long and gets truncated");
+
+        length                   = sizeof(line) - 1;
+        line[sizeof(line) - 2] = '\n';
+    }
+
+    SAIL_TRY(io->strict_write(io->stream, line, length));
+
+    return SAIL_OK;
+}
+
 sail_status_t hdr_private_write_header(struct sail_io* io,
                                        const struct hdr_header* header,
                                        const struct sail_meta_data_node* meta_data_node)
@@ -239,15 +274,11 @@ sail_status_t hdr_private_write_header(struct sail_io* io,
 
     if (software != NULL)
     {
-        char comment[1024];
-        int len = snprintf(comment, sizeof(comment), "# %s\n", software);
-        SAIL_TRY(io->strict_write(io->stream, comment, len));
+        SAIL_TRY(write_header_line(io, "# %s\n", software));
     }
     else if (header->software != NULL)
     {
-        char comment[1024];
-        int len = snprintf(comment, sizeof(comment), "# %s\n", header->software);
-        SAIL_TRY(io->strict_write(io->stream, comment, len));
+        SAIL_TRY(write_header_line(io, "# %s\n", header->software));
     }
 
     /* Write format line. */
@@ -257,53 +288,40 @@ sail_status_t hdr_private_write_header(struct sail_io* io,
     /* Write EXPOSURE if not default. */
     if (header->exposure != 1.0f)
     {
-        char line[64];
-        int len = snprintf(line, sizeof(line), "EXPOSURE=%20.10f\n", header->exposure);
-        SAIL_TRY(io->strict_write(io->stream, line, len));
+        SAIL_TRY(write_header_line(io, "EXPOSURE=%20.10f\n", header->exposure));
     }
 
     /* Write GAMMA if not default. */
     if (header->gamma != 1.0f)
     {
-        char line[64];
-        int len = snprintf(line, sizeof(line), "GAMMA=%f\n", header->gamma);
-        SAIL_TRY(io->strict_write(io->stream, line, len));
+        SAIL_TRY(write_header_line(io, "GAMMA=%f\n", header->gamma));
     }
 
     /* Write VIEW if present. */
     if (header->view != NULL)
     {
-        char line[1024];
-        int len = snprintf(line, sizeof(line), "VIEW=%s\n", header->view);
-        SAIL_TRY(io->strict_write(io->stream, line, len));
+        SAIL_TRY(write_header_line(io, "VIEW=%s\n", header->view));
     }
 
     /* Write PRIMARIES if present. */
     if (header->primaries != NULL)
     {
-        char line[1024];
-        int len = snprintf(line, sizeof(line), "PRIMARIES=%s\n", header->primaries);
-        SAIL_TRY(io->strict_write(io->stream, line, len));
+        SAIL_TRY(write_header_line(io, "PRIMARIES=%s\n", header->primaries));
     }
 
     /* Write COLORCORR if not default. */
     if (header->colorcorr[0] != 1.0f || header->colorcorr[1] != 1.0f || header->colorcorr[2] != 1.0f)
     {
-        char line[128];
-        int len = snprintf(line, sizeof(line), "COLORCORR=%f %f %f\n", header->colorcorr[0], header->colorcorr[1],
-                           header->colorcorr[2]);
-        SAIL_TRY(io->strict_write(io->stream, line, len));
+        SAIL_TRY(write_header_line(io, "COLORCORR=%f %f %f\n", header->colorcorr[0], header->colorcorr[1],
+                                   header->colorcorr[2]));
     }
 
     /* Empty line marks end of header. */
     SAIL_TRY(io->strict_write(io->stream, "\n", 1));
 
     /* Write resolution line. */
-    char resolution_line[64];
-    int len = snprintf(resolution_line, sizeof(resolution_line), "%cY %d %cX %d\n", header->y_increasing ? '+' : '-',
-                       header->height, header->x_increasing ? '+' : '-', header->width);
-
-    SAIL_TRY(io->strict_write(io->stream, resolution_line, len));
+    SAIL_TRY(write_header_line(io, "%cY %d %cX %d\n", header->y_increasing ? '+' : '-', header->height,
+                               header->x_increasing ? '+' : '-', header->width));
 
     return SAIL_OK;
 }
