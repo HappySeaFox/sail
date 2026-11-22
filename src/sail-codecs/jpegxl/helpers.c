@@ -284,11 +284,14 @@ sail_status_t jpegxl_private_fetch_name(JxlDecoder* decoder,
 {
     struct sail_meta_data_node* meta_data_node_local = NULL;
 
+    /* Computing the size in 32 bits could wrap around. */
+    const size_t name_size = (size_t)name_length + 1;
+
     void* ptr;
-    SAIL_TRY(sail_malloc(name_length + 1, &ptr));
+    SAIL_TRY(sail_malloc(name_size, &ptr));
     char* name = ptr;
 
-    if (JxlDecoderGetFrameName(decoder, name, name_length + 1) != JXL_DEC_SUCCESS)
+    if (JxlDecoderGetFrameName(decoder, name, name_size) != JXL_DEC_SUCCESS)
     {
         sail_free(name);
         SAIL_LOG_ERROR("JPEGXL: Failed to get frame name");
