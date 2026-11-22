@@ -60,8 +60,6 @@ struct hdr_write_context
     struct hdr_header* header;
 };
 
-SAIL_HIDDEN bool hdr_private_is_hdr(const void* data, size_t size);
-
 SAIL_HIDDEN sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* header);
 
 SAIL_HIDDEN sail_status_t hdr_private_write_header(struct sail_io* io,

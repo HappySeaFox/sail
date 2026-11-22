@@ -34,24 +34,6 @@
 
 #include "helpers.h"
 
-bool hdr_private_is_hdr(const void* data, size_t size)
-{
-    if (data == NULL || size < 11)
-    {
-        return false;
-    }
-
-    const char* str = data;
-
-    /* Check for "#?RADIANCE" or "#?RGBE" signature. */
-    if (strncmp(str, "#?RADIANCE", 10) == 0 || strncmp(str, "#?RGBE", 6) == 0)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 static sail_status_t read_line(struct sail_io* io, char* buffer, size_t buffer_size)
 {
     size_t pos = 0;
