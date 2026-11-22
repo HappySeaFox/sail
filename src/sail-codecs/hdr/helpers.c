@@ -419,13 +419,21 @@ static sail_status_t read_old_rle_scanline(struct sail_io* io, int width, uint8_
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
-            int count = ((int)rgbe[3]) << rshift;
-            if (pos + count > width)
+            /* Runs longer than 255 pixels continue in the next markers shifted by 8 bits. */
+            if (rshift > 24)
+            {
+                SAIL_LOG_ERROR("HDR: Too many RLE run length continuations");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+            }
+
+            const uint32_t count = (uint32_t)rgbe[3] << rshift;
+
+            if (count > (uint32_t)(width - pos))
             {
                 SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
             }
 
-            for (int i = 0; i < count; i++)
+            for (uint32_t i = 0; i < count; i++)
             {
                 memcpy(&scanline[pos * 4], &scanline[(pos - 1) * 4], 4);
                 pos++;
