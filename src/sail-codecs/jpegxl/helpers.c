@@ -359,7 +359,13 @@ sail_status_t jpegxl_private_fetch_metadata(JxlDecoder* decoder, struct sail_met
                         /* cleanup */ sail_free(data), sail_destroy_meta_data_node(meta_data_node_local));
 
     JxlDecoderReleaseBoxBuffer(decoder);
-    JxlDecoderSetBoxBuffer(decoder, data, size);
+
+    if (JxlDecoderSetBoxBuffer(decoder, data, size) != JXL_DEC_SUCCESS)
+    {
+        sail_destroy_meta_data_node(meta_data_node_local);
+        SAIL_LOG_ERROR("JPEGXL: Failed to set box buffer");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
 
     *meta_data_node = meta_data_node_local;
 
