@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h> /* size_t */
 #include <stdint.h>
@@ -334,11 +335,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
                 jpegxl_private_source_pixel_format_to_output(jpegxl_state->source_image->pixel_format);
             image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 
-            if (jpegxl_state->basic_info->have_animation)
+            if (jpegxl_state->basic_info->have_animation && jpegxl_state->basic_info->animation.tps_numerator > 0)
             {
-                float ms = frame_header.duration * 1000.f * jpegxl_state->basic_info->animation.tps_denominator
-                           / jpegxl_state->basic_info->animation.tps_numerator;
-                image_local->delay = (int)ms;
+                /* Ticks come from the file, so keep the result in the range of int. */
+                const double ms = (double)frame_header.duration * 1000.0
+                                  * jpegxl_state->basic_info->animation.tps_denominator
+                                  / jpegxl_state->basic_info->animation.tps_numerator;
+
+                image_local->delay = (ms > INT_MAX) ? INT_MAX : (int)ms;
                 SAIL_LOG_TRACE("JPEGXL: Frame delay(%d) ms.", image_local->delay);
             }
             break;
