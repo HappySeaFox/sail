@@ -245,6 +245,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
         }
         case JXL_DEC_BASIC_INFO:
         {
+            /* The event may in theory arrive more than once. */
+            sail_free(jpegxl_state->basic_info);
+            jpegxl_state->basic_info = NULL;
+
             void* ptr;
             SAIL_TRY_OR_CLEANUP(sail_malloc(sizeof(JxlBasicInfo), &ptr),
                                 /* cleanup */ sail_destroy_image(image_local));
