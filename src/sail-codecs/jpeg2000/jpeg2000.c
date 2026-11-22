@@ -51,7 +51,7 @@ struct jpeg2000_state
     opj_image_t* opj_image;
 
     int channel_depth_scaled;
-    int shift;
+    unsigned max_source_value;
     unsigned image_min_dimension;
 
     bool decode_single_tile;
@@ -95,7 +95,7 @@ static sail_status_t alloc_jpeg2000_state(struct sail_io* io,
         .opj_codec            = NULL,
         .opj_image            = NULL,
         .channel_depth_scaled = 0,
-        .shift                = 0,
+        .max_source_value     = 0,
         .image_min_dimension  = 0,
 
         .decode_single_tile = false,
@@ -329,7 +329,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
         }
     }
 
-    /* Calculate scaled precision and shift. */
+    /* Calculate scaled precision. */
     jpeg2000_state->channel_depth_scaled = ((prec + 7) / 8) * 8;
 
     if (jpeg2000_state->channel_depth_scaled != 8 && jpeg2000_state->channel_depth_scaled != 16)
@@ -338,10 +338,11 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_BIT_DEPTH);
     }
 
-    jpeg2000_state->shift = jpeg2000_state->channel_depth_scaled - prec;
+    jpeg2000_state->max_source_value = (1U << prec) - 1;
 
-    SAIL_LOG_TRACE("JPEG2000: Components: %u, Precision: %u (scaled to %d), shift samples by %d", opj_image->numcomps,
-                   prec, jpeg2000_state->channel_depth_scaled, jpeg2000_state->shift);
+    SAIL_LOG_TRACE("JPEG2000: Components: %u, Precision: %u (scaled to %d), maximum sample value %u",
+                   opj_image->numcomps, prec, jpeg2000_state->channel_depth_scaled,
+                   jpeg2000_state->max_source_value);
 
     /* Determine pixel format. */
     const enum SailPixelFormat pixel_format =
@@ -403,6 +404,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void* state, struct 
     const struct jpeg2000_state* jpeg2000_state = state;
     const opj_image_t* opj_image                = jpeg2000_state->opj_image;
 
+    const unsigned max_source = jpeg2000_state->max_source_value;
+    const unsigned max_target = (jpeg2000_state->channel_depth_scaled == 8) ? 255U : 65535U;
+
     /* Copy image data component by component. */
     for (size_t row = 0; row < image->height; row++)
     {
@@ -415,7 +419,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void* state, struct 
                 for (OPJ_UINT32 comp = 0; comp < opj_image->numcomps; comp++)
                 {
                     const OPJ_INT32 value = opj_image->comps[comp].data[row * image->width + column];
-                    *scan++               = (unsigned char)(value << jpeg2000_state->shift);
+                    *scan++ = (unsigned char)jpeg2000_private_scale_sample(value, max_source, max_target);
                 }
             }
         }
@@ -428,7 +432,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void* state, struct 
                 for (OPJ_UINT32 comp = 0; comp < opj_image->numcomps; comp++)
                 {
                     const OPJ_INT32 value = opj_image->comps[comp].data[row * image->width + column];
-                    *scan++               = (uint16_t)(value << jpeg2000_state->shift);
+                    *scan++ = (uint16_t)jpeg2000_private_scale_sample(value, max_source, max_target);
                 }
             }
         }

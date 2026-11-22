@@ -23,11 +23,32 @@
     SOFTWARE.
 */
 
+#include <stdint.h>
 #include <string.h>
 
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
+
+unsigned jpeg2000_private_scale_sample(OPJ_INT32 value, unsigned max_source, unsigned max_target)
+{
+    /* Samples come from the decoder and may fall outside the declared precision. */
+    if (value <= 0)
+    {
+        return 0;
+    }
+    if ((unsigned)value >= max_source)
+    {
+        return max_target;
+    }
+    if (max_source == max_target)
+    {
+        return (unsigned)value;
+    }
+
+    /* Stretch the source range onto the target range so that the maximum maps onto the maximum. */
+    return (unsigned)(((uint64_t)(unsigned)value * max_target + max_source / 2) / max_source);
+}
 
 enum SailPixelFormat jpeg2000_private_sail_pixel_format(OPJ_COLOR_SPACE color_space, int num_comps, int prec)
 {

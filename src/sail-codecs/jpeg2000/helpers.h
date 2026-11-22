@@ -35,6 +35,8 @@
 
 struct sail_variant;
 
+SAIL_HIDDEN unsigned jpeg2000_private_scale_sample(OPJ_INT32 value, unsigned max_source, unsigned max_target);
+
 SAIL_HIDDEN enum SailPixelFormat jpeg2000_private_sail_pixel_format(OPJ_COLOR_SPACE color_space,
                                                                     int num_comps,
                                                                     int prec);
