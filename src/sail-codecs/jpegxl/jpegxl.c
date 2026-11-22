@@ -180,6 +180,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpegxl(struct sail_io* io,
     jpegxl_state->runner  = JxlResizableParallelRunnerCreate(jpegxl_state->memory_manager);
     jpegxl_state->decoder = JxlDecoderCreate(jpegxl_state->memory_manager);
 
+    if (jpegxl_state->runner == NULL || jpegxl_state->decoder == NULL)
+    {
+        SAIL_LOG_ERROR("JPEGXL: Failed to create decoder");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
+    }
+
     if (JxlDecoderSetCoalescing(jpegxl_state->decoder, JXL_TRUE) != JXL_DEC_SUCCESS)
     {
         SAIL_LOG_ERROR("JPEGXL: Failed to set coalescing");
@@ -507,10 +513,10 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_jpegxl(struct sail_io* io,
     jpegxl_state->runner  = JxlResizableParallelRunnerCreate(jpegxl_state->memory_manager);
     jpegxl_state->encoder = JxlEncoderCreate(jpegxl_state->memory_manager);
 
-    if (jpegxl_state->encoder == NULL)
+    if (jpegxl_state->runner == NULL || jpegxl_state->encoder == NULL)
     {
         SAIL_LOG_ERROR("JPEGXL: Failed to create encoder");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
 
     /* Use container format. */
@@ -590,6 +596,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpegxl(void* state,
         /* Create frame settings. */
         jpegxl_state->frame_settings = JxlEncoderFrameSettingsCreate(jpegxl_state->encoder, NULL);
 
+        if (jpegxl_state->frame_settings == NULL)
+        {
+            SAIL_LOG_ERROR("JPEGXL: Failed to create frame settings");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
+        }
+
         /* Set compression quality. */
         const double compression = (jpegxl_state->save_options->compression_level < COMPRESSION_MIN
                                     || jpegxl_state->save_options->compression_level > COMPRESSION_MAX)
@@ -628,6 +640,12 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpegxl(void* state,
         if (jpegxl_state->frame_settings == NULL)
         {
             jpegxl_state->frame_settings = JxlEncoderFrameSettingsCreate(jpegxl_state->encoder, NULL);
+
+            if (jpegxl_state->frame_settings == NULL)
+            {
+                SAIL_LOG_ERROR("JPEGXL: Failed to create frame settings");
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
+            }
         }
     }
 
