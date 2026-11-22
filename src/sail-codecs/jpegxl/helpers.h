@@ -60,7 +60,8 @@ SAIL_HIDDEN sail_status_t jpegxl_private_fetch_iccp(JxlDecoder* decoder, struct 
 SAIL_HIDDEN sail_status_t jpegxl_private_read_more_data(struct sail_io* io,
                                                         JxlDecoder* decoder,
                                                         unsigned char* buffer,
-                                                        size_t buffer_size);
+                                                        size_t buffer_size,
+                                                        size_t* input_size);
 
 SAIL_HIDDEN sail_status_t jpegxl_private_fetch_special_properties(const JxlBasicInfo* basic_info,
                                                                   struct sail_hash_map* special_properties);

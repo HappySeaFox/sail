@@ -209,29 +209,38 @@ sail_status_t jpegxl_private_fetch_iccp(JxlDecoder* decoder, struct sail_iccp** 
 sail_status_t jpegxl_private_read_more_data(struct sail_io* io,
                                             JxlDecoder* decoder,
                                             unsigned char* buffer,
-                                            size_t buffer_size)
+                                            size_t buffer_size,
+                                            size_t* input_size)
 {
     size_t remaining = JxlDecoderReleaseInput(decoder);
 
     if (remaining > 0)
     {
-        memmove(buffer, buffer + buffer_size - remaining, remaining);
+        /* The unconsumed tail sits at the end of what was actually fed to the decoder. */
+        memmove(buffer, buffer + *input_size - remaining, remaining);
     }
 
-    size_t bytes_read;
-    SAIL_TRY(io->tolerant_read(io->stream, buffer + remaining, buffer_size - remaining, &bytes_read));
+    size_t bytes_read = 0;
+    const sail_status_t read_status =
+        io->tolerant_read(io->stream, buffer + remaining, buffer_size - remaining, &bytes_read);
 
     if (bytes_read == 0)
     {
+        /* Some I/O sources like memory report the end of the stream as an error. */
         JxlDecoderCloseInput(decoder);
+        *input_size = 0;
         return SAIL_OK;
     }
+
+    SAIL_TRY(read_status);
 
     if (JxlDecoderSetInput(decoder, buffer, bytes_read + remaining) != JXL_DEC_SUCCESS)
     {
         SAIL_LOG_ERROR("JPEGXL: Failed to set input buffer");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
+
+    *input_size = bytes_read + remaining;
 
     return SAIL_OK;
 }

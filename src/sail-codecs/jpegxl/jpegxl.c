@@ -69,6 +69,8 @@ struct jpegxl_state
     /* For progressive reading. */
     unsigned char* buffer;
     size_t buffer_size;
+    /* How many bytes of the buffer were given to the decoder. */
+    size_t input_size;
     bool frame_processed;
     unsigned current_frame;
     bool is_animation;
@@ -121,6 +123,7 @@ static sail_status_t alloc_jpegxl_state(struct sail_io* io,
         .frame_settings     = NULL,
         .buffer             = buffer,
         .buffer_size        = buffer_size,
+        .input_size         = 0,
         .frame_processed    = false,
         .current_frame      = 0,
         .is_animation       = false,
@@ -245,7 +248,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
         case JXL_DEC_NEED_MORE_INPUT:
         {
             SAIL_TRY_OR_CLEANUP(jpegxl_private_read_more_data(jpegxl_state->io, jpegxl_state->decoder,
-                                                              jpegxl_state->buffer, jpegxl_state->buffer_size),
+                                                              jpegxl_state->buffer, jpegxl_state->buffer_size,
+                                                              &jpegxl_state->input_size),
                                 /* cleanup */ sail_destroy_image(image_local));
             break;
         }
@@ -435,7 +439,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void* state, struct sa
         case JXL_DEC_NEED_MORE_INPUT:
         {
             SAIL_TRY(jpegxl_private_read_more_data(jpegxl_state->io, jpegxl_state->decoder, jpegxl_state->buffer,
-                                                   jpegxl_state->buffer_size));
+                                                   jpegxl_state->buffer_size, &jpegxl_state->input_size));
             break;
         }
         case JXL_DEC_FULL_IMAGE:
