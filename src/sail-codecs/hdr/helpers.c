@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <float.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -321,13 +322,50 @@ void hdr_private_rgbe_to_float(const uint8_t* rgbe, float* rgb)
     rgb[2]  = rgbe[2] * f;
 }
 
+/*
+ * RGBE stores non-negative finite values only. Pixels may come from other codecs,
+ * so map everything else onto the closest representable value.
+ */
+static float hdr_private_sanitize_component(float value)
+{
+    if (isnan(value) || value <= 0.0f)
+    {
+        return 0.0f;
+    }
+    if (isinf(value))
+    {
+        return FLT_MAX;
+    }
+
+    return value;
+}
+
+/* Converting out-of-range floating point values to integers is undefined, so clamp them. */
+static uint8_t hdr_private_to_byte(float value)
+{
+    if (!(value > 0.0f))
+    {
+        return 0;
+    }
+    if (value > 255.0f)
+    {
+        return 255;
+    }
+
+    return (uint8_t)value;
+}
+
 void hdr_private_float_to_rgbe(const float* rgb, uint8_t* rgbe)
 {
-    float max_val = rgb[0];
-    if (rgb[1] > max_val)
-        max_val = rgb[1];
-    if (rgb[2] > max_val)
-        max_val = rgb[2];
+    const float red   = hdr_private_sanitize_component(rgb[0]);
+    const float green = hdr_private_sanitize_component(rgb[1]);
+    const float blue  = hdr_private_sanitize_component(rgb[2]);
+
+    float max_val = red;
+    if (green > max_val)
+        max_val = green;
+    if (blue > max_val)
+        max_val = blue;
 
     if (max_val < 1e-32f)
     {
@@ -338,10 +376,22 @@ void hdr_private_float_to_rgbe(const float* rgb, uint8_t* rgbe)
     int exponent;
     float mantissa = frexpf(max_val, &exponent) * 256.0f / max_val;
 
-    rgbe[0] = (uint8_t)(rgb[0] * mantissa);
-    rgbe[1] = (uint8_t)(rgb[1] * mantissa);
-    rgbe[2] = (uint8_t)(rgb[2] * mantissa);
-    rgbe[3] = (uint8_t)(exponent + 128);
+    int biased_exponent = exponent + 128;
+
+    if (biased_exponent < 0)
+    {
+        rgbe[0] = rgbe[1] = rgbe[2] = rgbe[3] = 0;
+        return;
+    }
+    if (biased_exponent > 255)
+    {
+        biased_exponent = 255;
+    }
+
+    rgbe[0] = hdr_private_to_byte(red * mantissa);
+    rgbe[1] = hdr_private_to_byte(green * mantissa);
+    rgbe[2] = hdr_private_to_byte(blue * mantissa);
+    rgbe[3] = (uint8_t)biased_exponent;
 }
 
 static sail_status_t read_old_rle_scanline(struct sail_io* io, int width, uint8_t* scanline)
