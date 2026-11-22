@@ -404,13 +404,13 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void* state, struct 
     const opj_image_t* opj_image                = jpeg2000_state->opj_image;
 
     /* Copy image data component by component. */
-    for (OPJ_UINT32 row = 0; row < image->height; row++)
+    for (size_t row = 0; row < image->height; row++)
     {
         if (jpeg2000_state->channel_depth_scaled == 8)
         {
             unsigned char* scan = sail_scan_line(image, row);
 
-            for (OPJ_UINT32 column = 0; column < image->width; column++)
+            for (size_t column = 0; column < image->width; column++)
             {
                 for (OPJ_UINT32 comp = 0; comp < opj_image->numcomps; comp++)
                 {
@@ -423,7 +423,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpeg2000(void* state, struct 
         {
             uint16_t* scan = sail_scan_line(image, row);
 
-            for (OPJ_UINT32 column = 0; column < image->width; column++)
+            for (size_t column = 0; column < image->width; column++)
             {
                 for (OPJ_UINT32 comp = 0; comp < opj_image->numcomps; comp++)
                 {
@@ -564,13 +564,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg2000(void* state, const s
     opj_image_t* opj_image                = jpeg2000_state->opj_image;
 
     /* Copy pixels from sail_image to opj_image components. */
-    for (OPJ_UINT32 row = 0; row < image->height; row++)
+    for (size_t row = 0; row < image->height; row++)
     {
         if (jpeg2000_state->channel_depth_scaled == 8)
         {
             const unsigned char* scan = sail_scan_line(image, row);
 
-            for (OPJ_UINT32 column = 0; column < image->width; column++)
+            for (size_t column = 0; column < image->width; column++)
             {
                 for (OPJ_UINT32 comp = 0; comp < opj_image->numcomps; comp++)
                 {
@@ -582,7 +582,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_jpeg2000(void* state, const s
         {
             const uint16_t* scan = sail_scan_line(image, row);
 
-            for (OPJ_UINT32 column = 0; column < image->width; column++)
+            for (size_t column = 0; column < image->width; column++)
             {
                 for (OPJ_UINT32 comp = 0; comp < opj_image->numcomps; comp++)
                 {
