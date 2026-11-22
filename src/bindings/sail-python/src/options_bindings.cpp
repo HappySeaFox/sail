@@ -52,9 +52,35 @@ void init_options_classes(py::module_& m)
             },
             py::return_value_policy::reference_internal, "Codec-specific tuning options (dict[str, Variant])")
 
+        .def_property("max_width", &sail::load_options::max_width, &sail::load_options::set_max_width,
+                      "Maximum allowed image width. Wider images are rejected with "
+                      "Status.ERROR_IMAGE_TOO_LARGE. 0 means no limit")
+
+        .def_property("max_height", &sail::load_options::max_height, &sail::load_options::set_max_height,
+                      "Maximum allowed image height. Taller images are rejected with "
+                      "Status.ERROR_IMAGE_TOO_LARGE. 0 means no limit")
+
+        .def_property(
+            "max_dimensions", &sail::load_options::max_dimensions,
+            [](sail::load_options& opts, const std::pair<unsigned, unsigned>& dimensions) {
+                opts.set_max_dimensions(dimensions.first, dimensions.second);
+            },
+            "Maximum allowed image width and height as a (width, height) tuple. 0 means no limit")
+
+        .def_property("max_pixels", &sail::load_options::max_pixels, &sail::load_options::set_max_pixels,
+                      "Maximum allowed number of pixels (width * height) in an image. Bigger images are "
+                      "rejected with Status.ERROR_IMAGE_TOO_LARGE. 0 means no limit")
+
+        .def_property("max_frames", &sail::load_options::max_frames, &sail::load_options::set_max_frames,
+                      "Maximum allowed number of frames to load. Loading the frame that follows the last "
+                      "allowed one fails with Status.ERROR_TOO_MANY_FRAMES. 0 means no limit")
+
         // Methods
         .def("__repr__", [](const sail::load_options& opts) {
-            return "LoadOptions(options=" + std::to_string(opts.options()) + ")";
+            return "LoadOptions(options=" + std::to_string(opts.options()) + ", max_width="
+                   + std::to_string(opts.max_width()) + ", max_height=" + std::to_string(opts.max_height())
+                   + ", max_pixels=" + std::to_string(opts.max_pixels())
+                   + ", max_frames=" + std::to_string(opts.max_frames()) + ")";
         });
 
     // ============================================================================

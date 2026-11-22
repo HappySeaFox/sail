@@ -285,6 +285,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_webp(struct sail_io* io,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
     }
 
+    /* Reject too large images before allocating the canvas. */
+    SAIL_TRY_OR_CLEANUP(sail_check_image_dimensions_allowed(load_options, image_local->width, image_local->height),
+                        /* cleanup */ sail_destroy_image(image_local));
+
     image_local->pixel_format   = SAIL_PIXEL_FORMAT_BPP32_RGBA;
     image_local->bytes_per_line = sail_bytes_per_line(image_local->width, image_local->pixel_format);
 

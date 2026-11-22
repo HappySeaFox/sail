@@ -319,17 +319,136 @@ static MunitResult test_multi_frame_dimensions(const MunitParameter params[], vo
 }
 
 // clang-format off
+/*
+ * Loads frames with the specified max_frames limit until loading fails. Returns the number
+ * of loaded frames and stores the status that stopped loading.
+ */
+static unsigned load_frames_with_max_frames(const char* path,
+                                            const struct sail_codec_info* codec_info,
+                                            unsigned max_frames,
+                                            sail_status_t* final_status)
+{
+    struct sail_load_options* load_options;
+    munit_assert(sail_alloc_load_options_from_features(codec_info->load_features, &load_options) == SAIL_OK);
+    load_options->max_frames = max_frames;
+
+    void* state = NULL;
+    munit_assert(sail_start_loading_from_file_with_options(path, codec_info, load_options, &state) == SAIL_OK);
+
+    unsigned frame_count = 0;
+
+    while (true)
+    {
+        struct sail_image* image = NULL;
+        *final_status            = sail_load_next_frame(state, &image);
+
+        if (*final_status != SAIL_OK)
+        {
+            break;
+        }
+
+        sail_destroy_image(image);
+        frame_count++;
+    }
+
+    munit_assert(sail_stop_loading(state) == SAIL_OK);
+    sail_destroy_load_options(load_options);
+
+    return frame_count;
+}
+
+/* Test the max_frames load option */
+static MunitResult test_multi_frame_max_frames(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    const struct sail_codec_info* codec_info;
+    munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
+
+    bool is_multi_frame =
+        (codec_info->load_features->features & (SAIL_CODEC_FEATURE_ANIMATED | SAIL_CODEC_FEATURE_MULTI_PAGED)) != 0;
+    if (!is_multi_frame)
+    {
+        return MUNIT_SKIP;
+    }
+
+    sail_status_t status;
+
+    /* 0 means no limit. */
+    const unsigned frame_count = load_frames_with_max_frames(path, codec_info, 0, &status);
+    munit_assert_int(status, ==, SAIL_ERROR_NO_MORE_FRAMES);
+    munit_assert_uint(frame_count, >, 0);
+
+    /* Images with exactly max_frames frames load fine. */
+    munit_assert_uint(load_frames_with_max_frames(path, codec_info, frame_count, &status), ==, frame_count);
+    munit_assert_int(status, ==, SAIL_ERROR_NO_MORE_FRAMES);
+
+    munit_assert_uint(load_frames_with_max_frames(path, codec_info, frame_count + 1, &status), ==, frame_count);
+    munit_assert_int(status, ==, SAIL_ERROR_NO_MORE_FRAMES);
+
+    /* The allowed frames load, and the frame that follows them is rejected. */
+    if (frame_count > 1)
+    {
+        munit_assert_uint(load_frames_with_max_frames(path, codec_info, frame_count - 1, &status), ==,
+                          frame_count - 1);
+        munit_assert_int(status, ==, SAIL_ERROR_TOO_MANY_FRAMES);
+
+        munit_assert_uint(load_frames_with_max_frames(path, codec_info, 1, &status), ==, 1);
+        munit_assert_int(status, ==, SAIL_ERROR_TOO_MANY_FRAMES);
+    }
+
+    return MUNIT_OK;
+}
+
+/* Test probing ignores the max_frames load option */
+static MunitResult test_multi_frame_probe_ignores_max_frames(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    const struct sail_codec_info* codec_info;
+    munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
+
+    struct sail_image* image = NULL;
+    if (sail_probe_file(path, &image, NULL) != SAIL_OK)
+    {
+        return MUNIT_SKIP;
+    }
+    sail_destroy_image(image);
+
+    struct sail_io* io;
+    munit_assert(sail_alloc_io_read_file(path, &io) == SAIL_OK);
+
+    struct sail_load_options* load_options;
+    munit_assert(sail_alloc_load_options_from_features(codec_info->load_features, &load_options) == SAIL_OK);
+    load_options->max_frames = 1;
+
+    image = NULL;
+    munit_assert(sail_probe_io_with_options(io, codec_info, load_options, &image) == SAIL_OK);
+
+    sail_destroy_image(image);
+    sail_destroy_load_options(load_options);
+    sail_destroy_io(io);
+
+    return MUNIT_OK;
+}
+
 static MunitParameterEnum test_params[] = {
     { (char *)"path", (char **)SAIL_TEST_IMAGES },
     { NULL, NULL },
 };
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/load-all-frames",       test_multi_frame_load_all_frames,       NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/delay-consistency",     test_multi_frame_delay_consistency,     NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/special-properties",    test_multi_frame_special_properties,    NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/codec-features",        test_multi_frame_codec_features,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-    { (char *)"/dimensions",            test_multi_frame_dimensions,            NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/load-all-frames",          test_multi_frame_load_all_frames,          NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/delay-consistency",        test_multi_frame_delay_consistency,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/special-properties",       test_multi_frame_special_properties,       NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/codec-features",           test_multi_frame_codec_features,           NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/dimensions",               test_multi_frame_dimensions,               NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/max-frames",               test_multi_frame_max_frames,               NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/probe-ignores-max-frames", test_multi_frame_probe_ignores_max_frames, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

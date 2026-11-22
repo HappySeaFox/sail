@@ -153,6 +153,20 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_init_v8_raw(struct sail_io*
         SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
+
+    // Reject too large images before unpack() and dcraw_process() decode them. Some images
+    // get smaller after the processing, so leave them to the final check that SAIL does after it.
+    // Half size processing shrinks the image. Fuji SuperCCD sizes describe a canvas rotated
+    // by 45 degrees, and the image becomes smaller after LibRaw rotates it back.
+    if (raw_state->raw_processor->imgdata.params.half_size == 0 && raw_state->raw_processor->is_fuji_rotated() == 0)
+    {
+        const libraw_image_sizes_t& sizes = raw_state->raw_processor->imgdata.sizes;
+        const bool swap_dimensions        = (sizes.flip & 4) != 0;
+
+        SAIL_TRY(sail_check_image_dimensions_allowed(load_options, swap_dimensions ? sizes.height : sizes.width,
+                                                     swap_dimensions ? sizes.width : sizes.height));
+    }
+
     if (ret = raw_state->raw_processor->unpack(); ret != LIBRAW_SUCCESS)
     {
         SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));

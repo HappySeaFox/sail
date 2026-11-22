@@ -76,13 +76,14 @@ sail_status_t start_loading_io_with_options(struct sail_io* io,
                         /* cleanup */ if (own_io) sail_destroy_io(io));
     struct hidden_state* state_of_mind = ptr;
 
-    state_of_mind->io           = io;
-    state_of_mind->own_io       = own_io;
-    state_of_mind->load_options = NULL;
-    state_of_mind->save_options = NULL;
-    state_of_mind->state        = NULL;
-    state_of_mind->codec_info   = codec_info;
-    state_of_mind->codec        = NULL;
+    state_of_mind->io            = io;
+    state_of_mind->own_io        = own_io;
+    state_of_mind->load_options  = NULL;
+    state_of_mind->save_options  = NULL;
+    state_of_mind->state         = NULL;
+    state_of_mind->codec_info    = codec_info;
+    state_of_mind->codec         = NULL;
+    state_of_mind->frames_loaded = 0;
 
     SAIL_TRY_OR_CLEANUP(load_codec_by_codec_info(state_of_mind->codec_info, &state_of_mind->codec),
                         /* cleanup */ destroy_hidden_state(state_of_mind));
@@ -135,13 +136,14 @@ sail_status_t start_saving_io_with_options(struct sail_io* io,
                         /* cleanup */ if (own_io) sail_destroy_io(io));
     struct hidden_state* state_of_mind = ptr;
 
-    state_of_mind->io           = io;
-    state_of_mind->own_io       = own_io;
-    state_of_mind->load_options = NULL;
-    state_of_mind->save_options = NULL;
-    state_of_mind->state        = NULL;
-    state_of_mind->codec_info   = codec_info;
-    state_of_mind->codec        = NULL;
+    state_of_mind->io            = io;
+    state_of_mind->own_io        = own_io;
+    state_of_mind->load_options  = NULL;
+    state_of_mind->save_options  = NULL;
+    state_of_mind->state         = NULL;
+    state_of_mind->codec_info    = codec_info;
+    state_of_mind->codec         = NULL;
+    state_of_mind->frames_loaded = 0;
 
     SAIL_TRY_OR_CLEANUP(load_codec_by_codec_info(state_of_mind->codec_info, &state_of_mind->codec),
                         /* cleanup */ destroy_hidden_state(state_of_mind));

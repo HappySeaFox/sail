@@ -47,6 +47,10 @@ static MunitResult test_load_options_construct(const MunitParameter params[], vo
 
         munit_assert(load_options.options() == 0);
         munit_assert(load_options.tuning().empty());
+        munit_assert_uint(load_options.max_width(), ==, 0);
+        munit_assert_uint(load_options.max_height(), ==, 0);
+        munit_assert_uint64(load_options.max_pixels(), ==, 0);
+        munit_assert_uint(load_options.max_frames(), ==, 0);
     }
 
     {
@@ -88,6 +92,20 @@ static MunitResult test_load_options_copy(const MunitParameter params[], void* u
         munit_assert(load_options.tuning() == load_options2.tuning());
     }
 
+    {
+        sail::load_options load_options;
+        load_options.set_max_width(8192);
+        load_options.set_max_height(4096);
+        load_options.set_max_pixels(10000000000ULL);
+        load_options.set_max_frames(100);
+
+        const sail::load_options load_options2 = load_options;
+        munit_assert_uint(load_options2.max_width(), ==, 8192);
+        munit_assert_uint(load_options2.max_height(), ==, 4096);
+        munit_assert_uint64(load_options2.max_pixels(), ==, 10000000000ULL);
+        munit_assert_uint(load_options2.max_frames(), ==, 100);
+    }
+
     return MUNIT_OK;
 }
 
@@ -121,14 +139,78 @@ static MunitResult test_load_options_move(const MunitParameter params[], void* u
         munit_assert(load_options.tuning() == load_options3.tuning());
     }
 
+    {
+        sail::load_options load_options;
+        load_options.set_max_width(8192);
+        load_options.set_max_height(4096);
+        load_options.set_max_pixels(10000000000ULL);
+        load_options.set_max_frames(100);
+
+        const sail::load_options load_options2 = std::move(load_options);
+        munit_assert_uint(load_options2.max_width(), ==, 8192);
+        munit_assert_uint(load_options2.max_height(), ==, 4096);
+        munit_assert_uint64(load_options2.max_pixels(), ==, 10000000000ULL);
+        munit_assert_uint(load_options2.max_frames(), ==, 100);
+    }
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_load_options_max_dimensions(const MunitParameter params[], void* user_data)
+{
+
+    (void)params;
+    (void)user_data;
+
+    sail::load_options load_options;
+    munit_assert(load_options.max_dimensions() == std::make_pair(0u, 0u));
+
+    load_options.set_max_dimensions(8192, 4096);
+    munit_assert_uint(load_options.max_width(), ==, 8192);
+    munit_assert_uint(load_options.max_height(), ==, 4096);
+    munit_assert_uint(load_options.max_dimensions().first, ==, 8192);
+    munit_assert_uint(load_options.max_dimensions().second, ==, 4096);
+
+    load_options.set_max_width(100);
+    munit_assert(load_options.max_dimensions() == std::make_pair(100u, 4096u));
+
+    load_options.set_max_height(200);
+    munit_assert(load_options.max_dimensions() == std::make_pair(100u, 200u));
+
+    load_options.set_max_dimensions(0, 0);
+    munit_assert(load_options.max_dimensions() == std::make_pair(0u, 0u));
+
+    return MUNIT_OK;
+}
+
+static MunitResult test_load_options_max_pixels_and_frames(const MunitParameter params[], void* user_data)
+{
+
+    (void)params;
+    (void)user_data;
+
+    sail::load_options load_options;
+
+    load_options.set_max_pixels(10000000000ULL);
+    load_options.set_max_frames(100);
+    munit_assert_uint64(load_options.max_pixels(), ==, 10000000000ULL);
+    munit_assert_uint(load_options.max_frames(), ==, 100);
+
+    load_options.set_max_pixels(0);
+    load_options.set_max_frames(0);
+    munit_assert_uint64(load_options.max_pixels(), ==, 0);
+    munit_assert_uint(load_options.max_frames(), ==, 0);
+
     return MUNIT_OK;
 }
 
 // clang-format off
 static MunitTest test_suite_tests[] = {
-    { (char *)"/construct", test_load_options_construct, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/copy",      test_load_options_copy,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/move",      test_load_options_move,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/construct",             test_load_options_construct,             NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/copy",                  test_load_options_copy,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/move",                  test_load_options_move,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/max-dimensions",        test_load_options_max_dimensions,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/max-pixels-and-frames", test_load_options_max_pixels_and_frames, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

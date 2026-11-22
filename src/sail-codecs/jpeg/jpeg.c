@@ -143,6 +143,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io* io,
 
     jpeg_read_header(jpeg_state->decompress_context, true);
 
+    /* Reject too large images before jpeg_start_decompress() allocates full image buffers for progressive JPEGs. */
+    SAIL_TRY(sail_check_image_dimensions_allowed(load_options, jpeg_state->decompress_context->image_width,
+                                                 jpeg_state->decompress_context->image_height));
+
     /* Handle the requested color space. */
     if (jpeg_state->decompress_context->jpeg_color_space == JCS_YCbCr)
     {

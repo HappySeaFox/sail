@@ -183,6 +183,12 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jbig(void* state, s
      */
     if (variable_length)
     {
+        /*
+         * Reject too wide images before decoding. The real height is not known yet,
+         * so pass 0 to skip it. SAIL checks the real height after decoding.
+         */
+        SAIL_TRY(sail_check_image_dimensions_allowed(jbig_state->load_options, (unsigned)jbig_state->width, 0));
+
         SAIL_TRY(decode_image(jbig_state));
 
         jbig_state->width  = jbg_dec_getwidth(&jbig_state->decoder);

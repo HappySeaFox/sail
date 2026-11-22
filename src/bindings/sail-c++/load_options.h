@@ -25,7 +25,9 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
+#include <utility>
 
 #include <sail-common/export.h>
 #include <sail-common/status.h>
@@ -115,6 +117,36 @@ public:
     const sail::tuning& tuning() const;
 
     /*
+     * Returns the maximum allowed image width. Loading or probing a wider image fails
+     * with SAIL_ERROR_IMAGE_TOO_LARGE. 0 means no limit.
+     */
+    unsigned max_width() const;
+
+    /*
+     * Returns the maximum allowed image height. Loading or probing a taller image fails
+     * with SAIL_ERROR_IMAGE_TOO_LARGE. 0 means no limit.
+     */
+    unsigned max_height() const;
+
+    /*
+     * Returns the maximum allowed image width (first) and height (second). Loading or probing
+     * an image that exceeds any of them fails with SAIL_ERROR_IMAGE_TOO_LARGE. 0 means no limit.
+     */
+    std::pair<unsigned, unsigned> max_dimensions() const;
+
+    /*
+     * Returns the maximum allowed number of pixels (width * height) in an image. Loading or probing
+     * a bigger image fails with SAIL_ERROR_IMAGE_TOO_LARGE. 0 means no limit.
+     */
+    std::uint64_t max_pixels() const;
+
+    /*
+     * Returns the maximum allowed number of frames to load. Loading the frame that follows
+     * the last allowed one fails with SAIL_ERROR_TOO_MANY_FRAMES. 0 means no limit.
+     */
+    unsigned max_frames() const;
+
+    /*
      * Sets new or-ed manipulation options for loading operations. See SailOption.
      */
     void set_options(int options);
@@ -123,6 +155,31 @@ public:
      * Sets new codec tuning.
      */
     void set_tuning(const sail::tuning& tuning);
+
+    /*
+     * Sets the maximum allowed image width. 0 means no limit.
+     */
+    void set_max_width(unsigned max_width);
+
+    /*
+     * Sets the maximum allowed image height. 0 means no limit.
+     */
+    void set_max_height(unsigned max_height);
+
+    /*
+     * Sets the maximum allowed image width and height. 0 means no limit.
+     */
+    void set_max_dimensions(unsigned max_width, unsigned max_height);
+
+    /*
+     * Sets the maximum allowed number of pixels (width * height) in an image. 0 means no limit.
+     */
+    void set_max_pixels(std::uint64_t max_pixels);
+
+    /*
+     * Sets the maximum allowed number of frames to load. 0 means no limit.
+     */
+    void set_max_frames(unsigned max_frames);
 
 private:
     /*

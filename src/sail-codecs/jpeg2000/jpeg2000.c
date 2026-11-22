@@ -224,6 +224,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
+    /* Reject too large images before opj_decode() allocates component buffers. */
+    for (OPJ_UINT32 i = 0; i < jpeg2000_state->opj_image->numcomps; i++)
+    {
+        SAIL_TRY(sail_check_image_dimensions_allowed(jpeg2000_state->load_options,
+                                                     jpeg2000_state->opj_image->comps[i].w,
+                                                     jpeg2000_state->opj_image->comps[i].h));
+    }
+
     /* Decode the image. */
     if (!opj_decode(jpeg2000_state->opj_codec, jpeg2000_state->opj_stream, jpeg2000_state->opj_image))
     {

@@ -34,6 +34,7 @@
 #include <sail-c++/io_base_private.h>
 #include <sail-c++/io_file.h>
 #include <sail-c++/io_memory.h>
+#include <sail-c++/load_options.h>
 #include <sail-c++/utils.h>
 
 #include <sail-c++/suppress_end.h>
@@ -284,6 +285,82 @@ static MunitResult test_can_probe_memory_then_load(const MunitParameter params[]
     return MUNIT_OK;
 }
 
+/* Probes the image with the specified dimension limits. */
+static bool probe_with_dimension_limits(const char* path,
+                                        unsigned max_width,
+                                        unsigned max_height,
+                                        std::uint64_t max_pixels = 0)
+{
+    sail::load_options load_options;
+    load_options.set_max_dimensions(max_width, max_height);
+    load_options.set_max_pixels(max_pixels);
+
+    sail::image_input input(path);
+    input.with(load_options);
+
+    return std::get<1>(input.probe()).is_valid();
+}
+
+/* Loads the first frame of the image with the specified dimension limits. */
+static sail_status_t load_with_dimension_limits(const char* path,
+                                                unsigned max_width,
+                                                unsigned max_height,
+                                                std::uint64_t max_pixels = 0)
+{
+    sail::load_options load_options;
+    load_options.set_max_dimensions(max_width, max_height);
+    load_options.set_max_pixels(max_pixels);
+
+    sail::image_input input(path);
+    input.with(load_options);
+
+    sail::image image;
+    return input.next_frame(&image);
+}
+
+static MunitResult test_dimension_limits(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    sail::image_input input(path);
+    const auto probe_result = input.probe();
+
+    /* Some acceptance images cannot be probed (for example unknown codecs). */
+    if (!std::get<1>(probe_result).is_valid())
+    {
+        return MUNIT_SKIP;
+    }
+
+    const unsigned width  = std::get<0>(probe_result).width();
+    const unsigned height = std::get<0>(probe_result).height();
+
+    const std::uint64_t pixels = static_cast<std::uint64_t>(width) * height;
+
+    munit_assert_true(probe_with_dimension_limits(path, width, height, pixels));
+    munit_assert_int(load_with_dimension_limits(path, width, height, pixels), ==, SAIL_OK);
+
+    /* 0 means no limit, so 1 pixel wide or tall images cannot exceed a limit. */
+    if (width > 1)
+    {
+        munit_assert_false(probe_with_dimension_limits(path, width - 1, 0));
+        munit_assert_int(load_with_dimension_limits(path, width - 1, 0), ==, SAIL_ERROR_IMAGE_TOO_LARGE);
+    }
+    if (height > 1)
+    {
+        munit_assert_false(probe_with_dimension_limits(path, 0, height - 1));
+        munit_assert_int(load_with_dimension_limits(path, 0, height - 1), ==, SAIL_ERROR_IMAGE_TOO_LARGE);
+    }
+    if (pixels > 1)
+    {
+        munit_assert_false(probe_with_dimension_limits(path, 0, 0, pixels - 1));
+        munit_assert_int(load_with_dimension_limits(path, 0, 0, pixels - 1), ==, SAIL_ERROR_IMAGE_TOO_LARGE);
+    }
+
+    return MUNIT_OK;
+}
+
 static MunitParameterEnum test_params[] = {
     {(char*)"path", (char**)SAIL_TEST_IMAGES},
     {NULL, NULL},
@@ -301,6 +378,7 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/can-load-io-memory5",        test_can_load_io_memory5,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-probe-then-load",        test_can_probe_then_load,        NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/can-probe-memory-then-load", test_can_probe_memory_then_load, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/dimension-limits",           test_dimension_limits,           NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

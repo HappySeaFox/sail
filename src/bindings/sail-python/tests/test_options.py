@@ -107,6 +107,211 @@ def test_load_options_with_image_input(test_jpeg):
     assert img.is_valid
 
 
+def test_load_options_max_dimensions():
+    """Test LoadOptions dimension limits"""
+    options = sailpy.LoadOptions()
+    assert options.max_width == 0
+    assert options.max_height == 0
+
+    options.max_width = 8192
+    options.max_height = 4096
+    assert options.max_width == 8192
+    assert options.max_height == 4096
+    assert "max_width=8192" in repr(options)
+    assert "max_height=4096" in repr(options)
+
+    # max_dimensions mirrors max_width and max_height
+    assert options.max_dimensions == (8192, 4096)
+
+    options.max_dimensions = (100, 200)
+    assert options.max_width == 100
+    assert options.max_height == 200
+    assert options.max_dimensions == (100, 200)
+
+    options.max_dimensions = (0, 0)
+    assert options.max_dimensions == (0, 0)
+
+    assert sailpy.Status.ERROR_IMAGE_TOO_LARGE != sailpy.Status.ERROR_INVALID_IMAGE
+
+
+def test_load_options_max_pixels_and_frames():
+    """Test LoadOptions pixel and frame limits"""
+    options = sailpy.LoadOptions()
+    assert options.max_pixels == 0
+    assert options.max_frames == 0
+
+    options.max_pixels = 10_000_000_000
+    options.max_frames = 100
+    assert options.max_pixels == 10_000_000_000
+    assert options.max_frames == 100
+    assert "max_pixels=10000000000" in repr(options)
+    assert "max_frames=100" in repr(options)
+
+    options.max_pixels = 0
+    options.max_frames = 0
+    assert options.max_pixels == 0
+    assert options.max_frames == 0
+
+    with pytest.raises(TypeError):
+        options.max_frames = -1
+
+    assert sailpy.Status.ERROR_TOO_MANY_FRAMES != sailpy.Status.ERROR_IMAGE_TOO_LARGE
+
+
+def test_load_options_max_dimensions_with_image_input(test_jpeg):
+    """Test ImageInput honors LoadOptions dimension limits"""
+    metadata = sailpy.ImageInput.probe(str(test_jpeg))
+    width = metadata["width"]
+    height = metadata["height"]
+
+    # Limits equal to the image dimensions allow loading
+    options = sailpy.LoadOptions()
+    options.max_width = width
+    options.max_height = height
+
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
+    assert input.load().is_valid
+
+    # Too wide images are rejected
+    options.max_width = width - 1
+
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
+    with pytest.raises(RuntimeError, match="ERROR_IMAGE_TOO_LARGE"):
+        input.load()
+
+    # Too tall images are rejected
+    options.max_dimensions = (0, height - 1)
+
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
+    with pytest.raises(RuntimeError, match="ERROR_IMAGE_TOO_LARGE"):
+        input.load()
+
+    # Images with too many pixels are rejected
+    options.max_dimensions = (0, 0)
+    options.max_pixels = width * height
+
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
+    assert input.load().is_valid
+
+    options.max_pixels = width * height - 1
+
+    input = sailpy.ImageInput(str(test_jpeg))
+    input.with_options(options)
+    with pytest.raises(RuntimeError, match="ERROR_IMAGE_TOO_LARGE"):
+        input.load()
+
+
+def test_load_options_probe_with_dimension_limits(test_jpeg):
+    """Test ImageInput.probe() honors LoadOptions dimension limits"""
+    path = str(test_jpeg)
+
+    def summary(metadata):
+        # LoadOptions() don't request the source image info unlike the codec defaults, so compare just these
+        return (metadata["width"], metadata["height"], metadata["codec_name"])
+
+    metadata = sailpy.ImageInput.probe(path)
+    width = metadata["width"]
+    height = metadata["height"]
+
+    # No options and default options mean no limits
+    assert sailpy.ImageInput.probe(path, None) == metadata
+    assert summary(sailpy.ImageInput.probe(path, sailpy.LoadOptions())) == summary(metadata)
+
+    # Limits equal to the image dimensions allow probing
+    options = sailpy.LoadOptions()
+    options.max_dimensions = (width, height)
+    options.max_pixels = width * height
+    assert summary(sailpy.ImageInput.probe(path, options=options)) == summary(metadata)
+
+    # Probing is not affected by the frame limit
+    options.max_frames = 1
+    assert summary(sailpy.ImageInput.probe(path, options)) == summary(metadata)
+
+    # Too large images are rejected
+    for max_width, max_height, max_pixels in (
+        (width - 1, 0, 0),
+        (0, height - 1, 0),
+        (0, 0, width * height - 1),
+    ):
+        options = sailpy.LoadOptions()
+        options.max_dimensions = (max_width, max_height)
+        options.max_pixels = max_pixels
+
+        with pytest.raises(RuntimeError, match="Failed to probe image"):
+            sailpy.ImageInput.probe(path, options)
+
+
+def test_load_options_probe_huge_dimensions(test_images_dir):
+    """Test ImageInput.probe() rejects images with huge dimensions in their headers"""
+    path = str(test_images_dir.parent / "edge-cases" / "huge-dimensions.png")
+
+    options = sailpy.LoadOptions()
+    options.max_pixels = 8192 * 8192
+
+    with pytest.raises(RuntimeError, match="Failed to probe image"):
+        sailpy.ImageInput.probe(path, options)
+
+
+def test_load_options_max_frames_with_image_input(test_images_dir):
+    """Test ImageInput honors the LoadOptions frame limit"""
+    path = str(test_images_dir / "gif" / "bpp24-rgb-animated.gif")
+
+    frame_count = len(sailpy.ImageInput(path).load_all())
+    assert frame_count > 1
+
+    # Images with exactly max_frames frames load fine
+    options = sailpy.LoadOptions()
+    options.max_frames = frame_count
+
+    input = sailpy.ImageInput(path)
+    input.with_options(options)
+    assert len(input.load_all()) == frame_count
+
+    # The frame that follows the last allowed one is rejected
+    options.max_frames = 1
+
+    input = sailpy.ImageInput(path)
+    input.with_options(options)
+    assert input.load().is_valid
+    with pytest.raises(RuntimeError, match="ERROR_TOO_MANY_FRAMES"):
+        input.load()
+
+    input = sailpy.ImageInput(path)
+    input.with_options(options)
+    with pytest.raises(RuntimeError, match="ERROR_TOO_MANY_FRAMES"):
+        input.load_all()
+
+    # Iteration yields the allowed frames and then raises
+    frames = []
+    input = sailpy.ImageInput(path)
+    input.with_options(options)
+    with pytest.raises(RuntimeError, match="ERROR_TOO_MANY_FRAMES"):
+        for frame in input:
+            frames.append(frame)
+    assert len(frames) == 1
+
+
+def test_load_options_limit_errors_are_not_end_of_image(test_images_dir):
+    """Test images that exceed the limits raise instead of looking empty"""
+    path = str(test_images_dir / "gif" / "bpp24-rgb-animated.gif")
+
+    options = sailpy.LoadOptions()
+    options.max_dimensions = (1, 1)
+
+    with pytest.raises(RuntimeError, match="ERROR_IMAGE_TOO_LARGE"):
+        sailpy.ImageInput(path).with_options(options).load()
+
+    with pytest.raises(RuntimeError, match="ERROR_IMAGE_TOO_LARGE"):
+        sailpy.ImageInput(path).with_options(options).load_all()
+
+    with pytest.raises(RuntimeError, match="ERROR_IMAGE_TOO_LARGE"):
+        list(sailpy.ImageInput(path).with_options(options))
+
+
 # ============================================================================
 # SaveOptions - Full Coverage
 # ============================================================================

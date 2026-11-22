@@ -368,8 +368,15 @@ Low-level interface for loading images with more control.
 # Basic usage
 input = ImageInput(path: str)
 frames = input.load_all()  # Load all frames
-frame = input.next_frame()  # Load next frame
-input.stop()  # Stop loading
+frame = input.load()  # Load next frame
+input.finish()  # Finish loading
+
+# Iterate over frames
+for frame in ImageInput(path):
+    ...
+
+# Errors like broken images or images that exceed the load options limits raise RuntimeError
+# in load(), load_all(), and iteration. They don't look like the end of the image.
 
 # With custom options (builder pattern)
 options = LoadOptions()
@@ -487,9 +494,19 @@ options = LoadOptions()
 # Most codecs don't require load options
 # LoadOptions.tuning is available for codec-specific settings if needed
 
+# Reject images larger than 16384x16384 or 64 megapixels (0 means no limit)
+options.max_dimensions = (16384, 16384)  # Or set max_width and max_height separately
+options.max_pixels = 8192 * 8192
+
+# Load at most 1000 frames. Loading more frames raises RuntimeError (0 means no limit)
+options.max_frames = 1000
+
 # Use with ImageInput
 input = ImageInput("image.tiff").with_options(options)
 frames = input.load_all()
+
+# Probing honors the dimension limits too and raises RuntimeError for too large images
+metadata = ImageInput.probe("image.tiff", options)
 ```
 
 #### `Resolution`

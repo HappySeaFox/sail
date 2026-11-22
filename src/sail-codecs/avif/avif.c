@@ -183,6 +183,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_avif(struct sail_io* io,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
+    /* Reject too large images before avifDecoderNextImage() decodes them. */
+    SAIL_TRY(sail_check_image_dimensions_allowed(load_options, avif_state->avif_decoder->image->width,
+                                                 avif_state->avif_decoder->image->height));
+
     return SAIL_OK;
 }
 

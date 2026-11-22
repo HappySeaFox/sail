@@ -92,8 +92,27 @@ sail_status_t sail_load_next_frame(void* state, struct sail_image** image)
     struct sail_image* image_local;
     SAIL_TRY(state_of_mind->codec->v8->load_seek_next_frame(state_of_mind->state, &image_local));
 
+    /*
+     * The codec found one more frame. Reject it if all the allowed frames have been loaded already.
+     * Images that have exactly max_frames frames load fine as the codec reports no more frames.
+     */
+    const unsigned max_frames = (state_of_mind->load_options == NULL) ? 0 : state_of_mind->load_options->max_frames;
+
+    if (max_frames > 0 && state_of_mind->frames_loaded >= max_frames)
+    {
+        sail_destroy_image(image_local);
+        SAIL_LOG_ERROR("The number of frames exceeds the allowed maximum of %u", max_frames);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_TOO_MANY_FRAMES);
+    }
+
+    state_of_mind->frames_loaded++;
+
     SAIL_TRY_OR_CLEANUP(sail_check_image_skeleton_valid(image_local),
                         /* cleanup */ sail_destroy_image(image_local));
+
+    SAIL_TRY_OR_CLEANUP(
+        sail_check_image_dimensions_allowed(state_of_mind->load_options, image_local->width, image_local->height),
+        /* cleanup */ sail_destroy_image(image_local));
 
     if (image_local->pixels != NULL)
     {

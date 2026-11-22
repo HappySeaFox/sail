@@ -50,6 +50,9 @@ struct hidden_state
     /* Shallow pointers to internal data structures so no need to free these. */
     const struct sail_codec_info* codec_info;
     const struct sail_codec* codec;
+
+    /* The number of frames returned by the codec so far. Used to honor max_frames. */
+    unsigned frames_loaded;
 };
 
 SAIL_HIDDEN sail_status_t load_codec_by_codec_info(const struct sail_codec_info* codec_info,

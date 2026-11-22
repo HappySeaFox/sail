@@ -188,6 +188,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_gif(struct sail_io* io,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
     }
 
+    /* Reject too large images before allocating the canvas. */
+    SAIL_TRY(sail_check_image_dimensions_allowed(load_options, (unsigned)gif_state->gif->SWidth,
+                                                 (unsigned)gif_state->gif->SHeight));
+
     void* ptr;
     size_t buf_size;
 

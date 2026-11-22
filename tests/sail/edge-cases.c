@@ -31,6 +31,8 @@
 
 #include "munit.h"
 
+#include "dimension-limits.h"
+
 /* Test loading 1x1 pixel image */
 static MunitResult test_edge_1x1_image(const MunitParameter params[], void* user_data)
 {
@@ -506,6 +508,168 @@ static MunitResult test_edge_partial_frame_cleanup(const MunitParameter params[]
 #endif
 }
 
+/* Test dimension limits with a Fuji SuperCCD RAW image that LibRaw rotates by 45 degrees */
+static MunitResult test_edge_raw_fuji_superccd_dimension_limits(const MunitParameter params[], void* user_data)
+{
+    (void)params;
+    (void)user_data;
+
+#ifdef SAIL_HAVE_BUILTIN_RAW
+    const char* path = SAIL_TEST_IMAGES_EDGE_CASES_PATH "/fuji-superccd.raf";
+
+    const struct sail_codec_info* codec_info;
+    munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
+
+    /*
+     * Before the processing, LibRaw reports the sizes of a 64x63 canvas rotated by 45 degrees.
+     * The final image after rotating the canvas back is 43x45. Its 1935 pixels are fewer
+     * than the 4032 pixels of the canvas.
+     */
+    struct sail_image* image = NULL;
+    munit_assert(sail_probe_file(path, &image, NULL) == SAIL_OK);
+    munit_assert_uint(image->width, ==, 43);
+    munit_assert_uint(image->height, ==, 45);
+    sail_destroy_image(image);
+
+    /* Limits between the final image and the canvas sizes must not reject the image. */
+    bool failed_in_start;
+    munit_assert_int(dimension_limits_load(path, codec_info, 50, 50, 0, &failed_in_start), ==, SAIL_OK);
+    munit_assert_int(dimension_limits_probe(path, codec_info, 50, 50, 0), ==, SAIL_OK);
+    munit_assert_int(dimension_limits_load(path, codec_info, 0, 0, 2000, &failed_in_start), ==, SAIL_OK);
+    munit_assert_int(dimension_limits_probe(path, codec_info, 0, 0, 2000), ==, SAIL_OK);
+    munit_assert_int(dimension_limits_load(path, codec_info, 43, 45, 43 * 45, &failed_in_start), ==, SAIL_OK);
+
+    /* The codec skips the early check for such images, so SAIL rejects them after the processing. */
+    munit_assert_int(dimension_limits_load(path, codec_info, 42, 0, 0, &failed_in_start), ==,
+                     SAIL_ERROR_IMAGE_TOO_LARGE);
+    munit_assert_false(failed_in_start);
+    munit_assert_int(dimension_limits_load(path, codec_info, 0, 44, 0, &failed_in_start), ==,
+                     SAIL_ERROR_IMAGE_TOO_LARGE);
+    munit_assert_false(failed_in_start);
+    munit_assert_int(dimension_limits_load(path, codec_info, 0, 0, 43 * 45 - 1, &failed_in_start), ==,
+                     SAIL_ERROR_IMAGE_TOO_LARGE);
+    munit_assert_false(failed_in_start);
+    munit_assert_int(dimension_limits_probe(path, codec_info, 42, 0, 0), ==, SAIL_ERROR_IMAGE_TOO_LARGE);
+
+    return MUNIT_OK;
+#else
+    return MUNIT_SKIP;
+#endif
+}
+
+/*
+ * Images with huge dimensions in their headers and almost no pixel data. Codecs must reject them
+ * with SAIL_ERROR_IMAGE_TOO_LARGE when the dimension limits are set, before they allocate memory
+ * for the pixels or decode them. Never load them without limits.
+ *
+ * Images named huge-width.* have just a huge width.
+ */
+static const char* const test_images_huge_dimensions[] = {
+#ifdef SAIL_HAVE_BUILTIN_AVIF
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.avif",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_FLI
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.fli",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_GIF
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.gif",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_JBIG
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-width.jbig",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_JPEG
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.jpeg",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_JPEG2000
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.jp2",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_PNG
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.png",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_QOI
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.qoi",
+#endif
+#ifdef SAIL_HAVE_BUILTIN_WEBP
+    SAIL_TEST_IMAGES_EDGE_CASES_PATH "/huge-dimensions.webp",
+#endif
+    NULL,
+};
+
+/* Dimension limits to load images with huge dimensions with. Every set triggers the rejection on its own. */
+struct huge_dimensions_limits
+{
+    unsigned max_width;
+    unsigned max_height;
+    uint64_t max_pixels;
+};
+
+static const struct huge_dimensions_limits huge_dimensions_limits[] = {
+    {1000, 0, 0},
+    {0, 1000, 0},
+    {0, 0, 1000000},
+};
+
+/*
+ * Returns the number of the limit sets from huge_dimensions_limits[] that apply to the image.
+ * Images named huge-width.* have just a huge width, and their height is known only after decoding.
+ */
+static size_t huge_dimensions_limits_count(const char* path)
+{
+    return (strstr(path, "/huge-width.") != NULL) ? 1
+                                                  : sizeof(huge_dimensions_limits) / sizeof(huge_dimensions_limits[0]);
+}
+
+/*
+ * Test loading images with huge dimensions in their headers and almost no pixel data.
+ *
+ * Codecs must reject them before allocating memory for the pixels or decoding them. The final check
+ * in SAIL doesn't help here:
+ *   - Codecs that allocate memory in load_init() must fail in it.
+ *   - Codecs that decode the whole image in seek_next_frame() would fail with another error
+ *     while decoding the missing pixel data or allocating memory for it.
+ */
+static MunitResult test_edge_huge_dimensions_load(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    const struct sail_codec_info* codec_info;
+    munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
+
+    for (size_t i = 0; i < huge_dimensions_limits_count(path); i++)
+    {
+        const struct huge_dimensions_limits* limits = &huge_dimensions_limits[i];
+
+        dimension_limits_assert_load_rejected(path, codec_info, limits->max_width, limits->max_height,
+                                              limits->max_pixels);
+    }
+
+    return MUNIT_OK;
+}
+
+/* Test probing images with huge dimensions in their headers and almost no pixel data */
+static MunitResult test_edge_huge_dimensions_probe(const MunitParameter params[], void* user_data)
+{
+    (void)user_data;
+
+    const char* path = munit_parameters_get(params, "path");
+
+    const struct sail_codec_info* codec_info;
+    munit_assert(sail_codec_info_from_path(path, &codec_info) == SAIL_OK);
+
+    for (size_t i = 0; i < huge_dimensions_limits_count(path); i++)
+    {
+        const struct huge_dimensions_limits* limits = &huge_dimensions_limits[i];
+
+        munit_assert_int(
+            dimension_limits_probe(path, codec_info, limits->max_width, limits->max_height, limits->max_pixels), ==,
+            SAIL_ERROR_IMAGE_TOO_LARGE);
+    }
+
+    return MUNIT_OK;
+}
+
 /* Test saving to read-only format */
 static MunitResult test_edge_readonly_format_save(const MunitParameter params[], void* user_data)
 {
@@ -671,33 +835,41 @@ static MunitResult test_edge_zero_dimensions(const MunitParameter params[], void
 }
 
 // clang-format off
+static MunitParameterEnum test_params_huge_dimensions[] = {
+    { (char *)"path", (char **)test_images_huge_dimensions },
+    { NULL, NULL },
+};
+
 static MunitTest test_suite_tests[] = {
-    { (char *)"/1x1-image",                test_edge_1x1_image,                NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/cleanup-on-error",         test_edge_cleanup_on_error,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/corrupted-compression",    test_edge_corrupted_compression,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/corrupted-palette",        test_edge_corrupted_palette,        NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/double-destroy",           test_edge_double_destroy,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/early-stop-no-frames",     test_edge_early_stop_no_frames,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/empty-memory-buffer",      test_edge_empty_memory_buffer,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/huge-frame-duration",      test_edge_huge_frame_duration,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/invalid-codec-queries",    test_edge_invalid_codec_queries,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/invalid-magic",            test_edge_invalid_magic,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/invalid-palette-size",     test_edge_invalid_palette_size,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/memory-boundary",          test_edge_memory_boundary,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/nonexistent-file",         test_edge_nonexistent_file,         NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/null-pointers",            test_edge_null_pointers,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/options-null-state",       test_edge_options_null_state,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/partial-frame-cleanup",    test_edge_partial_frame_cleanup,    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/psd-missing-palette",      test_edge_psd_missing_palette,      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/psd-rle-overrun",          test_edge_psd_rle_overrun,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/psd-rle-vs-uncompressed",  test_edge_psd_rle_vs_uncompressed,  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/readonly-format-save",     test_edge_readonly_format_save,     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/save-without-start",       test_edge_save_without_start,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/stopped-state-load",       test_edge_stopped_state_load,       NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/truncated-file",           test_edge_truncated_file,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/unsupported-pixel-format", test_edge_unsupported_pixel_format, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/zero-byte-file",           test_edge_zero_byte_file,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
-    { (char *)"/zero-dimensions",          test_edge_zero_dimensions,          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/1x1-image",                          test_edge_1x1_image,                          NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/cleanup-on-error",                   test_edge_cleanup_on_error,                   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/corrupted-compression",              test_edge_corrupted_compression,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/corrupted-palette",                  test_edge_corrupted_palette,                  NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/double-destroy",                     test_edge_double_destroy,                     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/early-stop-no-frames",               test_edge_early_stop_no_frames,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/empty-memory-buffer",                test_edge_empty_memory_buffer,                NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/huge-dimensions-load",               test_edge_huge_dimensions_load,               NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_huge_dimensions },
+    { (char *)"/huge-dimensions-probe",              test_edge_huge_dimensions_probe,              NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_huge_dimensions },
+    { (char *)"/huge-frame-duration",                test_edge_huge_frame_duration,                NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-codec-queries",              test_edge_invalid_codec_queries,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-magic",                      test_edge_invalid_magic,                      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/invalid-palette-size",               test_edge_invalid_palette_size,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/memory-boundary",                    test_edge_memory_boundary,                    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/nonexistent-file",                   test_edge_nonexistent_file,                   NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/null-pointers",                      test_edge_null_pointers,                      NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/options-null-state",                 test_edge_options_null_state,                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/partial-frame-cleanup",              test_edge_partial_frame_cleanup,              NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/psd-missing-palette",                test_edge_psd_missing_palette,                NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/psd-rle-overrun",                    test_edge_psd_rle_overrun,                    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/psd-rle-vs-uncompressed",            test_edge_psd_rle_vs_uncompressed,            NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/raw-fuji-superccd-dimension-limits", test_edge_raw_fuji_superccd_dimension_limits, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/readonly-format-save",               test_edge_readonly_format_save,               NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/save-without-start",                 test_edge_save_without_start,                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/stopped-state-load",                 test_edge_stopped_state_load,                 NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/truncated-file",                     test_edge_truncated_file,                     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/unsupported-pixel-format",           test_edge_unsupported_pixel_format,           NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/zero-byte-file",                     test_edge_zero_byte_file,                     NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+    { (char *)"/zero-dimensions",                    test_edge_zero_dimensions,                    NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

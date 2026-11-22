@@ -128,6 +128,23 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_qoi(void* state, st
 
     qoi_state->frame_processed = true;
 
+    /*
+     * Reject too large images before qoi_decode() allocates pixels. The header starts with
+     * the 4 byte "qoif" magic followed by the big endian 32 bit width and height. Data with
+     * a wrong magic is left to qoi_decode() that reports it as invalid.
+     */
+    const unsigned char* header = qoi_state->image_data;
+
+    if (qoi_state->image_data_size >= 12 && memcmp(header, "qoif", 4) == 0)
+    {
+        uint32_t width32, height32;
+        memcpy(&width32, header + 4, sizeof(uint32_t));
+        memcpy(&height32, header + 8, sizeof(uint32_t));
+
+        SAIL_TRY(sail_check_image_dimensions_allowed(qoi_state->load_options, sail_reverse_uint32(width32),
+                                                     sail_reverse_uint32(height32)));
+    }
+
     /* Decode the image. */
     /* TODO Remove (int) when QOI supports size_t. */
     qoi_state->pixels = qoi_decode(qoi_state->image_data, (int)qoi_state->image_data_size, &qoi_state->qoi_desc, 0);

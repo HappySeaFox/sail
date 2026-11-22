@@ -143,6 +143,54 @@ def test_image_input_probe(test_png):
     assert metadata["codec_name"] == "PNG"
 
 
+def test_image_input_probe_invalid_image(test_images_dir):
+    """Test ImageInput.probe() raises for images that cannot be probed"""
+    edge_cases_dir = test_images_dir.parent / "edge-cases"
+
+    for name in ("truncated.jpg", "zero-byte.png", "invalid-magic.jpg"):
+        with pytest.raises(RuntimeError, match="Failed to probe image"):
+            sailpy.ImageInput.probe(str(edge_cases_dir / name))
+
+
+def test_image_input_end_of_image(test_images_dir):
+    """Test the end of the image raises StopIteration and keeps raising it"""
+    path = str(test_images_dir / "gif" / "bpp24-rgb-animated.gif")
+
+    input = sailpy.ImageInput(path)
+    frames = list(input)
+    assert len(frames) == 3
+
+    with pytest.raises(StopIteration):
+        next(input)
+
+    input = sailpy.ImageInput(path)
+    assert len(input.load_all()) == 3
+
+    with pytest.raises(RuntimeError, match="No more frames available"):
+        input.load()
+
+    input = sailpy.ImageInput(path)
+    for _ in range(3):
+        assert input.load().is_valid
+
+    with pytest.raises(RuntimeError, match="No more frames available"):
+        input.load()
+
+
+def test_image_input_broken_image_raises(test_images_dir):
+    """Test broken images raise instead of looking empty"""
+    path = str(test_images_dir.parent / "edge-cases" / "truncated.jpg")
+
+    with pytest.raises(RuntimeError, match="Failed to load frame"):
+        sailpy.ImageInput(path).load()
+
+    with pytest.raises(RuntimeError, match="Failed to load frame"):
+        sailpy.ImageInput(path).load_all()
+
+    with pytest.raises(RuntimeError, match="Failed to load frame"):
+        list(sailpy.ImageInput(path))
+
+
 def test_image_input_repr(test_png):
     """Test ImageInput string representation"""
     input = sailpy.ImageInput(str(test_png))

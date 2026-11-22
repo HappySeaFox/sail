@@ -29,6 +29,8 @@
 
 #include "tests/images/bugs/test-images.h"
 
+#include "dimension-limits.h"
+
 static MunitResult test_bugs_must_fail(const MunitParameter params[], void* user_data)
 {
     (void)user_data;
@@ -69,8 +71,10 @@ static MunitParameterEnum test_params_must_succeed[] = {
 };
 
 static MunitTest test_suite_tests[] = {
-    { (char *)"/must-fail",    test_bugs_must_fail,    NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_must_fail },
-    { (char *)"/must-succeed", test_bugs_must_succeed, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_must_succeed },
+    { (char *)"/must-fail",                                test_bugs_must_fail,         NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_must_fail },
+    { (char *)"/must-succeed",                             test_bugs_must_succeed,      NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_must_succeed },
+    { (char *)"/must-succeed-probe-with-dimension-limits", test_dimension_limits_probe, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_must_succeed },
+    { (char *)"/must-succeed-load-with-dimension-limits",  test_dimension_limits_load,  NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params_must_succeed },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

@@ -33,6 +33,8 @@
 
 #include "tests/images/acceptance/test-images.h"
 
+#include "dimension-limits.h"
+
 /* Test loading with NULL options (should use defaults) */
 static MunitResult test_deep_diver_load_with_null_options(const MunitParameter params[], void* user_data)
 {
@@ -517,6 +519,8 @@ static MunitTest test_suite_tests[] = {
     { (char *)"/stop-saving-with-written",      test_deep_diver_stop_saving_with_written,      NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/options-are-copied",            test_deep_diver_options_are_copied,            NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
     { (char *)"/compression-levels",            test_deep_diver_compression_levels,            NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/probe-with-dimension-limits",   test_dimension_limits_probe,                   NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
+    { (char *)"/load-with-dimension-limits",    test_dimension_limits_load,                    NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
 
     { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
 };

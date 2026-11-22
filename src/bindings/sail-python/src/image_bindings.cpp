@@ -35,6 +35,36 @@
 
 namespace py = pybind11;
 
+// Returns a readable status name like "ERROR_IMAGE_TOO_LARGE" for error messages
+static std::string status_name(sail_status_t status)
+{
+    return py::str(py::cast(status).attr("name")).cast<std::string>() + " (" + std::to_string(status) + ")";
+}
+
+// Loads the next frame. Returns an invalid image when there are no more frames.
+// Throws std::runtime_error on errors like broken images or images that exceed the load options limits,
+// so they don't look like the end of the image.
+static sail::image load_next_frame(sail::image_input& input)
+{
+    sail::image image;
+    const sail_status_t status = input.next_frame(&image);
+
+    if (status == SAIL_OK)
+    {
+        return image;
+    }
+
+    // image_input refuses to load from a finished input with SAIL_ERROR_CONFLICTING_OPERATION.
+    // It happens when loading after the last frame as the iterator and load_all() finish the input.
+    // Python iterators keep raising StopIteration then.
+    if (status == SAIL_ERROR_NO_MORE_FRAMES || status == SAIL_ERROR_CONFLICTING_OPERATION)
+    {
+        return {};
+    }
+
+    throw std::runtime_error("Failed to load frame: " + status_name(status));
+}
+
 // Helper to check if pixel format uses 16-bit per channel
 static bool is_16bit_per_channel(SailPixelFormat pixel_format)
 {
@@ -627,11 +657,12 @@ void init_image(py::module_& m)
                 }
 
                 sail::image_input input(buf_ptr, static_cast<std::size_t>(buf_size));
-                sail::image img = input.next_frame();
+                sail::image img;
+                const sail_status_t status = input.next_frame(&img);
 
-                if (!img.is_valid())
+                if (status != SAIL_OK)
                 {
-                    throw std::runtime_error("Failed to load image from bytes");
+                    throw std::runtime_error("Failed to load image from bytes: " + status_name(status));
                 }
 
                 return img;
@@ -670,7 +701,19 @@ void init_image(py::module_& m)
         .def("__iter__", [](sail::image_input& input) -> sail::image_input& { return input; })
         .def("__next__",
              [](sail::image_input& input) {
-                 sail::image img = input.next_frame();
+                 sail::image img;
+
+                 try
+                 {
+                     img = load_next_frame(input);
+                 }
+                 catch (...)
+                 {
+                     // Loading cannot continue after an error, so release the file right away
+                     input.finish();
+                     throw;
+                 }
+
                  if (!img.is_valid())
                  {
                      // All frames are read: release the file right away, don't wait for the
@@ -689,14 +732,15 @@ void init_image(py::module_& m)
         .def(
             "load",
             [](sail::image_input& input) {
-                sail::image img = input.next_frame();
+                sail::image img = load_next_frame(input);
                 if (!img.is_valid())
                 {
                     throw std::runtime_error("No more frames available");
                 }
                 return img;
             },
-            "Load next frame/image")
+            "Load next frame/image. Raises RuntimeError when no more frames are available "
+            "or loading fails, for example when the image exceeds the load options limits")
 
         .def(
             "load_all",
@@ -704,7 +748,19 @@ void init_image(py::module_& m)
                 std::vector<sail::image> images;
                 while (true)
                 {
-                    sail::image img = input.next_frame();
+                    sail::image img;
+
+                    try
+                    {
+                        img = load_next_frame(input);
+                    }
+                    catch (...)
+                    {
+                        // Loading cannot continue after an error, so release the file right away
+                        input.finish();
+                        throw;
+                    }
+
                     if (!img.is_valid())
                     {
                         // All frames are read: release the file right away, don't wait for the
@@ -716,41 +772,60 @@ void init_image(py::module_& m)
                 }
                 return images;
             },
-            "Load all frames/images and finish loading")
+            "Load all frames/images and finish loading. Raises RuntimeError if loading any frame fails, "
+            "for example when the image exceeds the load options limits")
 
         .def_static(
             "probe",
-            [](const std::string& path) -> py::dict {
+            [](const std::string& path, const sail::load_options* options) -> py::dict {
+                std::tuple<sail::image, sail::codec_info> probe_result;
+
                 try
                 {
                     sail::image_input input(path);
-                    auto probe_result           = input.probe();
-                    sail::image img             = std::get<0>(probe_result);
-                    sail::codec_info codec_info = std::get<1>(probe_result);
 
-                    py::dict result;
-                    result["width"]             = img.width();
-                    result["height"]            = img.height();
-                    result["pixel_format"]      = img.pixel_format();
-                    result["bits_per_pixel"]    = img.bits_per_pixel();
-                    result["codec_name"]        = codec_info.name();
-                    result["codec_description"] = codec_info.description();
-
-                    // Add source image info if available
-                    if (img.source_image().is_valid())
+                    if (options != nullptr)
                     {
-                        result["source_pixel_format"] = img.source_image().pixel_format();
-                        result["source_compression"]  = img.source_image().compression();
+                        input.with(*options);
                     }
 
-                    return result;
+                    probe_result = input.probe();
                 }
                 catch (const std::exception& e)
                 {
                     throw std::runtime_error(std::string("Failed to probe image: ") + e.what());
                 }
+
+                const sail::image& img             = std::get<0>(probe_result);
+                const sail::codec_info& codec_info = std::get<1>(probe_result);
+
+                // image_input::probe() reports errors with an invalid codec info
+                if (!codec_info.is_valid())
+                {
+                    throw std::runtime_error("Failed to probe image: " + path);
+                }
+
+                py::dict result;
+                result["width"]             = img.width();
+                result["height"]            = img.height();
+                result["pixel_format"]      = img.pixel_format();
+                result["bits_per_pixel"]    = img.bits_per_pixel();
+                result["codec_name"]        = codec_info.name();
+                result["codec_description"] = codec_info.description();
+
+                // Add source image info if available
+                if (img.source_image().is_valid())
+                {
+                    result["source_pixel_format"] = img.source_image().pixel_format();
+                    result["source_compression"]  = img.source_image().compression();
+                }
+
+                return result;
             },
-            py::arg("path"), "Probe image metadata without loading pixels (static method)")
+            py::arg("path"), py::arg("options") = nullptr,
+            "Probe image metadata without loading pixels (static method). Optional LoadOptions limit "
+            "the image dimensions with max_width, max_height, and max_pixels. Raises RuntimeError "
+            "if the image cannot be probed or exceeds the limits")
 
         .def(
             "finish",

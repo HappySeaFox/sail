@@ -35,8 +35,12 @@ sail_status_t sail_alloc_load_options(struct sail_load_options** load_options)
     SAIL_TRY(sail_malloc(sizeof(struct sail_load_options), &ptr));
     *load_options = ptr;
 
-    (*load_options)->options = 0;
-    (*load_options)->tuning  = NULL;
+    (*load_options)->options    = 0;
+    (*load_options)->tuning     = NULL;
+    (*load_options)->max_width  = 0;
+    (*load_options)->max_height = 0;
+    (*load_options)->max_pixels = 0;
+    (*load_options)->max_frames = 0;
 
     return SAIL_OK;
 }
@@ -90,7 +94,11 @@ sail_status_t sail_copy_load_options(const struct sail_load_options* source, str
     struct sail_load_options* target_local;
     SAIL_TRY(sail_alloc_load_options(&target_local));
 
-    target_local->options = source->options;
+    target_local->options    = source->options;
+    target_local->max_width  = source->max_width;
+    target_local->max_height = source->max_height;
+    target_local->max_pixels = source->max_pixels;
+    target_local->max_frames = source->max_frames;
 
     if (source->tuning != NULL)
     {
@@ -99,6 +107,39 @@ sail_status_t sail_copy_load_options(const struct sail_load_options* source, str
     }
 
     *target = target_local;
+
+    return SAIL_OK;
+}
+
+sail_status_t sail_check_image_dimensions_allowed(const struct sail_load_options* load_options,
+                                                  unsigned width,
+                                                  unsigned height)
+{
+    if (load_options == NULL)
+    {
+        return SAIL_OK;
+    }
+
+    if (load_options->max_width > 0 && width > load_options->max_width)
+    {
+        SAIL_LOG_ERROR("Image width %u exceeds the allowed maximum of %u", width, load_options->max_width);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_IMAGE_TOO_LARGE);
+    }
+
+    if (load_options->max_height > 0 && height > load_options->max_height)
+    {
+        SAIL_LOG_ERROR("Image height %u exceeds the allowed maximum of %u", height, load_options->max_height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_IMAGE_TOO_LARGE);
+    }
+
+    const uint64_t pixels = (uint64_t)width * height;
+
+    if (load_options->max_pixels > 0 && pixels > load_options->max_pixels)
+    {
+        SAIL_LOG_ERROR("Image dimensions %ux%u exceed the allowed maximum of %llu pixels", width, height,
+                       (unsigned long long)load_options->max_pixels);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_IMAGE_TOO_LARGE);
+    }
 
     return SAIL_OK;
 }

@@ -126,6 +126,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_fli(struct sail_io* io,
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
     }
 
+    /* Reject too large images before allocating the previous frame buffer. */
+    SAIL_TRY(
+        sail_check_image_dimensions_allowed(load_options, fli_state->fli_header.width, fli_state->fli_header.height));
+
     /* Validate depth (must be 8 for indexed color). */
     if (fli_state->fli_header.depth != 8)
     {

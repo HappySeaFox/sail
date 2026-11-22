@@ -71,6 +71,11 @@ sail_status_t sail_probe_io_with_options(struct sail_io* io,
 
     SAIL_TRY_OR_CLEANUP(codec->v8->load_seek_next_frame(state, &image_local),
                         /* cleanup */ codec->v8->load_finish(&state), sail_destroy_load_options(load_options_local));
+    SAIL_TRY_OR_CLEANUP(
+        sail_check_image_dimensions_allowed(load_options_local, image_local->width, image_local->height),
+        /* cleanup */ sail_destroy_image(image_local),
+                      codec->v8->load_finish(&state),
+                      sail_destroy_load_options(load_options_local));
     SAIL_TRY_OR_CLEANUP(codec->v8->load_finish(&state),
                         /* cleanup */ sail_destroy_image(image_local), sail_destroy_load_options(load_options_local));
 

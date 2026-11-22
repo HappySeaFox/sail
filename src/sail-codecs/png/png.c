@@ -230,6 +230,10 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_png(struct sail_io* io,
                  /* compression type */ NULL,
                  /* filter method */ NULL);
 
+    /* Reject too large images before allocating APNG frame buffers. */
+    SAIL_TRY(sail_check_image_dimensions_allowed(load_options, png_state->first_image->width,
+                                                 png_state->first_image->height));
+
     /* Convert to little-endian. */
     png_set_swap(png_state->png_ptr);
 
