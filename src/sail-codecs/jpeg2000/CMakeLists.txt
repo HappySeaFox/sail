@@ -12,6 +12,36 @@ endif()
 #
 set(SAIL_CODECS_FIND_DEPENDENCIES ${SAIL_CODECS_FIND_DEPENDENCIES} "find_dependency,OpenJPEG,\${OPENJPEG_LIBRARIES}" PARENT_SCOPE)
 
+# OpenJPEG before 2.5.4 fails to write ICC profiles
+# https://github.com/uclouvain/openjpeg/pull/1574
+#
+cmake_push_check_state(RESET)
+    set(CMAKE_REQUIRED_INCLUDES ${OPENJPEG_INCLUDE_DIRS})
+
+    check_c_source_compiles(
+        "
+        #include <openjpeg.h>
+
+        #if (OPJ_VERSION_MAJOR > 2) || (OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR > 5) \
+            || (OPJ_VERSION_MAJOR == 2 && OPJ_VERSION_MINOR == 5 && OPJ_VERSION_BUILD >= 4)
+        #else
+            #error OpenJPEG is too old to save ICC profiles
+        #endif
+
+        int main(int argc, char *argv[]) {
+            return 0;
+        }
+    "
+    HAVE_OPENJPEG_ICCP
+    )
+cmake_pop_check_state()
+
+# Used in .codec.info
+#
+if (HAVE_OPENJPEG_ICCP)
+    set(JPEG2000_CODEC_INFO_FEATURE_ICCP ";ICCP")
+endif()
+
 # Common codec configuration
 #
 sail_codec(NAME jpeg2000
