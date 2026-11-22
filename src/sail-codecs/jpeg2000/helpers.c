@@ -297,18 +297,6 @@ bool jpeg2000_private_tuning_key_value_callback_load(const char* key, const stru
         parameters->cp_layer = (OPJ_UINT32)layer;
         SAIL_LOG_TRACE("JPEG2000: Set layer to %u", parameters->cp_layer);
     }
-    else if (strcmp(key, "jpeg2000-tile-index") == 0)
-    {
-        unsigned tile_index = sail_variant_to_unsigned_int(value);
-        parameters->tile_index = (OPJ_UINT32)tile_index;
-        SAIL_LOG_TRACE("JPEG2000: Set tile-index to %u", parameters->tile_index);
-    }
-    else if (strcmp(key, "jpeg2000-num-tiles") == 0)
-    {
-        unsigned num_tiles = sail_variant_to_unsigned_int(value);
-        parameters->nb_tile_to_decode = (OPJ_UINT32)num_tiles;
-        SAIL_LOG_TRACE("JPEG2000: Set num-tiles to %u", parameters->nb_tile_to_decode);
-    }
 
     return true;
 }

@@ -12,7 +12,7 @@ mime-types=image/jp2;image/jpm
 
 [load-features]
 features=STATIC;ICCP;SOURCE-IMAGE
-tuning=jpeg2000-reduce;jpeg2000-layer;jpeg2000-tile-index;jpeg2000-num-tiles
+tuning=jpeg2000-reduce;jpeg2000-layer;jpeg2000-tile-index
 
 [save-features]
 features=STATIC;ICCP

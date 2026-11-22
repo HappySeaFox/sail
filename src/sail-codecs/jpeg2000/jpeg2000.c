@@ -53,6 +53,9 @@ struct jpeg2000_state
     int channel_depth_scaled;
     int shift;
     unsigned image_min_dimension;
+
+    bool decode_single_tile;
+    OPJ_UINT32 tile_index;
 };
 
 static void jpeg2000_private_error_callback(const char* msg, void* client_data)
@@ -94,6 +97,9 @@ static sail_status_t alloc_jpeg2000_state(struct sail_io* io,
         .channel_depth_scaled = 0,
         .shift                = 0,
         .image_min_dimension  = 0,
+
+        .decode_single_tile = false,
+        .tile_index         = 0,
     };
 
     return SAIL_OK;
@@ -189,6 +195,20 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg2000(struct sail_io* io,
     {
         sail_traverse_hash_map_with_user_data(load_options->tuning, jpeg2000_private_tuning_key_value_callback_load,
                                               &parameters);
+
+        /*
+         * Decoding a single tile is a separate OpenJPEG entry point, so it cannot be set up
+         * with the other decoder parameters.
+         */
+        const struct sail_variant* tile_index_variant = sail_hash_map_value(load_options->tuning, "jpeg2000-tile-index");
+
+        if (tile_index_variant != NULL)
+        {
+            jpeg2000_state->decode_single_tile = true;
+            jpeg2000_state->tile_index         = (OPJ_UINT32)sail_variant_to_unsigned_int(tile_index_variant);
+
+            SAIL_LOG_TRACE("JPEG2000: Decoding tile %u only", jpeg2000_state->tile_index);
+        }
     }
 
     if (!opj_setup_decoder(jpeg2000_state->opj_codec, &parameters))
@@ -233,7 +253,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
     }
 
     /* Decode the image. */
-    if (!opj_decode(jpeg2000_state->opj_codec, jpeg2000_state->opj_stream, jpeg2000_state->opj_image))
+    if (jpeg2000_state->decode_single_tile)
+    {
+        if (!opj_get_decoded_tile(jpeg2000_state->opj_codec, jpeg2000_state->opj_stream, jpeg2000_state->opj_image,
+                                  jpeg2000_state->tile_index))
+        {
+            SAIL_LOG_ERROR("JPEG2000: Failed to decode tile %u", jpeg2000_state->tile_index);
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+    }
+    else if (!opj_decode(jpeg2000_state->opj_codec, jpeg2000_state->opj_stream, jpeg2000_state->opj_image))
     {
         SAIL_LOG_ERROR("JPEG2000: Failed to decode image");
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
@@ -281,9 +310,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpeg2000(void* stat
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
-        if (opj_image->comps[i].x0 != 0 || opj_image->comps[i].y0 != 0)
+        /*
+         * Components of a single decoded tile start at the tile position rather than at zero.
+         * They just have to start at the same position as the copying loops don't use it.
+         */
+        if (opj_image->comps[i].x0 != opj_image->comps[0].x0 || opj_image->comps[i].y0 != opj_image->comps[0].y0)
         {
-            SAIL_LOG_ERROR("JPEG2000: Component %u has non-zero position", i);
+            SAIL_LOG_ERROR("JPEG2000: Component %u position (%u, %u) doesn't match component 0 position (%u, %u)", i,
+                           opj_image->comps[i].x0, opj_image->comps[i].y0, opj_image->comps[0].x0,
+                           opj_image->comps[0].y0);
             SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
         }
 
