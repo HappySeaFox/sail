@@ -70,6 +70,8 @@ SAIL_HIDDEN sail_status_t jpegxl_private_fetch_name(JxlDecoder* decoder,
                                                     uint32_t name_length,
                                                     struct sail_meta_data_node** meta_data_node);
 
+SAIL_HIDDEN void jpegxl_private_finish_box(JxlDecoder* decoder, struct sail_meta_data_node** pending_box_node);
+
 SAIL_HIDDEN sail_status_t jpegxl_private_fetch_metadata(JxlDecoder* decoder,
                                                         struct sail_meta_data_node** meta_data_node);
 

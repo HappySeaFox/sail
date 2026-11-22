@@ -321,6 +321,28 @@ sail_status_t jpegxl_private_fetch_name(JxlDecoder* decoder,
     return SAIL_OK;
 }
 
+void jpegxl_private_finish_box(JxlDecoder* decoder, struct sail_meta_data_node** pending_box_node)
+{
+    if (*pending_box_node == NULL)
+    {
+        return;
+    }
+
+    /*
+     * The reported box size covers the whole box while libjxl fills our buffer with its contents only.
+     * Cut the untouched tail off so that it never reaches applications.
+     */
+    const size_t unwritten     = JxlDecoderReleaseBoxBuffer(decoder);
+    struct sail_variant* value = (*pending_box_node)->meta_data->value;
+
+    if (unwritten <= value->size)
+    {
+        value->size -= unwritten;
+    }
+
+    *pending_box_node = NULL;
+}
+
 sail_status_t jpegxl_private_fetch_metadata(JxlDecoder* decoder, struct sail_meta_data_node** meta_data_node)
 {
     JxlBoxType type;

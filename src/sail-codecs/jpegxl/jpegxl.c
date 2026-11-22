@@ -66,6 +66,8 @@ struct jpegxl_state
     JxlDecoder* decoder;
     JxlEncoder* encoder;
     JxlEncoderFrameSettings* frame_settings;
+    /* Meta data node the current box is being read into. */
+    struct sail_meta_data_node* pending_box_node;
     /* For progressive reading. */
     unsigned char* buffer;
     size_t buffer_size;
@@ -123,6 +125,7 @@ static sail_status_t alloc_jpegxl_state(struct sail_io* io,
         .decoder            = NULL,
         .encoder            = NULL,
         .frame_settings     = NULL,
+        .pending_box_node   = NULL,
         .buffer             = buffer,
         .buffer_size        = buffer_size,
         .input_size         = 0,
@@ -371,12 +374,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_jpegxl(void* state,
         {
             if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA)
             {
+                jpegxl_private_finish_box(jpegxl_state->decoder, &jpegxl_state->pending_box_node);
+
                 SAIL_TRY_OR_CLEANUP(jpegxl_private_fetch_metadata(jpegxl_state->decoder, last_meta_data_node),
                                     /* cleanup*/ sail_destroy_image(image_local));
 
                 if (*last_meta_data_node != NULL)
                 {
-                    last_meta_data_node = &(*last_meta_data_node)->next;
+                    jpegxl_state->pending_box_node = *last_meta_data_node;
+                    last_meta_data_node            = &(*last_meta_data_node)->next;
                 }
             }
             break;
@@ -466,11 +472,14 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void* state, struct sa
         {
             if (jpegxl_state->load_options->options & SAIL_OPTION_META_DATA)
             {
+                jpegxl_private_finish_box(jpegxl_state->decoder, &jpegxl_state->pending_box_node);
+
                 SAIL_TRY(jpegxl_private_fetch_metadata(jpegxl_state->decoder, last_meta_data_node));
 
                 if (*last_meta_data_node != NULL)
                 {
-                    last_meta_data_node = &(*last_meta_data_node)->next;
+                    jpegxl_state->pending_box_node = *last_meta_data_node;
+                    last_meta_data_node            = &(*last_meta_data_node)->next;
                 }
             }
             break;
@@ -487,6 +496,9 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_jpegxl(void* state, struct sa
         }
         }
     }
+
+    /* The box buffer belongs to the image which the caller may destroy any time. */
+    jpegxl_private_finish_box(jpegxl_state->decoder, &jpegxl_state->pending_box_node);
 
     return SAIL_OK;
 }
