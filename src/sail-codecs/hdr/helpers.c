@@ -188,6 +188,15 @@ sail_status_t hdr_private_read_header(struct sail_io* io, struct hdr_header* hea
                 SAIL_TRY(sail_strdup(line + 2, &header->software));
             }
         }
+        else if (strncmp(line, "FORMAT=", 7) == 0)
+        {
+            /* Other formats like XYZE store different components and cannot be decoded as RGBE. */
+            if (strcmp(line + 7, "32-bit_rle_rgbe") != 0)
+            {
+                SAIL_LOG_ERROR("HDR: Unsupported format '%s'", line + 7);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+            }
+        }
     }
 
     /* Read dimensions (e.g., "-Y 512 +X 768"). */
