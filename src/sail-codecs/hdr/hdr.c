@@ -224,7 +224,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_hdr(void* state, struct sail_
                             /* cleanup */ sail_free(scanline));
 
         /* Copy to image buffer. */
-        float* dest = (float*)((uint8_t*)image->pixels + target_y * image->bytes_per_line);
+        float* dest = (float*)((uint8_t*)image->pixels + (size_t)target_y * image->bytes_per_line);
 
         if (hdr_codec_state->header.x_increasing)
         {
@@ -345,7 +345,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_frame_v8_hdr(void* state, const struct
     /* Write scanlines. */
     for (int y = 0; y < hdr_codec_state->header.height; y++)
     {
-        const float* scanline = (const float*)((const uint8_t*)image->pixels + y * image->bytes_per_line);
+        const float* scanline = (const float*)((const uint8_t*)image->pixels + (size_t)y * image->bytes_per_line);
 
         SAIL_TRY(hdr_private_write_scanline(hdr_codec_state->io, hdr_codec_state->header.width, scanline,
                                             hdr_codec_state->write_ctx.use_rle));
