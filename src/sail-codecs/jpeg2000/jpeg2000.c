@@ -633,7 +633,8 @@ SAIL_EXPORT sail_status_t sail_codec_save_finish_v8_jpeg2000(void** state)
     {
         int max_numresolution = 1;
         /* Find the maximum numresolution where 2^(numresolution-1) <= min_dimension */
-        while ((1u << (max_numresolution - 1)) <= jpeg2000_state->image_min_dimension && max_numresolution < 33)
+        /* Check the counter first: shifting by 32 or more is undefined. */
+        while (max_numresolution < 33 && (1u << (max_numresolution - 1)) <= jpeg2000_state->image_min_dimension)
         {
             max_numresolution++;
         }
