@@ -462,18 +462,30 @@ sail_status_t png_private_write_meta_data(png_structp png_ptr,
             {
                 if (meta_data->value->type == SAIL_VARIANT_TYPE_DATA)
                 {
-                    /* Skip "Exif\0\0" if any. */
-                    if (meta_data->value->size >= 4 && memcmp(sail_variant_to_data(meta_data->value), "Exif", 4) == 0)
+                    /*
+                     * JPEG stores EXIF behind a 6 byte "Exif\0\0" header. The PNG eXIf chunk is the
+                     * payload only. Strip the header when all 6 bytes are present. A shorter buffer is
+                     * saved as is, because subtracting 6 from its size wraps. The chunk data cannot be
+                     * longer than 2^31-1 bytes.
+                     */
+                    const void* exif           = sail_variant_to_data(meta_data->value);
+                    const size_t exif_size     = meta_data->value->size;
+                    const bool has_jpeg_header = exif_size >= 6 && memcmp(exif, "Exif", 4) == 0;
+                    const size_t payload_size  = has_jpeg_header ? exif_size - 6 : exif_size;
+
+                    if (payload_size > PNG_UINT_31_MAX)
                     {
-                        SAIL_LOG_TRACE("PNG: Saving raw EXIF %u bytes long w/o header",
-                                       (unsigned)meta_data->value->size - 6);
-                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size - 6,
-                                       ((png_bytep)sail_variant_to_data(meta_data->value)) + 6);
+                        SAIL_LOG_ERROR("PNG: EXIF meta data is too large to save");
                     }
-                    else
+                    else if (payload_size > 0 && has_jpeg_header)
                     {
-                        SAIL_LOG_TRACE("PNG: Saving raw EXIF %u bytes long", (unsigned)meta_data->value->size);
-                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)meta_data->value->size, meta_data->value->value);
+                        SAIL_LOG_TRACE("PNG: Saving raw EXIF %u bytes long w/o header", (unsigned)payload_size);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)payload_size, ((png_bytep)exif) + 6);
+                    }
+                    else if (payload_size > 0)
+                    {
+                        SAIL_LOG_TRACE("PNG: Saving raw EXIF %u bytes long", (unsigned)payload_size);
+                        png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)payload_size, meta_data->value->value);
                     }
                 }
                 else
