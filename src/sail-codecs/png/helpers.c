@@ -660,6 +660,48 @@ sail_status_t png_private_fetch_palette(png_structp png_ptr, png_infop info_ptr,
 }
 
 #ifdef PNG_APNG_SUPPORTED
+
+/* Non-premultiplied OVER. A zero result alpha keeps the color at zero. */
+static unsigned png_private_blend_over_sample(
+    double src_sample, double src_a, double dst_sample, double dst_a, double out_a, double max_value)
+{
+    double out;
+
+    if (out_a == 0.0)
+    {
+        return 0;
+    }
+
+    out = (src_a * src_sample + (1.0 - src_a) * dst_a * dst_sample) / out_a;
+
+    if (out <= 0.0)
+    {
+        return 0;
+    }
+    if (out >= max_value)
+    {
+        return (unsigned)max_value;
+    }
+
+    return (unsigned)(out + 0.5);
+}
+
+static unsigned png_private_blend_over_alpha(double out_a, double max_value)
+{
+    const double out = out_a * max_value;
+
+    if (out <= 0.0)
+    {
+        return 0;
+    }
+    if (out >= max_value)
+    {
+        return (unsigned)max_value;
+    }
+
+    return (unsigned)(out + 0.5);
+}
+
 sail_status_t png_private_blend_source(
     void* dst_raw, unsigned dst_offset, const void* src_raw, unsigned src_width, unsigned bytes_per_pixel)
 {
@@ -690,11 +732,12 @@ sail_status_t png_private_blend_over(
         {
             const double src_a = *(src + 1) / 255.0;
             const double dst_a = *(dst + 1) / 255.0;
+            const double out_a = src_a + (1.0 - src_a) * dst_a;
 
-            *dst = (uint8_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint8_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 255.0);
             src++;
             dst++;
-            *dst = (uint8_t)((src_a + (1 - src_a) * dst_a) * 255);
+            *dst = (uint8_t)png_private_blend_over_alpha(out_a, 255.0);
             src++;
             dst++;
         }
@@ -709,11 +752,12 @@ sail_status_t png_private_blend_over(
         {
             const double src_a = *(src + 1) / 65535.0;
             const double dst_a = *(dst + 1) / 65535.0;
+            const double out_a = src_a + (1.0 - src_a) * dst_a;
 
-            *dst = (uint16_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint16_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 65535.0);
             src++;
             dst++;
-            *dst = (uint16_t)((src_a + (1 - src_a) * dst_a) * 65535);
+            *dst = (uint16_t)png_private_blend_over_alpha(out_a, 65535.0);
             src++;
             dst++;
         }
@@ -728,17 +772,18 @@ sail_status_t png_private_blend_over(
         {
             const double src_a = *(src + 3) / 255.0;
             const double dst_a = *(dst + 3) / 255.0;
+            const double out_a = src_a + (1.0 - src_a) * dst_a;
 
-            *dst = (uint8_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint8_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 255.0);
             src++;
             dst++;
-            *dst = (uint8_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint8_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 255.0);
             src++;
             dst++;
-            *dst = (uint8_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint8_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 255.0);
             src++;
             dst++;
-            *dst = (uint8_t)((src_a + (1 - src_a) * dst_a) * 255);
+            *dst = (uint8_t)png_private_blend_over_alpha(out_a, 255.0);
             src++;
             dst++;
         }
@@ -753,17 +798,18 @@ sail_status_t png_private_blend_over(
         {
             const double src_a = *(src + 3) / 65535.0;
             const double dst_a = *(dst + 3) / 65535.0;
+            const double out_a = src_a + (1.0 - src_a) * dst_a;
 
-            *dst = (uint16_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint16_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 65535.0);
             src++;
             dst++;
-            *dst = (uint16_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint16_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 65535.0);
             src++;
             dst++;
-            *dst = (uint16_t)(src_a * (*src) + (1 - src_a) * dst_a * (*dst));
+            *dst = (uint16_t)png_private_blend_over_sample(*src, src_a, *dst, dst_a, out_a, 65535.0);
             src++;
             dst++;
-            *dst = (uint16_t)((src_a + (1 - src_a) * dst_a) * 65535);
+            *dst = (uint16_t)png_private_blend_over_alpha(out_a, 65535.0);
             src++;
             dst++;
         }
