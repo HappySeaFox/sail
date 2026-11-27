@@ -833,8 +833,10 @@ sail_status_t bmp_private_write_seek_next_frame(void* state, struct sail_io* io,
         }
         else if (image->palette != NULL)
         {
-            /* Use palette from image. */
-            colors_used = image->palette->color_count;
+            /* Use palette from image. Larger palettes cannot be read back with the selected bit depth. */
+            const unsigned max_colors = 1U << bits_per_pixel;
+
+            colors_used = (image->palette->color_count > max_colors) ? max_colors : image->palette->color_count;
         }
         else
         {
