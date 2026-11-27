@@ -145,16 +145,16 @@ enum SailCompression tiff_private_compression_to_sail_compression(int compressio
     case COMPRESSION_PIXARLOG: return SAIL_COMPRESSION_PIXAR_LOG;
 #endif
 #ifdef SAIL_HAVE_TIFF_SGILOG24
-    case COMPRESSION_SGILOG24: return SAIL_COMPRESSION_RLE;
+    case COMPRESSION_SGILOG24: return SAIL_COMPRESSION_SGI_LOG24;
 #endif
 #ifdef SAIL_HAVE_TIFF_SGILOG
     case COMPRESSION_SGILOG: return SAIL_COMPRESSION_SGI_LOG;
 #endif
 #ifdef SAIL_HAVE_TIFF_T43
-    case COMPRESSION_T43: return SAIL_COMPRESSION_SGI_LOG24;
+    case COMPRESSION_T43: return SAIL_COMPRESSION_T43;
 #endif
 #ifdef SAIL_HAVE_TIFF_T85
-    case COMPRESSION_T85: return SAIL_COMPRESSION_T43;
+    case COMPRESSION_T85: return SAIL_COMPRESSION_T85;
 #endif
 #ifdef SAIL_HAVE_TIFF_THUNDERSCAN
     case COMPRESSION_THUNDERSCAN: return SAIL_COMPRESSION_THUNDERSCAN;
@@ -252,16 +252,16 @@ sail_status_t tiff_private_sail_compression_to_compression(enum SailCompression 
     case SAIL_COMPRESSION_PIXAR_LOG: *tiff_compression = COMPRESSION_PIXARLOG; return SAIL_OK;
 #endif
 #ifdef SAIL_HAVE_TIFF_WRITE_SGILOG24
-    case SAIL_COMPRESSION_RLE: *tiff_compression = COMPRESSION_SGILOG24; return SAIL_OK;
+    case SAIL_COMPRESSION_SGI_LOG24: *tiff_compression = COMPRESSION_SGILOG24; return SAIL_OK;
 #endif
 #ifdef SAIL_HAVE_TIFF_WRITE_SGILOG
     case SAIL_COMPRESSION_SGI_LOG: *tiff_compression = COMPRESSION_SGILOG; return SAIL_OK;
 #endif
 #ifdef SAIL_HAVE_TIFF_WRITE_T43
-    case SAIL_COMPRESSION_SGI_LOG24: *tiff_compression = COMPRESSION_T43; return SAIL_OK;
+    case SAIL_COMPRESSION_T43: *tiff_compression = COMPRESSION_T43; return SAIL_OK;
 #endif
 #ifdef SAIL_HAVE_TIFF_WRITE_T85
-    case SAIL_COMPRESSION_T43: *tiff_compression = COMPRESSION_T85; return SAIL_OK;
+    case SAIL_COMPRESSION_T85: *tiff_compression = COMPRESSION_T85; return SAIL_OK;
 #endif
 #ifdef SAIL_HAVE_TIFF_WRITE_THUNDERSCAN
     case SAIL_COMPRESSION_THUNDERSCAN: *tiff_compression = COMPRESSION_THUNDERSCAN; return SAIL_OK;
