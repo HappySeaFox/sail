@@ -142,7 +142,17 @@ static sail_status_t read_bmp_headers(struct sail_io* io, struct bmp_state* bmp_
     size_t offset_of_bitmap_header;
     SAIL_TRY(io->tell(io->stream, &offset_of_bitmap_header));
 
-    SAIL_TRY(bmp_private_read_v2(io, &bmp_state->v2));
+    SAIL_TRY(bmp_private_read_dib_header_size(io, &bmp_state->v2.size));
+
+    if (bmp_state->v2.size == SAIL_BITMAP_DIB_HEADER_V2_SIZE)
+    {
+        /* The core header is 12 bytes long as it stores unsigned 16-bit dimensions. */
+        SAIL_TRY(bmp_private_read_v2_core(io, &bmp_state->v2));
+    }
+    else
+    {
+        SAIL_TRY(bmp_private_read_v2(io, &bmp_state->v2));
+    }
 
     /* If the height is negative, the bitmap is top-to-bottom. */
     if (bmp_state->v2.height < 0)

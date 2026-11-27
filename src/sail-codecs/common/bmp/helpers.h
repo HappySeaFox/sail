@@ -145,6 +145,10 @@ SAIL_HIDDEN sail_status_t bmp_private_read_v1(struct sail_io* io, struct SailBmp
 
 SAIL_HIDDEN sail_status_t bmp_private_read_dib_file_header(struct sail_io* io, struct SailBmpDibFileHeader* fh);
 
+SAIL_HIDDEN sail_status_t bmp_private_read_dib_header_size(struct sail_io* io, uint32_t* size);
+
+SAIL_HIDDEN sail_status_t bmp_private_read_v2_core(struct sail_io* io, struct SailBmpDibHeaderV2* v2);
+
 SAIL_HIDDEN sail_status_t bmp_private_read_v2(struct sail_io* io, struct SailBmpDibHeaderV2* v2);
 
 SAIL_HIDDEN sail_status_t bmp_private_read_v3(struct sail_io* io, struct SailBmpDibHeaderV3* v3);

@@ -60,9 +60,32 @@ sail_status_t bmp_private_read_dib_file_header(struct sail_io* io, struct SailBm
     return SAIL_OK;
 }
 
+sail_status_t bmp_private_read_dib_header_size(struct sail_io* io, uint32_t* size)
+{
+    SAIL_TRY(io->strict_read(io->stream, size, sizeof(*size)));
+
+    return SAIL_OK;
+}
+
+sail_status_t bmp_private_read_v2_core(struct sail_io* io, struct SailBmpDibHeaderV2* v2)
+{
+    /* The core header stores unsigned 16-bit dimensions. */
+    uint16_t width;
+    uint16_t height;
+
+    SAIL_TRY(io->strict_read(io->stream, &width, sizeof(width)));
+    SAIL_TRY(io->strict_read(io->stream, &height, sizeof(height)));
+    SAIL_TRY(io->strict_read(io->stream, &v2->planes, sizeof(v2->planes)));
+    SAIL_TRY(io->strict_read(io->stream, &v2->bit_count, sizeof(v2->bit_count)));
+
+    v2->width  = width;
+    v2->height = height;
+
+    return SAIL_OK;
+}
+
 sail_status_t bmp_private_read_v2(struct sail_io* io, struct SailBmpDibHeaderV2* v2)
 {
-    SAIL_TRY(io->strict_read(io->stream, &v2->size, sizeof(v2->size)));
     SAIL_TRY(io->strict_read(io->stream, &v2->width, sizeof(v2->width)));
     SAIL_TRY(io->strict_read(io->stream, &v2->height, sizeof(v2->height)));
     SAIL_TRY(io->strict_read(io->stream, &v2->planes, sizeof(v2->planes)));
