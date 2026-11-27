@@ -47,7 +47,7 @@ struct tiff_state
     const struct sail_save_options* save_options;
 
     TIFF* tiff;
-    uint16_t current_frame;
+    tdir_t current_frame;
     bool libtiff_error;
     int save_compression;
     enum SailPixelFormat pixel_format;
@@ -143,6 +143,16 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void* state, s
 
     struct sail_image* image_local;
     SAIL_TRY(sail_alloc_image(&image_local));
+
+    /*
+     * Stop before the frame counter wraps around. libtiff addresses directories with tdir_t,
+     * and a file may chain more of them than that type can hold.
+     */
+    if (tiff_state->current_frame == (tdir_t)-1)
+    {
+        sail_destroy_image(image_local);
+        return SAIL_ERROR_NO_MORE_FRAMES;
+    }
 
     /* Start reading the next directory. */
     if (!TIFFSetDirectory(tiff_state->tiff, tiff_state->current_frame++))
