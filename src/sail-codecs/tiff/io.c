@@ -105,9 +105,18 @@ int tiff_private_my_dummy_close_proc(thandle_t client_data)
     return 0;
 }
 
-toff_t tiff_private_my_dummy_size_proc(thandle_t client_data)
+toff_t tiff_private_my_size_proc(thandle_t client_data)
 {
-    (void)client_data;
+    struct sail_io* io = (struct sail_io*)client_data;
 
-    return (toff_t)-1;
+    size_t size;
+
+    /* libtiff uses the size to reject offsets pointing outside the file. */
+    if (sail_io_size(io, &size) != SAIL_OK)
+    {
+        TIFFError(NULL, "Failed to get the size of the I/O stream");
+        return (toff_t)-1;
+    }
+
+    return (toff_t)size;
 }

@@ -119,7 +119,7 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io* io,
      */
     tiff_state->tiff =
         TIFFClientOpen("sail-codec-tiff", "rhm", io, tiff_private_my_read_proc, tiff_private_my_write_proc,
-                       tiff_private_my_seek_proc, tiff_private_my_dummy_close_proc, tiff_private_my_dummy_size_proc,
+                       tiff_private_my_seek_proc, tiff_private_my_dummy_close_proc, tiff_private_my_size_proc,
                        /* map */ NULL,
                        /* unmap */ NULL);
 
@@ -344,7 +344,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io* io,
      */
     tiff_state->tiff = TIFFClientOpen(
         "tiff-sail-codec", "wm", io, tiff_private_my_read_proc, tiff_private_my_write_proc, tiff_private_my_seek_proc,
-        /* libsail will close for us. */ tiff_private_my_dummy_close_proc, tiff_private_my_dummy_size_proc,
+        /* libsail will close for us. */ tiff_private_my_dummy_close_proc, tiff_private_my_size_proc,
         /* map */ NULL,
         /* unmap */ NULL);
 
