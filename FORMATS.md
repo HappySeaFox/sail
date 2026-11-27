@@ -822,9 +822,9 @@
     <td>23</td>
     <td><a href="https://wikipedia.org/wiki/TIFF">TIFF</a></td>
     <td>
-        <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 40-bit, 48-bit, 64-bit, 80-bit.
+        <b>Bit depth:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit, 24-bit, 32-bit, 36-bit, 40-bit, 48-bit, 64-bit, 80-bit.
         <br/><br/>
-        <b>Color spaces:</b> Grayscale, Indexed, RGB, RGBA, CMYK, CMYKA, YCbCr, CIELab.
+        <b>Color spaces:</b> Grayscale, Indexed, RGB, RGBA, CMYK, CMYKA, YCbCr, CIELab, ICC Lab, ITU Lab.
         <br/><br/>
         <b>Compressions:</b><sup><a href="#star-underlying">[1]</a></sup> ADOBE-DEFLATE, CCITT-RLE, CCITT-RLEW, CCITT-T4, CCITT-T6, DCS, DEFLATE, IT-8BL, IT8-CTPAD, IT8-LW, IT8-MP, JBIG, JPEG, JPEG-2000, LERC, LZMA, LZW, NEXT, NONE, OJPEG, PACKBITS, PIXAR-FILM, PIXAR-LOG, SGI-LOG24, SGI-LOG, T43, T85, THUNDERSCAN, WEBP, ZSTD.
         <br/><br/>
@@ -836,7 +836,7 @@
         <br/>
         <b>Grayscale+Alpha:</b> 8-bit (4+4), 16-bit (8+8), 32-bit (16+16).
         <br/>
-        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit.
+        <b>Indexed:</b> 1-bit, 2-bit, 4-bit, 8-bit, 16-bit.
         <br/>
         <b>RGB:</b> 24-bit (8×3), 48-bit (16×3).
         <br/>
@@ -848,7 +848,11 @@
         <br/>
         <b>YCbCr:</b> 24-bit (8×3).
         <br/>
-        <b>CIELab:</b> 24-bit (8×3).
+        <b>CIELab:</b> 24-bit (8×3), 48-bit (16×3).
+        <br/>
+        <b>ICC Lab:</b> 24-bit (8×3), 48-bit (16×3).
+        <br/>
+        <b>ITU Lab:</b> 24-bit (8×3), 36-bit (12×3).
         <br/><br/>
         <b>Compressions:</b><sup><a href="#star-underlying">[1]</a></sup> ADOBE-DEFLATE, CCITT-RLE, CCITT-RLEW, CCITT-T4, CCITT-T6, DCS, DEFLATE, IT-8BL, IT8-CTPAD, IT8-LW, IT8-MP, JBIG, JPEG, JPEG-2000, LERC, LZMA, LZW, NEXT, NONE, OJPEG, PACKBITS, PIXAR-FILM, PIXAR-LOG, SGI-LOG24, SGI-LOG, T43, T85, THUNDERSCAN, WEBP, ZSTD.
         <br/><br/>
