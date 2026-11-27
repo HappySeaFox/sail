@@ -450,6 +450,7 @@ sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF* tiff, enum SailPixe
             case 2: *result = SAIL_PIXEL_FORMAT_BPP2_INDEXED; return SAIL_OK;
             case 4: *result = SAIL_PIXEL_FORMAT_BPP4_INDEXED; return SAIL_OK;
             case 8: *result = SAIL_PIXEL_FORMAT_BPP8_INDEXED; return SAIL_OK;
+            case 16: *result = SAIL_PIXEL_FORMAT_BPP16_INDEXED; return SAIL_OK;
             }
         }
         break;
@@ -657,6 +658,13 @@ sail_status_t tiff_private_sail_pixel_format_to_tiff(enum SailPixelFormat pixel_
     {
         *photometric       = PHOTOMETRIC_PALETTE;
         *bits_per_sample   = 8;
+        *samples_per_pixel = 1;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP16_INDEXED:
+    {
+        *photometric       = PHOTOMETRIC_PALETTE;
+        *bits_per_sample   = 16;
         *samples_per_pixel = 1;
         break;
     }
