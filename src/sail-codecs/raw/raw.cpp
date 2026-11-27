@@ -25,6 +25,7 @@
 
 #include <cstring>
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 #include <libraw/libraw.h>
@@ -116,73 +117,84 @@ extern "C" SAIL_EXPORT sail_status_t sail_codec_load_init_v8_raw(struct sail_io*
 {
     *state = NULL;
 
-    struct raw_state* raw_state;
-    SAIL_TRY(alloc_raw_state(io, load_options, NULL, &raw_state));
-    *state = raw_state;
-
-    raw_state->raw_processor.reset(new LibRaw());
-
-    if (raw_state->raw_processor == NULL)
+    /*
+     * We allocate, and so does LibRaw as it parses. We are called from C, where an escaping
+     * exception means std::terminate.
+     */
+    try
     {
-        SAIL_LOG_ERROR("RAW: Failed to initialize LibRaw");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        struct raw_state* raw_state;
+        SAIL_TRY(alloc_raw_state(io, load_options, NULL, &raw_state));
+        *state = raw_state;
+
+        raw_state->raw_processor.reset(new LibRaw());
+
+        // Set EXIF parser callback to collect EXIF data.
+        raw_state->raw_processor->set_exifparser_handler(raw_exif_parser_callback, &raw_state->exif_data);
+
+        // Handle tuning options.
+        if (load_options != NULL && load_options->tuning != NULL)
+        {
+            sail_traverse_hash_map_with_user_data(load_options->tuning, raw_private_tuning_key_value_callback,
+                                                  raw_state->raw_processor.get());
+        }
+
+        raw_state->datastream.reset(new sail::raw::SailRawDatastream(io));
+
+        if (raw_state->datastream->valid() == 0)
+        {
+            SAIL_LOG_ERROR("RAW: Failed to create datastream");
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        int ret;
+
+        if (ret = raw_state->raw_processor->open_datastream(raw_state->datastream.get()); ret != LIBRAW_SUCCESS)
+        {
+            SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        // Reject too large images before unpack() and dcraw_process() decode them. Some images
+        // get smaller after the processing, so leave them to the final check that SAIL does after it.
+        // Half size processing shrinks the image. Fuji SuperCCD sizes describe a canvas rotated
+        // by 45 degrees, and the image becomes smaller after LibRaw rotates it back.
+        if (raw_state->raw_processor->imgdata.params.half_size == 0 && raw_state->raw_processor->is_fuji_rotated() == 0)
+        {
+            const libraw_image_sizes_t& sizes = raw_state->raw_processor->imgdata.sizes;
+            const bool swap_dimensions        = (sizes.flip & 4) != 0;
+
+            SAIL_TRY(sail_check_image_dimensions_allowed(load_options, swap_dimensions ? sizes.height : sizes.width,
+                                                         swap_dimensions ? sizes.width : sizes.height));
+        }
+
+        if (ret = raw_state->raw_processor->unpack(); ret != LIBRAW_SUCCESS)
+        {
+            SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+        if (ret = raw_state->raw_processor->dcraw_process(); ret != LIBRAW_SUCCESS)
+        {
+            SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
+
+        raw_state->processed_image = raw_state->raw_processor->dcraw_make_mem_image(&ret);
+
+        if (raw_state->processed_image == NULL)
+        {
+            SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+        }
     }
-
-    // Set EXIF parser callback to collect EXIF data.
-    raw_state->raw_processor->set_exifparser_handler(raw_exif_parser_callback, &raw_state->exif_data);
-
-    // Handle tuning options.
-    if (load_options != NULL && load_options->tuning != NULL)
+    catch (const std::bad_alloc&)
     {
-        sail_traverse_hash_map_with_user_data(load_options->tuning, raw_private_tuning_key_value_callback,
-                                              raw_state->raw_processor.get());
+        SAIL_LOG_ERROR("RAW: Failed to allocate memory");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
     }
-
-    raw_state->datastream.reset(new sail::raw::SailRawDatastream(io));
-
-    if (raw_state->datastream == NULL || raw_state->datastream->valid() == 0)
+    catch (const std::exception& e)
     {
-        SAIL_LOG_ERROR("RAW: Failed to create datastream");
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
-
-    int ret;
-
-    if (ret = raw_state->raw_processor->open_datastream(raw_state->datastream.get()); ret != LIBRAW_SUCCESS)
-    {
-        SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
-
-    // Reject too large images before unpack() and dcraw_process() decode them. Some images
-    // get smaller after the processing, so leave them to the final check that SAIL does after it.
-    // Half size processing shrinks the image. Fuji SuperCCD sizes describe a canvas rotated
-    // by 45 degrees, and the image becomes smaller after LibRaw rotates it back.
-    if (raw_state->raw_processor->imgdata.params.half_size == 0 && raw_state->raw_processor->is_fuji_rotated() == 0)
-    {
-        const libraw_image_sizes_t& sizes = raw_state->raw_processor->imgdata.sizes;
-        const bool swap_dimensions        = (sizes.flip & 4) != 0;
-
-        SAIL_TRY(sail_check_image_dimensions_allowed(load_options, swap_dimensions ? sizes.height : sizes.width,
-                                                     swap_dimensions ? sizes.width : sizes.height));
-    }
-
-    if (ret = raw_state->raw_processor->unpack(); ret != LIBRAW_SUCCESS)
-    {
-        SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
-    if (ret = raw_state->raw_processor->dcraw_process(); ret != LIBRAW_SUCCESS)
-    {
-        SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
-
-    raw_state->processed_image = raw_state->raw_processor->dcraw_make_mem_image(&ret);
-
-    if (raw_state->processed_image == NULL)
-    {
-        SAIL_LOG_ERROR("RAW: %s", libraw_strerror(ret));
+        SAIL_LOG_ERROR("RAW: Failed to load the image: %s", e.what());
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
