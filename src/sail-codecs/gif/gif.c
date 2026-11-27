@@ -644,6 +644,16 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
         SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
     }
 
+    /*
+     * The frame delay is an unsigned 16 bit count of centiseconds.
+     * 655360 ms is 65536 centiseconds and would be stored as 0, which then loads as 100 ms.
+     */
+    if (image->delay > 0 && (unsigned)image->delay / 10 > UINT16_MAX)
+    {
+        SAIL_LOG_ERROR("GIF: Frame delay %d ms does not fit into 16 bits", image->delay);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_ARGUMENT);
+    }
+
     /* First frame: initialize GIF and write header. */
     if (gif_state->is_first_frame)
     {
