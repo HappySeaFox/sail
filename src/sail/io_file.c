@@ -61,6 +61,15 @@ static sail_status_t io_file_tolerant_read(void* stream, void* buf, size_t size_
 
     *read_size = fread(buf, 1, size_to_read, io_file_state->fptr);
 
+    /*
+     * fread returns a short count both at EOF and on a real error.
+     * EOF is a successful short read. A sticky stream error is not.
+     */
+    if (ferror(io_file_state->fptr) != 0)
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_READ_IO);
+    }
+
     return SAIL_OK;
 }
 
