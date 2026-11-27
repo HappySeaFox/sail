@@ -61,6 +61,12 @@ int SailRawDatastream::read(void* buffer, size_t size, size_t nmemb)
         return -1;
     }
 
+    /* LibRaw doesn't promise a non-zero item size and we divide by it below. */
+    if (size == 0)
+    {
+        return 0;
+    }
+
     size_t total_bytes = size * nmemb;
     size_t bytes_read;
 
