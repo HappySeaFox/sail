@@ -634,6 +634,16 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
         SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
     }
 
+    /*
+     * The logical screen and the image rectangle are unsigned 16 bit fields.
+     * A larger value is stored truncated, so a 65536 wide image is written as width 0.
+     */
+    if (image->width == 0 || image->height == 0 || image->width > UINT16_MAX || image->height > UINT16_MAX)
+    {
+        SAIL_LOG_ERROR("GIF: Invalid dimensions %ux%u", image->width, image->height);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
     /* First frame: initialize GIF and write header. */
     if (gif_state->is_first_frame)
     {
