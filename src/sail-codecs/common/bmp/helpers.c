@@ -475,6 +475,16 @@ sail_status_t bmp_private_write_rle8_scan_line(struct sail_io* io, const unsigne
     return SAIL_OK;
 }
 
+/*
+ * Scan lines of 4-bit images hold two pixels per byte. Fetch the index of the specified pixel.
+ */
+static uint8_t bmp_private_index4(const unsigned char* scan, unsigned index)
+{
+    const unsigned char byte = scan[index / 2];
+
+    return (index % 2 == 0) ? (uint8_t)(byte >> 4) : (uint8_t)(byte & 0xf);
+}
+
 sail_status_t bmp_private_write_rle4_scan_line(struct sail_io* io, const unsigned char* scan, unsigned width)
 {
     unsigned i = 0;
@@ -483,7 +493,8 @@ sail_status_t bmp_private_write_rle4_scan_line(struct sail_io* io, const unsigne
     {
         /* Find run length. */
         unsigned run_length = 1;
-        while (i + run_length < width && run_length < 255 && scan[i] == scan[i + run_length])
+        while (i + run_length < width && run_length < 255
+               && bmp_private_index4(scan, i) == bmp_private_index4(scan, i + run_length))
         {
             run_length++;
         }
@@ -491,10 +502,12 @@ sail_status_t bmp_private_write_rle4_scan_line(struct sail_io* io, const unsigne
         if (run_length > 1)
         {
             /* Encoded run: count + packed value. */
+            const uint8_t index = bmp_private_index4(scan, i);
+
             uint8_t encoded[2];
             encoded[0] = (uint8_t)run_length;
             /* Pack two 4-bit values into one byte. */
-            encoded[1] = (uint8_t)((scan[i] << 4) | scan[i]);
+            encoded[1] = (uint8_t)((index << 4) | index);
             SAIL_TRY(io->strict_write(io->stream, encoded, 2));
             i += run_length;
         }
@@ -507,7 +520,8 @@ sail_status_t bmp_private_write_rle4_scan_line(struct sail_io* io, const unsigne
                 /* Check if there's a run of same pixels ahead. */
                 unsigned ahead_run = 1;
                 while (i + literal_length + ahead_run < width && ahead_run < 3
-                       && scan[i + literal_length] == scan[i + literal_length + ahead_run])
+                       && bmp_private_index4(scan, i + literal_length)
+                              == bmp_private_index4(scan, i + literal_length + ahead_run))
                 {
                     ahead_run++;
                 }
@@ -534,12 +548,13 @@ sail_status_t bmp_private_write_rle4_scan_line(struct sail_io* io, const unsigne
                 uint8_t packed;
                 if (i + j * 2 + 1 < width)
                 {
-                    packed = (uint8_t)((scan[i + j * 2] << 4) | scan[i + j * 2 + 1]);
+                    packed = (uint8_t)((bmp_private_index4(scan, i + j * 2) << 4)
+                                       | bmp_private_index4(scan, i + j * 2 + 1));
                 }
                 else
                 {
                     /* Last pixel, pad with 0. */
-                    packed = (uint8_t)(scan[i + j * 2] << 4);
+                    packed = (uint8_t)(bmp_private_index4(scan, i + j * 2) << 4);
                 }
                 SAIL_TRY(io->strict_write(io->stream, &packed, 1));
             }
