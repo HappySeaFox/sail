@@ -845,21 +845,28 @@ sail_status_t bmp_private_write_seek_next_frame(void* state, struct sail_io* io,
     }
 
     /* For RLE compression, bitmap size is unknown and can be 0. For uncompressed, calculate the size. */
-    const unsigned bitmap_size =
-        (compression == 0) ? (bmp_state->bytes_in_row + bmp_state->pad_bytes) * image->height : 0;
-    const unsigned file_header_size = (bmp_state->bmp_load_options & SAIL_WRITE_BMP_FILE_HEADER) ? 14 : 0;
-    const unsigned dib_header_size  = 40;
-    const unsigned offset           = file_header_size + dib_header_size + palette_size;
+    const uint64_t bitmap_size =
+        (compression == 0) ? ((uint64_t)bmp_state->bytes_in_row + bmp_state->pad_bytes) * image->height : 0;
+    const uint64_t file_header_size = (bmp_state->bmp_load_options & SAIL_WRITE_BMP_FILE_HEADER) ? 14 : 0;
+    const uint64_t dib_header_size  = 40;
+    const uint64_t offset           = file_header_size + dib_header_size + palette_size;
+
+    /* BMP stores sizes and offsets in 32-bit fields. */
+    if (offset + bitmap_size > UINT32_MAX)
+    {
+        SAIL_LOG_ERROR("BMP: Image of %llu bytes is too large to save", (unsigned long long)(offset + bitmap_size));
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
 
     /* Write file header only if requested (BMP files have it, ICO files don't). */
     if (bmp_state->bmp_load_options & SAIL_WRITE_BMP_FILE_HEADER)
     {
         struct SailBmpDibFileHeader file_header = {
             .type      = 0x4D42, /* "BM" */
-            .size      = offset + bitmap_size,
+            .size      = (uint32_t)(offset + bitmap_size),
             .reserved1 = 0,
             .reserved2 = 0,
-            .offset    = offset,
+            .offset    = (uint32_t)offset,
         };
         SAIL_TRY(bmp_private_write_dib_file_header(io, &file_header));
     }
@@ -894,7 +901,7 @@ sail_status_t bmp_private_write_seek_next_frame(void* state, struct sail_io* io,
 
     struct SailBmpDibHeaderV3 v3 = {
         .compression        = compression,
-        .bitmap_size        = bitmap_size,
+        .bitmap_size        = (uint32_t)bitmap_size,
         .x_pixels_per_meter = x_pixels_per_meter,
         .y_pixels_per_meter = y_pixels_per_meter,
         .colors_used        = colors_used,
