@@ -24,6 +24,7 @@
 */
 
 #include <climits>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -77,32 +78,45 @@ int SailRawDatastream::read(void* buffer, size_t size, size_t nmemb)
 
 int SailRawDatastream::seek(INT64 offset, int whence)
 {
-    long seek_offset;
+    INT64 target;
 
     switch (whence)
     {
-    case SEEK_SET: seek_offset = static_cast<long>(offset); break;
-    case SEEK_CUR: seek_offset = static_cast<long>(mPosition + offset); break;
+    case SEEK_SET: target = offset; break;
+    case SEEK_CUR: target = static_cast<INT64>(mPosition) + offset; break;
     case SEEK_END:
         {
             if (mSize == SIZE_MAX)
             {
                 return -1;
             }
-            seek_offset = static_cast<long>(mSize + offset);
+            target = static_cast<INT64>(mSize) + offset;
             break;
         }
     default: return -1;
     }
 
-    sail_status_t err = mIo->seek(mIo->stream, seek_offset, SEEK_SET);
+    if (target < 0)
+    {
+        return -1;
+    }
+
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < INT64_MAX
+    if (target > LONG_MAX)
+    {
+        return -1;
+    }
+#endif
+
+    sail_status_t err = mIo->seek(mIo->stream, static_cast<long>(target), SEEK_SET);
 
     if (err != SAIL_OK)
     {
         return -1;
     }
 
-    mPosition = static_cast<size_t>(seek_offset);
+    mPosition = static_cast<size_t>(target);
 
     return 0;
 }
