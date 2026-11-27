@@ -23,6 +23,8 @@
     SOFTWARE.
 */
 
+#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #include <sail-common/sail-common.h>
@@ -197,17 +199,29 @@ sail_status_t bmp_private_skip_end_of_scan_line(struct sail_io* io)
 
 sail_status_t bmp_private_bytes_in_row(unsigned width, unsigned bit_count, unsigned* bytes_in_row)
 {
+    /* Compute in 64 bits: the width comes from the file and may overflow the row size. */
+    uint64_t bytes;
+
     switch (bit_count)
     {
-    case 1: *bytes_in_row = (width + 7) / 8; return SAIL_OK;
-    case 4: *bytes_in_row = (width + 1) / 2; return SAIL_OK;
-    case 8: *bytes_in_row = width; return SAIL_OK;
-    case 16: *bytes_in_row = width * 2; return SAIL_OK;
-    case 24: *bytes_in_row = width * 3; return SAIL_OK;
-    case 32: *bytes_in_row = width * 4; return SAIL_OK;
+    case 1: bytes = ((uint64_t)width + 7) / 8; break;
+    case 4: bytes = ((uint64_t)width + 1) / 2; break;
+    case 8: bytes = width; break;
+    case 16: bytes = (uint64_t)width * 2; break;
+    case 24: bytes = (uint64_t)width * 3; break;
+    case 32: bytes = (uint64_t)width * 4; break;
+    default: SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
     }
 
-    SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_FORMAT);
+    if (bytes > UINT_MAX)
+    {
+        SAIL_LOG_ERROR("BMP: Row of %u pixels with %u bits per pixel doesn't fit into memory", width, bit_count);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE_DIMENSIONS);
+    }
+
+    *bytes_in_row = (unsigned)bytes;
+
+    return SAIL_OK;
 }
 
 unsigned bmp_private_pad_bytes(unsigned bytes_in_row)

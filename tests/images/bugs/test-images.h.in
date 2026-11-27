@@ -9,6 +9,7 @@ static const char * const SAIL_TEST_IMAGES_MUST_FAIL[] = {
 
 #ifdef SAIL_HAVE_BUILTIN_BMP
     "@SAIL_TEST_IMAGES_PATH@/bmp/TALOS-2025-2215.bmp",
+    "@SAIL_TEST_IMAGES_PATH@/bmp/row-size-overflow.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/TALOS-2025-2216.bmp",
     "@SAIL_TEST_IMAGES_PATH@/bmp/core-header-huge-dimensions.bmp",
 #endif
