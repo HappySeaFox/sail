@@ -443,6 +443,26 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, c
         green_colormap = red_colormap + palette_count;
         blue_colormap  = green_colormap + palette_count;
 
+        /* We read three components per color below, so the layout must be known. */
+        unsigned bytes_per_color;
+
+        switch (image->palette->pixel_format)
+        {
+        case SAIL_PIXEL_FORMAT_BPP24_RGB:
+            bytes_per_color = 3;
+            break;
+        case SAIL_PIXEL_FORMAT_BPP32_RGBA:
+            bytes_per_color = 4;
+            break;
+        default:
+        {
+            sail_free(ptr);
+            SAIL_LOG_ERROR("TIFF: Unsupported palette format %s",
+                           sail_pixel_format_to_string(image->palette->pixel_format));
+            SAIL_LOG_AND_RETURN(SAIL_ERROR_UNSUPPORTED_PIXEL_FORMAT);
+        }
+        }
+
         const uint8_t* palette_data = image->palette->data;
         const unsigned actual_colors =
             image->palette->color_count < palette_count ? image->palette->color_count : palette_count;
@@ -450,9 +470,9 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, c
         for (unsigned i = 0; i < actual_colors; i++)
         {
             /* Convert 8-bit palette to 16-bit TIFF palette. */
-            red_colormap[i]   = (uint16_t)(palette_data[i * 3 + 0] << 8);
-            green_colormap[i] = (uint16_t)(palette_data[i * 3 + 1] << 8);
-            blue_colormap[i]  = (uint16_t)(palette_data[i * 3 + 2] << 8);
+            red_colormap[i]   = (uint16_t)(palette_data[i * bytes_per_color + 0] << 8);
+            green_colormap[i] = (uint16_t)(palette_data[i * bytes_per_color + 1] << 8);
+            blue_colormap[i]  = (uint16_t)(palette_data[i * bytes_per_color + 2] << 8);
         }
 
         /* Fill remaining entries with black if needed. */
