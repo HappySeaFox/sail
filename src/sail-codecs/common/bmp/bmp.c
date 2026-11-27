@@ -105,20 +105,20 @@ static sail_status_t alloc_bmp_state(struct bmp_state** bmp_state)
     SAIL_TRY(sail_malloc(sizeof(struct bmp_state), &ptr));
     *bmp_state = ptr;
 
-    if (*bmp_state == NULL)
-    {
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
-    }
-
-    (*bmp_state)->load_options     = NULL;
-    (*bmp_state)->save_options     = NULL;
-    (*bmp_state)->bmp_load_options = 0;
-    (*bmp_state)->iccp             = NULL;
-    (*bmp_state)->palette          = NULL;
-    (*bmp_state)->palette_count    = 0;
-    (*bmp_state)->bytes_in_row     = 0;
-    (*bmp_state)->pad_bytes        = 0;
-    (*bmp_state)->flipped          = false;
+    /* Zero out the DIB headers as well: not every BMP version fills all of them. */
+    **bmp_state = (struct bmp_state){
+        .load_options        = NULL,
+        .save_options        = NULL,
+        .bmp_load_options    = 0,
+        .source_pixel_format = SAIL_PIXEL_FORMAT_UNKNOWN,
+        .version             = SAIL_BMP_V1,
+        .iccp                = NULL,
+        .palette             = NULL,
+        .palette_count       = 0,
+        .bytes_in_row        = 0,
+        .pad_bytes           = 0,
+        .flipped             = false,
+    };
 
     return SAIL_OK;
 }
@@ -441,8 +441,10 @@ sail_status_t bmp_private_read_seek_next_frame(void* state, struct sail_io* io, 
         image_local->source_image->pixel_format = bmp_state->source_pixel_format;
         image_local->source_image->orientation =
             bmp_state->flipped ? SAIL_ORIENTATION_MIRRORED_VERTICALLY : SAIL_ORIENTATION_NORMAL;
+        /* Only V3 and newer headers have the compression field. */
         image_local->source_image->compression =
-            (bmp_state->v3.compression == SAIL_BI_RLE4 || bmp_state->v3.compression == SAIL_BI_RLE8)
+            (bmp_state->version >= SAIL_BMP_V3
+             && (bmp_state->v3.compression == SAIL_BI_RLE4 || bmp_state->v3.compression == SAIL_BI_RLE8))
                 ? SAIL_COMPRESSION_RLE
                 : SAIL_COMPRESSION_NONE;
     }
