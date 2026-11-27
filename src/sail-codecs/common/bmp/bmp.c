@@ -371,7 +371,7 @@ sail_status_t bmp_private_read_init(struct sail_io* io,
         }
 
         void* ptr;
-        SAIL_TRY(sail_malloc(sizeof(sail_rgba32_t) * bmp_state->palette_count, &ptr));
+        SAIL_TRY(sail_malloc(sizeof(sail_rgb24_t) * bmp_state->palette_count, &ptr));
         bmp_state->palette = ptr;
 
         if (bmp_state->version == SAIL_BMP_V2)
