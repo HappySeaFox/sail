@@ -526,12 +526,15 @@ sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF* tiff, enum SailPixe
         /* CIELab color space for accurate color representation. */
         if (samples_per_pixel == 3)
         {
+            /* TIFF spec allows mixed bit depths for CIELab (L=8, a=16, b=16). */
             switch (bits_per_sample)
             {
             case 8:
                 *result = SAIL_PIXEL_FORMAT_BPP24_CIE_LAB;
                 return SAIL_OK;
-                /* Note: TIFF spec allows mixed bit depths for CIELab (L=8, a=16, b=16). */
+            case 16:
+                *result = SAIL_PIXEL_FORMAT_BPP48_CIE_LAB;
+                return SAIL_OK;
             }
         }
         break;
@@ -747,6 +750,13 @@ sail_status_t tiff_private_sail_pixel_format_to_tiff(enum SailPixelFormat pixel_
     {
         *photometric       = PHOTOMETRIC_CIELAB;
         *bits_per_sample   = 8;
+        *samples_per_pixel = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP48_CIE_LAB:
+    {
+        *photometric       = PHOTOMETRIC_CIELAB;
+        *bits_per_sample   = 16;
         *samples_per_pixel = 3;
         break;
     }
