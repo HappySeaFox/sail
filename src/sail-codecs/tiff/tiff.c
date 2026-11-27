@@ -35,6 +35,9 @@
 #include "helpers.h"
 #include "io.h"
 
+/* A TIFF colormap holds 1 << bits_per_sample entries per component. */
+static const uint16_t SAIL_TIFF_MAX_PALETTE_BITS_PER_SAMPLE = 16;
+
 /*
  * Codec-specific state.
  */
@@ -197,9 +200,15 @@ SAIL_EXPORT sail_status_t sail_codec_load_seek_next_frame_v8_tiff(void* state, s
         uint16_t* green_colormap = NULL;
         uint16_t* blue_colormap  = NULL;
 
-        if (TIFFGetField(tiff_state->tiff, TIFFTAG_COLORMAP, &red_colormap, &green_colormap, &blue_colormap))
+        /* A colormap holds 1 << bits_per_sample entries, which only fits small sample sizes. */
+        if (tiff_state->bits_per_sample > SAIL_TIFF_MAX_PALETTE_BITS_PER_SAMPLE)
         {
-            const unsigned palette_count = 1 << tiff_state->bits_per_sample;
+            SAIL_LOG_ERROR("TIFF: Palette images with %u bits per sample are not supported",
+                           tiff_state->bits_per_sample);
+        }
+        else if (TIFFGetField(tiff_state->tiff, TIFFTAG_COLORMAP, &red_colormap, &green_colormap, &blue_colormap))
+        {
+            const unsigned palette_count = 1U << tiff_state->bits_per_sample;
 
             SAIL_TRY_OR_CLEANUP(sail_alloc_palette(&image_local->palette),
                                 /* cleanup */ sail_destroy_image(image_local));
@@ -422,7 +431,7 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_tiff(void* state, c
             SAIL_LOG_AND_RETURN(SAIL_ERROR_MISSING_PALETTE);
         }
 
-        const unsigned palette_count = 1 << bits_per_sample;
+        const unsigned palette_count = 1U << bits_per_sample;
         uint16_t* red_colormap       = NULL;
         uint16_t* green_colormap     = NULL;
         uint16_t* blue_colormap      = NULL;
