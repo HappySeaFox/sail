@@ -309,6 +309,14 @@ bool gif_private_color_maps_equal(const ColorMapObject* left, const ColorMapObje
     return true;
 }
 
+void gif_private_fill_rgba(unsigned char* pixels, unsigned pixel_count, const unsigned char color[4])
+{
+    for (unsigned i = 0; i < pixel_count; i++)
+    {
+        memcpy(pixels + (size_t)i * 4, color, 4);
+    }
+}
+
 bool gif_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
     struct gif_tuning_state* tuning_state = (struct gif_tuning_state*)user_data;

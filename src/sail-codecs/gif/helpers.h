@@ -58,6 +58,8 @@ SAIL_HIDDEN sail_status_t gif_private_build_color_map(const struct sail_palette*
 
 SAIL_HIDDEN bool gif_private_color_maps_equal(const ColorMapObject* left, const ColorMapObject* right);
 
+SAIL_HIDDEN void gif_private_fill_rgba(unsigned char* pixels, unsigned pixel_count, const unsigned char color[4]);
+
 SAIL_HIDDEN sail_status_t gif_private_convert_rgba_palette_to_rgb(const struct sail_palette* source_palette,
                                                                   struct sail_palette** target_palette,
                                                                   int* transparency_index);

@@ -421,6 +421,37 @@ SAIL_EXPORT sail_status_t sail_codec_load_frame_v8_gif(void* state, struct sail_
     const int last_pass          = passes - 1;
     unsigned next_interlaced_row = 0;
 
+    /*
+     * Pixels the first image does not cover take the logical screen background.
+     * A transparent index leaves them empty, so a transparent color stays clear.
+     */
+    if (gif_state->current_image == 0 && gif_state->transparency_index < 0)
+    {
+        for (unsigned y = 0; y < image->height; y++)
+        {
+            unsigned char* canvas_row = gif_state->first_frame[y];
+
+            if (y < gif_state->row || y >= gif_state->row + gif_state->height)
+            {
+                gif_private_fill_rgba(canvas_row, image->width, gif_state->background);
+                continue;
+            }
+
+            if (gif_state->column > 0)
+            {
+                gif_private_fill_rgba(canvas_row, gif_state->column, gif_state->background);
+            }
+
+            unsigned covered_right = gif_state->column + gif_state->width;
+
+            if (covered_right < image->width)
+            {
+                gif_private_fill_rgba(canvas_row + (size_t)covered_right * 4, image->width - covered_right,
+                                      gif_state->background);
+            }
+        }
+    }
+
     for (int current_pass = 0; current_pass < passes; current_pass++)
     {
         /* Apply disposal method on the previous frame. */
