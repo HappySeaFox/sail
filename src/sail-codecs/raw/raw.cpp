@@ -66,11 +66,16 @@ struct raw_state
     const struct sail_load_options* load_options;
     const struct sail_save_options* save_options;
 
-    std::unique_ptr<LibRaw> raw_processor;
     libraw_processed_image_t* processed_image;
     std::unique_ptr<LibRaw_abstract_datastream> datastream;
     std::vector<unsigned char> exif_data;
     bool frame_processed;
+
+    /*
+     * Declared last on purpose: LibRaw holds the datastream and the EXIF buffer above, so it must be
+     * destroyed before them.
+     */
+    std::unique_ptr<LibRaw> raw_processor;
 };
 
 static sail_status_t alloc_raw_state(struct sail_io* io,
@@ -82,11 +87,11 @@ static sail_status_t alloc_raw_state(struct sail_io* io,
         io,                                              // io
         load_options,                                    // load_options
         save_options,                                    // save_options
-        std::unique_ptr<LibRaw>(),                       // raw_processor
         nullptr,                                         // processed_image
         std::unique_ptr<sail::raw::SailRawDatastream>(), // datastream
         {},                                              // exif_data
-        false                                            // frame_processed
+        false,                                           // frame_processed
+        std::unique_ptr<LibRaw>()                        // raw_processor
     };
 
     return SAIL_OK;
