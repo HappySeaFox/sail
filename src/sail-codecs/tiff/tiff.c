@@ -103,9 +103,6 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io* io,
 {
     *state = NULL;
 
-    TIFFSetWarningHandler(tiff_private_my_warning_fn);
-    TIFFSetErrorHandler(tiff_private_my_error_fn);
-
     /* Allocate a new state. */
     struct tiff_state* tiff_state;
     SAIL_TRY(alloc_tiff_state(load_options, NULL, &tiff_state));
@@ -117,17 +114,8 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_tiff(struct sail_io* io,
      * 'h': read TIFF header only
      * 'm': disable use of memory-mapped files
      */
-    tiff_state->tiff =
-        TIFFClientOpen("sail-codec-tiff", "rhm", io, tiff_private_my_read_proc, tiff_private_my_write_proc,
-                       tiff_private_my_seek_proc, tiff_private_my_dummy_close_proc, tiff_private_my_size_proc,
-                       /* map */ NULL,
-                       /* unmap */ NULL);
-
-    if (tiff_state->tiff == NULL)
-    {
-        tiff_state->libtiff_error = true;
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
+    SAIL_TRY_OR_CLEANUP(tiff_private_open_client(io, "sail-codec-tiff", "rhm", &tiff_state->tiff),
+                        /* cleanup */ tiff_state->libtiff_error = true);
 
     return SAIL_OK;
 }
@@ -344,25 +332,13 @@ SAIL_EXPORT sail_status_t sail_codec_save_init_v8_tiff(struct sail_io* io,
                                                      sail_compression_to_string(tiff_state->save_options->compression));
                         return __sail_status);
 
-    TIFFSetWarningHandler(tiff_private_my_warning_fn);
-    TIFFSetErrorHandler(tiff_private_my_error_fn);
-
     /* Initialize TIFF.
      *
      * 'w': writing operation
      * 'm': disable use of memory-mapped files
      */
-    tiff_state->tiff = TIFFClientOpen(
-        "tiff-sail-codec", "wm", io, tiff_private_my_read_proc, tiff_private_my_write_proc, tiff_private_my_seek_proc,
-        /* libsail will close for us. */ tiff_private_my_dummy_close_proc, tiff_private_my_size_proc,
-        /* map */ NULL,
-        /* unmap */ NULL);
-
-    if (tiff_state->tiff == NULL)
-    {
-        tiff_state->libtiff_error = true;
-        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
-    }
+    SAIL_TRY_OR_CLEANUP(tiff_private_open_client(io, "tiff-sail-codec", "wm", &tiff_state->tiff),
+                        /* cleanup */ tiff_state->libtiff_error = true);
 
     return SAIL_OK;
 }

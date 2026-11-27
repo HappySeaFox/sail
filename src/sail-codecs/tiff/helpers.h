@@ -36,13 +36,16 @@
 #include <sail-common/status.h>
 
 struct sail_iccp;
+struct sail_io;
 struct sail_meta_data_node;
 struct sail_resolution;
 struct sail_variant;
 
-SAIL_HIDDEN void tiff_private_my_error_fn(const char* module, const char* format, va_list ap);
+SAIL_HIDDEN int tiff_private_my_error_fn(TIFF* tiff, void* user_data, const char* module, const char* format, va_list ap);
 
-SAIL_HIDDEN void tiff_private_my_warning_fn(const char* module, const char* format, va_list ap);
+SAIL_HIDDEN int tiff_private_my_warning_fn(TIFF* tiff, void* user_data, const char* module, const char* format, va_list ap);
+
+SAIL_HIDDEN sail_status_t tiff_private_open_client(struct sail_io* io, const char* name, const char* mode, TIFF** tiff);
 
 SAIL_HIDDEN enum SailCompression tiff_private_compression_to_sail_compression(int compression);
 

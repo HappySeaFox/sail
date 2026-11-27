@@ -35,9 +35,13 @@
 #include <sail-common/sail-common.h>
 
 #include "helpers.h"
+#include "io.h"
 
-void tiff_private_my_error_fn(const char* module, const char* format, va_list ap)
+int tiff_private_my_error_fn(TIFF* tiff, void* user_data, const char* module, const char* format, va_list ap)
 {
+    (void)tiff;
+    (void)user_data;
+
     char buffer[160];
 
     vsnprintf(buffer, sizeof(buffer), format, ap);
@@ -50,10 +54,16 @@ void tiff_private_my_error_fn(const char* module, const char* format, va_list ap
     {
         SAIL_LOG_ERROR("TIFF: %s", buffer);
     }
+
+    /* Non-zero keeps libtiff from also calling the process wide handler. */
+    return 1;
 }
 
-void tiff_private_my_warning_fn(const char* module, const char* format, va_list ap)
+int tiff_private_my_warning_fn(TIFF* tiff, void* user_data, const char* module, const char* format, va_list ap)
 {
+    (void)tiff;
+    (void)user_data;
+
     char buffer[160];
 
     vsnprintf(buffer, sizeof(buffer), format, ap);
@@ -66,6 +76,41 @@ void tiff_private_my_warning_fn(const char* module, const char* format, va_list 
     {
         SAIL_LOG_WARNING("TIFF: %s", buffer);
     }
+
+    /* Non-zero keeps libtiff from also calling the process wide handler. */
+    return 1;
+}
+
+sail_status_t tiff_private_open_client(struct sail_io* io, const char* name, const char* mode, TIFF** tiff)
+{
+    SAIL_CHECK_PTR(io);
+    SAIL_CHECK_PTR(name);
+    SAIL_CHECK_PTR(mode);
+    SAIL_CHECK_PTR(tiff);
+
+    /* Handlers belong to this TIFF handle, so other threads and the application keep their own. */
+    TIFFOpenOptions* options = TIFFOpenOptionsAlloc();
+
+    if (options == NULL)
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_MEMORY_ALLOCATION);
+    }
+
+    TIFFOpenOptionsSetErrorHandlerExtR(options, tiff_private_my_error_fn, NULL);
+    TIFFOpenOptionsSetWarningHandlerExtR(options, tiff_private_my_warning_fn, NULL);
+
+    *tiff = TIFFClientOpenExt(name, mode, io, tiff_private_my_read_proc, tiff_private_my_write_proc,
+                              tiff_private_my_seek_proc, tiff_private_my_dummy_close_proc, tiff_private_my_size_proc,
+                              /* map */ NULL,
+                              /* unmap */ NULL, options);
+    TIFFOpenOptionsFree(options);
+
+    if (*tiff == NULL)
+    {
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
+    }
+
+    return SAIL_OK;
 }
 
 enum SailCompression tiff_private_compression_to_sail_compression(int compression)

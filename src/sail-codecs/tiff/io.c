@@ -39,7 +39,7 @@ tmsize_t tiff_private_my_read_proc(thandle_t client_data, void* buffer, tmsize_t
 
     if (err != SAIL_OK)
     {
-        TIFFError(NULL, "Failed to read from the I/O stream: %d", err);
+        SAIL_LOG_ERROR("TIFF: Failed to read from the I/O stream: %d", err);
         return (tmsize_t)-1;
     }
 
@@ -55,7 +55,7 @@ tmsize_t tiff_private_my_write_proc(thandle_t client_data, void* buffer, tmsize_
 
     if (err != SAIL_OK)
     {
-        TIFFError(NULL, "Failed to write to the I/O stream: %d", err);
+        SAIL_LOG_ERROR("TIFF: Failed to write to the I/O stream: %d", err);
         return (tmsize_t)-1;
     }
 
@@ -73,7 +73,7 @@ toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whenc
 #if LONG_MAX < INT64_MAX
     if ((int64_t)offset > LONG_MAX || (int64_t)offset < LONG_MIN)
     {
-        TIFFError(NULL, "Offset %llu is too large to seek to", (unsigned long long)offset);
+        SAIL_LOG_ERROR("TIFF: Offset %llu is too large to seek to", (unsigned long long)offset);
         return (toff_t)-1;
     }
 #endif
@@ -82,7 +82,7 @@ toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whenc
 
     if (err != SAIL_OK)
     {
-        TIFFError(NULL, "Failed to seek the I/O stream: %d", err);
+        SAIL_LOG_ERROR("TIFF: Failed to seek the I/O stream: %d", err);
         return (toff_t)-1;
     }
 
@@ -91,7 +91,7 @@ toff_t tiff_private_my_seek_proc(thandle_t client_data, toff_t offset, int whenc
 
     if (err != SAIL_OK)
     {
-        TIFFError(NULL, "Failed to get the current position of the I/O stream: %d", err);
+        SAIL_LOG_ERROR("TIFF: Failed to get the current position of the I/O stream: %d", err);
         return (toff_t)-1;
     }
 
@@ -114,7 +114,7 @@ toff_t tiff_private_my_size_proc(thandle_t client_data)
     /* libtiff uses the size to reject offsets pointing outside the file. */
     if (sail_io_size(io, &size) != SAIL_OK)
     {
-        TIFFError(NULL, "Failed to get the size of the I/O stream");
+        SAIL_LOG_ERROR("TIFF: Failed to get the size of the I/O stream");
         return (toff_t)-1;
     }
 
