@@ -244,45 +244,72 @@ sail_status_t jpeg_private_write_resolution(struct jpeg_compress_struct* compres
     return SAIL_OK;
 }
 
-bool jpeg_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
+static void jpeg_private_apply_dct_method(J_DCT_METHOD* dct_method, const struct sail_variant* value)
+{
+    if (value == NULL || value->type != SAIL_VARIANT_TYPE_STRING || value->value == NULL)
+    {
+        SAIL_LOG_ERROR("JPEG: 'jpeg-dct-method' must be a string");
+        return;
+    }
+
+    const char* str_value = sail_variant_to_string(value);
+
+    if (strcmp(str_value, "slow") == 0)
+    {
+        SAIL_LOG_TRACE("JPEG: Applying slow DCT method");
+        *dct_method = JDCT_ISLOW;
+    }
+    else if (strcmp(str_value, "fast") == 0)
+    {
+        SAIL_LOG_TRACE("JPEG: Applying fast DCT method");
+        *dct_method = JDCT_IFAST;
+    }
+    else if (strcmp(str_value, "float") == 0)
+    {
+        SAIL_LOG_TRACE("JPEG: Applying float DCT method");
+        *dct_method = JDCT_FLOAT;
+    }
+    else
+    {
+        SAIL_LOG_ERROR("JPEG: 'jpeg-dct-method' must be 'slow', 'fast', or 'float', got '%s'", str_value);
+    }
+}
+
+bool jpeg_private_tuning_key_value_callback_load(const char* key, const struct sail_variant* value, void* user_data)
+{
+    struct jpeg_decompress_struct* decompress_context = user_data;
+
+    if (strcmp(key, "jpeg-dct-method") == 0)
+    {
+        jpeg_private_apply_dct_method(&decompress_context->dct_method, value);
+    }
+    else if (strcmp(key, "jpeg-optimize-coding") == 0 || strcmp(key, "jpeg-smoothing-factor") == 0)
+    {
+        SAIL_LOG_WARNING("JPEG: '%s' applies to saving only", key);
+    }
+
+    return true;
+}
+
+bool jpeg_private_tuning_key_value_callback_save(const char* key, const struct sail_variant* value, void* user_data)
 {
     struct jpeg_compress_struct* compress_context = user_data;
 
     if (strcmp(key, "jpeg-dct-method") == 0)
     {
-        if (value->type == SAIL_VARIANT_TYPE_STRING)
-        {
-            const char* str_value = sail_variant_to_string(value);
-
-            if (strcmp(str_value, "slow") == 0)
-            {
-                SAIL_LOG_TRACE("JPEG: Applying SLOW DCT method");
-                compress_context->dct_method = JDCT_ISLOW;
-            }
-            else if (strcmp(str_value, "fast") == 0)
-            {
-                SAIL_LOG_TRACE("JPEG: Applying FAST DCT method");
-                compress_context->dct_method = JDCT_IFAST;
-            }
-            else if (strcmp(str_value, "float") == 0)
-            {
-                SAIL_LOG_TRACE("JPEG: Applying FLOAT DCT method");
-                compress_context->dct_method = JDCT_FLOAT;
-            }
-        }
-        else
-        {
-            SAIL_LOG_ERROR("JPEG: 'jpeg-dct-method' must be a string");
-        }
+        jpeg_private_apply_dct_method(&compress_context->dct_method, value);
     }
     else if (strcmp(key, "jpeg-optimize-coding") == 0)
     {
-        bool optimize_coding = sail_variant_to_bool(value);
-
-        if (optimize_coding)
+        if (value == NULL || (value->type != SAIL_VARIANT_TYPE_BOOL && value->type != SAIL_VARIANT_TYPE_STRING))
         {
-            SAIL_LOG_TRACE("JPEG: Optimizing coding");
-            compress_context->optimize_coding = optimize_coding;
+            SAIL_LOG_ERROR("JPEG: 'jpeg-optimize-coding' must be a bool");
+        }
+        else
+        {
+            compress_context->optimize_coding = sail_variant_to_bool(value);
+            SAIL_LOG_TRACE("JPEG: Huffman optimization is %s",
+                           compress_context->optimize_coding ? "enabled" : "disabled");
         }
     }
     else if (strcmp(key, "jpeg-smoothing-factor") == 0)

@@ -330,6 +330,9 @@
         <b>YCCK:</b> 32-bit.
         <br/><br/>
         <b>Content:</b> Static, Meta data, ICC profiles.
+        <br/><br/>
+        <b>Tuning:</b> Key: <i>"jpeg-dct-method"</i>. Description: Inverse DCT method used while loading.
+        Possible values: "slow", "fast", "float".
     </td>
     <td>-</td>
     <td>
@@ -346,7 +349,7 @@
         <br/><br/>
         <b>Content:</b> Static, Meta data, ICC profiles.
         <br/><br/>
-        <b>Tuning:</b> Key: <i>"jpeg-dct-method"</i>. Description: JPEG DCT method.
+        <b>Tuning:</b> Key: <i>"jpeg-dct-method"</i>. Description: Forward DCT method used while saving.
         Possible values: "slow", "fast", "float".
         <br/>Key: <i>"jpeg-optimize-coding"</i>. Description: Compute optimal Huffman tables.
         Possible values: true or false.

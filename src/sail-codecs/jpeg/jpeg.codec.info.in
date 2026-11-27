@@ -2,7 +2,7 @@
 #
 [codec]
 layout=8
-version=1.3.5
+version=1.3.6
 priority=@JPEG_CODEC_PRIORITY@
 name=JPEG
 description=Joint Photographic Experts Group
@@ -12,7 +12,7 @@ mime-types=image/jpeg
 
 [load-features]
 features=STATIC;META-DATA@JPEG_CODEC_INFO_FEATURE_ICCP@;SOURCE-IMAGE
-tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor
+tuning=jpeg-dct-method
 
 [save-features]
 features=STATIC;META-DATA@JPEG_CODEC_INFO_FEATURE_ICCP@
@@ -23,4 +23,4 @@ compression-level-min=0
 compression-level-max=100
 compression-level-default=15
 compression-level-step=1
-tuning=
+tuning=jpeg-dct-method;jpeg-optimize-coding;jpeg-smoothing-factor

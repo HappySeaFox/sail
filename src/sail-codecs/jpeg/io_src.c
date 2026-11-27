@@ -89,7 +89,17 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo)
 
     sail_status_t err = src->io->tolerant_read(src->io->stream, src->buffer, INPUT_BUF_SIZE, &nbytes);
 
-    if (err != SAIL_OK || nbytes == 0)
+    /*
+     * A hard read error is fatal. End of input is not: libjpeg recovers a
+     * truncated image by inserting a fake EOI marker. Memory streams report
+     * the end as SAIL_ERROR_EOF, files report it as a short read.
+     */
+    if (err != SAIL_OK && err != SAIL_ERROR_EOF)
+    {
+        ERREXIT(cinfo, JERR_FILE_READ);
+    }
+
+    if (err == SAIL_ERROR_EOF || nbytes == 0)
     {
         if (src->start_of_file) /* Treat empty input file as fatal error */
             ERREXIT(cinfo, JERR_INPUT_EMPTY);

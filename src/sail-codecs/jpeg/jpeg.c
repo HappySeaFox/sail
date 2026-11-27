@@ -23,6 +23,7 @@
     SOFTWARE.
 */
 
+#include <math.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -159,6 +160,18 @@ SAIL_EXPORT sail_status_t sail_codec_load_init_v8_jpeg(struct sail_io* io,
 
     /* We don't want colormapped output. */
     jpeg_state->decompress_context->quantize_colors = false;
+
+    /*
+     * jpeg_read_header() sets dct_method back to the libjpeg default.
+     * The inverse DCT is chosen in jpeg_start_decompress(), so the override
+     * has to land between those two calls.
+     */
+    if (jpeg_state->load_options->tuning != NULL)
+    {
+        sail_traverse_hash_map_with_user_data(jpeg_state->load_options->tuning,
+                                              jpeg_private_tuning_key_value_callback_load,
+                                              jpeg_state->decompress_context);
+    }
 
     /* Launch decompression! */
     jpeg_start_decompress(jpeg_state->decompress_context);
@@ -372,17 +385,22 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_jpeg(void* state, c
     /* Save resolution. */
     SAIL_TRY(jpeg_private_write_resolution(jpeg_state->compress_context, image->resolution));
 
-    /* Compute image quality. */
-    const double compression = (jpeg_state->save_options->compression_level < COMPRESSION_MIN
-                                || jpeg_state->save_options->compression_level > COMPRESSION_MAX)
+    /*
+     * NaN compares false against both bounds, so reject every non finite value
+     * the same way as a level outside 0..100.
+     */
+    const double requested_compression = jpeg_state->save_options->compression_level;
+    const double compression = (!isfinite(requested_compression) || requested_compression < COMPRESSION_MIN
+                                || requested_compression > COMPRESSION_MAX)
                                    ? COMPRESSION_DEFAULT
-                                   : jpeg_state->save_options->compression_level;
+                                   : requested_compression;
     jpeg_set_quality(jpeg_state->compress_context, /* to quality */ (int)(COMPRESSION_MAX - compression), true);
 
     /* Handle tuning. */
     if (jpeg_state->save_options->tuning != NULL)
     {
-        sail_traverse_hash_map_with_user_data(jpeg_state->save_options->tuning, jpeg_private_tuning_key_value_callback,
+        sail_traverse_hash_map_with_user_data(jpeg_state->save_options->tuning,
+                                              jpeg_private_tuning_key_value_callback_save,
                                               jpeg_state->compress_context);
     }
 
