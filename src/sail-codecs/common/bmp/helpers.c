@@ -230,6 +230,27 @@ unsigned bmp_private_pad_bytes(unsigned bytes_in_row)
     return (remainder == 0) ? 0 : (4 - remainder);
 }
 
+/* The 16 colors every VGA adapter starts with. */
+static void bmp_private_fill_vga_colors(sail_rgb24_t* palette)
+{
+    palette[0]  = (sail_rgb24_t){0, 0, 0};
+    palette[1]  = (sail_rgb24_t){128, 0, 0};
+    palette[2]  = (sail_rgb24_t){0, 128, 0};
+    palette[3]  = (sail_rgb24_t){128, 128, 0};
+    palette[4]  = (sail_rgb24_t){0, 0, 128};
+    palette[5]  = (sail_rgb24_t){128, 0, 128};
+    palette[6]  = (sail_rgb24_t){0, 128, 128};
+    palette[7]  = (sail_rgb24_t){192, 192, 192};
+    palette[8]  = (sail_rgb24_t){128, 128, 128};
+    palette[9]  = (sail_rgb24_t){255, 0, 0};
+    palette[10] = (sail_rgb24_t){0, 255, 0};
+    palette[11] = (sail_rgb24_t){255, 255, 0};
+    palette[12] = (sail_rgb24_t){0, 0, 255};
+    palette[13] = (sail_rgb24_t){255, 0, 255};
+    palette[14] = (sail_rgb24_t){0, 255, 255};
+    palette[15] = (sail_rgb24_t){255, 255, 255};
+}
+
 sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb24_t** palette, unsigned* palette_count)
 {
     switch (bit_count)
@@ -255,22 +276,40 @@ sail_status_t bmp_private_fill_system_palette(unsigned bit_count, sail_rgb24_t**
         SAIL_TRY(sail_malloc(sizeof(sail_rgb24_t) * (*palette_count), &ptr));
         *palette = ptr;
 
-        (*palette)[0]  = (sail_rgb24_t){0, 0, 0};
-        (*palette)[1]  = (sail_rgb24_t){128, 0, 0};
-        (*palette)[2]  = (sail_rgb24_t){0, 128, 0};
-        (*palette)[3]  = (sail_rgb24_t){128, 128, 0};
-        (*palette)[4]  = (sail_rgb24_t){0, 0, 128};
-        (*palette)[5]  = (sail_rgb24_t){128, 0, 128};
-        (*palette)[6]  = (sail_rgb24_t){0, 128, 128};
-        (*palette)[7]  = (sail_rgb24_t){192, 192, 192};
-        (*palette)[8]  = (sail_rgb24_t){128, 128, 128};
-        (*palette)[9]  = (sail_rgb24_t){255, 0, 0};
-        (*palette)[10] = (sail_rgb24_t){0, 255, 0};
-        (*palette)[11] = (sail_rgb24_t){255, 255, 0};
-        (*palette)[12] = (sail_rgb24_t){0, 0, 255};
-        (*palette)[13] = (sail_rgb24_t){255, 0, 255};
-        (*palette)[14] = (sail_rgb24_t){0, 255, 255};
-        (*palette)[15] = (sail_rgb24_t){255, 255, 255};
+        bmp_private_fill_vga_colors(*palette);
+
+        return SAIL_OK;
+    }
+    case 8:
+    {
+        *palette_count = 256;
+
+        void* ptr;
+        SAIL_TRY(sail_malloc(sizeof(sail_rgb24_t) * (*palette_count), &ptr));
+        *palette = ptr;
+
+        /* The VGA colors, a 6x6x6 color cube, and a gray ramp: the default halftone palette. */
+        bmp_private_fill_vga_colors(*palette);
+
+        unsigned index = 16;
+
+        for (unsigned r = 0; r < 6; r++)
+        {
+            for (unsigned g = 0; g < 6; g++)
+            {
+                for (unsigned b = 0; b < 6; b++)
+                {
+                    (*palette)[index++] = (sail_rgb24_t){(uint8_t)(r * 51), (uint8_t)(g * 51), (uint8_t)(b * 51)};
+                }
+            }
+        }
+
+        for (unsigned gray = 1; index < *palette_count; gray++)
+        {
+            const uint8_t value = (uint8_t)(gray * 255 / 25);
+
+            (*palette)[index++] = (sail_rgb24_t){value, value, value};
+        }
 
         return SAIL_OK;
     }
