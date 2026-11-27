@@ -206,10 +206,19 @@ static sail_status_t read_bmp_headers(struct sail_io* io, struct bmp_state* bmp_
         SAIL_TRY(bmp_private_read_v4(io, &bmp_state->v4));
         SAIL_TRY(bmp_private_read_v5(io, &bmp_state->v5));
 
-        if (memcmp(&bmp_state->v4.color_space_type, SAIL_PROFILE_EMBEDDED, sizeof(SAIL_PROFILE_EMBEDDED)) == 0)
+        if (bmp_state->load_options != NULL && (bmp_state->load_options->options & SAIL_OPTION_ICCP) != 0
+            && memcmp(&bmp_state->v4.color_space_type, SAIL_PROFILE_EMBEDDED, sizeof(SAIL_PROFILE_EMBEDDED)) == 0)
         {
-            SAIL_TRY(bmp_private_fetch_iccp(io, (long)(offset_of_bitmap_header + bmp_state->v5.profile_data),
-                                            bmp_state->v5.profile_size, &bmp_state->iccp));
+            const uint64_t profile_offset = (uint64_t)offset_of_bitmap_header + bmp_state->v5.profile_data;
+
+            if (profile_offset > LONG_MAX)
+            {
+                SAIL_LOG_ERROR("BMP: ICC profile offset %llu is too large to seek to",
+                               (unsigned long long)profile_offset);
+                SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+            }
+
+            SAIL_TRY(bmp_private_fetch_iccp(io, (long)profile_offset, bmp_state->v5.profile_size, &bmp_state->iccp));
         }
 
         break;
@@ -478,6 +487,13 @@ sail_status_t bmp_private_read_seek_next_frame(void* state, struct sail_io* io, 
             *palette_ptr++ = bmp_state->palette[i].component2;
             *palette_ptr++ = bmp_state->palette[i].component1;
         }
+    }
+
+    /* ICC profile. */
+    if (bmp_state->iccp != NULL)
+    {
+        SAIL_TRY_OR_CLEANUP(sail_copy_iccp(bmp_state->iccp, &image_local->iccp),
+                            /* cleanup */ sail_destroy_image(image_local));
     }
 
     /* Resolution. */

@@ -161,6 +161,36 @@ sail_status_t bmp_private_fetch_iccp(struct sail_io* io,
                                      uint32_t profile_size,
                                      struct sail_iccp** iccp)
 {
+    if (profile_size == 0)
+    {
+        SAIL_LOG_ERROR("BMP: ICC profile size is zero");
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    /* The profile size comes from the file, so make sure the profile actually fits into the stream. */
+    size_t stream_size;
+    SAIL_TRY(io->size(io->stream, &stream_size));
+
+    if ((size_t)offset_of_data > stream_size || profile_size > stream_size - (size_t)offset_of_data)
+    {
+        SAIL_LOG_ERROR("BMP: ICC profile of %u bytes at offset %ld doesn't fit into the stream of %lu bytes",
+                       profile_size, offset_of_data, (unsigned long)stream_size);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+
+    /* Reading the profile moves the stream, so remember where the caller stopped. */
+    size_t saved_offset;
+    SAIL_TRY(io->tell(io->stream, &saved_offset));
+
+/* Seeking takes a long, which is too narrow for the whole offset range on some platforms. */
+#if LONG_MAX < SIZE_MAX
+    if (saved_offset > LONG_MAX)
+    {
+        SAIL_LOG_ERROR("BMP: Offset %lu is too large to seek to", (unsigned long)saved_offset);
+        SAIL_LOG_AND_RETURN(SAIL_ERROR_INVALID_IMAGE);
+    }
+#endif
+
     SAIL_TRY(io->seek(io->stream, offset_of_data, SEEK_SET));
 
     void* profile_data;
@@ -171,6 +201,8 @@ sail_status_t bmp_private_fetch_iccp(struct sail_io* io,
 
     SAIL_TRY_OR_CLEANUP(sail_alloc_iccp_from_shallow_data(profile_data, profile_size, iccp),
                         /* cleanup */ sail_free(profile_data));
+
+    SAIL_TRY(io->seek(io->stream, (long)saved_offset, SEEK_SET));
 
     return SAIL_OK;
 }
