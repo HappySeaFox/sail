@@ -289,6 +289,26 @@ sail_status_t gif_private_build_color_map(const struct sail_palette* palette,
     return SAIL_OK;
 }
 
+bool gif_private_color_maps_equal(const ColorMapObject* left, const ColorMapObject* right)
+{
+    if (left == NULL || right == NULL || left->ColorCount != right->ColorCount || left->Colors == NULL
+        || right->Colors == NULL)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < left->ColorCount; i++)
+    {
+        if (left->Colors[i].Red != right->Colors[i].Red || left->Colors[i].Green != right->Colors[i].Green
+            || left->Colors[i].Blue != right->Colors[i].Blue)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool gif_private_tuning_key_value_callback(const char* key, const struct sail_variant* value, void* user_data)
 {
     struct gif_tuning_state* tuning_state = (struct gif_tuning_state*)user_data;

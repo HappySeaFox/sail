@@ -725,16 +725,48 @@ SAIL_EXPORT sail_status_t sail_codec_save_seek_next_frame_v8_gif(void* state, co
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
 
+    /*
+     * The screen color table comes from the first frame. A later frame with another
+     * palette needs its own local color table, otherwise its indexes are painted
+     * with the first palette. An identical palette keeps using the global table.
+     */
+    ColorMapObject* local_color_map = NULL;
+
+    if (gif_state->frames_written > 0)
+    {
+        int unused_transparency = -1;
+        SAIL_TRY(gif_private_build_color_map(image->palette, &local_color_map, &unused_transparency));
+
+        if (gif_private_color_maps_equal(local_color_map, gif_state->color_map))
+        {
+            GifFreeMapObject(local_color_map);
+            local_color_map = NULL;
+        }
+    }
+
+    /*
+     * giflib stores the previous local color table on GifFile->Image.ColorMap.
+     * Passing NULL for the next image drops that pointer without freeing it.
+     */
+    if (local_color_map == NULL && gif_state->gif->Image.ColorMap != NULL)
+    {
+        GifFreeMapObject(gif_state->gif->Image.ColorMap);
+        gif_state->gif->Image.ColorMap = NULL;
+    }
+
     /* Write image descriptor. */
     if (EGifPutImageDesc(gif_state->gif, 0,                  /* left */
                          0,                                  /* top */
                          image->width, image->height, false, /* interlace */
-                         NULL)
+                         local_color_map)
         == GIF_ERROR)
     {
+        GifFreeMapObject(local_color_map);
         SAIL_LOG_ERROR("GIF: %s", GifErrorString(gif_state->gif->Error));
         SAIL_LOG_AND_RETURN(SAIL_ERROR_UNDERLYING_CODEC);
     }
+
+    GifFreeMapObject(local_color_map);
 
     gif_state->frames_written++;
 
