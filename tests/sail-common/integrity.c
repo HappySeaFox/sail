@@ -156,6 +156,10 @@ static MunitResult test_pixel_format_to_string(const MunitParameter params[], vo
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_CIE_LAB), "BPP24-CIE-LAB");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP40_CIE_LAB), "BPP40-CIE-LAB");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP48_CIE_LAB), "BPP48-CIE-LAB");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_ICC_LAB), "BPP24-ICC-LAB");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP48_ICC_LAB), "BPP48-ICC-LAB");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP24_ITU_LAB), "BPP24-ITU-LAB");
+    munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP36_ITU_LAB), "BPP36-ITU-LAB");
 
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP32_CIE_LABA), "BPP32-CIE-LABA");
     munit_assert_string_equal(sail_pixel_format_to_string(SAIL_PIXEL_FORMAT_BPP64_CIE_LABA), "BPP64-CIE-LABA");
@@ -295,6 +299,10 @@ static MunitResult test_pixel_format_from_string(const MunitParameter params[], 
     munit_assert(sail_pixel_format_from_string("BPP24-CIE-LAB") == SAIL_PIXEL_FORMAT_BPP24_CIE_LAB);
     munit_assert(sail_pixel_format_from_string("BPP40-CIE-LAB") == SAIL_PIXEL_FORMAT_BPP40_CIE_LAB);
     munit_assert(sail_pixel_format_from_string("BPP48-CIE-LAB") == SAIL_PIXEL_FORMAT_BPP48_CIE_LAB);
+    munit_assert(sail_pixel_format_from_string("BPP24-ICC-LAB") == SAIL_PIXEL_FORMAT_BPP24_ICC_LAB);
+    munit_assert(sail_pixel_format_from_string("BPP48-ICC-LAB") == SAIL_PIXEL_FORMAT_BPP48_ICC_LAB);
+    munit_assert(sail_pixel_format_from_string("BPP24-ITU-LAB") == SAIL_PIXEL_FORMAT_BPP24_ITU_LAB);
+    munit_assert(sail_pixel_format_from_string("BPP36-ITU-LAB") == SAIL_PIXEL_FORMAT_BPP36_ITU_LAB);
 
     munit_assert(sail_pixel_format_from_string("BPP32-CIE-LABA") == SAIL_PIXEL_FORMAT_BPP32_CIE_LABA);
     munit_assert(sail_pixel_format_from_string("BPP64-CIE-LABA") == SAIL_PIXEL_FORMAT_BPP64_CIE_LABA);

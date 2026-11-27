@@ -233,6 +233,18 @@ static MunitResult test_cie_lab(const MunitParameter params[], void* user_data)
     munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP48_CIE_LAB) == 60);
     munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP48_CIE_LAB) == 66);
 
+    /* ICC Lab uses the same channel widths as CIE Lab. */
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_ICC_LAB) == 30);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP24_ICC_LAB) == 33);
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP48_ICC_LAB) == 60);
+    munit_assert(sail_bytes_per_line(11, SAIL_PIXEL_FORMAT_BPP48_ICC_LAB) == 66);
+
+    /* ITU Lab. 12 bits per channel packs to a whole byte at the end of the row. */
+    munit_assert(sail_bytes_per_line(10, SAIL_PIXEL_FORMAT_BPP24_ITU_LAB) == 30);
+    munit_assert(sail_bytes_per_line(1, SAIL_PIXEL_FORMAT_BPP36_ITU_LAB) == 5);
+    munit_assert(sail_bytes_per_line(2, SAIL_PIXEL_FORMAT_BPP36_ITU_LAB) == 9);
+    munit_assert(sail_bytes_per_line(3, SAIL_PIXEL_FORMAT_BPP36_ITU_LAB) == 14);
+
     return MUNIT_OK;
 }
 

@@ -206,6 +206,11 @@ enum SailPixelFormat
     SAIL_PIXEL_FORMAT_BPP128_RGBA_UINT,           /* 32-bit unsigned int RGBA */
 
     SAIL_PIXEL_FORMAT_BPP48_CIE_LAB, /* 16/16/16 (e.g. PSD 16-bit Lab) */
+
+    SAIL_PIXEL_FORMAT_BPP24_ICC_LAB, /* 8/8/8 ICC Lab. a and b store the CIE value plus 128. */
+    SAIL_PIXEL_FORMAT_BPP48_ICC_LAB, /* 16/16/16 ICC v2 Lab. */
+    SAIL_PIXEL_FORMAT_BPP24_ITU_LAB, /* 8/8/8 ITU T.42 Lab. */
+    SAIL_PIXEL_FORMAT_BPP36_ITU_LAB, /* 12/12/12 ITU T.42 Lab. Samples stay packed in the row. */
 };
 
 /* Chroma subsampling. See https://en.wikipedia.org/wiki/Chroma_subsampling */

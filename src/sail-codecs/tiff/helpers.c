@@ -539,6 +539,40 @@ sail_status_t tiff_private_sail_pixel_format_from_tiff(TIFF* tiff, enum SailPixe
         }
         break;
     }
+    case PHOTOMETRIC_ICCLAB:
+    {
+        /* ICC v2 Lab. The byte scale differs from CIELab, so it keeps its own pixel formats. */
+        if (samples_per_pixel == 3)
+        {
+            switch (bits_per_sample)
+            {
+            case 8:
+                *result = SAIL_PIXEL_FORMAT_BPP24_ICC_LAB;
+                return SAIL_OK;
+            case 16:
+                *result = SAIL_PIXEL_FORMAT_BPP48_ICC_LAB;
+                return SAIL_OK;
+            }
+        }
+        break;
+    }
+    case PHOTOMETRIC_ITULAB:
+    {
+        /* ITU T.42 Lab. 8 and 12 bits per channel are the depths that recommendation defines. */
+        if (samples_per_pixel == 3)
+        {
+            switch (bits_per_sample)
+            {
+            case 8:
+                *result = SAIL_PIXEL_FORMAT_BPP24_ITU_LAB;
+                return SAIL_OK;
+            case 12:
+                *result = SAIL_PIXEL_FORMAT_BPP36_ITU_LAB;
+                return SAIL_OK;
+            }
+        }
+        break;
+    }
     }
 
     /* Unknown or unsupported combination. */
@@ -757,6 +791,34 @@ sail_status_t tiff_private_sail_pixel_format_to_tiff(enum SailPixelFormat pixel_
     {
         *photometric       = PHOTOMETRIC_CIELAB;
         *bits_per_sample   = 16;
+        *samples_per_pixel = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP24_ICC_LAB:
+    {
+        *photometric       = PHOTOMETRIC_ICCLAB;
+        *bits_per_sample   = 8;
+        *samples_per_pixel = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP48_ICC_LAB:
+    {
+        *photometric       = PHOTOMETRIC_ICCLAB;
+        *bits_per_sample   = 16;
+        *samples_per_pixel = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP24_ITU_LAB:
+    {
+        *photometric       = PHOTOMETRIC_ITULAB;
+        *bits_per_sample   = 8;
+        *samples_per_pixel = 3;
+        break;
+    }
+    case SAIL_PIXEL_FORMAT_BPP36_ITU_LAB:
+    {
+        *photometric       = PHOTOMETRIC_ITULAB;
+        *bits_per_sample   = 12;
         *samples_per_pixel = 3;
         break;
     }
